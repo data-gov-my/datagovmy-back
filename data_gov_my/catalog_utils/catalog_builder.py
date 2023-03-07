@@ -27,7 +27,7 @@ def catalog_update(operation, op_method):
     meta_files = opr_data["files"]
 
     META_DIR = os.path.join(
-        os.getcwd(), "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/"
+        os.getcwd(), "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/"
     )
 
     if operation == "REBUILD":
@@ -42,7 +42,7 @@ def catalog_update(operation, op_method):
         try:
             FILE_META = os.path.join(
                 os.getcwd(),
-                "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/" + meta,
+                "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/catalog/" + meta,
             )
 
             if pathlib.Path(meta).suffix == ".json":
@@ -176,13 +176,13 @@ def catalog_update(operation, op_method):
 
 def catalog_operation(operation, op_method):
     try:
-        dir_name = "AKSARA_SRC"
+        dir_name = "DATAGOVMY_SRC"
         zip_name = "repo.zip"
         git_url = os.getenv("GITHUB_URL", "-")
-        git_token = os.getenv("GITHUB_TOKEN", "-")
+        # git_token = os.getenv("GITHUB_TOKEN", "-")
 
         cron_utils.create_directory(dir_name)
-        res = cron_utils.fetch_from_git(zip_name, git_url, git_token)
+        res = cron_utils.fetch_from_git(zip_name, git_url)
 
         if "resp_code" in res and res["resp_code"] == 200:
             triggers.send_telegram(

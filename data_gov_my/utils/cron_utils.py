@@ -38,10 +38,10 @@ Fetches entire content from a git repo
 """
 
 
-def fetch_from_git(zip_name, git_url, git_token):
+def fetch_from_git(zip_name, git_url):
     file_name = os.path.join(os.getcwd(), zip_name)
     headers = {
-        "Authorization": f"token {git_token}",
+        # "Authorization": f"token {git_token}",
         "Accept": "application/vnd.github.v3.raw",
     }
 
@@ -85,15 +85,15 @@ such as update or rebuild
 
 
 def data_operation(operation, op_method):
-    dir_name = "AKSARA_SRC"
+    dir_name = "DATAGOVMY_SRC"
     zip_name = "repo.zip"
     git_url = os.getenv("GITHUB_URL", "-")
-    git_token = os.getenv("GITHUB_TOKEN", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
 
     triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
 
     create_directory(dir_name)
-    res = fetch_from_git(zip_name, git_url, git_token)
+    res = fetch_from_git(zip_name, git_url)
     if "resp_code" in res and res["resp_code"] == 200:
         write_as_binary(res["file_name"], res["data"])
         extract_zip(res["file_name"], dir_name)
@@ -105,10 +105,10 @@ def data_operation(operation, op_method):
 
 def get_latest_info_git(type, commit_id):
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")
-    url = "https://api.github.com/repos/dosm-malaysia/aksara-data/commits/" + sha_ext
+    url = "https://api.github.com/repos/data-gov-my/datagovmy-meta/commits/" + sha_ext
     headers_accept = "application/vnd.github.VERSION.sha"
 
-    git_token = os.getenv("GITHUB_TOKEN", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
 
     if type == "COMMIT":
         url = url.replace(sha_ext, "")
@@ -116,7 +116,7 @@ def get_latest_info_git(type, commit_id):
         headers_accept = "application/vnd.github+json"
 
     res = requests.get(
-        url, headers={"Authorization": f"token {git_token}", "Accept": headers_accept}
+        url, headers={"Accept": headers_accept}
     )
 
     if res.status_code == 200:
@@ -128,18 +128,18 @@ def get_latest_info_git(type, commit_id):
 def selective_update():
     # Delete all file src
     # os.remove("repo.zip")
-    # shutil.rmtree("AKSARA_SRC/")
+    # shutil.rmtree("DATAGOVMY_SRC/")
     remove_src_folders()
 
-    dir_name = "AKSARA_SRC"
+    dir_name = "DATAGOVMY_SRC"
     zip_name = "repo.zip"
     git_url = os.getenv("GITHUB_URL", "-")
-    git_token = os.getenv("GITHUB_TOKEN", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
 
     triggers.send_telegram("--- PERFORMING SELECTIVE UPDATE ---")
 
     create_directory(dir_name)
-    res = fetch_from_git(zip_name, git_url, git_token)
+    res = fetch_from_git(zip_name, git_url)
     if "resp_code" in res and res["resp_code"] == 200:
         write_as_binary(res["file_name"], res["data"])
         extract_zip(res["file_name"], dir_name)
@@ -218,7 +218,7 @@ def filter_changed_files(file_list):
     changed_files = {"dashboards": [], "catalog": []}
 
     for f in file_list:
-        f_path = "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
+        f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
         f_info = f.split("/")
         if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path):
             changed_files[f_info[0]].append(f_info[1])
@@ -233,13 +233,13 @@ Remove deleted files
 
 def remove_deleted_files():
     for k, v in common.REFRESH_VARIABLES.items():
-        model_name = apps.get_model("aksara", k)
+        model_name = apps.get_model("data_gov_my", k)
         distinct_db = [
             m[v["column_name"]]
             for m in model_name.objects.values(v["column_name"]).distinct()
         ]
         DIR = os.path.join(
-            os.getcwd(), "AKSARA_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"]
+            os.getcwd(), "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"]
         )
         distinct_dir = [
             f.replace(".json", "") for f in listdir(DIR) if isfile(join(DIR, f))
@@ -281,9 +281,11 @@ def revalidate_frontend(dashboard):
     headers = {"Authorization": fe_auth}
     body = {"route": endpoint}
 
-    response = requests.post(url, headers=headers, data=body)
+    # Comment out temporarily
+    # response = requests.post(url, headers=headers, data=body)
 
-    return response.status_code
+    # return response.status_code
+    return 200
 
 
 """
@@ -314,7 +316,7 @@ REMOVE SRC FOLDERS
 
 
 def remove_src_folders():
-    if os.path.exists("AKSARA_SRC") and os.path.isdir("AKSARA_SRC"):
-        shutil.rmtree("AKSARA_SRC")
+    if os.path.exists("DATAGOVMY_SRC") and os.path.isdir("DATAGOVMY_SRC"):
+        shutil.rmtree("DATAGOVMY_SRC")
     if os.path.exists("repo.zip"):
         os.remove("repo.zip")
