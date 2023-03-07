@@ -53,7 +53,7 @@ class Command(BaseCommand):
         ]:
             # Delete all file src
             # os.remove("repo.zip")
-            # shutil.rmtree("AKSARA_SRC/")
+            # shutil.rmtree("DATAGOVMY_SRC/")
             cron_utils.remove_src_folders()
             if category == "DATA_CATALOG":
                 catalog_builder.catalog_operation(command, "MANUAL")
