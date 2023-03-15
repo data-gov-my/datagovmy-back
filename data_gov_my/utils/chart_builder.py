@@ -569,6 +569,8 @@ def metrics_table(file_name: str, variables: MetricsTableVariables):
 
     res = {}
     for group in u_groups_list:
+        group = group[0] if len(group) == 1 else group
+
         result = {}
         start = (
             df.groupby(keys)[cols]
