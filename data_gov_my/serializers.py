@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MetaJson, DashboardJson, CatalogJson
+from .models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName
 
 class MetaSerializer(serializers.ModelSerializer) :
     class Meta : 

@@ -27,16 +27,16 @@ Formats a telegram message
 
 
 def format_multi_line(arr, header):
-    str = header + "\n\n"
+    h_str = header + "\n\n"
 
     for obj in arr:
         cur_str = ""
         for k, v in obj.items():
-            cur_str += k + " : " + v + "\n"
+            cur_str += str(k) + " : " + str(v) + "\n"
         cur_str += "\n\n"
-        str += cur_str
+        h_str += cur_str
 
-    return str
+    return h_str
 
 
 def format_status_message(arr, header):

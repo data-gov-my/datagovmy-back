@@ -43,11 +43,11 @@ def rebuild_dashboard_meta(operation, op_method):
     failed_builds = []
 
     for meta in meta_files:
+        dbd_name = meta.replace(".json", "")
         try:
             f_meta = META_DIR + meta
             f = open(f_meta)
             data = json.load(f)
-            dbd_name = meta.replace(".json", "")
 
             updated_values = {"dashboard_meta": data}
             obj, created = MetaJson.objects.update_or_create(
