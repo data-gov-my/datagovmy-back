@@ -569,12 +569,11 @@ def metrics_table(file_name: str, variables: MetricsTableVariables):
 
     res = {}
     for group in u_groups_list:
-        group = group[0] if len(group) == 1 else group
-
+        group_key = group[0] if len(group) == 1 else group
         result = {}
         start = (
             df.groupby(keys)[cols]
-            .get_group(group)
+            .get_group(group_key)
             .rename(columns=attr)
             .to_dict("records")
         )
