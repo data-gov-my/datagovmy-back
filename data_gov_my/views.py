@@ -21,6 +21,7 @@ from django.contrib.postgres.search import SearchHeadline
 from data_gov_my.utils import cron_utils, triggers
 from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName
 from data_gov_my.api_handling import handle, cache_search
+from data_gov_my.explorers import class_list as exp_class
 
 from threading import Thread
 
@@ -206,58 +207,13 @@ class DATA_CATALOG(APIView):
 
 class EXPLORER(APIView) :
     def get(self, request, format=None):
-        s = self.request.GET.get('name')
-        type = self.request.GET.get('type')
-        dashboard = self.request.GET.get('explorer')
+        params = dict(request.GET)
+        if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
+            print('entered')
+            obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
+            return obj.handle_api(params)
 
-        if (s is None or type is None or dashboard is None) or (type.lower() != 'first' and type.lower() != 'last') or dashboard != 'name_dashboard':
-            return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
-
-        type = type.lower()
-        
-        model_type = {'first' : 'NameDashboard_FirstName', 'last' : 'NameDashboard_LastName'}
-        model_name = model_type[ type ]
-        model_choice = apps.get_model('data_gov_my', model_name)   
-        res = model_choice.objects.all().filter(name=s).values()
-
-        fin = {}    
-        if len(res) > 0 :
-            res = res[0] 
-            fin['name'] = res['name']
-            fin['total'] = res['total']
-            res.pop('name')
-            res.pop('total')
-            fin['decade'] = [d.replace("d_", "") for d in list(res.keys())] 
-            fin['count'] = list(res.values())
-        
-        return JsonResponse(fin, safe=False)
-
-
-
-    def post(self, request, format=None) :
-        cols = {}
-        for i in range(1920, 2020, 10) :
-            cols[ f"{ str(i) }s" ] = f"d_{ str(i) }"
-
-        bulk_insert('NameDashboard_LastName', batch_size=10000, rename_columns=cols)        
-        return JsonResponse({}, safe=False)
-
-
-"""
-Performs a bulk insert, for large datasets
-"""
-
-def bulk_insert(file, model_name, batch_size=10000, rename_columns={}) :
-    df = pd.read_parquet(file)
-    if rename_columns : 
-        df.rename(columns = rename_columns, inplace = True)
-    groups = df.groupby(np.arange(len(df))//batch_size)        
-    
-    model_choice = apps.get_model("data_gov_my", model_name)
-    for k,v in groups :
-        model_rows = [ model_choice(**i) for i in v.to_dict('records') ]
-        model_choice.objects.bulk_create(model_rows)
-
+        return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
 
 """
 Checks which filters have been applied for the data-catalog
