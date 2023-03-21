@@ -96,3 +96,9 @@ class General_Explorer :
             if i not in request_params :
                 return False
         return True
+
+    '''
+    Converts a string into a boolean
+    '''
+    def str2bool(self, b):
+        return b.lower() in ("yes", "true", "t", "1")    

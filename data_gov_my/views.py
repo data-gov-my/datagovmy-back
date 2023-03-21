@@ -209,7 +209,6 @@ class EXPLORER(APIView) :
     def get(self, request, format=None):
         params = dict(request.GET)
         if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
-            print('entered')
             obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
             return obj.handle_api(params)
 
