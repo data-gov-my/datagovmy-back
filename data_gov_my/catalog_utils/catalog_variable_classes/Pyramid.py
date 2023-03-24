@@ -94,6 +94,8 @@ class Pyramid(GeneralChartsUtil):
             tbl_res["tbl_columns"] = {
                 "x_en": self.translations["x_en"],
                 "x_bm": self.translations["x_bm"],
+                "date_en" : "Date",
+                "date_bm" : "Tarikh"                
             }
 
             for y_lang in ["en", "bm"]:
@@ -129,6 +131,8 @@ class Pyramid(GeneralChartsUtil):
                 group_l = [group[0]] if len(group) == 1 else list(group)
                 group = group[0] if len(group) == 1 else group
                 x_list = df.groupby(self.p_keys)[self.p_x].get_group(group).to_list()
+                date_list = None if 'date' not in df.columns else df.groupby(self.b_keys)['date'].get_group(group).to_list()
+
                 y1_list = [
                     x * -1
                     for x in df.groupby(self.p_keys)[self.p_y[0]]
@@ -146,7 +150,7 @@ class Pyramid(GeneralChartsUtil):
                     .to_dict("records")
                 )
 
-                chart_data = {"x": x_list, "y1": y1_list, "y2": y2_list}
+                chart_data = {"date" : date_list, "x": x_list, "y1": y1_list, "y2": y2_list}
                 self.set_dict(result, group_l, chart_data)
                 self.set_dict(tbl, group_l, table_vals)
                 merge(res, result)
