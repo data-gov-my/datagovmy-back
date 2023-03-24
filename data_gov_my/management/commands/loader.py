@@ -35,73 +35,40 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **kwargs):
-        if kwargs['operation'][0] == "POPULATE" :
-            dataset = kwargs['operation'][1]
+        category = kwargs["operation"][0]
+        operation = kwargs["operation"][1]
+        command = operation
 
-            choice = {
-                'FIRST_NAME' : {
-                    "file" : "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/name_popularity_first.parquet",
-                    "model" : "NameDashboard_FirstName"
-                },
-                'LAST_NAME' : {
-                    "file" : "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/name_popularity_last.parquet",
-                    "model" : "NameDashboard_LastName"
-                },                
-            }
+        if len(kwargs["operation"]) > 2:
+            files = kwargs["operation"][2]
+            command = operation + " " + files
 
-            batch_size = 10000
-            rename_columns = {}
-            for i in range(1920, 2020, 10) :
-                rename_columns[ f"{ str(i) }s" ] = f"d_{ str(i) }"            
-            
-            start_time = time.time()
-            df = pd.read_parquet(choice[dataset]['file'])
-            if rename_columns : 
-                df.rename(columns = rename_columns, inplace = True)
-            groups = df.groupby(np.arange(len(df))//batch_size)        
-            
-            model_choice = apps.get_model("data_gov_my", choice[dataset]['model'])
-            for k,v in groups :
-                model_rows = [ model_choice(**i) for i in v.to_dict('records') ]
-                model_choice.objects.bulk_create(model_rows)            
-            print(time.time() - start_time)
-        
-        else :
+        """
+        CATEGORIES :
+        1. DATA_CATALOG
+        2. DASHBOARD
 
-            category = kwargs["operation"][0]
-            operation = kwargs["operation"][1]
-            command = operation
+        OPERATIONS :
+        1. UPDATE
+            - Updates the db, by updating values of pre-existing records
 
-            if len(kwargs["operation"]) > 2:
-                files = kwargs["operation"][2]
-                command = operation + " " + files
+        2. REBUILD
+            - Rebuilds the db, by clearing existing values, and inputting new ones
 
-            """
-            CATEGORIES :
-            1. DATA_CATALOG
-            2. DASHBOARD
+        SAMPLE COMMAND :
+        - python manage.py loader DATA_CATALOG REBUILD
+        - python manage.py loader DASHBOARDS UPDATE meta_1,meta_2
+        """
 
-            OPERATIONS :
-            1. UPDATE
-                - Updates the db, by updating values of pre-existing records
-
-            2. REBUILD
-                - Rebuilds the db, by clearing existing values, and inputting new ones
-
-            SAMPLE COMMAND :
-            - python manage.py loader DATA_CATALOG REBUILD
-            - python manage.py loader DASHBOARDS UPDATE meta_1,meta_2
-            """
-
-            if category in ["DATA_CATALOG", "DASHBOARDS"] and operation in [
-                "UPDATE",
-                "REBUILD",
-            ]:
-                # Delete all file src
-                # os.remove("repo.zip")
-                # shutil.rmtree("DATAGOVMY_SRC/")
-                cron_utils.remove_src_folders()
-                if category == "DATA_CATALOG":
-                    catalog_builder.catalog_operation(command, "MANUAL")
-                else:
-                    cron_utils.data_operation(command, "MANUAL")
+        if category in ["DATA_CATALOG", "DASHBOARDS"] and operation in [
+            "UPDATE",
+            "REBUILD",
+        ]:
+            # Delete all file src
+            # os.remove("repo.zip")
+            # shutil.rmtree("DATAGOVMY_SRC/")
+            cron_utils.remove_src_folders()
+            if category == "DATA_CATALOG":
+                catalog_builder.catalog_operation(command, "MANUAL")
+            else:
+                cron_utils.data_operation(command, "MANUAL")
