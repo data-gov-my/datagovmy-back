@@ -97,6 +97,8 @@ class Bar(GeneralChartsUtil):
             table_res["tbl_columns"] = {
                 "x_en": self.translations["x_en"],
                 "x_bm": self.translations["x_bm"],
+                "date_en" : "Date",
+                "date_bm" : "Tarikh"
             }
 
             for y_lang in ["en", "bm"]:
@@ -127,9 +129,10 @@ class Bar(GeneralChartsUtil):
             group_l = [group[0]] if len(group) == 1 else list(group)
             group = group[0] if len(group) == 1 else group
             x_list = df.groupby(self.b_keys)[self.b_x].get_group(group).to_list()
+            date_list = None if 'date' not in df.columns else df.groupby(self.b_keys)['date'].get_group(group).to_list()
 
             rename_columns = {self.b_x: "x"}
-            chart_vals = {"x": x_list}
+            chart_vals = {"date" : date_list, "x": x_list}
             count = 1
             for y in self.b_y:
                 y_list = df.groupby(self.b_keys)[y].get_group(group).to_list()
@@ -138,8 +141,6 @@ class Bar(GeneralChartsUtil):
                 chart_vals[y_val] = y_list
                 count += 1
 
-            # y_list = df.groupby(self.b_keys)[self.b_y].get_group(group).to_list()
-
             table_vals = (
                 df.rename(columns=rename_columns)
                 .groupby(self.b_keys)[list(rename_columns.values())]
@@ -147,7 +148,6 @@ class Bar(GeneralChartsUtil):
                 .to_dict("records")
             )
 
-            # final_d = {"x": x_list, "y": y_list}
             final_d = chart_vals
             self.set_dict(result, group_l, final_d)
             self.set_dict(tbl, group_l, table_vals)

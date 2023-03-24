@@ -73,14 +73,21 @@ class NAME_POPULARITY(General_Explorer) :
                 i.pop('name')
                 i.pop('total')
                 
-                if compare :               
+                if compare :
                     temp['max'] = [key.replace('d_', '') for m in [max(i.values())] for key,val in i.items() if val == m][-1]
-                    temp['min'] = [key.replace('d_', '') for m in [min(i.values())] for key,val in i.items() if val == m][-1]
+                    temp['min'] = [key.replace('d_', '') for m in [min(i.values())] for key,val in i.items() if val == m][-1] 
+                    
                     fin.append(temp)
+                    s.remove(temp['name'])
                 else : 
                     temp['decade'] = [d.replace("d_", "") for d in list(i.keys())]
                     temp['count'] = list(i.values())
                     fin = temp # Convert back into Dictionary
                     break
-        
+            
+        if len(s) > 0 and compare:
+            for name in s :
+                fin.append({"name" : name, "total" : 0, "max" : "-", "min" : "-"})
+
+
         return JsonResponse(fin, safe=False, status=200)
