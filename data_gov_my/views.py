@@ -295,8 +295,9 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type == "CHOROPLETH":
         defaults_api = {}
 
-        for d in data["API"]["filters"]:
-            defaults_api[d["key"]] = d["default"]["value"]
+        if 'filters' in data['API'] : 
+            for d in data["API"]["filters"]:
+                defaults_api[d["key"]] = d["default"]["value"]
 
         intro = data["chart_details"]["intro"]
         tbl_cols = data["chart_details"]["chart"]["TABLE"]["columns"]
