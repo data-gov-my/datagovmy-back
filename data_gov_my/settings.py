@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import environ
 from urllib.parse import urlparse
+import platform
 
 env = environ.Env()
 environ.Env.read_env()
@@ -81,12 +82,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'data_gov_my.wsgi.application'
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": "/var/tmp/django_cache",
+# Cache
+# https://docs.djangoproject.com/en/4.1/topics/cache/#filesystem-caching
+
+if platform.system() == 'Windows':
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "c:/var/tmp/django_cache",
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/django_cache",
+        }
+    }
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
