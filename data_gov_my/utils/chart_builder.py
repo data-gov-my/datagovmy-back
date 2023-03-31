@@ -173,6 +173,14 @@ def custom_chart(file_name: str, variables: CustomChartVariables):
 
     keys = variables["keys"]
 
+    for i in keys : 
+        if df[i].dtype == "object" :
+            df[i] = df[i].astype(str)
+
+    for i in variables["columns"] : 
+        if df[i].dtype == "object" :
+            df[i] = df[i].astype(str)
+
     df["data"] = df[variables["columns"]].to_dict(orient="records")
 
     res = {}
@@ -298,6 +306,10 @@ def snapshot_chart(file_name: str, variables: SnapshotChartVariables):
     for k, v in data.items():
         if replace_word != "":
             changed_cols = {x: x.replace(k, replace_word) for x in v}
+        for i in v :
+            if df[i].dtype == "object" :
+                df[i] = df[i].astype(str)
+
         df[k] = df[v].rename(columns=changed_cols).apply(lambda s: s.to_dict(), axis=1)
 
     res_dict = df[record_list].to_dict(orient="records")
