@@ -24,7 +24,21 @@ def dates_in_year(year: int):
     return dates
 
 
-def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int):
+def dates_in_month():
+    """
+    Return a list of dates (epoch milliseconds) for every 
+    first day of every month within a year starting from epoch millisecond 0.
+    """
+    start = datetime(1971, 1, 1)  # 1971 is an arbitrary year
+    dates = []
+    for month in range(1, 13):
+        first_day_in_month = datetime(1971, month, 1)
+        epoch_ms = int((first_day_in_month - start).total_seconds() * 1000)
+        dates.append(epoch_ms)
+    return dates
+
+
+def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int, groupByDay=True):
     """
     Aggregate different dates by day across years between [start, end]
     """
@@ -32,16 +46,21 @@ def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int):
     hasLeap = any(calendar.isleap(y) for y in range(start, end + 1))
     start, end = datetime(year=start, month=1, day=1), datetime(
         year=end, month=12, day=31)
-    count = [0]*(365 + hasLeap)
+    count = [0]*(365 + hasLeap) if groupByDay else [0]*12
 
     for i, e in enumerate(epochs):
         date = FIST_VALID_DATE + timedelta(milliseconds=e)
         if start <= date <= end:
             pos = date.timetuple().tm_yday + (hasLeap and not calendar.isleap(date.year)
-                                              and date.timetuple().tm_yday > 59)  # 59 = 1 March
+                                              and date.timetuple().tm_yday > 59) if groupByDay else date.month  # 59 = 1 March
             count[pos - 1] += births[i]
 
-    return {"x": dates_in_year(1972) if hasLeap else dates_in_year(1970), "y": count}
+    if groupByDay:
+        valid_dates = dates_in_year(1972) if hasLeap else dates_in_year(1970)
+    else:
+        valid_dates = dates_in_month()
+
+    return {"x": valid_dates, "y": count}
 
 
 def dashboard_additional_handling(params, res):
@@ -58,11 +77,12 @@ def dashboard_additional_handling(params, res):
             return res
         return res
     if dashboard == "birthday_popularity":
-        if {"start", "end"} <= params.keys():
+        if {"start", "end", "groupByDay"} <= params.keys():
             res = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
                                 births=res["timeseries"]["data"]["births"],
                                 start=int(params["start"][0]),
-                                end=int(params["end"][0]))
+                                end=int(params["end"][0]),
+                                groupByDay=params["groupByDay"][0] == "true")
         return res
 
     else:  # Default if no additions to make
