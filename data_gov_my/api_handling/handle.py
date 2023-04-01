@@ -1,7 +1,7 @@
 import calendar
 from typing import List
 from data_gov_my.models import MetaJson, DashboardJson, CatalogJson
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 '''
 Build methods for any post-handling / additional info,
 not covered by Meta Json
@@ -77,13 +77,32 @@ def dashboard_additional_handling(params, res):
             return res
         return res
     if dashboard == "birthday_popularity":
-        if {"start", "end", "groupByDay"} <= params.keys():
-            res = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
+        if {"start", "end", "groupByDay"} <= params.keys():                
+            newRes = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
                                 births=res["timeseries"]["data"]["births"],
                                 start=int(params["start"][0]),
                                 end=int(params["end"][0]),
                                 groupByDay=params["groupByDay"][0] == "true")
-        return res
+            if {"birthday", "state"} <= params.keys():
+                input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d")
+                first_date = datetime.strptime(res["rank_table"]["data"][0]["data"]["date"], "%Y-%m-%d")
+                last_date = datetime.strptime(res["rank_table"]["data"][-1]["data"]["date"], "%Y-%m-%d")
 
+                daysBetween = (input_birthday - first_date).days
+                STATE_INTERVAL = (last_date - first_date).days + 1
+                # pinpoint where the date
+                rank_table_info = res["rank_table"]["data"][daysBetween]
+                while daysBetween < len(res["rank_table"]["data"]):
+                    rank_table_info = res["rank_table"]["data"][daysBetween]
+                    if rank_table_info["state"] == params["state"][0]:
+                        newRes["rank"] = rank_table_info["data"]["rank"]
+                        newRes["year_rare"] = rank_table_info["data"]["year_rare"]
+                        newRes["year_popular"] = rank_table_info["data"]["year_popular"]
+                        return newRes
+                    else:
+                        daysBetween += STATE_INTERVAL
+            return newRes
+        else:
+            return res["timeseries"]
     else:  # Default if no additions to make
         return res
