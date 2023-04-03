@@ -38,9 +38,10 @@ def dates_in_month():
     return dates
 
 
-def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int, groupByDay=True):
+def aggregate_sum(epochs: List[int], births: List[int], ranks: List[int], start:int, end:int, birthday: datetime, groupByDay=True):
     """
     Aggregate different dates by day across years between [start, end]
+    Also returns the correct rank based on the input birthday and ranks list
     """
     FIST_VALID_DATE = datetime(1970, 1, 1)
     hasLeap = any(calendar.isleap(y) for y in range(start, end + 1))
@@ -48,8 +49,11 @@ def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int, grou
         year=end, month=12, day=31)
     count = [0]*(365 + hasLeap) if groupByDay else [0]*12
 
+    rank = None
     for i, e in enumerate(epochs):
         date = FIST_VALID_DATE + timedelta(milliseconds=e)
+        if date == birthday:
+            rank =  ranks[i]
         if start <= date <= end:
             pos = date.timetuple().tm_yday + (hasLeap and not calendar.isleap(date.year)
                                               and date.timetuple().tm_yday > 59) if groupByDay else date.month  # 59 = 1 March
@@ -60,7 +64,7 @@ def aggregate_sum(epochs: List[int], births: List[int], start=int, end=int, grou
     else:
         valid_dates = dates_in_month()
 
-    return {"x": valid_dates, "y": count}
+    return {"x": valid_dates, "y": count, "rank": rank}
 
 
 def dashboard_additional_handling(params, res):
@@ -77,30 +81,17 @@ def dashboard_additional_handling(params, res):
             return res
         return res
     if dashboard == "birthday_popularity":
-        if {"start", "end", "groupByDay"} <= params.keys():                
+        if {"start", "end", "groupByDay", "state", "birthday"} <= params.keys():                
+            input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d")
             newRes = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
                                 births=res["timeseries"]["data"]["births"],
+                                ranks=res["timeseries"]["data"]["rank"],
                                 start=int(params["start"][0]),
                                 end=int(params["end"][0]),
+                                birthday=input_birthday,
                                 groupByDay=params["groupByDay"][0] == "true")
-            if {"birthday", "state"} <= params.keys():
-                input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d")
-                first_date = datetime.strptime(res["rank_table"]["data"][0]["data"]["date"], "%Y-%m-%d")
-                last_date = datetime.strptime(res["rank_table"]["data"][-1]["data"]["date"], "%Y-%m-%d")
-
-                daysBetween = (input_birthday - first_date).days
-                STATE_INTERVAL = (last_date - first_date).days + 1
-                # pinpoint where the date
-                rank_table_info = res["rank_table"]["data"][daysBetween]
-                while daysBetween < len(res["rank_table"]["data"]):
-                    rank_table_info = res["rank_table"]["data"][daysBetween]
-                    if rank_table_info["state"] == params["state"][0]:
-                        newRes["rank"] = rank_table_info["data"]["rank"]
-                        newRes["year_rare"] = rank_table_info["data"]["year_rare"]
-                        newRes["year_popular"] = rank_table_info["data"]["year_popular"]
-                        return newRes
-                    else:
-                        daysBetween += STATE_INTERVAL
+            # find out most and least popular birthday based on the state and birthday year
+            newRes["popularity"] = res["rank_table"]["data"][params["state"][0]][params["birthday"][0].split("-")[0]]
             return newRes
         else:
             return res["timeseries"]
