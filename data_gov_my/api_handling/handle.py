@@ -64,7 +64,7 @@ def aggregate_sum(epochs: List[int], births: List[int], ranks: List[int], start:
     else:
         valid_dates = dates_in_month()
 
-    return {"x": valid_dates, "y": count, "rank": rank}
+    return {"x": valid_dates, "y": count, "rank": rank } if rank else {"x": valid_dates, "y": count}
 
 
 def dashboard_additional_handling(params, res):
@@ -81,8 +81,8 @@ def dashboard_additional_handling(params, res):
             return res
         return res
     if dashboard == "birthday_popularity":
-        if {"start", "end", "groupByDay", "state", "birthday"} <= params.keys():                
-            input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d")
+        if {"start", "end", "groupByDay", "state"} <= params.keys():
+            input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d") if "birthday" in params.keys() else None
             newRes = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
                                 births=res["timeseries"]["data"]["births"],
                                 ranks=res["timeseries"]["data"]["rank"],
@@ -90,8 +90,9 @@ def dashboard_additional_handling(params, res):
                                 end=int(params["end"][0]),
                                 birthday=input_birthday,
                                 groupByDay=params["groupByDay"][0] == "true")
-            # find out most and least popular birthday based on the state and birthday year
-            newRes["popularity"] = res["rank_table"]["data"][params["state"][0]][params["birthday"][0].split("-")[0]]
+            if "birthday" in params.keys():
+                # find out most and least popular birthday based on the state and birthday year
+                newRes["popularity"] = res["rank_table"]["data"][params["state"][0]][params["birthday"][0].split("-")[0]]
             return newRes
         else:
             return res["timeseries"]
