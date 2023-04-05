@@ -22,6 +22,7 @@ from data_gov_my.utils import cron_utils, triggers
 from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName
 from data_gov_my.api_handling import handle, cache_search
 from data_gov_my.explorers import class_list as exp_class
+from data_gov_my.catalog_utils.catalog_variable_classes import CatalogueDataHandler as cdh
 
 from threading import Thread
 
@@ -325,31 +326,9 @@ def data_variable_chart_handler(data, chart_type, param_list):
         intro = data["chart_details"]["intro"]
         return {"intro": intro}
     elif chart_type == "BAR" or chart_type == "HBAR":
-        defaults_api = {}
-
-        for d in data["API"]["filters"]:
-            defaults_api[d["key"]] = d["default"]["value"]
-
-        intro = data["chart_details"]["intro"]  # Get intro
-        tbl_data = data["chart_details"]["chart"]["table_data"]  # Get tbl data
-        tbl_header = data["chart_details"]["chart"]["table_data"]["tbl_columns"]
-        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
-
-        for k, v in defaults_api.items():
-            key = param_list[k][0] if k in param_list else v
-            if key in tbl_data and key in chart:
-                tbl_data = tbl_data[key]
-                chart = chart[key]
-            else:
-                tbl_data = {}
-                chart = {}
-                break
-
-        tbl = {"columns": tbl_header, "data": tbl_data}
-
-        res = {"chart_data": chart, "table_data": tbl, "intro": intro}
-
-        return res
+        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
+        return c_handler.get_results()
+    
     elif chart_type == "HEATMAP":
         defaults_api = {}
 
@@ -413,7 +392,7 @@ def data_variable_handler(param_list):
 
     chart_type = info["API"]["chart_type"]
 
-    info["chart_details"] = data_variable_chart_handler(info, chart_type, param_list)
+    info = data_variable_chart_handler(info, chart_type, param_list)
 
     if len(info) == 0:
         return {}
