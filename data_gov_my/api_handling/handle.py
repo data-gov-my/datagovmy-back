@@ -43,7 +43,11 @@ def aggregate_sum(epochs: List[int], births: List[int], ranks: List[int], start:
     Aggregate different dates by day across years between [start, end]
     Also returns the correct rank based on the input birthday and ranks list
     """
-    FIST_VALID_DATE = datetime(1970, 1, 1)
+    if not start:
+        start = (datetime.utcfromtimestamp(0) + timedelta(milliseconds=epochs[0])).year
+    if not end:
+        end = (datetime.utcfromtimestamp(0) + timedelta(milliseconds=epochs[-1])).year
+
     hasLeap = any(calendar.isleap(y) for y in range(start, end + 1))
     start, end = datetime(year=start, month=1, day=1), datetime(
         year=end, month=12, day=31)
@@ -51,9 +55,10 @@ def aggregate_sum(epochs: List[int], births: List[int], ranks: List[int], start:
 
     rank = None
     for i, e in enumerate(epochs):
-        date = FIST_VALID_DATE + timedelta(milliseconds=e)
+        date = datetime.utcfromtimestamp(0) + timedelta(milliseconds=e)
         if date == birthday:
             rank =  ranks[i]
+            state_total = births[i]
         if start <= date <= end:
             pos = date.timetuple().tm_yday + (hasLeap and not calendar.isleap(date.year)
                                               and date.timetuple().tm_yday > 59) if groupByDay else date.month  # 59 = 1 March
@@ -64,7 +69,7 @@ def aggregate_sum(epochs: List[int], births: List[int], ranks: List[int], start:
     else:
         valid_dates = dates_in_month()
 
-    return {"x": valid_dates, "y": count, "rank": rank } if rank else {"x": valid_dates, "y": count}
+    return {"x": valid_dates, "y": count, "rank": rank, "state_total": state_total} if rank and state_total else {"x": valid_dates, "y": count}
 
 
 def dashboard_additional_handling(params, res):
@@ -81,20 +86,24 @@ def dashboard_additional_handling(params, res):
             return res
         return res
     if dashboard == "birthday_popularity":
-        if {"start", "end", "groupByDay", "state"} <= params.keys():
-            input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d") if "birthday" in params.keys() else None
-            newRes = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
-                                births=res["timeseries"]["data"]["births"],
-                                ranks=res["timeseries"]["data"]["rank"],
-                                start=int(params["start"][0]),
-                                end=int(params["end"][0]),
-                                birthday=input_birthday,
-                                groupByDay=params["groupByDay"][0] == "true")
-            if "birthday" in params.keys():
-                # find out most and least popular birthday based on the state and birthday year
-                newRes["popularity"] = res["rank_table"]["data"][params["state"][0]][params["birthday"][0].split("-")[0]]
-            return newRes
-        else:
-            return res["timeseries"]
+        start = int(params["start"][0]) if "start" in params else None
+        end = int(params["end"][0]) if "end" in params else None
+        groupByDay = params["groupByDay"][0] == "true" if "groupByDay" in params else True
+        state = params["state"][0]
+        input_birthday = datetime.strptime(params["birthday"][0], "%Y-%m-%d") if "birthday" in params.keys() else None
+
+        newRes = aggregate_sum(epochs=res["timeseries"]["data"]["x"],
+                            births=res["timeseries"]["data"]["births"],
+                            ranks=res["timeseries"]["data"]["rank"],
+                            start=start,
+                            end=end,
+                            birthday=input_birthday,
+                            groupByDay=groupByDay)
+        
+        if "birthday" in params:
+            # find out most and least popular birthday based on the state and birthday year
+            newRes["popularity"] = res["rank_table"]["data"][state][params["birthday"][0].split("-")[0]]
+        return newRes
+    
     else:  # Default if no additions to make
         return res
