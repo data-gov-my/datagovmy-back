@@ -31,7 +31,6 @@ class Bar(GeneralChartsUtil):
         full_meta,
         file_data,
         meta_data,
-        variable_data,
         all_variable_data,
         file_src,
     ):
@@ -159,7 +158,7 @@ class Bar(GeneralChartsUtil):
         return overall
 
     """
-    Builds the API info for timeseries
+    Builds the API info for Bar
     """
 
     def build_api_info(self):

@@ -286,7 +286,7 @@ def snapshot_chart(file_name: str, variables: SnapshotChartVariables):
     df = pd.read_parquet(file_name)
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
-    df = df.replace({np.nan: variables["null_vals"]})
+    df = df.replace({np.nan: None})
 
     main_key = variables["main_key"]
     replace_word = variables["replace_word"]

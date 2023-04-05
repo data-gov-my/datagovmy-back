@@ -3,11 +3,13 @@ from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from data_gov_my.catalog_utils import general_helper as gh
+from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Timeseries as tm
 from data_gov_my.catalog_utils.catalog_variable_classes import Choropleth as ch
 from data_gov_my.catalog_utils.catalog_variable_classes import Table as tb
 from data_gov_my.catalog_utils.catalog_variable_classes import Geojson as gj
 from data_gov_my.catalog_utils.catalog_variable_classes import Bar as bar
+from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Heatmap as hm
 from data_gov_my.catalog_utils.catalog_variable_classes import Pyramid as py
 
@@ -19,6 +21,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import pathlib
+import json
 
 
 def catalog_update(operation, op_method):
@@ -48,112 +51,42 @@ def catalog_update(operation, op_method):
             if pathlib.Path(meta).suffix == ".json":
                 data = gh.read_json(FILE_META)
                 file_data = data["file"]
-                all_variable_data = data["file"]["variables"]
-                catalog_data = data["catalog_data"]
+                all_variable_data = data["file"]["variables"] # TODO : change variable name
                 full_meta = data
                 file_src = meta.replace(".json", "")
 
                 failed_builds = []
                 all_builds = []
 
-                for cur_data in catalog_data:
+                for cur_data in all_variable_data:
                     try:
-                        chart_type = cur_data["chart"]["chart_type"]
-                        obj = []
-                        variable_data = {}
-                        # variable_data = all_variable_data[ cur_data['id'] - 1 ]
+                        
+                        if 'catalog_data' in cur_data : # Checks if the catalog_data is in
+                            cur_catalog_data = cur_data["catalog_data"]
+                            chart_type = cur_catalog_data["chart"]["chart_type"]
+                            
+                            # Enum based approach
+                            # if chart_type in ["TABLE", "GEOJSON", "PYRAMID"]:
+                            #     if var["id"] == 0:
+                            #         variable_data = var
+                            #         break
 
-                        for var in all_variable_data:
-                            if chart_type in ["TABLE", "GEOJSON", "PYRAMID"]:
-                                if var["id"] == 0:
-                                    variable_data = var
-                                    break
-                            else:
-                                if cur_data["id"] == var["id"]:
-                                    variable_data = var
-                                    break
+                            if chart_type == 'HBAR' or chart_type == 'BAR' : 
+                                obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
 
-                        if chart_type == "TIMESERIES":
-                            obj = tm.Timeseries(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "CHOROPLETH":
-                            obj = ch.Choropleth(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "TABLE":
-                            obj = tb.Table(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "GEOJSON":
-                            obj = gj.Geojson(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "HBAR" or chart_type == "BAR":
-                            obj = bar.Bar(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "HEATMAP":
-                            obj = hm.Heatmap(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
-                        elif chart_type == "PYRAMID":
-                            obj = py.Pyramid(
-                                full_meta,
-                                file_data,
-                                cur_data,
-                                variable_data,
-                                all_variable_data,
-                                file_src,
-                            )
+                            unique_id = obj.unique_id
+                            db_input = remove_circular_refs(obj.db_input)
 
-                        db_input = obj.db_input
-                        unique_id = obj.unique_id
+                            db_obj, created = CatalogJson.objects.update_or_create( id=unique_id, defaults=db_input)
 
-                        db_obj, created = CatalogJson.objects.update_or_create(
-                            id=unique_id, defaults=db_input
-                        )
-
-                        cache.set(unique_id, db_input["catalog_data"])
-                        all_builds.append(
-                            {"status": "✅", "variable": variable_data["name"]}
-                        )
+                            cache.set(unique_id, db_input["catalog_data"])
+                            all_builds.append({"status": "✅", "variable": cur_data["name"]})
                     except Exception as e:
                         all_builds.append(
-                            {"status": "❌", "variable": variable_data["name"]}
+                            {"status": "❌", "variable": cur_data["name"]}
                         )
                         err_obj = {
-                            "variable name": variable_data["name"],
+                            "variable name": cur_data["name"],
                             "exception": str(e),
                         }
                         failed_builds.append(err_obj)
@@ -173,6 +106,32 @@ def catalog_update(operation, op_method):
         except Exception as e:
             triggers.send_telegram(str(e))
 
+'''
+Removes any existing circular references
+'''
+def remove_circular_refs(ob, _seen=None):
+    if _seen is None:
+        _seen = set()
+    if id(ob) in _seen:
+        # circular reference, remove it.
+        return None
+    _seen.add(id(ob))
+    res = ob
+    if isinstance(ob, dict):
+        res = {
+            remove_circular_refs(k, _seen): remove_circular_refs(v, _seen)
+            for k, v in ob.items()
+        }
+    elif isinstance(ob, (list, tuple, set, frozenset)):
+        res = type(ob)(remove_circular_refs(v, _seen) for v in ob)
+    # remove id again; only *nested* references count
+    _seen.remove(id(ob))
+    return res
+
+
+'''
+Catalog operation to fetch new data
+'''
 
 def catalog_operation(operation, op_method):
     try:
