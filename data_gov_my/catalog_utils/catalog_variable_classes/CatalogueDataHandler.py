@@ -29,14 +29,11 @@ class CatalogueDataHandler() :
 
         defaults_api = {} # Creates a default API
 
-        has_date = self.chart_has_date(self._data["API"])
-
-        if has_date : 
-            defaults_api["date_range"] = has_date
-            self._data["API"].pop("has_date")
-
         for d in self._data["API"]["filters"]: # Gets all the default API values
-            defaults_api[d["key"]] = d["default"]["value"]
+            if d["key"] == "date_slider" : 
+                defaults_api[d["key"]] = d["default"]
+            else : 
+                defaults_api[d["key"]] = d["default"]["value"]
 
         for k, v in defaults_api.items():
             key = self._params[k][0] if k in self._params else v
@@ -91,6 +88,14 @@ class CatalogueDataHandler() :
 
         temp = self._data["explanation"][lang]
         self._data["explanation"] = temp
+
+        for j in ["in_dataset", "out_dataset"] :
+            for i in self._data["metadata"][j] :
+                desc = i[f"desc_{lang}"]
+                title = i[f"title_{lang}"]
+                i["desc"] = desc
+                i["title"] = title
+                [ i.pop(k) for k in ["desc_en", "desc_bm", "title_en", "title_bm"]]
 
     '''
     Extract languages from intro key

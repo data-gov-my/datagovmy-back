@@ -75,7 +75,7 @@ def catalog_update(operation, op_method):
                                 obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
 
                             unique_id = obj.unique_id
-                            db_input = remove_circular_refs(obj.db_input)
+                            db_input = obj.db_input
 
                             db_obj, created = CatalogJson.objects.update_or_create( id=unique_id, defaults=db_input)
 
@@ -105,29 +105,6 @@ def catalog_update(operation, op_method):
 
         except Exception as e:
             triggers.send_telegram(str(e))
-
-'''
-Removes any existing circular references
-'''
-def remove_circular_refs(ob, _seen=None):
-    if _seen is None:
-        _seen = set()
-    if id(ob) in _seen:
-        # circular reference, remove it.
-        return None
-    _seen.add(id(ob))
-    res = ob
-    if isinstance(ob, dict):
-        res = {
-            remove_circular_refs(k, _seen): remove_circular_refs(v, _seen)
-            for k, v in ob.items()
-        }
-    elif isinstance(ob, (list, tuple, set, frozenset)):
-        res = type(ob)(remove_circular_refs(v, _seen) for v in ob)
-    # remove id again; only *nested* references count
-    _seen.remove(id(ob))
-    return res
-
 
 '''
 Catalog operation to fetch new data

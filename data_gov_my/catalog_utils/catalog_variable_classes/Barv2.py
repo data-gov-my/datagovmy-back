@@ -64,6 +64,7 @@ class Bar(GeneralChartsUtil):
 
         return result
 
+
     """
     Builds chart data with 0 nested keys
     """
@@ -123,11 +124,6 @@ class Bar(GeneralChartsUtil):
 
         chart_res = {}
         table_res = {}
-        date_list = None
-
-        if has_date : 
-            date_list = df['date'].unique().tolist()
-            self.api['has_date'] = date_list[0]
 
         table_columns = self.set_table_columns(has_date)
 
@@ -145,7 +141,7 @@ class Bar(GeneralChartsUtil):
             x_list = df.groupby(self.b_keys)[self.b_x].get_group(group).to_list()
 
             rename_columns = {self.b_x: "x"} # Dict to rename columns for table
-            chart_vals = {"date" : date_list, "x": x_list} # Extracted chart values
+            chart_vals = {"x": x_list} # Extracted chart values
 
             # Gets y-values for chart
             for index, y in enumerate(self.b_y):
@@ -220,6 +216,10 @@ class Bar(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         api_filters_inc = []
 
+        if 'date' in df.columns :
+            slider_obj = self.build_date_slider(df)
+            api_filters_inc.append(slider_obj)
+
         if self.api_filter:
             for api in self.api_filter:
                 fe_vals = df[api].unique().tolist()
@@ -240,6 +240,18 @@ class Bar(GeneralChartsUtil):
         res["API"]["chart_type"] = self.chart["chart_type"]
 
         return res["API"]
+
+    def build_date_slider(self, df) :
+        df["date"] = df["date"].astype(str)
+        options_list = df["date"].unique().tolist()
+        
+        obj = {}
+        obj['key'] = "date_slider"
+        obj["default"] = options_list[0]
+        obj["options"] = options_list 
+        obj["interval"] = self.data_frequency
+
+        return obj        
 
     """
     Returns the appropriate y-values
