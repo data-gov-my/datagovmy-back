@@ -16,6 +16,7 @@ class GeneralChartsUtil:
     # Additional API data
     precision = 1
     translations = {}
+    data_frequency = ''
 
     # Identifiers
     unique_id = ""
@@ -47,6 +48,7 @@ class GeneralChartsUtil:
         self.cur_data = cur_data
         self.cur_catalog_data = cur_data['catalog_data']
         self.catalog_filters = self.cur_catalog_data['catalog_filters']
+        self.data_frequency = self.catalog_filters["frequency"]
         self.metadata_neutral = self.cur_catalog_data['metadata_neutral']
         self.metadata_lang = self.cur_catalog_data['metadata_lang']
         self.chart = self.cur_catalog_data['chart']
