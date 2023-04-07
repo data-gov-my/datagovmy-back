@@ -16,10 +16,16 @@ class CatalogueDataHandler() :
 
     
     def get_results(self) :
-        if self._chart_type == 'BAR' or self._chart_type == 'HBAR' :
-            return self.bar_handler()
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES'] :
+            return self.array_value_handler()
 
-    def bar_handler(self) :
+
+    '''
+    This handler supports of type : 
+    1. Bar : BAR, HBAR, STACKED_BAR
+    2. Timeseries : TIMESERIES, AREA, STACKED_AREA
+    '''
+    def array_value_handler(self) :
         lang = self.default_param_value('lang', 'en', self._params)
 
         intro = self._data["chart_details"]["intro"]  # Get intro
