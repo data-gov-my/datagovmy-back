@@ -164,7 +164,7 @@ Builds Custom Chart
 
 def custom_chart(file_name: str, variables: CustomChartVariables):
     df = pd.read_parquet(file_name)
-    df = df.replace({np.nan: variables["null_vals"]})
+    df = df.replace({np.nan: None})
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
 
@@ -172,14 +172,6 @@ def custom_chart(file_name: str, variables: CustomChartVariables):
         df["district"] = df["district"].apply(lambda x: x.lower().replace(" ", "-"))
 
     keys = variables["keys"]
-
-    for i in keys : 
-        if df[i].dtype == "object" :
-            df[i] = df[i].astype(str)
-
-    for i in variables["columns"] : 
-        if df[i].dtype == "object" :
-            df[i] = df[i].astype(str)
 
     df["data"] = df[variables["columns"]].to_dict(orient="records")
 
