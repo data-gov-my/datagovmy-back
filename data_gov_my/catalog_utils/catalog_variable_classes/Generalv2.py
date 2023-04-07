@@ -121,11 +121,15 @@ class GeneralChartsUtil:
     Builds the variables table for each catalog variable
     """
 
-    def build_variable_table(self, x_arr, y_arr):
+    def build_variable_table(self, dict_data):
         res = []
 
-        for i in range(0, len(x_arr)):
-            data = {"x": x_arr[i], "y": y_arr[i]}
+        key_list = list(dict_data.keys())
+
+        for i in range(0, len(dict_data['x'])) :
+            data = {}
+            for k in key_list : 
+                data[k] = dict_data[k][i]
             res.append(data)
 
         return res

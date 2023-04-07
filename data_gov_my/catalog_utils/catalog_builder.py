@@ -3,16 +3,17 @@ from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
 from data_gov_my.catalog_utils import general_helper as gh
-from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Timeseries as tm
 from data_gov_my.catalog_utils.catalog_variable_classes import Choropleth as ch
 from data_gov_my.catalog_utils.catalog_variable_classes import Table as tb
 from data_gov_my.catalog_utils.catalog_variable_classes import Geojson as gj
 from data_gov_my.catalog_utils.catalog_variable_classes import Bar as bar
-from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Heatmap as hm
 from data_gov_my.catalog_utils.catalog_variable_classes import Pyramid as py
 
+# Version 2 code
+from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
+from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2
+from data_gov_my.catalog_utils.catalog_variable_classes import Timeseriesv2 as timev2 
 
 from data_gov_my.utils import cron_utils, data_utils, triggers
 from data_gov_my.models import CatalogJson
@@ -71,8 +72,10 @@ def catalog_update(operation, op_method):
                             #         variable_data = var
                             #         break
 
-                            if chart_type == 'HBAR' or chart_type == 'BAR' : 
+                            if chart_type in ["HBAR", "BAR", "STACKED_BAR"] : 
                                 obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
+                            if chart_type in ["AREA", "TIMESERIES", "STACKED_AREA"] :
+                                obj = timev2.Timeseries(full_meta, file_data, cur_data, all_variable_data, file_src)
 
                             unique_id = obj.unique_id
                             db_input = obj.db_input
