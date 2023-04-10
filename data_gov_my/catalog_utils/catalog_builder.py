@@ -13,7 +13,8 @@ from data_gov_my.catalog_utils.catalog_variable_classes import Pyramid as py
 # Version 2 code
 from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Timeseriesv2 as timev2 
+from data_gov_my.catalog_utils.catalog_variable_classes import Timeseriesv2 as timev2
+from data_gov_my.catalog_utils.catalog_variable_classes import Pyramidv2 as pyrv2
 
 from data_gov_my.utils import cron_utils, data_utils, triggers
 from data_gov_my.models import CatalogJson
@@ -65,17 +66,13 @@ def catalog_update(operation, op_method):
                         if 'catalog_data' in cur_data : # Checks if the catalog_data is in
                             cur_catalog_data = cur_data["catalog_data"]
                             chart_type = cur_catalog_data["chart"]["chart_type"]
-                            
-                            # Enum based approach
-                            # if chart_type in ["TABLE", "GEOJSON", "PYRAMID"]:
-                            #     if var["id"] == 0:
-                            #         variable_data = var
-                            #         break
 
                             if chart_type in ["HBAR", "BAR", "STACKED_BAR"] : 
                                 obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
                             if chart_type in ["AREA", "TIMESERIES", "STACKED_AREA"] :
                                 obj = timev2.Timeseries(full_meta, file_data, cur_data, all_variable_data, file_src)
+                            if chart_type in ["PYRAMID"] : 
+                                obj = pyrv2.Pyramid(full_meta, file_data, cur_data, all_variable_data, file_src)
 
                             unique_id = obj.unique_id
                             db_input = obj.db_input

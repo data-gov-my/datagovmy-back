@@ -270,32 +270,6 @@ def data_variable_chart_handler(data, chart_type, param_list):
     if chart_type == "TIMESERIES":
         c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
         return c_handler.get_results()
-
-        defaults_api = {}
-
-        for d in data["API"]["filters"]:
-            defaults_api[d["key"]] = d["default"]["value"]
-
-        intro_data = data["chart_details"]["intro"]
-        table_data = data["chart_details"]["chart"]
-        chart_data = data["chart_details"]["chart"]
-
-        for k, v in defaults_api.items():
-            key = param_list[k][0] if k in param_list else v
-            if key in chart_data:
-                chart_data = chart_data[key]
-                if k == "range":
-                    table_vals = table_data["TABLE"]["data"][key]
-                    table_cols = table_data["TABLE"]["columns"]
-                    table_data = {"columns": table_cols, "data": table_vals}
-                else:
-                    table_data = table_data[key]
-            else:
-                chart_data = {}
-                table_data = {}
-                break
-
-        return {"chart_data": chart_data, "table_data": table_data, "intro": intro_data}
     elif chart_type == "CHOROPLETH":
         defaults_api = {}
 
@@ -331,7 +305,6 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type in ["BAR", "HBAR", "STACKED_BAR"] :
         c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
         return c_handler.get_results()
-    
     elif chart_type == "HEATMAP":
         defaults_api = {}
 
@@ -353,30 +326,8 @@ def data_variable_chart_handler(data, chart_type, param_list):
 
         return res
     elif chart_type == "PYRAMID":
-        defaults_api = {}
-
-        for d in data["API"]["filters"]:
-            defaults_api[d["key"]] = d["default"]["value"]
-
-        intro = data["chart_details"]["intro"]  # Get intro
-        tbl_data = data["chart_details"]["chart"]["table_data"]  # Get tbl data
-        tbl_header = data["chart_details"]["chart"]["table_data"]["tbl_columns"]
-        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
-
-        for k, v in defaults_api.items():
-            key = param_list[k][0] if k in param_list else v
-            if key in tbl_data and key in chart:
-                tbl_data = tbl_data[key]
-                chart = chart[key]
-            else:
-                tbl_data = {}
-                chart = {}
-                break
-
-        tbl = {"columns": tbl_header, "data": tbl_data}
-        res = {"chart_data": chart, "table_data": tbl, "intro": intro}
-
-        return res
+        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
+        return c_handler.get_results()
 
 
 """
