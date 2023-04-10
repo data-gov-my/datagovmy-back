@@ -16,7 +16,7 @@ class CatalogueDataHandler() :
 
     
     def get_results(self) :
-        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES'] :
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID'] :
             return self.array_value_handler()
 
 
@@ -96,12 +96,13 @@ class CatalogueDataHandler() :
         self._data["explanation"] = temp
 
         for j in ["in_dataset", "out_dataset"] :
-            for i in self._data["metadata"][j] :
-                desc = i[f"desc_{lang}"]
-                title = i[f"title_{lang}"]
-                i["desc"] = desc
-                i["title"] = title
-                [ i.pop(k) for k in ["desc_en", "desc_bm", "title_en", "title_bm"]]
+            if j in self._data["metadata"] : 
+                for i in self._data["metadata"][j] :
+                    desc = i[f"desc_{lang}"]
+                    title = i[f"title_{lang}"]
+                    i["desc"] = desc
+                    i["title"] = title
+                    [ i.pop(k) for k in ["desc_en", "desc_bm", "title_en", "title_bm"]]
 
     '''
     Extract languages from intro key
