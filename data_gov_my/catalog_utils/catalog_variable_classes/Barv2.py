@@ -58,7 +58,7 @@ class Bar(GeneralChartsUtil):
             has_date = True
 
         if len(self.b_keys) > 0 : 
-            result = self.build_chart_parents(has_date)
+            result = self.build_chart_parents()
         else : 
             result = self.build_chart_self()
 
@@ -105,7 +105,7 @@ class Bar(GeneralChartsUtil):
     Build the Bar chart
     """
 
-    def build_chart_parents(self, has_date):
+    def build_chart_parents(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
 

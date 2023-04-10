@@ -18,7 +18,40 @@ class CatalogueDataHandler() :
     def get_results(self) :
         if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID'] :
             return self.array_value_handler()
+        elif self._chart_type in ['HEATTABLE'] :
+            return self.table_view_handler()
 
+    def table_view_handler(self) :
+        lang = self.default_param_value('lang', 'en', self._params)
+
+        intro = self._data["chart_details"]["intro"]
+        chart_data = self._data["chart_details"]["chart"] # should put as chart_data(?)
+
+        defaults_api = {}
+
+        for d in self._data["API"]["filters"]: # Gets all the default API values
+            if d["key"] == "date_slider" : 
+                defaults_api[d["key"]] = d["default"]
+            else : 
+                defaults_api[d["key"]] = d["default"]["value"]
+
+        for k, v in defaults_api.items():
+            key = self._params[k][0] if k in self._params else v
+            if key in chart_data :
+                chart_data = chart_data[key]
+            else:
+                chart_data = {}
+                break
+
+        self.extract_lang(lang)
+
+        res = {}
+        res["chart_data"] = chart_data
+        res["intro"] = self.extract_lang_intro(lang, intro)
+
+        self._data["chart_details"] = res
+
+        return self._data
 
     '''
     This handler supports of type : 
@@ -48,7 +81,7 @@ class CatalogueDataHandler() :
                 chart_data = chart_data[key]
             else:
                 tbl_data = {}
-                chart = {}
+                chart_data = {}
                 break
         
         self.extract_lang(lang)
