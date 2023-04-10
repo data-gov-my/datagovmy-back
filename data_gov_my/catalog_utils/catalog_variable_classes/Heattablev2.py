@@ -19,8 +19,6 @@ class Heattable(GeneralChartsUtil):
     # Chart related
     chart_name = {}
     h_keys = []
-    h_index = ""
-    h_cols = []
 
     """
     Initiailize the neccessary data for a bar chart
@@ -34,8 +32,6 @@ class Heattable(GeneralChartsUtil):
         self.api = self.build_api_info()
 
         self.h_keys = self.chart["chart_variables"]["parents"]
-        self.h_index = self.chart["chart_variables"]["format"]["index"]
-        self.h_cols = self.chart["chart_variables"]["format"]["columns"]
 
         self.chart_name = {}
         self.chart_name["en"] = self.cur_data["title_en"]
@@ -49,7 +45,6 @@ class Heattable(GeneralChartsUtil):
     """
     def chartv2(self) :
         result = {}
-        has_date = False
 
         df = pd.read_parquet(self.read_from)
 
