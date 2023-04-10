@@ -216,6 +216,7 @@ class Timeseries(GeneralChartsUtil):
 
                     for index, y in enumerate(self.t_y) :
                         res["chart_data"][range][f"y{index + 1}"] = (new_temp_df.groupby(self.t_keys)[y].get_group(cur_group).replace({np.nan: None}).to_list())
+
                 else:
                     res["chart_data"][range]["x"] = (new_temp_df["interval"].replace({np.nan: None}).to_list())
 
@@ -224,34 +225,18 @@ class Timeseries(GeneralChartsUtil):
 
                 res["table_data"][range] = self.build_variable_table(res["chart_data"][range])
 
-                if "line" in self.t_format:
-                    if self.t_keys:
-                        for index, y in enumerate(self.t_y) :
-                            res["chart_data"][range][f"line{index + 1}"] = (new_temp_df.groupby(self.t_keys)[y].get_group(cur_group).replace({np.nan: None}).to_list())
-                    else:
-                        for index, y in enumerate(self.t_y) : 
-                            res["chart_data"][range][f"line{index + 1}"] = (new_temp_df[y].replace({np.nan: None}).to_list())
-
             else:
                 range_df["date"] = range_df["date"].values.astype(np.int64) // 10**6
 
                 if self.t_keys:
                     res["chart_data"][range]["x"] = (range_df.groupby(self.t_keys)["date"].get_group(cur_group).replace({np.nan: None}).to_list())
-                    
                     for index, y in enumerate(self.t_y) : 
-                        res["chart_data"][range][f"y{index + 1}"] = (range_df.groupby(self.t_keys)[y].get_group(cur_group).replace({np.nan: None}).to_list())
-                        dma_col = (y if self.t_format["line"] == "" else self.t_format["line"][index])
-                        res["chart_data"][range][f"line{index + 1}"] = (range_df.groupby(self.t_keys)[dma_col].get_group(cur_group).rolling(window=7).mean().replace({np.nan: None}).to_list())
-                    
+                        res["chart_data"][range][f"y{index + 1}"] = (range_df.groupby(self.t_keys)[y].get_group(cur_group).replace({np.nan: None}).to_list())                    
                     res["table_data"][range] = self.build_variable_table(res["chart_data"][range])
                 else:
                     res["chart_data"][range]["x"] = range_df["date"].replace({np.nan: None}).to_list()
-
                     for index, y in enumerate(self.t_y) :
-                        res["chart_data"][range][f"y{index + 1}"] = (range_df[y].replace({np.nan: None}).to_list())
-                        dma_col = (y if self.t_format["line"] == "" else self.t_format["line"][index])
-                        res["chart_data"][range][f"line{index + 1}"] = (range_df[dma_col].rolling(window=7).mean().replace({np.nan: None}).to_list())
-                    
+                        res["chart_data"][range][f"y{index + 1}"] = (range_df[y].replace({np.nan: None}).to_list())                    
                     res["table_data"][range] = self.build_variable_table(res["chart_data"][range])
 
 
@@ -391,11 +376,11 @@ class Timeseries(GeneralChartsUtil):
         self.validate_data_type(s, src, self.meta_data["chart"]["chart_variables"])
 
         self.validate_field_presence(
-            ["x", "y", "line"],
+            ["x", "y"],
             src,
             self.meta_data["chart"]["chart_variables"]["format"],
         )
-        s = {"str": ["x", "y", "line"]}
+        s = {"str": ["x", "y"]}
         self.validate_data_type(
             s, src, self.meta_data["chart"]["chart_variables"]["format"]
         )

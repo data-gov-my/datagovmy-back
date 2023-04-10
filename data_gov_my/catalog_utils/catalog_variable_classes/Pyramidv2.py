@@ -69,14 +69,10 @@ class Pyramid(GeneralChartsUtil):
     """
     Populates table columns
     """
-    def set_table_columns(self, has_date) : 
+    def set_table_columns(self) : 
         tbl_res = {}
         tbl_res["en"] = {}
         tbl_res["bm"] = {}
-
-        if has_date :
-            tbl_res["en"]["date"] = "Date"
-            tbl_res["bm"]["date"] = "Tarikh"
 
         if self.translations:
             tbl_res["en"]["x"] = self.translations["x_en"]
@@ -112,7 +108,7 @@ class Pyramid(GeneralChartsUtil):
         tbl_res = {}
 
         tbl_res['data'] = {}
-        tbl_res['columns'] = self.set_table_columns(None)
+        tbl_res['columns'] = self.set_table_columns()
 
         rename_columns = {self.p_x: "x", self.p_y[0]: "y1", self.p_y[1]: "y2"}
         x_list = df[self.p_x].to_list()
@@ -141,7 +137,7 @@ class Pyramid(GeneralChartsUtil):
         tbl_res = {}
 
         tbl_res['data'] = {}
-        tbl_res['columns'] = self.set_table_columns(has_date)
+        tbl_res['columns'] = self.set_table_columns()
 
         rename_columns = {self.p_x: "x", self.p_y[0]: "y1", self.p_y[1]: "y2"}
 

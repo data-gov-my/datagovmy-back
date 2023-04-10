@@ -75,7 +75,7 @@ class Bar(GeneralChartsUtil):
         c_vals = {} # Chart Values
         t_vals = {} # Table Values
 
-        t_columns = self.set_table_columns(False)
+        t_columns = self.set_table_columns()
 
         rename_cols = {}
         rename_cols[self.b_x] = 'x'
@@ -125,7 +125,7 @@ class Bar(GeneralChartsUtil):
         chart_res = {}
         table_res = {}
 
-        table_columns = self.set_table_columns(has_date)
+        table_columns = self.set_table_columns()
 
         for group in u_groups_list:
             result = {}
@@ -175,16 +175,11 @@ class Bar(GeneralChartsUtil):
     """
     Set table columns
     """
-    def set_table_columns(self, has_date) :
+    def set_table_columns(self) :
         res = {}
 
         res["en"] = {}
         res["bm"] = {}
-
-        if has_date : 
-            res['en']['date'] = "Date"
-            res['bm']['date'] = "Tarikh"
-
 
         if self.translations:
             res['en']['x'] = self.translations["x_en"]
