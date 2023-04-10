@@ -206,6 +206,7 @@ class DATA_CATALOG(APIView):
 
         return JsonResponse(res, safe=False)
 
+
 class EXPLORER(APIView) :
     def get(self, request, format=None):
         params = dict(request.GET)
@@ -305,26 +306,9 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type in ["BAR", "HBAR", "STACKED_BAR"] :
         c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
         return c_handler.get_results()
-    elif chart_type == "HEATMAP":
-        defaults_api = {}
-
-        for d in data["API"]["filters"]:
-            defaults_api[d["key"]] = d["default"]["value"]
-
-        intro = data["chart_details"]["intro"]  # Get intro
-        chart = data["chart_details"]["chart"]["chart_data"]  # Get chart data
-
-        for k, v in defaults_api.items():
-            key = param_list[k][0] if k in param_list else v
-            if key in chart:
-                chart = chart[key]
-            else:
-                chart = {}
-                break
-
-        res = {"chart_data": chart, "intro": intro}
-
-        return res
+    elif chart_type == "HEATTABLE":
+        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
+        return c_handler.get_results()
     elif chart_type == "PYRAMID":
         c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
         return c_handler.get_results()
