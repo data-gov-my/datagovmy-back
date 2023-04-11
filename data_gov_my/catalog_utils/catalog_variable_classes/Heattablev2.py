@@ -113,19 +113,21 @@ class Heattable(GeneralChartsUtil):
             for l in ["en", "bm"] :
                 if l in self.data_translation :
                     columns = list(self.data_translation[l].keys())
-                    for c in columns : 
-                        for k, v in self.data_translation[l][c].items() :
-                            col_str = ""
-                            ori_col = ""
-                            if c == "columns" :
-                                ori_col = "x"
-                                col_str = f"x_{l}"
-                            elif c == "index" : 
-                                ori_col = "y"
-                                col_str = f"y_{l}"
+                    for c in columns :
+                        col_str = ""
+                        ori_col = ""
+                        if c == "columns" :
+                            ori_col = "x"
+                            col_str = f"x_{l}"
+                        elif c == "index" : 
+                            ori_col = "y"
+                            col_str = f"y_{l}"
 
-                            group_keys.append(col_str)
-                            df[col_str] = df[ori_col].str.replace(k, v)
+                        df[col_str] = df[ori_col]
+                        group_keys.append(col_str)
+                        print(df)
+                        for k, v in self.data_translation[l][c].items() :
+                            df[col_str] = df[col_str].str.replace(k, v)
 
 
         df["u_groups"] = list(df[self.h_keys].itertuples(index=False, name=None))
