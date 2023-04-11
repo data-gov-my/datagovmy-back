@@ -9,18 +9,32 @@ from mergedeep import merge
 
 class CatalogueDataHandler() :
 
+    table_view_attributes = {
+        "HEATTABLE" : ["x", "y", "z"]
+    }
+
+    
+    """
+    Constructor
+    """
     def __init__(self, chart_type, data, params) :
         self._chart_type = chart_type
         self._data = data
         self._params = params
 
-    
+    """
+    Gets the results depending on which chart type
+    """
     def get_results(self) :
-        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH'] :
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEODATA"] :
             return self.array_value_handler()
         elif self._chart_type in ['HEATTABLE'] :
             return self.table_view_handler()
 
+    """
+    Handles charts with a table view, E.g : 
+    1. Heatmap
+    """
     def table_view_handler(self) :
         lang = self.default_param_value('lang', 'en', self._params)
 
@@ -45,6 +59,7 @@ class CatalogueDataHandler() :
 
         self.extract_lang(lang)
 
+        chart_data = self.extract_lang_table_view(lang, self.table_view_attributes[self._chart_type], chart_data)
         res = {}
         res["chart_data"] = chart_data
         res["intro"] = self.extract_lang_intro(lang, intro)
@@ -98,7 +113,6 @@ class CatalogueDataHandler() :
         self._data["chart_details"] = res
         
         return self._data
-    
 
     '''
     Check if a chart has a date range element
@@ -148,4 +162,14 @@ class CatalogueDataHandler() :
         return intro
 
 
+    def extract_lang_table_view(self, lang, keys, data) :        
+        for d in data : 
+            for k in keys : 
+                if f"{k}_{lang}" in d :
+                    d[k] = d[f"{k}_{lang}"]
+                for l in ["en", "bm"] :
+                    if f"{k}_{l}" in d : 
+                        d.pop(f"{k}_{l}")
+        
+        return data
 

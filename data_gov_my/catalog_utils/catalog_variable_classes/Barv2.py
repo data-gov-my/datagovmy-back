@@ -180,12 +180,12 @@ class Bar(GeneralChartsUtil):
         res["en"] = {}
         res["bm"] = {}
 
-        if self.translations:
-            res['en']['x'] = self.translations["x_en"]
-            res['bm']['x'] = self.translations["x_bm"]
+        if self.table_translation:
+            res['en']['x'] = self.table_translation["en"]["x"]
+            res['bm']['x'] = self.table_translation["bm"]["x"]
 
             for y_lang in ["en", "bm"] :
-                y_list = self.translations[f"y_{y_lang}"]
+                y_list = self.table_translation[y_lang]["y"]
                 for index, c_y in enumerate(y_list):
                     y_val = f"y{ index + 1}"
                     res[y_lang][y_val] = c_y

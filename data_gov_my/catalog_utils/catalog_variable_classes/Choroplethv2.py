@@ -79,13 +79,13 @@ class Choropleth(GeneralChartsUtil):
         t_columns = self.set_table_columns()
 
         rename_cols = {}
-        rename_cols[self.c_x] = 'labels'
+        rename_cols[self.c_x] = 'x'
 
-        c_vals['labels'] = df[self.c_x].to_list()
+        c_vals['x'] = df[self.c_x].to_list()
 
         y_list = df[self.c_y].to_list()
-        rename_cols[self.c_y] = 'values'
-        c_vals['values'] = y_list
+        rename_cols[self.c_y] = 'y'
+        c_vals['y'] = y_list
         
         t_vals = (
             df.rename(columns=rename_cols)[list(rename_cols.values())]
@@ -139,13 +139,13 @@ class Choropleth(GeneralChartsUtil):
             
             x_list = df.groupby(self.c_keys)[self.c_x].get_group(group).to_list()
 
-            rename_columns = {self.c_x: "labels"} # Dict to rename columns for table
-            chart_vals = {"labels": x_list} # Extracted chart values
+            rename_columns = {self.c_x: "x"} # Dict to rename columns for table
+            chart_vals = {"x": x_list} # Extracted chart values
 
             # Gets y-values for chart            
             y_list = df.groupby(self.c_keys)[self.c_y].get_group(group).to_list()
-            rename_columns[self.c_y] = "values"
-            chart_vals["values"] = y_list
+            rename_columns[self.c_y] = "y"
+            chart_vals["y"] = y_list
 
             # Gets y-values for table
             table_vals = (
@@ -178,12 +178,12 @@ class Choropleth(GeneralChartsUtil):
         res["en"] = {}
         res["bm"] = {}
 
-        if self.translations:
-            res['en']['x'] = self.translations["x_en"]
-            res['en']['y'] = self.translations["y_en"]
+        if self.table_translation:
+            res['en']['x'] = self.table_translation["en"]["x"]
+            res['en']['y'] = self.table_translation["en"]["y"]
 
-            res['bm']['x'] = self.translations["x_bm"]
-            res['bm']['y'] = self.translations["y_bm"]            
+            res['bm']['x'] = self.table_translation["bm"]["x"]
+            res['bm']['y'] = self.table_translation["bm"]["y"]            
         else:
             res["en"]["x"] = self.c_x
             res["en"]["y"] = self.c_y
