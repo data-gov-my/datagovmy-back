@@ -24,5 +24,6 @@ urlpatterns = [
     path("data-catalog/", views.DATA_CATALOG.as_view(), name="DATA_CATALOG"),
     path("update/", views.UPDATE.as_view(), name="UPDATE"),
     path("chart/", views.CHART.as_view(), name="CHART"),
+    path("dropdown/", views.DROPDOWN.as_view(), name="DROPDOWN"),
     path("explorer/", views.EXPLORER.as_view(), name="EXPLORER")
 ]
