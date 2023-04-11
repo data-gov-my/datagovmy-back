@@ -15,7 +15,9 @@ class GeneralChartsUtil:
 
     # Additional API data
     precision = 1
-    translations = {}
+    table_translation = {}
+    data_translation = {}
+    filter_translation = {}
     data_frequency = ''
 
     # Identifiers
@@ -84,7 +86,7 @@ class GeneralChartsUtil:
         
         # Sets precision attribute for API
         self.set_precision()
-        self.get_format_lang()
+        self.get_translations()
 
     """
     Gets a nested dictionary key
@@ -113,9 +115,19 @@ class GeneralChartsUtil:
     """
     Get language format
     """
-    def get_format_lang(self) : 
-        if 'format_lang' in self.chart["chart_variables"] :
-            self.translations = self.chart["chart_variables"]["format_lang"]
+    def get_translations(self) : 
+        mapping = ["table_columns","filters","chart_columns"]
+
+        for k in mapping :
+            if 'translations' in self.cur_catalog_data :
+                if k in self.cur_catalog_data["translations"] :
+                    value = self.cur_catalog_data["translations"][k]
+                    if k == 'table_columns' : 
+                        self.table_translation = value
+                    elif k == 'filters' : 
+                        self.filter_translation = value
+                    elif k == 'chart_columns' : 
+                        self.data_translation = value             
 
     """
     Builds the variables table for each catalog variable

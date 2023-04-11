@@ -68,7 +68,27 @@ class Heattable(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         df = df.rename(columns={'columns': 'x', 'index': 'y', 'values' : 'z'})
-        return df[['x', 'y', 'z']].to_dict(orient="records")
+        
+        group_keys = ['x', 'y', 'z']
+        # Builds the i18n for data
+        # TODO : Refactor, looks bad
+       
+        if self.data_translation : 
+            for l in ["en", "bm"] :
+                if l in self.data_translation :
+                    columns = list(self.data_translation[l].keys())
+                    for c in columns : 
+                        for k, v in self.data_translation[l][c] :
+                            col_str = ""
+                            if k == "columns" : 
+                                col_str = f"x_{l}"
+                            elif k == "index" : 
+                                col_str = f"y_{l}"
+
+                            group_keys.append(col_str)
+                            df[col_str] = df[k].str.replace(k, v)
+
+        return df[group_keys].to_dict(orient="records")
 
 
     
@@ -85,6 +105,28 @@ class Heattable(GeneralChartsUtil):
                 df[key] = df[key].astype(str)            
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
+        group_keys = ["x", "y", "z"]
+
+        # Builds the i18n for data
+        # TODO : Refactor, looks bad
+        if self.data_translation : 
+            for l in ["en", "bm"] :
+                if l in self.data_translation :
+                    columns = list(self.data_translation[l].keys())
+                    for c in columns : 
+                        for k, v in self.data_translation[l][c].items() :
+                            col_str = ""
+                            ori_col = ""
+                            if c == "columns" :
+                                ori_col = "x"
+                                col_str = f"x_{l}"
+                            elif c == "index" : 
+                                ori_col = "y"
+                                col_str = f"y_{l}"
+
+                            group_keys.append(col_str)
+                            df[col_str] = df[ori_col].str.replace(k, v)
+
 
         df["u_groups"] = list(df[self.h_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
@@ -100,7 +142,7 @@ class Heattable(GeneralChartsUtil):
             if len(group) == 1 : 
                 group = group[0]            
             
-            final_d = df.groupby(self.h_keys)[["x", "y", "z"]].get_group(group).to_dict(orient="records")
+            final_d = df.groupby(self.h_keys)[group_keys].get_group(group).to_dict(orient="records")
 
             self.set_dict(result, group_l, final_d)
             merge(res, result)

@@ -74,12 +74,12 @@ class Pyramid(GeneralChartsUtil):
         tbl_res["en"] = {}
         tbl_res["bm"] = {}
 
-        if self.translations:
-            tbl_res["en"]["x"] = self.translations["x_en"]
-            tbl_res["bm"]["x"] = self.translations["x_bm"]
+        if self.table_translation:
+            tbl_res["en"]["x"] = self.table_translation["en"]["x"]
+            tbl_res["bm"]["x"] = self.table_translation["bm"]["x"]
             
             for y_lang in ["en", "bm"]:
-                for index, c_y in enumerate(self.translations[f"y_{y_lang}"]):
+                for index, c_y in enumerate(self.table_translation[y_lang]["y"]):
                     y_val = f"y{ index + 1 }"
                     tbl_res[y_lang][y_val] = c_y
         else:
