@@ -50,7 +50,6 @@ class Heattable(GeneralChartsUtil):
 
         if 'date' in df.columns : 
             self.h_keys.insert(0, 'date')
-            has_date = True
 
         if len(self.h_keys) > 0 : 
             result = self.build_chart_parents()
@@ -66,7 +65,7 @@ class Heattable(GeneralChartsUtil):
     def build_chart_self(self) :
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
-        df = df.rename(columns={'index': 'x', 'columns': 'y', 'values' : 'z'})
+        df = df.rename(columns={'columns': 'x', 'index': 'y', 'values' : 'z'})
         return df[['x', 'y', 'z']].to_dict(orient="records")
 
 
@@ -77,7 +76,7 @@ class Heattable(GeneralChartsUtil):
     def build_chart_parents(self) :
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
-        df = df.rename(columns={'index': 'x', 'columns': 'y', 'values' : 'z'})
+        df = df.rename(columns={'columns': 'x', 'index': 'y', 'values' : 'z'})
 
         for key in self.h_keys:
             if df[key].dtype == "object" :
