@@ -19,6 +19,7 @@ class Heattable(GeneralChartsUtil):
     # Chart related
     chart_name = {}
     h_keys = []
+    h_color = ''
 
     """
     Initiailize the neccessary data for a bar chart
@@ -29,6 +30,7 @@ class Heattable(GeneralChartsUtil):
 
         self.chart_type = self.chart["chart_type"]
         self.api_filter = self.chart["chart_filters"]["SLICE_BY"]
+        self.h_color = self.chart["chart_variables"]["colour"]
         self.api = self.build_api_info()
 
         self.h_keys = self.chart["chart_variables"]["parents"]
@@ -152,6 +154,7 @@ class Heattable(GeneralChartsUtil):
         res["API"] = {}
         res["API"]["filters"] = api_filters_inc
         res["API"]["precision"] = self.precision
+        res["API"]["colour"] = self.h_color
         res["API"]["chart_type"] = self.chart["chart_type"]
 
         return res["API"]

@@ -16,7 +16,7 @@ class CatalogueDataHandler() :
 
     
     def get_results(self) :
-        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID'] :
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH'] :
             return self.array_value_handler()
         elif self._chart_type in ['HEATTABLE'] :
             return self.table_view_handler()

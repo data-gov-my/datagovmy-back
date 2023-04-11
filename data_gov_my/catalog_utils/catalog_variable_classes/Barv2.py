@@ -55,7 +55,6 @@ class Bar(GeneralChartsUtil):
 
         if 'date' in df.columns : 
             self.b_keys.insert(0, 'date')
-            has_date = True
 
         if len(self.b_keys) > 0 : 
             result = self.build_chart_parents()
