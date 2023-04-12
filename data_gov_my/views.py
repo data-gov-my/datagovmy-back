@@ -216,6 +216,22 @@ class EXPLORER(APIView) :
 
         return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
 
+
+class DROPDOWN(APIView):
+    def get(self, request, format=None):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
+        param_list = dict(request.GET)
+        params_req = ["dashboard"]
+
+        if all(p in param_list for p in params_req):
+            res = handle_request(param_list, False)
+            return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({}, safe=False)
+
+
 """
 Checks which filters have been applied for the data-catalog
 """
@@ -319,7 +335,7 @@ Handles request for dashboards
 """
 
 
-def handle_request(param_list):
+def handle_request(param_list, isDashboard=True):
     dbd_name = str(param_list["dashboard"][0])
     dbd_info = cache.get("META_" + dbd_name)
 
@@ -337,7 +353,7 @@ def handle_request(param_list):
         params_req = dbd_info["required_params"]
 
     res = {}
-    if all(p in param_list for p in params_req):
+    if all(p in param_list for p in params_req) or not isDashboard:
         data = dbd_info["charts"]
 
         if len(data) > 0:
@@ -345,6 +361,10 @@ def handle_request(param_list):
                 api_type = v["api_type"]
                 api_params = v["api_params"]
                 cur_chart_data = cache.get(dbd_name + "_" + k)
+
+                # dashboard endpoint should ignore this unless the chart name is query_values
+                if (isDashboard and k == "query_values") or (not isDashboard and k != "query_values"):
+                    continue
 
                 if not cur_chart_data:
                     cur_chart_data = DashboardJson.objects.filter(

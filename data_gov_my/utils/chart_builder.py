@@ -631,3 +631,24 @@ def timeseries_shared(file_name: str, variables):
             merge(res, result)
 
     return res
+
+"""
+Query values chart builder for values to be queried, usually as options for dropdown selection.
+"""
+
+def query_values(file_name: str, variables: QueryValuesVariables):
+    df = pd.read_parquet(file_name)
+    columns = variables["columns"]
+    
+    res = {}
+    for keys, v in df.groupby(columns[:-1])[columns[-1]]:
+        d = res
+        val = list(set(v))
+        for k in keys:
+            if k not in d:
+                d[k] = {}
+            parent = d
+            d = d[k]
+        parent[k] = val
+
+    return res
