@@ -19,24 +19,8 @@ class Geojson(GeneralChartsUtil):
     Initiailize the neccessary data for a table chart
     """
 
-    def __init__(
-        self,
-        full_meta,
-        file_data,
-        meta_data,
-        variable_data,
-        all_variable_data,
-        file_src,
-    ):
-        GeneralChartsUtil.__init__(
-            self,
-            full_meta,
-            file_data,
-            meta_data,
-            variable_data,
-            all_variable_data,
-            file_src,
-        )
+    def __init__(self,full_meta,file_data,meta_data,variable_data,all_variable_data,file_src):
+        GeneralChartsUtil.__init__(self,full_meta,file_data,meta_data,variable_data,all_variable_data,file_src)
 
         # self.validate_meta_json()
 
