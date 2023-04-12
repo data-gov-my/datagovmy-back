@@ -17,6 +17,7 @@ from data_gov_my.catalog_utils.catalog_variable_classes import Timeseriesv2 as t
 from data_gov_my.catalog_utils.catalog_variable_classes import Pyramidv2 as pyrv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Heattablev2 as htblv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Choroplethv2 as chrv2
+from data_gov_my.catalog_utils.catalog_variable_classes import Geopointv2 as gptv2
 
 from data_gov_my.utils import cron_utils, data_utils, triggers
 from data_gov_my.models import CatalogJson
@@ -79,6 +80,8 @@ def catalog_update(operation, op_method):
                                 obj = htblv2.Heattable(full_meta, file_data, cur_data, all_variable_data, file_src)
                             if chart_type in ["CHOROPLETH", "GEOCHOROPLETH", "GEODATA"] :
                                 obj = chrv2.Choropleth(full_meta, file_data, cur_data, all_variable_data, file_src)
+                            if chart_type in ["GEOPOINT"] : 
+                                obj = gptv2.Geopoint(full_meta, file_data, cur_data, all_variable_data, file_src)
 
                             unique_id = obj.unique_id
                             db_input = obj.db_input

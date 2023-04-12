@@ -284,10 +284,7 @@ Handles the data-variable queries, by chart applied
 
 
 def data_variable_chart_handler(data, chart_type, param_list):
-    if chart_type == "TIMESERIES":
-        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
-        return c_handler.get_results()
-    elif chart_type == "CHOROPLETH":
+    if chart_type in ["TIMESERIRES", "CHOROPLETH", "BAR", "HBAR", "STACKED_BAR", "HEATTABLE", "PYRAMID", "GEOPOINT"] :
         c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
         return c_handler.get_results()
     elif chart_type == "TABLE":
@@ -296,15 +293,6 @@ def data_variable_chart_handler(data, chart_type, param_list):
     elif chart_type == "GEOJSON":
         intro = data["chart_details"]["intro"]
         return {"intro": intro}
-    elif chart_type in ["BAR", "HBAR", "STACKED_BAR"] :
-        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
-        return c_handler.get_results()
-    elif chart_type == "HEATTABLE":
-        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
-        return c_handler.get_results()
-    elif chart_type == "PYRAMID":
-        c_handler = cdh.CatalogueDataHandler(chart_type, data, param_list)
-        return c_handler.get_results()
 
 
 """
