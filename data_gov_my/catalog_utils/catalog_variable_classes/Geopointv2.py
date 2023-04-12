@@ -50,9 +50,9 @@ class Geopoint(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
 
         if 'date' in df.columns : 
-            self.c_keys.insert(0, 'date')
+            self.g_keys.insert(0, 'date')
 
-        if len(self.c_keys) > 0 : 
+        if len(self.g_keys) > 0 : 
             result = self.build_chart_parents()
         else : 
             result = self.build_chart_self()
@@ -66,7 +66,7 @@ class Geopoint(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})        
 
-        include = self.g_include
+        include = list(self.g_include)
 
         df["position"] = df[["lat", "lon"]].values.tolist() # Lat, Lon, must be present
         include.append("position") # Add position into the array
@@ -98,10 +98,10 @@ class Geopoint(GeneralChartsUtil):
         df = df.replace({np.nan: None})
         df["position"] = df[["lat", "lon"]].values.tolist() # Lat, Lon, must be present
 
-        chart_include = self.g_include
+        chart_include = list(self.g_include)
         chart_include.append("position")
 
-        table_include = self.g_include
+        table_include = list(self.g_include)
         table_include.append("lat")
         table_include.append("lon")
 
@@ -134,7 +134,6 @@ class Geopoint(GeneralChartsUtil):
             if len(group) == 1 : 
                 group = group[0]
             
-
             chart_vals = df.groupby(self.g_keys)[chart_include].get_group(group).to_dict(orient="records")
             table_vals = df.groupby(self.g_keys)[table_include].get_group(group).to_dict(orient="records")
 
@@ -161,14 +160,15 @@ class Geopoint(GeneralChartsUtil):
         res["en"] = {}
         res["bm"] = {}
 
-        if self.table_translation: # TODO : SET TRANSLATION FOR THOSE NEEDING TRANSLATIONS
-            res['en']['x'] = self.table_translation["en"]["x"]
-            res['en']['y'] = self.table_translation["en"]["y"]
+        if self.table_translation: 
+            
+            for l in ["en", "bm"] :
+                if l in self.table_translation : 
+                    for k, v in self.table_translation[l].items() :
+                        res[l][k] = v
 
-            res['bm']['x'] = self.table_translation["bm"]["x"]
-            res['bm']['y'] = self.table_translation["bm"]["y"]            
         else: # Sets the default
-            include = self.g_include
+            include = list(self.g_include)
             include.append("lat")
             include.append("lon")
             
@@ -211,8 +211,6 @@ class Geopoint(GeneralChartsUtil):
         res["API"]["filters"] = api_filters_inc
         res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.chart["chart_type"]
-        res["API"]["colour"] = self.c_color
-        res["API"]["file_json"] = self.c_file_json
 
         return res["API"]
 
