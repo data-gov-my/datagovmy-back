@@ -19,6 +19,7 @@ from data_gov_my.catalog_utils.catalog_variable_classes import Heattablev2 as ht
 from data_gov_my.catalog_utils.catalog_variable_classes import Choroplethv2 as chrv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Geopointv2 as gptv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Geojsonv2 as geov2
+from data_gov_my.catalog_utils.catalog_variable_classes import Scatterv2 as sctv2
 
 from data_gov_my.utils import cron_utils, data_utils, triggers
 from data_gov_my.models import CatalogJson
@@ -85,6 +86,8 @@ def catalog_update(operation, op_method):
                                 obj = gptv2.Geopoint(full_meta, file_data, cur_data, all_variable_data, file_src)
                             if chart_type in ["GEOJSON"] :
                                 obj = geov2.Geojson(full_meta, file_data, cur_data, all_variable_data, file_src)
+                            if chart_type in ["SCATTER"] : 
+                                obj = sctv2.Scatter(full_meta, file_data, cur_data, all_variable_data, file_src)
 
                             unique_id = obj.unique_id
                             db_input = obj.db_input
