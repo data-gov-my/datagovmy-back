@@ -26,6 +26,7 @@ class CatalogueDataHandler() :
     Gets the results depending on which chart type
     """
     def get_results(self) :
+        # Families with same format
         if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEODATA", "GEOPOINT"] :
             return self.array_value_handler()
         elif self._chart_type in ['HEATTABLE'] :
