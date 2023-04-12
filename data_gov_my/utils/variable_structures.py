@@ -75,3 +75,6 @@ class LatLonVariables(TypedDict):
     keys: List[str]
     values: List[str]
     null_vals: str | int | None
+
+class QueryValuesVariables(TypedDict):
+    columns: List[str] # has specific ordering

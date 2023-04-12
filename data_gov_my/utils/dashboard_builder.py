@@ -40,5 +40,7 @@ def build_chart(chart_type, data):
         return metrics_table(input_file, variables)
     elif chart_type == "timeseries_shared":
         return timeseries_shared(input_file, variables)
+    elif chart_type == "query_values":
+        return query_values(input_file, variables)
     else:
         return {}
