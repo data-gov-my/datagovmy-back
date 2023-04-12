@@ -27,10 +27,28 @@ class CatalogueDataHandler() :
     """
     def get_results(self) :
         # Families with same format
-        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEODATA", "GEOPOINT"] :
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEOPOINT"] :
             return self.array_value_handler()
         elif self._chart_type in ['HEATTABLE'] :
             return self.table_view_handler()
+        elif self._chart_type in ['GEOJSON'] :
+            return self.geo_data_handler()
+        
+    """
+    Handles chart type Geodata
+    """
+    def geo_data_handler(self) :
+        lang = self.default_param_value('lang', 'en', self._params)
+
+        res = {}
+        intro = self._data["chart_details"]["intro"]
+        self.extract_lang(lang)
+
+        res["intro"] = self.extract_lang_intro(lang, intro)
+
+        self._data["chart_details"] = res
+        return self._data
+
 
     """
     Handles charts with a table view, E.g : 
