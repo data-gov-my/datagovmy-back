@@ -137,6 +137,15 @@ Builds Choropleth
 
 
 def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
+    def get_dict(d, keys):
+        for key in keys:
+            d = d[key]
+        return d
+
+    def set_dict(d, keys, value):
+        d = get_dict(d, keys[:-1])
+        d[keys[-1]] = value
+    
     df = pd.read_parquet(file_name)
     
     x = variables["x"]
@@ -171,6 +180,7 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
         result = {}
         for b in group[::-1]:
             result = {b: result}
+        group_l = list(group)
 
         if len(group) == 1:
             group = group[0]
@@ -180,11 +190,13 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
         chart_vals = {"x": x_list, "y": {}}
 
         # gets y-values for chart 
-        for i, y_col in enumerate(y):
+        for y_col in y:
             y_list = df.groupby(keys)[y_col].get_group(group).to_list()
             chart_vals["y"][y_col] = y_list
 
-        res[group] = chart_vals
+        final_d = chart_vals
+        set_dict(result, group_l, final_d)
+        merge(res, result)
         
     return res
 
