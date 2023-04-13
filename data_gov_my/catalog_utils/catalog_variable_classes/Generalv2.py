@@ -179,7 +179,8 @@ class GeneralChartsUtil:
                 v.pop("catalog_data")
                 append_to = "in_dataset"
 
-            res["metadata"][append_to].append(v)
+            if v["id"] != 0 :
+                res["metadata"][append_to].append(v)
 
         return res["metadata"]
 
