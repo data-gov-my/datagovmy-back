@@ -31,8 +31,9 @@ class CustomChartVariables(TypedDict):
 
 
 class ChoroplethChartVariables(TypedDict):
-    cols_list: List[str]
-    area_key: str
+    x: str
+    y: List[str] # alow multiple y columns
+    keys: List[str] # filters
 
 
 class MetricsTableVariables(TypedDict):
