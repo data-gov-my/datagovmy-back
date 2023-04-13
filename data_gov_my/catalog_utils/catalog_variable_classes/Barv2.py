@@ -68,10 +68,11 @@ class Bar(GeneralChartsUtil):
     """
     def build_chart_self(self) :
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})        
 
         if "STACKED" in self.chart_type : 
             df = self.abs_to_perc(df)
+        
+        df = df.replace({np.nan: None}) 
 
         c_vals = {} # Chart Values
         t_vals = {} # Table Values
@@ -108,11 +109,12 @@ class Bar(GeneralChartsUtil):
 
     def build_chart_parents(self):
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})
 
         if "STACKED" in self.chart_type : 
             df = self.abs_to_perc(df)
 
+        df = df.replace({np.nan: None}) 
+        
         # Converts all values to : 
         # - A str if its an object
         # - A str with lowercase, and spaces as hyphen

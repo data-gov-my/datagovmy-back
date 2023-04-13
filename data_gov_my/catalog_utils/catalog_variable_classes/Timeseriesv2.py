@@ -117,7 +117,6 @@ class Timeseries(GeneralChartsUtil):
 
     def build_chart(self):
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})
 
         for key in self.t_keys:
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
@@ -126,6 +125,8 @@ class Timeseries(GeneralChartsUtil):
 
         if "STACKED" in self.chart_type : 
             df = self.abs_to_perc(df)
+
+        df = df.replace({np.nan: None}) 
 
         res = {}
         res['chart_data'] = {}
