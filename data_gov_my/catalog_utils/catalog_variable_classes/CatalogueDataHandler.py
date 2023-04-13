@@ -27,7 +27,7 @@ class CatalogueDataHandler() :
     """
     def get_results(self) :
         # Families with same format
-        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEOPOINT", "SCATTER"] :
+        if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'AREA', 'TIMESERIES', 'STACKED_AREA', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEOPOINT", "SCATTER"] :
             return self.array_value_handler()
         elif self._chart_type in ['HEATTABLE', "TABLE"] :
             return self.table_view_handler()
