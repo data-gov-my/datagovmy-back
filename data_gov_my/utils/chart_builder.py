@@ -138,22 +138,54 @@ Builds Choropleth
 
 def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
     df = pd.read_parquet(file_name)
-
-    cols_list = variables["cols_list"]
-    area_key = variables["area_key"]
+    
+    x = variables["x"]
+    y = variables["y"]
+    keys = variables["keys"] if "keys" in variables else []
+    if 'date' in df.columns:
+        keys.insert(0, 'date')
 
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
-
     df = df.replace({np.nan: None})
+
     res = {}
+    if len(keys) < 1:
+        res["x"] = df[x].tolist()
+        res["y"] = {}
+        for col in y:
+            res["y"][col] = df[col].tolist()
+        return res 
 
-    for col in cols_list:
-        to_extract = [area_key, col]
-        temp_df = df[to_extract].rename(columns={area_key: "id", col: "value"})
-        vals = temp_df.to_dict("records")
-        res[col] = vals
+    # filter by keys 
+    for key in keys:
+        if df[key].dtype == "object":
+            df[key] = df[key].astype(str)
+        df[key] = df[key].apply(lambda x: x.lower().replace(" ", ","))
+    
+    # Gets all unique groups
+    df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
+    u_groups_list = df["u_groups"].unique().tolist()
 
+    for group in u_groups_list:
+        result = {}
+        for b in group[::-1]:
+            result = {b: result}
+
+        if len(group) == 1:
+            group = group[0]
+        
+        x_list = df.groupby(keys)[x].get_group(group).to_list()
+
+        chart_vals = {"x": x_list, "y": {}}
+
+        # gets y-values for chart 
+        for i, y_col in enumerate(y):
+            y_list = df.groupby(keys)[y_col].get_group(group).to_list()
+            chart_vals["y"][y_col] = y_list
+
+        res[group] = chart_vals
+        
     return res
 
 
