@@ -70,6 +70,9 @@ class Timeseries(GeneralChartsUtil):
         self.chart_details["chart"] = self.build_chart()
         self.db_input["catalog_data"] = self.build_catalog_data_info()
 
+    """
+    Get the y-values from meta
+    """
     def get_y_values(self) :
         y_vals = self.chart["chart_variables"]["format"]["y"]
 
@@ -114,12 +117,16 @@ class Timeseries(GeneralChartsUtil):
 
     def build_chart(self):
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})
 
         for key in self.t_keys:
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
         df["date"] = pd.to_datetime(df["date"])
+
+        if "STACKED" in self.chart_type : 
+            df = self.abs_to_perc(df)
+
+        df = df.replace({np.nan: None}) 
 
         res = {}
         res['chart_data'] = {}
@@ -297,6 +304,17 @@ class Timeseries(GeneralChartsUtil):
         res["API"]["chart_type"] = self.chart["chart_type"]
 
         return res["API"]
+
+    """
+    Returns converted stacked values from abs to perc
+    """
+    def abs_to_perc(self, df_given):
+        temp = df_given.copy()
+        temp['total'] = temp[self.t_y].sum(axis=1)
+        for c in self.t_y:
+            temp[c] = temp[c]/temp['total']*100
+        temp.drop(['total'], axis=1, inplace=True)
+        return temp
 
     """
     Validates the meta json

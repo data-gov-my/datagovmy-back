@@ -49,7 +49,6 @@ class Bar(GeneralChartsUtil):
     """
     def chart_v2(self) :
         result = {}
-        has_date = False
 
         df = pd.read_parquet(self.read_from)
 
@@ -69,7 +68,11 @@ class Bar(GeneralChartsUtil):
     """
     def build_chart_self(self) :
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})        
+
+        if "STACKED" in self.chart_type : 
+            df = self.abs_to_perc(df)
+        
+        df = df.replace({np.nan: None}) 
 
         c_vals = {} # Chart Values
         t_vals = {} # Table Values
@@ -106,8 +109,12 @@ class Bar(GeneralChartsUtil):
 
     def build_chart_parents(self):
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})
 
+        if "STACKED" in self.chart_type : 
+            df = self.abs_to_perc(df)
+
+        df = df.replace({np.nan: None}) 
+        
         # Converts all values to : 
         # - A str if its an object
         # - A str with lowercase, and spaces as hyphen
@@ -234,7 +241,22 @@ class Bar(GeneralChartsUtil):
         res["API"]["chart_type"] = self.chart["chart_type"]
 
         return res["API"]
+    
+    """
+    Returns converted stacked values from abs to perc
+    """
+    def abs_to_perc(self, df_given):
+        temp = df_given.copy()
+        temp['total'] = temp[self.b_y].sum(axis=1)
+        for c in self.b_y:
+            temp[c] = temp[c]/temp['total']*100
+        temp.drop(['total'], axis=1, inplace=True)
+        return temp
+    
 
+    """
+    Builds the date slider
+    """
     def build_date_slider(self, df) :
         df["date"] = df["date"].astype(str)
         options_list = df["date"].unique().tolist()
