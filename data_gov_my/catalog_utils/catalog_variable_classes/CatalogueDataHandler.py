@@ -29,7 +29,7 @@ class CatalogueDataHandler() :
         # Families with same format
         if self._chart_type in ['BAR','HBAR','STACKED_BAR', 'TIMESERIES', 'PYRAMID', 'CHOROPLETH', 'GEOCHOROPLETH', "GEOPOINT", "SCATTER"] :
             return self.array_value_handler()
-        elif self._chart_type in ['HEATTABLE'] :
+        elif self._chart_type in ['HEATTABLE', "TABLE"] :
             return self.table_view_handler()
         elif self._chart_type in ['GEOJSON'] :
             return self.geo_data_handler()
@@ -78,7 +78,9 @@ class CatalogueDataHandler() :
 
         self.extract_lang(lang)
 
-        chart_data = self.extract_lang_table_view(lang, self.table_view_attributes[self._chart_type], chart_data)
+        if self._chart_type in self.table_view_attributes : 
+            chart_data = self.extract_lang_table_view(lang, self.table_view_attributes[self._chart_type], chart_data)
+        
         res = {}
         res["chart_data"] = chart_data
         res["intro"] = self.extract_lang_intro(lang, intro)
