@@ -151,8 +151,6 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
     x = variables["x"]
     y = variables["y"]
     keys = variables["keys"] if "keys" in variables else []
-    if 'date' in df.columns:
-        keys.insert(0, 'date')
 
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
