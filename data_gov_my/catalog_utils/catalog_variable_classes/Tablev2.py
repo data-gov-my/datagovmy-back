@@ -65,7 +65,15 @@ class Table(GeneralChartsUtil):
         df = df.replace({np.nan: None})
         all_columns = df.columns.to_list()
         group_keys = list(set(all_columns) - set(self.exclude))
-        return df[group_keys].to_dict(orient="records")
+        
+        table_columns = self.set_table_columns(group_keys)
+        table_data = df[group_keys].to_dict(orient="records")
+        
+        overall = {}
+        overall["data"] = table_data
+        overall["columns"] = table_columns
+        
+        return overall
 
     """
     Builds chart parents
@@ -76,12 +84,14 @@ class Table(GeneralChartsUtil):
         all_columns = df.columns.to_list()
         group_keys = list(set(all_columns) - set(self.exclude))
 
-        for key in self.h_keys:
+        for key in self.t_keys:
             if df[key].dtype == "object" :
                 df[key] = df[key].astype(str)            
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
-        df["u_groups"] = list(df[self.h_keys].itertuples(index=False, name=None))
+        table_columns = self.set_table_columns(group_keys)
+
+        df["u_groups"] = list(df[self.t_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
         
         res = {}
@@ -100,7 +110,28 @@ class Table(GeneralChartsUtil):
             self.set_dict(result, group_l, final_d)
             merge(res, result)
 
-        return res
+        overall = {}
+        overall["data"] = res
+        overall["colums"] = table_columns
+
+        return overall
+
+    def set_table_columns(self, columns) :
+        res = {}
+
+        res["en"] = {}
+        res["bm"] = {}
+
+        if self.table_translation:
+            for lang in ["en", "bm"] :
+                for k, v in self.table_translation[lang] :
+                    res[lang][k] = v            
+        else:
+            for lang in ["en", "bm"] :
+                for i in columns : 
+                    res[lang][i] = i
+
+        return res 
 
 
     """

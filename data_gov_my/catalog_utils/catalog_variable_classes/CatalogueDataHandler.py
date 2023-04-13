@@ -33,7 +33,7 @@ class CatalogueDataHandler() :
             return self.table_view_handler()
         elif self._chart_type in ['GEOJSON'] :
             return self.geo_data_handler()
-        
+
     """
     Handles chart type Geodata
     """
@@ -60,6 +60,9 @@ class CatalogueDataHandler() :
         intro = self._data["chart_details"]["intro"]
         chart_data = self._data["chart_details"]["chart"] # should put as chart_data(?)
 
+        if self._chart_type == "TABLE" :
+            chart_data = chart_data["data"]
+
         defaults_api = {}
 
         for d in self._data["API"]["filters"]: # Gets all the default API values
@@ -82,7 +85,14 @@ class CatalogueDataHandler() :
             chart_data = self.extract_lang_table_view(lang, self.table_view_attributes[self._chart_type], chart_data)
         
         res = {}
-        res["chart_data"] = chart_data
+
+        if self._chart_type == "TABLE" :
+            res["table_data"] = {}
+            res["table_data"]["data"] = chart_data
+            res["table_data"]["columns"] = self._data["chart_details"]["chart"]["columns"][lang]
+        else : 
+            res["chart_data"] = chart_data
+        
         res["intro"] = self.extract_lang_intro(lang, intro)
 
         self._data["chart_details"] = res
@@ -116,7 +126,7 @@ class CatalogueDataHandler() :
                 table_data = table_data[key]
                 chart_data = chart_data[key]
             else:
-                tbl_data = {}
+                table_data = {}
                 chart_data = {}
                 break
         
