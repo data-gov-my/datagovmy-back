@@ -5,11 +5,18 @@ import numpy as np
 import json
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
-
+from data_gov_my.utils import common
 
 class CatalogueDataHandler() :
 
-    _area_default_mapping = {"state" : {}, "district" : {}, "parlimen" : {}}
+    # Default mappings for area-types
+    _area_default_mapping = {
+        "state" : common.STATE_TRANSLATIONS,
+        "parlimen" : common.PARLIMEN_TRANSLATIONS,
+        "district" : common.DISTRICT_TRANSLATIONS,
+        "dun" : common.DUN_TRANSLATIONS
+    }
+
     
     """
     Constructor
