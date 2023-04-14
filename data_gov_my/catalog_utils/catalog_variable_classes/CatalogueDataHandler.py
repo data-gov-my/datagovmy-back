@@ -5,18 +5,18 @@ import numpy as np
 import json
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
-from data_gov_my.utils import common
+from data_gov_my.utils import translations as translation
 
 class CatalogueDataHandler() :
 
     # Default mappings for area-types
-    _area_default_mapping = {
-        "state" : common.STATE_TRANSLATIONS,
-        "parlimen" : common.PARLIMEN_TRANSLATIONS,
-        "district" : common.DISTRICT_TRANSLATIONS,
-        "dun" : common.DUN_TRANSLATIONS
+    _default_mapping = {
+        "state" : translation.STATE_TRANSLATIONS,
+        "parlimen" : translation.PARLIMEN_TRANSLATIONS,
+        "district" : translation.DISTRICT_TRANSLATIONS,
+        "dun" : translation.DUN_TRANSLATIONS,
+        "range" : translation.RANGE_TRANSLATIONS
     }
-
     
     """
     Constructor
@@ -209,8 +209,8 @@ class CatalogueDataHandler() :
         additional_filters = {}
 
         for f in api_filters : 
-            if f["key"] in ["state", "parlimen", "district"] :
-                additional_filters.update(self._area_default_mapping[ f["key"] ])
+            if f["key"] in ["state", "parlimen", "district", "range"] :
+                additional_filters.update(self._default_mapping[ f["key"] ])
         
         trans_data[lang].update(additional_filters)
 
