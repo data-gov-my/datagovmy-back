@@ -9,10 +9,7 @@ from mergedeep import merge
 
 class CatalogueDataHandler() :
 
-    table_view_attributes = {
-        "HEATTABLE" : ["x", "y", "z"]
-    }
-
+    _area_default_mapping = {"state" : {}, "district" : {}, "parlimen" : {}}
     
     """
     Constructor
@@ -42,7 +39,10 @@ class CatalogueDataHandler() :
 
         res = {}
         intro = self._data["chart_details"]["intro"]
+        translations = self._data["translations"]
+
         self.extract_lang(lang)
+        self.set_translations(lang, translations, []) # Assuming no filters
 
         res["intro"] = self.extract_lang_intro(lang, intro)
 
@@ -58,18 +58,16 @@ class CatalogueDataHandler() :
         lang = self.default_param_value('lang', 'en', self._params)
 
         intro = self._data["chart_details"]["intro"]
+        translations = self._data["translations"]
         chart_data = self._data["chart_details"]["chart"] # should put as chart_data(?)
 
         if self._chart_type == "TABLE" :
-            chart_data = chart_data["data"]
+            chart_data = chart_data
 
         defaults_api = {}
 
         for d in self._data["API"]["filters"]: # Gets all the default API values
-            if d["key"] == "date_slider" : 
-                defaults_api[d["key"]] = d["default"]
-            else : 
-                defaults_api[d["key"]] = d["default"]["value"]
+            defaults_api[d["key"]] = d["default"]
 
         for k, v in defaults_api.items():
             key = self._params[k][0] if k in self._params else v
@@ -80,16 +78,12 @@ class CatalogueDataHandler() :
                 break
 
         self.extract_lang(lang)
-
-        if self._chart_type in self.table_view_attributes : 
-            chart_data = self.extract_lang_table_view(lang, self.table_view_attributes[self._chart_type], chart_data)
+        self.set_translations(lang, translations, self._data["API"]["filters"])
         
         res = {}
 
         if self._chart_type == "TABLE" :
-            res["table_data"] = {}
-            res["table_data"]["data"] = chart_data
-            res["table_data"]["columns"] = self._data["chart_details"]["chart"]["columns"][lang]
+            res["table_data"] = chart_data
         else : 
             res["chart_data"] = chart_data
         
@@ -108,17 +102,15 @@ class CatalogueDataHandler() :
         lang = self.default_param_value('lang', 'en', self._params)
 
         intro = self._data["chart_details"]["intro"]  # Get intro
-        table_data = self._data["chart_details"]["chart"]["table_data"]["data"]
-        table_cols = self._data["chart_details"]["chart"]["table_data"]["columns"]
+        translations = self._data["translations"]
+        table_data = self._data["chart_details"]["chart"]["table_data"]
         chart_data = self._data["chart_details"]["chart"]["chart_data"]  # Get chart data
 
         defaults_api = {} # Creates a default API
 
         for d in self._data["API"]["filters"]: # Gets all the default API values
-            if d["key"] == "date_slider" : 
-                defaults_api[d["key"]] = d["default"]
-            else : 
-                defaults_api[d["key"]] = d["default"]["value"]
+            defaults_api[d["key"]] = d["default"]
+
 
         for k, v in defaults_api.items():
             key = self._params[k][0] if k in self._params else v
@@ -131,14 +123,11 @@ class CatalogueDataHandler() :
                 break
         
         self.extract_lang(lang)
-
-        table = {}
-        table["columns"] = table_cols[lang]
-        table["data"] = table_data
+        self.set_translations(lang, translations, self._data["API"]["filters"])
 
         res = {}
         res["chart_data"] = chart_data
-        res["table_data"] = table
+        res["table_data"] = table_data
         res["intro"] = self.extract_lang_intro(lang, intro)
 
         self._data["chart_details"] = res
@@ -192,7 +181,9 @@ class CatalogueDataHandler() :
         intro.update(lang_info)
         return intro
 
-
+    '''
+    Extracts the language from a table view
+    '''
     def extract_lang_table_view(self, lang, keys, data) :        
         for d in data : 
             for k in keys : 
@@ -204,3 +195,19 @@ class CatalogueDataHandler() :
         
         return data
 
+    """
+    Sets the appropriate translations : en / bm
+    """
+    def set_translations(self, lang, trans_data, api_filters) :
+        additional_filters = {}
+
+        for f in api_filters : 
+            if f["key"] in ["state", "parlimen", "district"] :
+                additional_filters.update(self._area_default_mapping[ f["key"] ])
+        
+        trans_data[lang].update(additional_filters)
+
+        if trans_data[lang] : 
+            self._data["translations"] = trans_data[lang]
+        else : 
+            self._data.pop("translations")

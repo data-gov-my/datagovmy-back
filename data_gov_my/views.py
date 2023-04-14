@@ -124,6 +124,8 @@ class DATA_VARIABLE(APIView):
 
         if all(p in param_list for p in params_req):
             res = data_variable_handler(param_list)
+            if not res : 
+                return JsonResponse({"status" : 404, "message" : "Catalogue data not found."}, status=404)
             return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
@@ -299,14 +301,15 @@ def data_variable_handler(param_list):
 
     if not info:
         info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
+        if len(info) == 0 : # If catalogue doesn't exist
+            return {}
         info = info[0]["catalog_data"]
         cache.set(var_id, info)
 
     chart_type = info["API"]["chart_type"]
-
     info = data_variable_chart_handler(info, chart_type, param_list)
 
-    if len(info) == 0:
+    if len(info) == 0: # If catalogues with the filter isn't found
         return {}
     return info
 

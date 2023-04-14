@@ -2,14 +2,6 @@ from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-from data_gov_my.catalog_utils import general_helper as gh
-from data_gov_my.catalog_utils.catalog_variable_classes import Choropleth as ch
-from data_gov_my.catalog_utils.catalog_variable_classes import Table as tb
-from data_gov_my.catalog_utils.catalog_variable_classes import Geojson as gj
-from data_gov_my.catalog_utils.catalog_variable_classes import Bar as bar
-from data_gov_my.catalog_utils.catalog_variable_classes import Heatmap as hm
-from data_gov_my.catalog_utils.catalog_variable_classes import Pyramid as py
-
 # Version 2 code
 from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
 from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2

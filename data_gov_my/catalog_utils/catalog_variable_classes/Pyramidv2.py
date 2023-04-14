@@ -107,15 +107,15 @@ class Pyramid(GeneralChartsUtil):
         res = {}
         tbl_res = {}
 
-        tbl_res['data'] = {}
-        tbl_res['columns'] = self.set_table_columns()
+        # tbl_res['data'] = {}
+        # tbl_res['columns'] = self.set_table_columns()
 
         rename_columns = {self.p_x: "x", self.p_y[0]: "y1", self.p_y[1]: "y2"}
         x_list = df[self.p_x].to_list()
         y1_list = [x * -1 for x in df[self.p_y[0]].to_list()]
         y2_list = df[self.p_y[1]].to_list()
         res = {"x": x_list, "y1": y1_list, "y2": y2_list}
-        tbl_res['data'] = df.rename(columns=rename_columns)[list(rename_columns.values())].to_dict("records")
+        tbl_res = df.rename(columns=rename_columns)[list(rename_columns.values())].to_dict("records")
 
         overall = {}
         overall["chart_data"] = res
@@ -136,8 +136,8 @@ class Pyramid(GeneralChartsUtil):
         res = {}
         tbl_res = {}
 
-        tbl_res['data'] = {}
-        tbl_res['columns'] = self.set_table_columns()
+        # tbl_res['data'] = {}
+        # tbl_res['columns'] = self.set_table_columns()
 
         rename_columns = {self.p_x: "x", self.p_y[0]: "y1", self.p_y[1]: "y2"}
 
@@ -175,7 +175,7 @@ class Pyramid(GeneralChartsUtil):
             self.set_dict(result, group_l, chart_data)
             self.set_dict(tbl, group_l, table_vals)
             merge(res, result)
-            merge(tbl_res['data'], tbl)
+            merge(tbl_res, tbl)
 
         overall = {}
         overall["chart_data"] = res
@@ -200,16 +200,13 @@ class Pyramid(GeneralChartsUtil):
         if self.api_filter:
             for api in self.api_filter:
                 df[api] = df[api].astype(str)
-                fe_vals = df[api].unique().tolist()
                 be_vals = (
                     df[api]
                     .apply(lambda x: x.lower().replace(" ", "-"))
                     .unique()
                     .tolist()
                 )
-                api_obj = self.build_api_object_filter(
-                    api, fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
-                )
+                api_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
                 api_filters_inc.append(api_obj)
 
         res["API"] = {}
