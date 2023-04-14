@@ -66,7 +66,7 @@ class Scatter(GeneralChartsUtil):
 
         c_vals = []
         t_vals = {}
-        t_columns = self.set_table_columns()
+        # t_columns = self.set_table_columns()
 
         grp = df.groupby("category")
         for u_cat in df["category"].unique().tolist() :
@@ -79,9 +79,8 @@ class Scatter(GeneralChartsUtil):
 
         overall = {}
         overall["chart_data"] = c_vals
-        overall["table_data"] = {}
-        overall["table_data"]["columns"] = t_columns
-        overall["table_data"]["data"] = t_vals  
+        overall["table_data"] = t_vals
+
         return overall
     
     """
@@ -102,7 +101,7 @@ class Scatter(GeneralChartsUtil):
         chart_res = {}
         table_res = {}
 
-        table_columns = self.set_table_columns()
+        # table_columns = self.set_table_columns()
 
         for group in u_groups_list:
             result = {}
@@ -135,9 +134,7 @@ class Scatter(GeneralChartsUtil):
 
         overall = {}
         overall["chart_data"] = chart_res
-        overall["table_data"] = {}
-        overall["table_data"]["columns"] = table_columns
-        overall["table_data"]["data"] = table_res 
+        overall["table_data"] = table_res
 
         return overall
 
@@ -173,16 +170,13 @@ class Scatter(GeneralChartsUtil):
 
         if self.api_filter:
             for api in self.api_filter:
-                fe_vals = df[api].unique().tolist()
                 be_vals = (
                     df[api]
                     .apply(lambda x: x.lower().replace(" ", "-"))
                     .unique()
                     .tolist()
                 )
-                api_obj = self.build_api_object_filter(
-                    api, fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
-                )
+                api_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
                 api_filters_inc.append(api_obj)
 
         res["API"] = {}

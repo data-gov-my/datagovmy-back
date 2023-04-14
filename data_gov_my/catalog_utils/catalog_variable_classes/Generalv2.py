@@ -15,9 +15,7 @@ class GeneralChartsUtil:
 
     # Additional API data
     precision = 1
-    table_translation = {}
-    data_translation = {}
-    filter_translation = {}
+    translations = {"en" : {}, "bm" : {}}
     data_frequency = ''
 
     # Identifiers
@@ -116,19 +114,9 @@ class GeneralChartsUtil:
     Get language format
     """
     def get_translations(self) : 
-        mapping = ["table_columns","filters","chart_columns"]
-
-        for k in mapping :
-            if 'translations' in self.cur_catalog_data :
-                if k in self.cur_catalog_data["translations"] :
-                    value = self.cur_catalog_data["translations"][k]
-                    if k == 'table_columns' : 
-                        self.table_translation = value
-                    elif k == 'filters' : 
-                        self.filter_translation = value
-                    elif k == 'chart_columns' : 
-                        self.data_translation = value             
-
+        if 'translations' in self.cur_catalog_data : 
+            self.translations = self.cur_catalog_data["translations"]
+         
     """
     Builds the variables table for each catalog variable
     """
@@ -200,16 +188,14 @@ class GeneralChartsUtil:
     Helper to build the filters within an API
     """
 
-    def build_api_object_filter(self, key, def_lbl, def_val, options):
+    def build_api_object_filter(self, key, def_val, options):
         # If it is a dictionary, convert to list of objects
-        if isinstance(options, dict):
-            options = [{"label": k, "value": v} for k, v in options.items()]
+        # if isinstance(options, dict):
+        #     options = [{"label": k, "value": v} for k, v in options.items()]
 
         filter = {}
         filter["key"] = key
-        filter["default"] = {}
-        filter["default"]["label"] = def_lbl
-        filter["default"]["value"] = def_val
+        filter["default"] = def_val
         filter["options"] = options
 
         return filter
@@ -284,6 +270,7 @@ class GeneralChartsUtil:
         res["metadata"] = self.metadata
         res["downloads"] = self.downloads
         res["chart_details"] = self.chart_details
+        res["translations"] = self.translations
 
         return res
 

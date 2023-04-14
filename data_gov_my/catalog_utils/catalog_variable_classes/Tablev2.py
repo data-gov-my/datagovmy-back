@@ -66,12 +66,11 @@ class Table(GeneralChartsUtil):
         all_columns = df.columns.to_list()
         group_keys = list(set(all_columns) - set(self.exclude))
         
-        table_columns = self.set_table_columns(group_keys)
+        # table_columns = self.set_table_columns(group_keys)
         table_data = df[group_keys].to_dict(orient="records")
         
-        overall = {}
-        overall["data"] = table_data
-        overall["columns"] = table_columns
+        overall = table_data
+        # overall["columns"] = table_columns
         
         return overall
 
@@ -89,7 +88,7 @@ class Table(GeneralChartsUtil):
                 df[key] = df[key].astype(str)            
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
-        table_columns = self.set_table_columns(group_keys)
+        # table_columns = self.set_table_columns(group_keys)
 
         df["u_groups"] = list(df[self.t_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
@@ -110,9 +109,7 @@ class Table(GeneralChartsUtil):
             self.set_dict(result, group_l, final_d)
             merge(res, result)
 
-        overall = {}
-        overall["data"] = res
-        overall["colums"] = table_columns
+        overall = res
 
         return overall
 
@@ -193,16 +190,13 @@ class Table(GeneralChartsUtil):
 
         if self.api_filter:
             for api in self.api_filter:
-                fe_vals = df[api].unique().tolist()
                 be_vals = (
                     df[api]
                     .apply(lambda x: x.lower().replace(" ", "-"))
                     .unique()
                     .tolist()
                 )
-                api_obj = self.build_api_object_filter(
-                    api, fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
-                )
+                api_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
                 api_filters_inc.append(api_obj)
 
         res["API"] = {}

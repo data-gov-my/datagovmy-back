@@ -130,7 +130,8 @@ class Timeseries(GeneralChartsUtil):
 
         res = {}
         res['chart_data'] = {}
-        self.populate_table_info(res)
+        res['table_data'] = {}
+        # self.populate_table_info(res)
 
 
         if self.t_keys:
@@ -150,7 +151,7 @@ class Timeseries(GeneralChartsUtil):
                 self.set_dict(result, list(group), chart_vals)
                 self.set_dict(tbl, list(group), table_vals)
                 merge(res['chart_data'], result)
-                merge(res['table_data']['data'], tbl)                
+                merge(res['table_data'], tbl)                
 
             return res
         else:            
@@ -274,28 +275,19 @@ class Timeseries(GeneralChartsUtil):
 
         if self.api_filter:
             for api in self.api_filter:
-                fe_vals = df[api].unique().tolist()
                 be_vals = (
                     df[api]
                     .apply(lambda x: x.lower().replace(" ", "-"))
                     .unique()
                     .tolist()
                 )
-                filter_obj = self.build_api_object_filter(
-                    api, fe_vals[0], be_vals[0], dict(zip(fe_vals, be_vals))
-                )
+                filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
                 api_filters_inc.append(filter_obj)
 
-        range_options = [
-            {"label": self.timeseries_values[r], "value": r}
-            for r in self.applicable_frequency
-        ]
-        range_obj = self.build_api_object_filter(
-            "range",
-            self.timeseries_values[self.frequency],
-            self.frequency,
-            range_options,
-        )
+        range_options = [ r for r in self.applicable_frequency ]
+
+        range_obj = self.build_api_object_filter("range", self.frequency, range_options)
+
         api_filters_inc.append(range_obj)
 
         res["API"] = {}
