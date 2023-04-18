@@ -237,19 +237,21 @@ class DROPDOWN(APIView):
 
 
 class I18N(APIView):
-
     def get(self, request, *args, **kwargs):
-        if "filename" not in request.query_params:
-            queryset = get_list_or_404(i18nJson)
-            many = True
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(queryset, many=False)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    
+        queryset = get_list_or_404(i18nJson)
+        res = {'en-GB' : [], 'ms-MY': []}
+        for file in queryset:
+            if file["language"] == 'en': 
+                res["en-GB"].append(file["translation_json"])
+            elif file["language"] == "bm":
+                res["ms-MY"].append(file["translation_json"])
+        return JsonResponse(data=res, status=status.HTTP_200_OK)
 
-        else:
-            queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"])
-            many = False
-        
-        serializer = i18nSerializer(queryset, many=many)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
         serializer = i18nSerializer(data=request.data)

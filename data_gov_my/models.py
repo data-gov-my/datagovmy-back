@@ -62,7 +62,15 @@ class NameDashboard_LastName(models.Model) :
 class i18nJson(models.Model):
     LANGUAGE_CHOICES = [('en', 'English'), ('bm', 'Bahasa Melayu')]
 
-    filename = models.CharField(max_length=50, primary_key=True)
+    filename = models.CharField(max_length=50)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     route = models.CharField(max_length=50)
     translation_json = models.JSONField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["filename", "language"], name="filename_language_idx")
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["filename", "language"], name="unique json file by language")
+        ]
