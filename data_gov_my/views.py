@@ -240,18 +240,19 @@ class I18N(APIView):
     def get(self, request, *args, **kwargs):
         if {"filename", "lang"} <= request.query_params.keys(): # return all
             queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
-            serializer = i18nSerializer(queryset, many=False)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-    
-        queryset = get_list_or_404(i18nJson)
-        res = {'en-GB' : [], 'ms-MY': []}
-        for file in queryset:
-            if file["language"] == 'en': 
-                res["en-GB"].append(file["translation_json"])
-            elif file["language"] == "bm":
-                res["ms-MY"].append(file["translation_json"])
-        return JsonResponse(data=res, status=status.HTTP_200_OK)
+            serializer = i18nSerializer(queryset)
+            res = serializer.data
+        else:
+            queryset = get_list_or_404(i18nJson)
+            serializer = i18nSerializer(queryset, many=True)
+            res = {'en-GB' : [], 'ms-MY': []}
+            for file in serializer.data:
+                if file["language"] == "en":
+                    res["en-GB"].append(file["filename"])
+                elif file["language"] == "bm":
+                    res["ms-MY"].append(file["filename"])
 
+        return JsonResponse(res, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
         serializer = i18nSerializer(data=request.data)

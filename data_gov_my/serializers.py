@@ -20,7 +20,8 @@ class CatalogSerializer(serializers.ModelSerializer) :
 class i18nSerializer(serializers.ModelSerializer):
     class Meta:
         model = i18nJson 
-        fields = '__all__'
+        exclude = ['id']
+
 
     def update(self, instance, validated_data):
         i18n_object = i18nJson.objects.filter(filename=instance.filename).update(**validated_data)

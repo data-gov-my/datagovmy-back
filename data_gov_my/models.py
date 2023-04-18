@@ -67,6 +67,8 @@ class i18nJson(models.Model):
     route = models.CharField(max_length=50)
     translation_json = models.JSONField()
 
+    def __str__(self) -> str:
+        return f'{self.filename} ({self.language})'
     class Meta:
         indexes = [
             models.Index(fields=["filename", "language"], name="filename_language_idx")
