@@ -270,15 +270,15 @@ class I18N(APIView):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         
-        if "filename" not in request.query_params:
-            return JsonResponse(data={"detail": "Query parameter filename is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            i18n_object = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(instance=i18n_object, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.validated_data, status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        i18n_object = get_object_or_404(i18nJson, filename=request.query_params["filename"])
-        serializer = i18nSerializer(instance=i18n_object, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(data={"detail": "Query parameter filename & lang is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
 
 """
 Checks which filters have been applied for the data-catalog

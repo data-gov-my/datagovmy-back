@@ -24,5 +24,5 @@ class i18nSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        i18n_object = i18nJson.objects.filter(filename=instance.filename).update(**validated_data)
+        i18n_object = i18nJson.objects.filter(filename=instance.filename, language=instance.language).update(**validated_data)
         return i18n_object
