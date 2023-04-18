@@ -25,5 +25,6 @@ urlpatterns = [
     path("update/", views.UPDATE.as_view(), name="UPDATE"),
     path("chart/", views.CHART.as_view(), name="CHART"),
     path("dropdown/", views.DROPDOWN.as_view(), name="DROPDOWN"),
-    path("explorer/", views.EXPLORER.as_view(), name="EXPLORER")
+    path("explorer/", views.EXPLORER.as_view(), name="EXPLORER"),
+    path("i18n/", views.I18N.as_view(), name="I18N")
 ]

@@ -57,3 +57,12 @@ class NameDashboard_LastName(models.Model) :
     d_2000 = models.IntegerField(null=True, default=0)
     d_2010 = models.IntegerField(null=True, default=0)
     total = models.IntegerField(null=True, default=0)
+
+
+class i18nJson(models.Model):
+    LANGUAGE_CHOICES = [('en', 'English'), ('bm', 'Bahasa Melayu')]
+
+    filename = models.CharField(max_length=50, primary_key=True)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    route = models.CharField(max_length=50)
+    translation_json = models.JSONField()
