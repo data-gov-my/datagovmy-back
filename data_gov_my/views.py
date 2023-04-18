@@ -238,6 +238,9 @@ class DROPDOWN(APIView):
 
 class I18N(APIView):
     def get(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
         if {"filename", "lang"} <= request.query_params.keys(): # return all
             queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
             serializer = i18nSerializer(queryset)
@@ -255,6 +258,8 @@ class I18N(APIView):
         return JsonResponse(res, status=status.HTTP_200_OK)
     
     def post(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         serializer = i18nSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -262,6 +267,9 @@ class I18N(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def patch(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
         if "filename" not in request.query_params:
             return JsonResponse(data={"detail": "Query parameter filename is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
         
