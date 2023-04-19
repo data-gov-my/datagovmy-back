@@ -16,10 +16,12 @@ from django.db.models.base import ModelBase
 from django.contrib.postgres.search import TrigramWordSimilarity
 from django.contrib.postgres.search import SearchVector
 from django.contrib.postgres.search import SearchHeadline
+from data_gov_my.serializers import i18nSerializer
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 from data_gov_my.utils import cron_utils, triggers
-from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName
+from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName, i18nJson
 from data_gov_my.api_handling import handle, cache_search
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.catalog_utils.catalog_variable_classes import CatalogueDataHandler as cdh
@@ -233,6 +235,50 @@ class DROPDOWN(APIView):
         else:
             return JsonResponse({}, safe=False)
 
+
+class I18N(APIView):
+    def get(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(queryset)
+            res = serializer.data
+        else:
+            queryset = get_list_or_404(i18nJson)
+            serializer = i18nSerializer(queryset, many=True)
+            res = {'en-GB' : [], 'ms-MY': []}
+            for file in serializer.data:
+                if file["language"] == "en":
+                    res["en-GB"].append(file["filename"])
+                elif file["language"] == "bm":
+                    res["ms-MY"].append(file["filename"])
+
+        return JsonResponse(res, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        serializer = i18nSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            i18n_object = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(instance=i18n_object, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.validated_data, status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return JsonResponse(data={"detail": "Query parameter filename & lang is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
 
 """
 Checks which filters have been applied for the data-catalog
