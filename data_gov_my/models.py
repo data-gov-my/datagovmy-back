@@ -57,3 +57,22 @@ class NameDashboard_LastName(models.Model) :
     d_2000 = models.IntegerField(null=True, default=0)
     d_2010 = models.IntegerField(null=True, default=0)
     total = models.IntegerField(null=True, default=0)
+
+
+class i18nJson(models.Model):
+    LANGUAGE_CHOICES = [('en', 'English'), ('bm', 'Bahasa Melayu')]
+
+    filename = models.CharField(max_length=50)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    route = models.CharField(max_length=50)
+    translation_json = models.JSONField()
+
+    def __str__(self) -> str:
+        return f'{self.filename} ({self.language})'
+    class Meta:
+        indexes = [
+            models.Index(fields=["filename", "language"], name="filename_language_idx")
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["filename", "language"], name="unique json file by language")
+        ]
