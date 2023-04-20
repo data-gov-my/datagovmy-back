@@ -15,9 +15,6 @@ class ELECTIONS(General_Explorer):
     # General Data    
     explorer_name = "ELECTIONS"
 
-    # API handling
-    required_params = ["explorer"]
-
     # List of charts within explorer, with own endpoints
     charts = ["candidates"]
 
