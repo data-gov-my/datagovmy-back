@@ -58,7 +58,6 @@ class NameDashboard_LastName(models.Model) :
     d_2010 = models.IntegerField(null=True, default=0)
     total = models.IntegerField(null=True, default=0)
 
-
 class i18nJson(models.Model):
     LANGUAGE_CHOICES = [('en', 'English'), ('bm', 'Bahasa Melayu')]
 
@@ -76,3 +75,14 @@ class i18nJson(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["filename", "language"], name="unique json file by language")
         ]
+
+class ElectionDashboard_Candidates(models.Model) :
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20)
+    date = models.CharField(max_length=100)
+    election_name = models.CharField(max_length=100)
+    seat = models.CharField(max_length=100)
+    party = models.CharField(max_length=100)
+    votes = models.IntegerField(null=True)
+    votes_perc = models.IntegerField(null=True)
+    result = models.CharField(max_length=100, null=True)
