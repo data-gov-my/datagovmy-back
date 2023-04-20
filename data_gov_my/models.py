@@ -84,5 +84,5 @@ class ElectionDashboard_Candidates(models.Model) :
     seat = models.CharField(max_length=100)
     party = models.CharField(max_length=100)
     votes = models.IntegerField()
-    votes_perc = models.IntegerField(null=True)
+    votes_perc = models.FloatField(null=True)
     result = models.CharField(max_length=100)
