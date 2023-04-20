@@ -73,8 +73,9 @@ class General_Explorer :
     batches.
     '''
 
-    def bulk_insert(file, model_name, batch_size=10000, rename_columns={}, exclude=[]) :
+    def bulk_insert(self, file, model_name, batch_size=10000, rename_columns={}, exclude=[]) :
         df = pd.read_parquet(file)
+        df = df.replace({np.nan : None})
         df = df.drop(columns=exclude)
 
         if rename_columns : 
