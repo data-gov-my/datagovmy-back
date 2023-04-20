@@ -223,9 +223,12 @@ class EXPLORER(APIView) :
     # TODO: Protect this, or remove once meta is created
     def post(self, request, format=None) :
         params = dict(request.POST)
+
         if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
             obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
-            obj.populate_db()
+            to_rebuild = 'rebuild' in params
+            r_table = params['table'][0] if 'table' in params else ''
+            obj.populate_db(table=r_table,rebuild=to_rebuild)
 
         return JsonResponse({"status": 200, "message": "Table Populated."}, status=200)
     

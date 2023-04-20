@@ -21,6 +21,9 @@ class ELECTIONS(General_Explorer):
     # List of charts within explorer, with own endpoints
     charts = ["candidates"]
 
+    # List of dropdowns within explorer, with own endpoints
+    dropdowns=['candidate_list']
+
     # Data population
     data_populate = {
         'ElectionDashboard_Candidates' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_candidates.parquet'
@@ -39,17 +42,38 @@ class ELECTIONS(General_Explorer):
     '''
     Dafault API handler
     '''
-    def handle_api(self, request_params):
 
+    # TODO: Handle this better
+    def handle_api(self, request_params):
+        
+        # Handles Dropdowns
+        if 'dropdown' in request_params and request_params["dropdown"][0] in self.dropdowns :
+            dropdown_type = request_params["dropdown"][0]
+            if dropdown_type == 'candidate_list' :
+                res = self.candidate_list()
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+
+        # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
             chart_type = request_params["chart"][0]
-
             if chart_type == "candidates" :
                 res = self.candidates_chart(request_params=request_params)
-                if res :
-                    return JsonResponse(res["msg"], status=res["status"], safe=False)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+            
+        return JsonResponse({"400" : "Bad Request."}, status=400)
 
-        return JsonResponse({}, status=200)
+
+    '''
+    Handles Candidate dropdown list
+    '''
+    def candidate_list(self) :
+        model_name = 'ElectionDashboard_Candidates'
+        model_choice = apps.get_model('data_gov_my', model_name)
+        data = list(model_choice.objects.values_list('name', flat=True).distinct())
+        res = {}
+        res["msg"] = data
+        res["status"] = 200
+        return res
 
 
     '''
