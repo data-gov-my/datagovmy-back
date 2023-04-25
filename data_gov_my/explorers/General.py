@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from django.apps import apps
 from django.http import JsonResponse
+from data_gov_my.utils.general_chart_helpers import STATE_ABBR
 
 class General_Explorer :
     # General Data
@@ -77,6 +78,9 @@ class General_Explorer :
         df = pd.read_parquet(file)
         df = df.replace({np.nan : None})
         df = df.drop(columns=exclude)
+
+        if "state" in df.columns:
+            df["state"].replace(STATE_ABBR, inplace=True)
 
         if rename_columns : 
             df.rename(columns = rename_columns, inplace = True)
