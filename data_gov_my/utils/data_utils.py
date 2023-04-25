@@ -176,6 +176,8 @@ def rebuild_i18n(operation, op_method):
         i18n_files = [f for f in listdir(I18N_DIR) if isfile(join(I18N_DIR, f))]
     else:
         i18n_files = [f + ".json" for f in i18n_files]
+
+    failed_builds = []
     
     for file in i18n_files:
         language = os.path.split(file)[0]
@@ -185,8 +187,22 @@ def rebuild_i18n(operation, op_method):
             f = open(f_meta)
             data = json.load(f)
             obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
+            obj.save()
+            cache.set("_".join(["I18N", filename, language]), data)
         except Exception as e:
-            pass
+            failed_obj = {}
+            failed_obj["I18N_FILENAME"] = filename
+            failed_obj["I18N_LANGUAGE"] = language 
+            failed_obj["ERROR"] = e 
+            failed_builds.append(failed_obj)
+
+    if len(failed_builds) > 0:
+        err_message = triggers.format_multi_line(failed_builds, "--- FAILED I18N ---")
+        triggers.send_telegram(err_message)
+    else:
+        print("I18N Built successfully.")
+        triggers.send_telegram("I18N Built successfully.")
+
         
 
 
