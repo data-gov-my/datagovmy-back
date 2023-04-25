@@ -59,7 +59,7 @@ class ELECTIONS(General_Explorer):
                 res = self.seat_list()
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
             if dropdown_type == 'party_list' : 
-                res = self.seat_list()
+                res = self.party_list()
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
 
         # Handles Charts
@@ -105,7 +105,7 @@ class ELECTIONS(General_Explorer):
     '''
     Handles Party dropdown list
     '''
-    def seat_list(self) :
+    def party_list(self) :
         model_name = 'ElectionDashboard_Party'
         model_choice = apps.get_model('data_gov_my', model_name)
         data = list(model_choice.objects.values_list('party', flat=True).distinct())
