@@ -6,7 +6,7 @@ from rest_framework import exceptions
 from django.http import JsonResponse
 from django.apps import apps
 from data_gov_my.models import DashboardJson
-from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer
+from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer
 
 
 
@@ -16,7 +16,7 @@ class ELECTIONS(General_Explorer):
     explorer_name = "ELECTIONS"
 
     # List of charts within explorer, with own endpoints
-    charts = ["candidates", "seats"]
+    charts = ["candidates", "seats", "party"]
 
     # List of dropdowns within explorer, with own endpoints
     dropdowns=['candidate_list', "seats_list"]
@@ -24,14 +24,16 @@ class ELECTIONS(General_Explorer):
     # Data population
     data_populate = {
         'ElectionDashboard_Candidates' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_candidates.parquet',
-        'ElectionDashboard_Seats' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_seats_winner.parquet'
+        'ElectionDashboard_Seats' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_seats_winner.parquet',
+        'ElectionDashboard_Party' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_parties.parquet'
     }
 
     # API related
     required_params = ['explorer', 'chart']
     param_models = {
         'candidates' : 'ElectionDashboard_Candidates', 
-        'seats' : 'ElectionDashboard_Seats'
+        'seats' : 'ElectionDashboard_Seats',
+        'party' : 'ElectionDashboard_Party'
     }
 
     '''
@@ -66,7 +68,10 @@ class ELECTIONS(General_Explorer):
             if chart_type == "seats" :
                 res = self.seats_chart(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
-            
+            if chart_type == "party" :
+                res = self.party_chart(request_params=request_params)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+
         return JsonResponse({"400" : "Bad Request."}, status=400)
 
 
@@ -143,6 +148,33 @@ class ELECTIONS(General_Explorer):
 
         candidates_res = model_choice.objects.filter(seat_name=name)
         serializer = ElectionSeatSerializer(candidates_res, many=True)
+
+        res["msg"] = serializer.data
+        res["status"] = 200
+
+        return res
+    
+    '''
+    Handles Party Charts
+    '''
+    def party_chart(self, request_params) : 
+        required_params = ["party_name", "state"]
+
+        res = {}
+        print(request_params)
+        if not all(param in request_params for param in required_params) :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+    
+        model_name = 'ElectionDashboard_Party'
+        
+        name = request_params['party_name'][0]
+        state = request_params['state'][0]
+        model_choice = apps.get_model('data_gov_my', model_name)
+
+        candidates_res = model_choice.objects.filter(party=name, state=state)
+        serializer = ElectionPartySerializer(candidates_res, many=True)
 
         res["msg"] = serializer.data
         res["status"] = 200
