@@ -188,7 +188,6 @@ def rebuild_i18n(operation, op_method):
             data = json.load(f)
             obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
             obj.save()
-            cache.set("_".join(["I18N", filename, language]), data)
         except Exception as e:
             failed_obj = {}
             failed_obj["I18N_FILENAME"] = filename
