@@ -102,6 +102,23 @@ def data_operation(operation, op_method):
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
+def i18n_operation(operation, op_method):
+    dir_name = "DATAGOVMY_SRC"
+    zip_name = "repo.zip"
+    git_url = os.getenv("GITHUB_URL", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
+
+    triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
+
+    create_directory(dir_name)
+    res = fetch_from_git(zip_name, git_url)
+    if "resp_code" in res and res["resp_code"] == 200:
+        write_as_binary(res["file_name"], res["data"])
+        extract_zip(res["file_name"], dir_name)
+        data_utils.rebuild_i18n(operation, op_method)
+    else:
+        triggers.send_telegram("FAILED TO GET SOURCE DATA")
+
 
 def get_latest_info_git(type, commit_id):
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")

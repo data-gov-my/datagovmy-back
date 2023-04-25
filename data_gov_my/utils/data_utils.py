@@ -169,11 +169,16 @@ def rebuild_i18n(operation, op_method):
         os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), "i18n"
     )
 
-    if op_method == "REBUILD":
+    if operation == "REBUILD":
         i18nJson.objects.all().delete()
 
     if not i18n_files:
-        i18n_files = [f for f in listdir(I18N_DIR) if isfile(join(I18N_DIR, f))]
+        language_folders = [f for f in listdir(I18N_DIR)]
+        i18n_files = []
+        for lang in language_folders:
+            file = [os.path.join(lang, f) for f in listdir(os.path.join(I18N_DIR, lang)) if isfile(os.path.join(I18N_DIR, lang, f))]
+            print(file)
+            i18n_files.extend(file)
     else:
         i18n_files = [f + ".json" for f in i18n_files]
 
