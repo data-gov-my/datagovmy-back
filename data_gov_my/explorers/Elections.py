@@ -19,7 +19,7 @@ class ELECTIONS(General_Explorer):
     charts = ["candidates", "seats", "party"]
 
     # List of dropdowns within explorer, with own endpoints
-    dropdowns=['candidate_list', "seats_list"]
+    dropdowns=['candidate_list', "seats_list", "party_list"]
 
     # Data population
     data_populate = {
@@ -58,6 +58,9 @@ class ELECTIONS(General_Explorer):
             if dropdown_type == 'seats_list' : 
                 res = self.seat_list()
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
+            if dropdown_type == 'party_list' : 
+                res = self.seat_list()
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
 
         # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
@@ -94,6 +97,18 @@ class ELECTIONS(General_Explorer):
         model_name = 'ElectionDashboard_Seats'
         model_choice = apps.get_model('data_gov_my', model_name)
         data = list(model_choice.objects.values_list('seat_name', flat=True).distinct())
+        res = {}
+        res["msg"] = data
+        res["status"] = 200
+        return res
+
+    '''
+    Handles Party dropdown list
+    '''
+    def seat_list(self) :
+        model_name = 'ElectionDashboard_Party'
+        model_choice = apps.get_model('data_gov_my', model_name)
+        data = list(model_choice.objects.values_list('party', flat=True).distinct())
         res = {}
         res["msg"] = data
         res["status"] = 200
