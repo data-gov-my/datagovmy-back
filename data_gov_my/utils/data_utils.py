@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-from data_gov_my.models import MetaJson, DashboardJson
+from data_gov_my.models import MetaJson, DashboardJson, i18nJson
 from data_gov_my.utils import dashboard_builder
 from data_gov_my.utils import triggers
 from data_gov_my.utils import common
@@ -154,6 +154,41 @@ def rebuild_dashboard_charts(operation, op_method):
     validate_info["failed_dashboards"] = failed_notify
 
     return validate_info
+
+
+"""
+Operation to rebuild i18n translation files.
+"""
+
+def rebuild_i18n(operation, op_method):
+    opr_data = get_operation_files(operation)
+    operation = opr_data["operation"]
+    i18n_files = opr_data["files"]
+
+    I18N_DIR = os.path.join(
+        os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), "i18n"
+    )
+
+    if op_method == "REBUILD":
+        i18nJson.objects.all().delete()
+
+    if not i18n_files:
+        i18n_files = [f for f in listdir(I18N_DIR) if isfile(join(I18N_DIR, f))]
+    else:
+        i18n_files = [f + ".json" for f in i18n_files]
+    
+    for file in i18n_files:
+        language = os.path.split(file)[0]
+        filename = os.path.split(file)[1].replace(".json", "")
+        try:
+            f_meta = os.path.join(I18N_DIR, file)
+            f = open(f_meta)
+            data = json.load(f)
+            obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
+        except Exception as e:
+            pass
+        
+
 
 
 """

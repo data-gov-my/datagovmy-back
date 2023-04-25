@@ -205,23 +205,33 @@ def selective_update():
             )
             cache.set("catalog_list", catalog_list)
             # cache_search.set_filter_cache()
+        
+        if filtered_changes["i18n"]:
+            fin_files = [x.replace(".json", "") for x in filtered_changes["i18n"]]
+            file_list = ",".join(fin_files)
+            filenames = filtered_changes["i18n"]
+            triggers.send_telegram("Updating : " + file_list)
+            operation = "UPDATE " + file_list
+
+            data_utils.rebuild_i18n(operation, "AUTO")
+
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 
 """
-Filters the changed files for dashboards and catalog data
+Filters the changed files for dashboards, catalog and i18n data
 """
 
 
 def filter_changed_files(file_list):
-    changed_files = {"dashboards": [], "catalog": []}
+    changed_files = {"dashboards": [], "catalog": [], "i18n": []}
 
     for f in file_list:
         f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
         f_info = f.split("/")
         if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path):
-            changed_files[f_info[0]].append(f_info[1])
+            changed_files[f_info[0]].append(os.path.join(*f_info[1:]))
 
     return changed_files
 
