@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, i18nJson, ElectionDashboard_Candidates
+from .models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, i18nJson, ElectionDashboard_Candidates, ElectionDashboard_Seats
 
 class MetaSerializer(serializers.ModelSerializer) :
     class Meta : 
@@ -26,6 +26,16 @@ class ElectionCandidateSerializer(serializers.ModelSerializer):
 
     def get_votes(self, obj):
         return {"abs" : obj.votes,"perc" : obj.votes_perc}
+
+class ElectionSeatSerializer(serializers.ModelSerializer):
+    majority = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ElectionDashboard_Seats
+        fields = ['seat', 'election_name', 'date', 'party', 'name', 'majority', 'type']
+
+    def get_majority(self, obj):
+        return {"abs" : obj.majority, "perc" : obj.majority_perc}
 
 
 class i18nSerializer(serializers.ModelSerializer):

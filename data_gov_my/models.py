@@ -86,3 +86,14 @@ class ElectionDashboard_Candidates(models.Model) :
     votes = models.IntegerField()
     votes_perc = models.FloatField(null=True)
     result = models.CharField(max_length=100)
+
+class ElectionDashboard_Seats(models.Model) :
+    seat = models.CharField(max_length=100)
+    election_name = models.CharField(max_length=100)
+    date = models.CharField(max_length=100)
+    party = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, default='')
+    majority = models.IntegerField()
+    majority_perc = models.FloatField(null=True)
+    seat_name = models.CharField(max_length=100)
