@@ -16,7 +16,7 @@ class ELECTIONS(General_Explorer):
     explorer_name = "ELECTIONS"
 
     # List of charts within explorer, with own endpoints
-    charts = ["candidates", "seats", "party"]
+    charts = ["candidates", "seats", "party", "full_result"]
 
     # List of dropdowns within explorer, with own endpoints
     dropdowns=['candidate_list', "seats_list", "party_list"]
@@ -74,8 +74,51 @@ class ELECTIONS(General_Explorer):
             if chart_type == "party" :
                 res = self.party_chart(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
+            if chart_type == "full_result" :
+                res = self.full_result(request_params=request_params)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
 
         return JsonResponse({"400" : "Bad Request."}, status=400)
+
+    def full_result(self, request_params) :
+        required_params = ["type"] # Declare required params
+
+        res = {}
+
+        if not all(param in request_params for param in required_params) :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+        
+        c_type = request_params['type'][0]
+        model_name = ''
+        c_serializer = ''
+        c_filters = {}
+
+        if c_type == "candidates" or c_type == "seats":
+            election = request_params['election'][0]
+            seat = request_params['seat'][0]
+            model_name = 'ElectionDashboard_Candidates'
+            c_serializer = ElectionCandidateSerializer
+            c_filters = {"election_name" : election, "seat" : seat}
+        if c_type == "party" : 
+            election = request_params['election'][0]
+            state = request_params['state'][0]
+            model_name = "ElectionDashboard_Party"
+            c_serializer = ElectionPartySerializer
+            c_filters = {"election_name":election,'state':state}
+
+
+        model_choice = apps.get_model('data_gov_my', model_name)
+        candidates_res = model_choice.objects.filter(**c_filters)
+        serializer = c_serializer(candidates_res, many=True)
+
+        res["msg"] = serializer.data
+        res["status"] = 200
+
+        return res
+
+
 
 
     '''
