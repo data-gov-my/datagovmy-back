@@ -102,6 +102,23 @@ def data_operation(operation, op_method):
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
+def i18n_operation(operation, op_method):
+    dir_name = "DATAGOVMY_SRC"
+    zip_name = "repo.zip"
+    git_url = os.getenv("GITHUB_URL", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
+
+    triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
+
+    create_directory(dir_name)
+    res = fetch_from_git(zip_name, git_url)
+    if "resp_code" in res and res["resp_code"] == 200:
+        write_as_binary(res["file_name"], res["data"])
+        extract_zip(res["file_name"], dir_name)
+        data_utils.rebuild_i18n(operation, op_method)
+    else:
+        triggers.send_telegram("FAILED TO GET SOURCE DATA")
+
 
 def get_latest_info_git(type, commit_id):
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")
@@ -205,23 +222,33 @@ def selective_update():
             )
             cache.set("catalog_list", catalog_list)
             # cache_search.set_filter_cache()
+        
+        if filtered_changes["i18n"]:
+            fin_files = [x.replace(".json", "") for x in filtered_changes["i18n"]]
+            file_list = ",".join(fin_files)
+            filenames = filtered_changes["i18n"]
+            triggers.send_telegram("Updating : " + file_list)
+            operation = "UPDATE " + file_list
+
+            data_utils.rebuild_i18n(operation, "AUTO")
+
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 
 """
-Filters the changed files for dashboards and catalog data
+Filters the changed files for dashboards, catalog and i18n data
 """
 
 
 def filter_changed_files(file_list):
-    changed_files = {"dashboards": [], "catalog": []}
+    changed_files = {"dashboards": [], "catalog": [], "i18n": []}
 
     for f in file_list:
         f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
         f_info = f.split("/")
         if len(f_info) > 1 and f_info[0] in changed_files and os.path.exists(f_path):
-            changed_files[f_info[0]].append(f_info[1])
+            changed_files[f_info[0]].append(os.path.join(*f_info[1:]))
 
     return changed_files
 
