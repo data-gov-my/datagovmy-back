@@ -60,7 +60,7 @@ class Command(BaseCommand):
         - python manage.py loader DASHBOARDS UPDATE meta_1,meta_2
         """
 
-        if category in ["DATA_CATALOG", "DASHBOARDS"] and operation in [
+        if category in ["DATA_CATALOG", "DASHBOARDS", "I18N"] and operation in [
             "UPDATE",
             "REBUILD",
         ]:
@@ -70,5 +70,7 @@ class Command(BaseCommand):
             cron_utils.remove_src_folders()
             if category == "DATA_CATALOG":
                 catalog_builder.catalog_operation(command, "MANUAL")
-            else:
+            elif category == "DASHBOARDS":
                 cron_utils.data_operation(command, "MANUAL")
+            else: # i18n
+                cron_utils.i18n_operation(command, "MANUAL")

@@ -258,9 +258,14 @@ class I18N(APIView):
             queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
             serializer = i18nSerializer(queryset)
             res = serializer.data["translation_json"]
-            return JsonResponse(res, status=status.HTTP_200_OK)
+        else: # return all 
+            queryset = get_list_or_404(i18nJson)
+            serializer = i18nSerializer(queryset, many=True)
+            res = {'en-GB' : [], 'ms-MY': []}
+            for file in serializer.data:
+                res[file["language"]].append(file["filename"])
         
-        return JsonResponse(data={"detail": "Query parameter filename & lang is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(res, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
