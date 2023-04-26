@@ -95,7 +95,7 @@ class ELECTIONS(General_Explorer):
         c_serializer = ''
         c_filters = {}
 
-        if c_type == "candidates" :
+        if c_type == "candidates" or c_type == "seats":
             election = request_params['election'][0]
             seat = request_params['seat'][0]
             model_name = 'ElectionDashboard_Candidates'
