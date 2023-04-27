@@ -681,7 +681,13 @@ Query values chart builder for values to be queried, usually as options for drop
 def query_values(file_name: str, variables: QueryValuesVariables):
     df = pd.read_parquet(file_name)
     columns = variables["columns"]
-    
+    isFlat = variables["flat"] if "flat" in variables else False
+    if len(columns) == 1:
+        return list(df[columns[0]].unique())
+    if isFlat:
+        keys = df.drop_duplicates(subset=columns)[columns]
+        return keys.to_dict(orient="records")
+
     res = {}
     for keys, v in df.groupby(columns[:-1])[columns[-1]]:
         d = res
