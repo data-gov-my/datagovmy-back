@@ -57,3 +57,55 @@ class NameDashboard_LastName(models.Model) :
     d_2000 = models.IntegerField(null=True, default=0)
     d_2010 = models.IntegerField(null=True, default=0)
     total = models.IntegerField(null=True, default=0)
+
+class i18nJson(models.Model):
+    LANGUAGE_CHOICES = [('en-GB', 'English'), ('ms-MY', 'Bahasa Melayu')]
+
+    filename = models.CharField(max_length=50)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en-GB')
+    route = models.CharField(max_length=50)
+    translation_json = models.JSONField()
+
+    def __str__(self) -> str:
+        return f'{self.filename} ({self.language})'
+    class Meta:
+        indexes = [
+            models.Index(fields=["filename", "language"], name="filename_language_idx")
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=["filename", "language"], name="unique json file by language")
+        ]
+
+class ElectionDashboard_Candidates(models.Model) :
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20)
+    date = models.CharField(max_length=100)
+    election_name = models.CharField(max_length=100)
+    seat = models.CharField(max_length=100)
+    party = models.CharField(max_length=100)
+    votes = models.IntegerField()
+    votes_perc = models.FloatField(null=True)
+    result = models.CharField(max_length=100)
+
+class ElectionDashboard_Seats(models.Model) :
+    seat = models.CharField(max_length=100)
+    election_name = models.CharField(max_length=100)
+    date = models.CharField(max_length=100)
+    party = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20, default='')
+    majority = models.IntegerField()
+    majority_perc = models.FloatField(null=True)
+    seat_name = models.CharField(max_length=100)
+
+class ElectionDashboard_Party(models.Model) :
+    party = models.CharField(max_length=100)
+    type = models.CharField(max_length=20)
+    state = models.CharField(max_length=100)
+    election_name = models.CharField(max_length=100)
+    date = models.CharField(max_length=100)
+    seats = models.IntegerField()
+    seats_total = models.IntegerField()
+    seats_perc = models.FloatField(null=True)
+    votes = models.IntegerField()
+    votes_perc = models.FloatField(null=True)

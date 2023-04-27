@@ -16,10 +16,12 @@ from django.db.models.base import ModelBase
 from django.contrib.postgres.search import TrigramWordSimilarity
 from django.contrib.postgres.search import SearchVector
 from django.contrib.postgres.search import SearchHeadline
+from data_gov_my.serializers import i18nSerializer
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 
 from data_gov_my.utils import cron_utils, triggers
-from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName
+from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName, i18nJson
 from data_gov_my.api_handling import handle, cache_search
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.catalog_utils.catalog_variable_classes import CatalogueDataHandler as cdh
@@ -217,6 +219,19 @@ class EXPLORER(APIView) :
             return obj.handle_api(params)
 
         return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
+    
+    # TODO: Protect this, or remove once meta is created
+    def post(self, request, format=None) :
+        params = dict(request.POST)
+
+        if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
+            obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
+            to_rebuild = 'rebuild' in params
+            r_table = params['table'][0] if 'table' in params else ''
+            obj.populate_db(table=r_table,rebuild=to_rebuild)
+
+        return JsonResponse({"status": 200, "message": "Table Populated."}, status=200)
+    
 
 
 class DROPDOWN(APIView):
@@ -233,6 +248,47 @@ class DROPDOWN(APIView):
         else:
             return JsonResponse({}, safe=False)
 
+
+class I18N(APIView):
+    def get(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(queryset)
+            res = serializer.data["translation_json"]
+        else: # return all 
+            queryset = get_list_or_404(i18nJson)
+            serializer = i18nSerializer(queryset, many=True)
+            res = {'en-GB' : [], 'ms-MY': []}
+            for file in serializer.data:
+                res[file["language"]].append(file["filename"])
+        
+        return JsonResponse(res, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        serializer = i18nSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
+        if {"filename", "lang"} <= request.query_params.keys(): # return all
+            i18n_object = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+            serializer = i18nSerializer(instance=i18n_object, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.validated_data, status=status.HTTP_204_NO_CONTENT)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        return JsonResponse(data={"detail": "Query parameter filename & lang is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
 
 """
 Checks which filters have been applied for the data-catalog
