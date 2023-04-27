@@ -419,6 +419,48 @@ def timeseries_chart(file_name: str, variables: Dict):
 
 
 """
+Builds Line Chart
+"""
+def line_chart(file_name: str, variables):
+    df = pd.read_parquet(file_name)
+    df = df.replace({np.nan: None})
+    if "state" in df.columns:
+        df["state"].replace(STATE_ABBR, inplace=True)
+
+    structure_info = {"key_list": [], "value_obj": []}
+
+    get_nested_keys(variables, structure_info)
+    keys_list = structure_info["key_list"][::-1]
+    value_obj = structure_info["value_obj"]
+
+    if len(keys_list) == 0:
+        res = {}
+        for k, v in variables.items():
+            res[k] = df[v].to_list()
+    else:
+        df["u_groups"] = list(df[keys_list].itertuples(index=False, name=None))
+        u_groups_list = df["u_groups"].unique().tolist()
+
+        res = {}
+        for group in u_groups_list:
+            result = {}
+            for b in group[::-1]:
+                result = {b: result}
+            for k, v in value_obj[0].items():
+                group_l = group + (k,)
+                temp_group = group[0] if len(group) == 1 else group
+                set_dict(
+                    result,
+                    list(group_l),
+                    df.groupby(keys_list)[v].get_group(temp_group).to_list(),
+                    "SET",
+                )
+            merge(res, result)
+
+    return res
+
+
+"""
 Builds Waffle Chart
 """
 
@@ -681,7 +723,13 @@ Query values chart builder for values to be queried, usually as options for drop
 def query_values(file_name: str, variables: QueryValuesVariables):
     df = pd.read_parquet(file_name)
     columns = variables["columns"]
-    
+    isFlat = variables["flat"] if "flat" in variables else False
+    if len(columns) == 1:
+        return list(df[columns[0]].unique())
+    if isFlat:
+        keys = df.drop_duplicates(subset=columns)[columns]
+        return keys.to_dict(orient="records")
+
     res = {}
     for keys, v in df.groupby(columns[:-1])[columns[-1]]:
         d = res
