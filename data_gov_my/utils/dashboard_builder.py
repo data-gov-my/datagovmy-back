@@ -18,6 +18,8 @@ def build_chart(chart_type, data):
         return heatmap_chart(input_file, variables)
     elif chart_type == "timeseries_chart":
         return timeseries_chart(input_file, variables)
+    elif chart_type == "line_chart":
+        return line_chart(input_file, variables)
     elif chart_type == "bar_meter":
         return bar_meter(input_file, variables)
     elif chart_type == "custom_chart":
