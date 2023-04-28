@@ -66,7 +66,7 @@ def bar_chart(file_name: str, variables: BarChartVariables):
 Builds Bar Meter
 """
 
-def barmeter(file_name, variables: BarMeterVariables):
+def bar_meter(file_name, variables: BarMeterVariables):
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: variables["null_vals"]})
 
