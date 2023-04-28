@@ -180,23 +180,17 @@ def custom_chart(file_name: str, variables: CustomChartVariables):
         df["district"] = df["district"].apply(lambda x: x.lower().replace(" ", "-"))
 
     keys = variables["keys"]
-
-    df["data"] = df[variables["columns"]].to_dict(orient="records")
+    columns = variables["columns"]
 
     res = {}
-
-    df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
-    u_groups_list = df["u_groups"].unique().tolist()
-
-    for group in u_groups_list:
-        result = {}
-        for b in group[::-1]:
-            result = {b: result}
-        group_l = [group[0]] if len(group) == 1 else list(group)
-        group = group[0] if len(group) == 1 else group
-        temp = df.groupby(keys)["data"].get_group(group).to_list()[0]
-        set_dict(result, group_l, temp, "SET")
-        merge(res, result)
+    grouped = df.groupby(keys)
+    for name, group in grouped:
+        current_lvl = res
+        if isinstance(name, tuple):
+            for n in name[:-1]:
+                current_lvl = current_lvl.setdefault(n, {})
+            name = name[-1]
+        current_lvl[name] = group[columns].to_dict('records')[0]
 
     return res
 
