@@ -66,22 +66,22 @@ def bar_chart(file_name: str, variables: BarChartVariables):
 Builds Bar Meter
 """
 
-def bar_meter(file_name, variables: BarMeterVariables):
+def bar_meter(file_name, variables):
     df = pd.read_parquet(file_name)
-    df = df.replace({np.nan: variables["null_vals"]})
-
-    if "state" in df.columns:
-        df["state"].replace(STATE_ABBR, inplace=True)
-
-    if "area" in df.columns:  # District usually uses has spaces and Uppercase
-        df["area"] = df["area"].apply(lambda x: x.lower().replace(" ", "_"))
+    df = df.replace({np.nan: None})
 
     group_columns = variables["keys"]
     value_columns = variables["axis_values"]
 
     def group_to_dict(group):
-        return [{group.iloc[i][key]: group.iloc[i][value] for d in value_columns for key, value in d.items()} for i in range(len(group))]
-    
+        result = []
+        for d in value_columns:
+            for key, value in d.items():
+                x_values = group[key].values
+                y_values = group[value].values
+                result.extend([{"x": x, "y": y} for x, y in zip(x_values, y_values)])
+        return result       
+
     if not group_columns:
         return group_to_dict(df)
     
