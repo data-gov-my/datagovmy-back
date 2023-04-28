@@ -66,8 +66,7 @@ def bar_chart(file_name: str, variables: BarChartVariables):
 Builds Bar Meter
 """
 
-
-def bar_meter(file_name: str, variables: BarMeterVariables):
+def barmeter(file_name, variables: BarMeterVariables):
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: variables["null_vals"]})
 
@@ -77,59 +76,26 @@ def bar_meter(file_name: str, variables: BarMeterVariables):
     if "area" in df.columns:  # District usually uses has spaces and Uppercase
         df["area"] = df["area"].apply(lambda x: x.lower().replace(" ", "_"))
 
-    keys = variables["keys"]
-    axis_values = variables["axis_values"]
-    final_key_cols = []
-    add_key = variables["add_key"]
-    wanted = variables["wanted"]
-    id_needed = variables["id_needed"]
-    condition = variables["condition"]
-    post_op = variables["post_operation"]
+    group_columns = variables["keys"]
+    value_columns = variables["axis_values"]
 
-    if len(wanted) > 0:
-        for i in wanted:
-            df = df[df[i["col_name"]].isin(i["values"])]
-
-    for i in axis_values:
-        for k, v in i.items():
-            columns = [k, v] + list(add_key.keys())
-            if id_needed:
-                columns.append("id")
-            df["id"] = df[k]
-            rename_cols = {k: "x", v: "y"}
-            rename_cols.update(add_key)
-            df["final_" + v] = (
-                df[columns]
-                .rename(columns=rename_cols)
-                .apply(lambda s: s.to_dict(), axis=1)
-            )
-            final_key_cols.append("final_" + v)
-
-    res = {}
-
-    if len(keys) != 0:
-        df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
-        u_groups_list = df["u_groups"].unique().tolist()
-
-        for group in u_groups_list:
-            result = {}
-            for b in group[::-1]:
-                result = {b: result}
-            for i in final_key_cols:
-                group_l = [group[0]] if len(group) == 1 else list(group)
-                group = group[0] if len(group) == 1 else group
-                temp = df.groupby(keys)[i].get_group(group).to_list()
-                temp = perform_operation(temp, post_op)
-                set_dict(result, group_l, temp, "SET")
-            merge(res, result)
-    else:
-        res = {}
-        for i in final_key_cols:
-            key = i.replace("final_", "")
-            res[key] = df[i].to_list()
-
-    return res
-
+    def group_to_dict(group):
+        return [{group.iloc[i][key]: group.iloc[i][value] for d in value_columns for key, value in d.items()} for i in range(len(group))]
+    
+    if not group_columns:
+        return group_to_dict(df)
+    
+    result = {}
+    for name, group in df.groupby(group_columns):
+        if len(group_columns) > 1:
+            current_level = result
+            for i in range(len(name)-1):
+                current_level = current_level.setdefault(name[i], {})
+            current_level[name[-1]] = group_to_dict(group)
+        else:
+            result[name] = group_to_dict(group)
+    
+    return result
 
 """
 Builds Choropleth
