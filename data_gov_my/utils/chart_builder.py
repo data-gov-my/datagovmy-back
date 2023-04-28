@@ -70,6 +70,12 @@ def bar_meter(file_name, variables):
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: None})
 
+    if "state" in df.columns:
+        df["state"].replace(STATE_ABBR, inplace=True)
+
+    if "district" in df.columns:  # District usually uses has spaces and Uppercase
+        df["district"] = df["district"].apply(lambda x: x.lower().replace(" ", "-"))
+
     group_columns = variables["keys"]
     value_columns = variables["axis_values"]
 
