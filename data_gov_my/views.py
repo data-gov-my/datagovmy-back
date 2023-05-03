@@ -257,7 +257,7 @@ class I18N(APIView):
         if {"filename", "lang"} <= request.query_params.keys(): # return all
             queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
             serializer = i18nSerializer(queryset)
-            res = serializer.data["translation_json"]
+            res = serializer.data["translation"]
         else: # return all 
             queryset = get_list_or_404(i18nJson)
             serializer = i18nSerializer(queryset, many=True)
