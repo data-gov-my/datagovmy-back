@@ -51,6 +51,16 @@ class ElectionPartySerializer(serializers.ModelSerializer):
     def get_seats(self, obj) : 
         return {"total" : obj.seats_total, "perc" : obj.seats_perc, "won" : obj.seats}
 
+class ElectionOverallSeatSerializer(serializers.ModelSerializer):
+    majority = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ElectionDashboard_Seats
+        fields = ['seat', 'party', 'name', 'majority']
+
+    def get_majority(self, obj):
+        return {"abs" : obj.majority, "perc" : obj.majority_perc}
+
 class i18nSerializer(serializers.ModelSerializer):
     class Meta:
         model = i18nJson 
