@@ -6,7 +6,7 @@ from rest_framework import exceptions
 from django.http import JsonResponse
 from django.apps import apps
 from data_gov_my.models import DashboardJson
-from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer
+from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer, ElectionOverallSeatSerializer
 
 
 
@@ -16,7 +16,7 @@ class ELECTIONS(General_Explorer):
     explorer_name = "ELECTIONS"
 
     # List of charts within explorer, with own endpoints
-    charts = ["candidates", "seats", "party", "full_result"]
+    charts = ["candidates", "seats", "party", "full_result", "overall_seat"]
 
     # List of dropdowns within explorer, with own endpoints
     dropdowns=['candidate_list', "seats_list", "party_list"]
@@ -76,6 +76,9 @@ class ELECTIONS(General_Explorer):
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
             if chart_type == "full_result" :
                 res = self.full_result(request_params=request_params)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+            if chart_type == "overall_seat" :
+                res = self.overall_seat(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
 
         return JsonResponse({"400" : "Bad Request."}, status=400)
@@ -234,6 +237,35 @@ class ELECTIONS(General_Explorer):
 
         candidates_res = model_choice.objects.filter(party=name, state=state, type=area_type)
         serializer = ElectionPartySerializer(candidates_res, many=True)
+
+        res["msg"] = serializer.data
+        res["status"] = 200
+
+        return res
+    
+    '''
+    Handles Overall Seats Charts
+    '''
+    def overall_seat(self, request_params) : 
+        required_params = ["state", "type", "election"]
+
+        res = {}
+        
+        if not all(param in request_params for param in required_params) :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+    
+        model_name = 'ElectionDashboard_Seats'
+        
+        state = request_params['state'][0]
+        area_type = request_params['type'][0]
+        election = request_params['election'][0]
+        
+        model_choice = apps.get_model('data_gov_my', model_name)
+
+        overall_res = model_choice.objects.filter(election_name=election, state=state, type=area_type)
+        serializer = ElectionOverallSeatSerializer(overall_res, many=True)
 
         res["msg"] = serializer.data
         res["status"] = 200

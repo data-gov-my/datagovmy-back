@@ -1,4 +1,3 @@
-import jsonfield
 from django.db import models
 from django.contrib.postgres.indexes import GinIndex
 
@@ -97,6 +96,7 @@ class ElectionDashboard_Seats(models.Model) :
     majority = models.IntegerField()
     majority_perc = models.FloatField(null=True)
     seat_name = models.CharField(max_length=100)
+    state = models.CharField(max_length=50, null=True)
 
 class ElectionDashboard_Party(models.Model) :
     party = models.CharField(max_length=100)
