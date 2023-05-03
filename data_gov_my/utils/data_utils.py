@@ -182,9 +182,7 @@ def rebuild_i18n(operation, op_method):
         i18n_files = [f + ".json" for f in i18n_files]
 
     failed_builds = []
-    validate_routes = {}
-    failed_notify = []
-
+    
     for file in i18n_files:
         language = os.path.split(file)[0]
         filename = os.path.split(file)[1].replace(".json", "")
@@ -192,15 +190,9 @@ def rebuild_i18n(operation, op_method):
             f_meta = os.path.join(I18N_DIR, file)
             f = open(f_meta)
             data = json.load(f)
-            if file in validate_routes:
-                validate_routes[file].append(data["route"])
-            else:
-                validate_routes[file] = [data["route"]]
             obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
             obj.save()
-            
         except Exception as e:
-            failed_notify.append(file)
             failed_obj = {}
             failed_obj["I18N_FILENAME"] = filename
             failed_obj["I18N_LANGUAGE"] = language 
@@ -214,10 +206,7 @@ def rebuild_i18n(operation, op_method):
         print("I18N Built successfully.")
         triggers.send_telegram("I18N Built successfully.")
 
-    validate_info = {}
-    validate_info["routes"] = validate_routes
-    validate_info["failed_dashboards"] = failed_notify
-    return validate_info
+        
 
 
 

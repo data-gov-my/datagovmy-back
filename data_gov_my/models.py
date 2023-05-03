@@ -63,8 +63,8 @@ class i18nJson(models.Model):
 
     filename = models.CharField(max_length=50)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en-GB')
-    route = models.CharField(max_length=100) # routes are comma-separated 
-    translation = models.JSONField()
+    route = models.CharField(max_length=50)
+    translation_json = models.JSONField()
 
     def __str__(self) -> str:
         return f'{self.filename} ({self.language})'
