@@ -297,22 +297,26 @@ Revalidate Frontend
 """
 
 
-def revalidate_frontend(dashboard):
-    if dashboard not in common.FRONTEND_ENDPOINTS:
+def revalidate_frontend(dashboard=False, route=False):
+    endpoint = []
+    if route: 
+        endpoint.append(route)
+    elif dashboard in common.FRONTEND_ENDPOINTS:
+        r = common.FRONTEND_ENDPOINTS[dashboard]
+        endpoint.append(r)
+    else:
         return -1
-
-    endpoint = common.FRONTEND_ENDPOINTS[dashboard]
+    
+    endpoint = ",".join(endpoint)
+        
     url = os.getenv("FRONTEND_URL", "-")
     fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
 
-    headers = {"Authorization": fe_auth}
-    body = {"route": endpoint}
+    headers = {"Authorization": fe_auth, 'Content-Type': "application/x-www-form-urlencoded"}
+    payload = f'route={endpoint}'
 
-    # Comment out temporarily
-    # response = requests.post(url, headers=headers, data=body)
-
-    # return response.status_code
-    return 200
+    response = requests.post(url, headers=headers, data=payload)
+    return response.status_code
 
 
 """
