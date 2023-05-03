@@ -230,7 +230,32 @@ def selective_update():
             triggers.send_telegram("Updating : " + file_list)
             operation = "UPDATE " + file_list
 
-            data_utils.rebuild_i18n(operation, "AUTO")
+            validate_info = data_utils.rebuild_i18n(operation, "AUTO")
+            dashboards_validate = validate_info["routes"]
+            failed_dashboards = validate_info["failed_dashboards"]
+
+            dashboards_validate_status = []
+
+            for file in dashboards_validate:
+                routes = ",".join(dashboards_validate[file])
+                if file not in failed_dashboards and revalidate_frontend(route=routes) == 200:
+                    dashboards_validate_status.append(
+                        {"status": "✅", "variable": routes}
+                    )
+                else:
+                    dashboards_validate_status.append(
+                        {"status": "❌", "variable": routes}
+                    )
+
+            if dashboards_validate_status:
+                revalidation_results = triggers.format_status_message(
+                    dashboards_validate_status, "-- I18N REVALIDATION STATUS --"
+                )
+                triggers.send_telegram(revalidation_results)
+
+                    
+
+
 
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
@@ -297,22 +322,26 @@ Revalidate Frontend
 """
 
 
-def revalidate_frontend(dashboard):
-    if dashboard not in common.FRONTEND_ENDPOINTS:
+def revalidate_frontend(dashboard=False, route=False):
+    endpoint = []
+    if route: 
+        endpoint.append(route)
+    elif dashboard in common.FRONTEND_ENDPOINTS:
+        r = common.FRONTEND_ENDPOINTS[dashboard]
+        endpoint.append(r)
+    else:
         return -1
-
-    endpoint = common.FRONTEND_ENDPOINTS[dashboard]
+    
+    endpoint = ",".join(endpoint)
+        
     url = os.getenv("FRONTEND_URL", "-")
     fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
 
-    headers = {"Authorization": fe_auth}
-    body = {"route": endpoint}
+    headers = {"Authorization": fe_auth, 'Content-Type': "application/x-www-form-urlencoded"}
+    payload = f'route={endpoint}'
 
-    # Comment out temporarily
-    # response = requests.post(url, headers=headers, data=body)
-
-    # return response.status_code
-    return 200
+    response = requests.post(url, headers=headers, data=payload)
+    return response.status_code
 
 
 """
