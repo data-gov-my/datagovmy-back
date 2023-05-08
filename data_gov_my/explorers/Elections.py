@@ -264,7 +264,13 @@ class ELECTIONS(General_Explorer):
         
         model_choice = apps.get_model('data_gov_my', model_name)
 
-        overall_res = model_choice.objects.filter(election_name=election, state=state, type=area_type)
+        overall_res = None
+
+        if area_type == 'parlimen' and state == 'mys' : 
+            overall_res = model_choice.objects.filter(election_name=election, type=area_type)
+        else : 
+            overall_res = model_choice.objects.filter(election_name=election, state=state, type=area_type)
+        
         serializer = ElectionOverallSeatSerializer(overall_res, many=True)
 
         res["msg"] = serializer.data
