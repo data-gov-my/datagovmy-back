@@ -32,8 +32,8 @@ class CustomChartVariables(TypedDict):
 
 class ChoroplethChartVariables(TypedDict):
     x: str
-    y: List[str] # alow multiple y columns
-    keys: List[str] # filters
+    y: List[str]  # alow multiple y columns
+    keys: List[str]  # filters
 
 
 class MetricsTableVariables(TypedDict):
@@ -77,5 +77,13 @@ class LatLonVariables(TypedDict):
     values: List[str]
     null_vals: str | int | None
 
+
+class SortValuesVariables(TypedDict):
+    by: List[str]
+    ascending: List[bool]
+
+
 class QueryValuesVariables(TypedDict):
-    columns: List[str] # has specific ordering
+    flat: bool
+    columns: List[str]
+    sort_values: SortValuesVariables
