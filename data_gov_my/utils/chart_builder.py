@@ -682,16 +682,26 @@ def timeseries_shared(file_name: str, variables):
 
     return res
 
+
 """
 Query values chart builder for values to be queried, usually as options for dropdown selection.
 """
 
+
 def query_values(file_name: str, variables: QueryValuesVariables):
     df = pd.read_parquet(file_name)
-    columns = variables["columns"]
-    isFlat = variables["flat"] if "flat" in variables else False
+    columns = variables.get("columns", [])
+    isFlat = variables.get("flat", False)
+    sort_values = variables.get("sort_values", False)
+
+    if sort_values:
+        sort_cols, ascending = sort_values.get(
+            "by", []), sort_values.get("ascending", [])
+        df = df.sort_values(by=sort_cols, ascending=ascending)
+
     if len(columns) == 1:
         return list(df[columns[0]].unique())
+
     if isFlat:
         keys = df.drop_duplicates(subset=columns)[columns]
         return keys.to_dict(orient="records")
