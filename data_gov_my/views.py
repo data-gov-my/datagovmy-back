@@ -246,13 +246,19 @@ class DROPDOWN(APIView):
             dropdown_lst = res["query_values"]["data"]["data"]
 
             filtered_res = dropdown_lst
-            if filters := param_list.get("filter"):
-                filters = map(lambda f: f.split("@"), filters)
-                for query, column in filters:
+            if query := param_list.get("query"):
+                query = query[0].lower()
+                if filters := param_list.get("filters"):
+                    filters = filters[0].split(",")
+                else:
+                    # by default take all columns
+                    filters = filtered_res[0].keys()
+                for column in filters:
                     if column not in filtered_res[0]:
                         return JsonResponse({"error": f'{column} is not a valid filter column.'}, status=400)
-                    filtered_res = [
-                        d for d in filtered_res if query.lower() in d[column].lower()]
+                filtered_res = [
+                    d for d in filtered_res if any(query.lower() in d[column].lower() for column in filters)]
+
             if limit := param_list.get('limit'):
                 limit = int(limit[0])
                 filtered_res = filtered_res[:limit]
