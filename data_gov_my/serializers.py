@@ -56,7 +56,7 @@ class ElectionOverallSeatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElectionDashboard_Seats
-        fields = ['seat', 'party', 'name', 'majority']
+        fields = ['seat', 'date', 'party', 'name', 'majority']
 
     def get_majority(self, obj):
         return {"abs" : obj.majority, "perc" : obj.majority_perc}
