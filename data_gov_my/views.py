@@ -233,7 +233,6 @@ class EXPLORER(APIView) :
         return JsonResponse({"status": 200, "message": "Table Populated."}, status=200)
     
 
-
 class DROPDOWN(APIView):
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
@@ -244,7 +243,20 @@ class DROPDOWN(APIView):
 
         if all(p in param_list for p in params_req):
             res = handle_request(param_list, False)
-            return JsonResponse(res, safe=False)
+            dropdown_lst = res["query_values"]["data"]["data"]
+
+            filtered_res = dropdown_lst
+            if filters := param_list.get("filter"):
+                filters = map(lambda f: f.split("@"), filters)
+                for query, column in filters:
+                    if column not in filtered_res[0]:
+                        return JsonResponse({"error": f'{column} is not a valid filter column.'}, status=400)
+                    filtered_res = [
+                        d for d in filtered_res if query.lower() in d[column].lower()]
+            if limit := param_list.get('limit'):
+                limit = int(limit[0])
+                filtered_res = filtered_res[:limit]
+            return JsonResponse(filtered_res, safe=False)
         else:
             return JsonResponse({}, safe=False)
 
