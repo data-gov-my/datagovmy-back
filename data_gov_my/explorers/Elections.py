@@ -97,6 +97,7 @@ class ELECTIONS(General_Explorer):
         model_name = ''
         c_serializer = ''
         c_filters = {}
+        extract_votes_outcome = False
 
         if c_type == "candidates" or c_type == "seats":
             election = request_params['election'][0]
@@ -104,6 +105,7 @@ class ELECTIONS(General_Explorer):
             model_name = 'ElectionDashboard_Candidates'
             c_serializer = ElectionCandidateSerializer
             c_filters = {"election_name" : election, "seat" : seat}
+            extract_votes_outcome = True
         if c_type == "party" : 
             election = request_params['election'][0]
             state = request_params['state'][0]
@@ -114,9 +116,17 @@ class ELECTIONS(General_Explorer):
 
         model_choice = apps.get_model('data_gov_my', model_name)
         candidates_res = model_choice.objects.filter(**c_filters)
-        serializer = c_serializer(candidates_res, many=True)
+        data = c_serializer(candidates_res, many=True).data
 
-        res["msg"] = serializer.data
+        # For particular case of full_results
+        if extract_votes_outcome and len(data) > 0 :
+            const_keys = ["voter_turnout", "voter_turnout_perc", "votes_rejected", "votes_rejected_perc"]
+            r = {}
+            r["votes"] = {k: data[0][k] for k in const_keys}
+            r["data"] = [{k: v for k, v in d.items() if k not in const_keys} for d in data]
+            data = r
+
+        res["msg"] = data
         res["status"] = 200
 
         return res
