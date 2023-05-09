@@ -18,7 +18,7 @@ from django.contrib.postgres.search import SearchVector
 from django.contrib.postgres.search import SearchHeadline
 from data_gov_my.serializers import i18nSerializer
 from django.shortcuts import get_object_or_404, get_list_or_404
-
+from rest_framework.exceptions import ParseError
 
 from data_gov_my.utils import cron_utils, triggers
 from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName, i18nJson
@@ -479,6 +479,9 @@ def get_nested_data(api_params, param_list, data):
             )
             if key in data:
                 data = data[key]
+            else:
+                raise ParseError(
+                    detail=f'The {a} \'{key}\' is invalid. Please use a valid {a}.')
         else:
             data = {}
             break
