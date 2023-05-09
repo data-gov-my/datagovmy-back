@@ -22,7 +22,8 @@ class ElectionCandidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElectionDashboard_Candidates
-        fields = ['name', 'type', 'date', 'election_name', 'seat', 'party', 'votes', 'result']
+        fields = ['name', 'type', 'date', 'election_name', 'seat', 'party', 'votes', 'result', 'voter_turnout', 'voter_turnout_perc',
+       'votes_rejected', 'votes_rejected_perc' ]
 
     def get_votes(self, obj):
         return {"abs" : obj.votes,"perc" : obj.votes_perc}

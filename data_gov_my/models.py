@@ -85,6 +85,10 @@ class ElectionDashboard_Candidates(models.Model) :
     votes = models.IntegerField()
     votes_perc = models.FloatField(null=True)
     result = models.CharField(max_length=100)
+    voter_turnout = models.IntegerField(null=True)
+    voter_turnout_perc = models.FloatField(null=True, default=None)
+    votes_rejected = models.IntegerField(null=True)
+    votes_rejected_perc = models.FloatField(null=True, default=None)
 
 class ElectionDashboard_Seats(models.Model) :
     seat = models.CharField(max_length=100)
