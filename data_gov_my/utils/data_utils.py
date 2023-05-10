@@ -192,10 +192,8 @@ def rebuild_i18n(operation, op_method):
             f_meta = os.path.join(I18N_DIR, file)
             f = open(f_meta)
             data = json.load(f)
-            if file in validate_routes:
-                validate_routes[file].append(data["route"])
-            else:
-                validate_routes[file] = [data["route"]]
+            if data["route"]: # do not revalidate invalid routes
+                validate_routes.setdefault(file,[]).append(data["route"])
             obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
             obj.save()
             
