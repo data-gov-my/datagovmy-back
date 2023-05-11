@@ -152,7 +152,7 @@ class ELECTIONS(General_Explorer):
     def seat_list(self) :
         model_name = 'ElectionDashboard_Seats'
         model_choice = apps.get_model('data_gov_my', model_name)
-        data = list(model_choice.objects.values_list('seat_name', flat=True).distinct())
+        data = list(model_choice.objects.values('seat_name', 'type').distinct())
         res = {}
         res["msg"] = data
         res["status"] = 200
