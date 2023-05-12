@@ -78,14 +78,18 @@ def bar_meter(file_name, variables):
 
     group_columns = variables["keys"]
     value_columns = variables["axis_values"]
+    sub_keys = "sub_keys" in variables["subkeys"] # For when each obj in axis_values, should be nested
 
     def group_to_dict(group):
-        result = []
+        result = {} if sub_keys else []
         for d in value_columns:
             for key, value in d.items():
                 x_values = group[key].values
                 y_values = group[value].values
-                result.extend([{"x": x, "y": y} for x, y in zip(x_values, y_values)])
+                if sub_keys : 
+                    result[value] = [{"x": x, "y": y} for x, y in zip(x_values, y_values)]
+                else : 
+                    result.extend([{"x": x, "y": y} for x, y in zip(x_values, y_values)])
         return result       
 
     if not group_columns:
