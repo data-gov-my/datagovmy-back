@@ -61,7 +61,6 @@ def bar_chart(file_name: str, variables: BarChartVariables):
 
     return res
 
-
 """
 Builds Bar Meter
 """
