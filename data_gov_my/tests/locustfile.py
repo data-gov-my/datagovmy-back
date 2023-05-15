@@ -1,6 +1,9 @@
 import os
+import environ
 from locust import HttpUser, task
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class User(HttpUser):
     def on_start(self):
