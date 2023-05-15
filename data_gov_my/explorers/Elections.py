@@ -175,7 +175,7 @@ class ELECTIONS(General_Explorer):
     Handles chart for candidates
     '''
     def candidates_chart(self, request_params) :
-        required_params = ["name", "type"] # Declare required params
+        required_params = ["name"] # Declare required params
 
         res = {}
 
@@ -187,14 +187,19 @@ class ELECTIONS(General_Explorer):
         model_name = 'ElectionDashboard_Candidates'
         
         name = request_params['name'][0]
-        e_type = request_params['type'][0]
 
         model_choice = apps.get_model('data_gov_my', model_name)
 
-        candidates_res = model_choice.objects.filter(name=name, type=e_type)
-        serializer = ElectionCandidateSerializer(candidates_res, many=True)
+        candidates_parlimen = model_choice.objects.filter(name=name, type="parlimen")
+        candidates_dun = model_choice.objects.filter(name=name, type="dun")
+        res_parlimen = ElectionCandidateSerializer(candidates_parlimen, many=True)
+        res_dun = ElectionCandidateSerializer(candidates_dun, many=True)
 
-        res["msg"] = serializer.data
+        results = {}
+        results['parlimen'] = res_parlimen.data
+        results['dun'] = res_dun.data
+
+        res["msg"] = results
         res["status"] = 200
 
         return res
