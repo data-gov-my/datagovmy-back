@@ -5,22 +5,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class User(HttpUser):
     def on_start(self):
-        # FIXME: headers are still missing for the actual request sent
         self.client.headers = {
             "Authorization": os.getenv("WORKFLOW_TOKEN"),
         }
 
     # Dashboards
     @task
-    def sekolahku(self):
+    def exchange_rates(self):
         self.client.get(
-            url="/dashboard",
-            params={"dashboard": "sekolahku", "code": "ABA0001"},
-            headers={
-                "Authorization": os.getenv("WORKFLOW_TOKEN"),
-            },
+            url="/dashboard", params={"dashboard": "exchange_rates", "state": "mys"}
         )
 
     @task
@@ -34,4 +30,10 @@ class User(HttpUser):
     def geopoint(self):
         self.client.get(
             url="/data-variable", params={"id": "dgmy-public-mwe_mwe_geopoint_0"}
+        )
+
+    @task
+    def table(self):
+        self.client.get(
+            url="/data-variable", params={"id": "dgmy-public-mwe_mwe_table_0"}
         )
