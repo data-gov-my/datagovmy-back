@@ -77,7 +77,7 @@ def bar_meter(file_name, variables):
 
     group_columns = variables["keys"]
     value_columns = variables["axis_values"]
-    sub_keys = "sub_keys" in variables["subkeys"] # For when each obj in axis_values, should be nested
+    sub_keys = "sub_keys" in variables # For when each obj in axis_values, should be nested
 
     def group_to_dict(group):
         result = {} if sub_keys else []
