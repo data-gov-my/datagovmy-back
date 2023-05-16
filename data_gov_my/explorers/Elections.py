@@ -234,7 +234,7 @@ class ELECTIONS(General_Explorer):
     Handles Party Charts
     '''
     def party_chart(self, request_params) : 
-        required_params = ["party_name", "state", "type"]
+        required_params = ["party_name", "state"]
 
         res = {}
         print(request_params)
@@ -247,13 +247,19 @@ class ELECTIONS(General_Explorer):
         
         name = request_params['party_name'][0]
         state = request_params['state'][0]
-        area_type = request_params['type'][0]
         model_choice = apps.get_model('data_gov_my', model_name)
 
-        candidates_res = model_choice.objects.filter(party=name, state=state, type=area_type)
-        serializer = ElectionPartySerializer(candidates_res, many=True)
+        party_parlimen = model_choice.objects.filter(party=name, state=state, type='parlimen')
+        party_dun = model_choice.objects.filter(party=name, state=state, type='dun')
 
-        res["msg"] = serializer.data
+        s_parlimen = ElectionPartySerializer(party_parlimen, many=True)
+        s_dun = ElectionPartySerializer(party_dun, many=True)
+
+        result = {}
+        result['parlimen'] = s_parlimen.data
+        result['dun'] = s_dun.data
+
+        res["msg"] = result
         res["status"] = 200
 
         return res
