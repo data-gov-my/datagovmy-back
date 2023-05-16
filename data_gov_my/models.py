@@ -1,6 +1,7 @@
+import collections
 from django.db import models
 from django.contrib.postgres.indexes import GinIndex
-
+from jsonfield import JSONField
 
 class MetaJson(models.Model) :
     dashboard_name = models.CharField(max_length=200)
@@ -11,7 +12,7 @@ class DashboardJson(models.Model) :
     chart_name = models.CharField(max_length=200, null=True)
     chart_type = models.CharField(max_length=200, null=True)
     api_type = models.CharField(max_length=200, null=True)
-    chart_data = models.JSONField()
+    chart_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
 
 class CatalogJson(models.Model) :
     id = models.CharField(max_length=400, primary_key=True)
@@ -26,7 +27,7 @@ class CatalogJson(models.Model) :
     dataset_begin = models.IntegerField(default=0)
     dataset_end = models.IntegerField(default=0)
     data_source = models.CharField(max_length=100)
-    catalog_data = models.JSONField()
+    catalog_data = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict})
     file_src = models.CharField(max_length=400, default='')
 
 class NameDashboard_FirstName(models.Model) :
