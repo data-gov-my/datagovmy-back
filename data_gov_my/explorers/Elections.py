@@ -268,7 +268,7 @@ class ELECTIONS(General_Explorer):
     Handles Overall Seats Charts
     '''
     def overall_seat(self, request_params) : 
-        required_params = ["state", "type", "election"]
+        required_params = ["state", "election"]
 
         res = {}
         
@@ -280,17 +280,12 @@ class ELECTIONS(General_Explorer):
         model_name = 'ElectionDashboard_Seats'
         
         state = request_params['state'][0]
-        area_type = request_params['type'][0]
         election = request_params['election'][0]
         
         model_choice = apps.get_model('data_gov_my', model_name)
 
-        overall_res = None
 
-        if area_type == 'parlimen' and state == 'mys' : 
-            overall_res = model_choice.objects.filter(election_name=election, type=area_type)
-        else : 
-            overall_res = model_choice.objects.filter(election_name=election, state=state, type=area_type)
+        overall_res = model_choice.objects.filter(election_name=election, state=state)
         
         serializer = ElectionOverallSeatSerializer(overall_res, many=True)
 
