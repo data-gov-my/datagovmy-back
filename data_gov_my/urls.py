@@ -26,5 +26,6 @@ urlpatterns = [
     path("chart/", views.CHART.as_view(), name="CHART"),
     path("dropdown/", views.DROPDOWN.as_view(), name="DROPDOWN"),
     path("explorer/", views.EXPLORER.as_view(), name="EXPLORER"),
-    path("i18n/", views.I18N.as_view(), name="I18N")
+    path("i18n/", views.I18N.as_view(), name="I18N"),
+    path("mods/",views.MODS.as_view(),name="MODS")
 ]

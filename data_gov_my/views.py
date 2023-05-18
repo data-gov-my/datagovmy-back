@@ -16,15 +16,28 @@ from django.db.models.base import ModelBase
 from django.contrib.postgres.search import TrigramWordSimilarity
 from django.contrib.postgres.search import SearchVector
 from django.contrib.postgres.search import SearchHeadline
+from data_gov_my.forms import ModsDataForm
 from data_gov_my.serializers import i18nSerializer
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.exceptions import ParseError
+from post_office.models import EmailTemplate
+from post_office import mail
 
 from data_gov_my.utils import cron_utils, triggers
-from data_gov_my.models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, NameDashboard_LastName, i18nJson
+from data_gov_my.models import (
+    MetaJson,
+    DashboardJson,
+    CatalogJson,
+    ModsData,
+    NameDashboard_FirstName,
+    NameDashboard_LastName,
+    i18nJson,
+)
 from data_gov_my.api_handling import handle, cache_search
 from data_gov_my.explorers import class_list as exp_class
-from data_gov_my.catalog_utils.catalog_variable_classes import CatalogueDataHandler as cdh
+from data_gov_my.catalog_utils.catalog_variable_classes import (
+    CatalogueDataHandler as cdh,
+)
 
 from threading import Thread
 
@@ -126,8 +139,10 @@ class DATA_VARIABLE(APIView):
 
         if all(p in param_list for p in params_req):
             res = data_variable_handler(param_list)
-            if not res : 
-                return JsonResponse({"status" : 404, "message" : "Catalogue data not found."}, status=404)
+            if not res:
+                return JsonResponse(
+                    {"status": 404, "message": "Catalogue data not found."}, status=404
+                )
             return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
@@ -211,27 +226,33 @@ class DATA_CATALOG(APIView):
         return JsonResponse(res, safe=False)
 
 
-class EXPLORER(APIView) :
+class EXPLORER(APIView):
     def get(self, request, format=None):
         params = dict(request.GET)
-        if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
-            obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
+        if (
+            "explorer" in params
+            and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
+        ):
+            obj = exp_class.EXPLORERS_CLASS_LIST[params["explorer"][0]]()
             return obj.handle_api(params)
 
         return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
-    
+
     # TODO: Protect this, or remove once meta is created
-    def post(self, request, format=None) :
+    def post(self, request, format=None):
         params = dict(request.POST)
 
-        if 'explorer' in params and params['explorer'][0] in exp_class.EXPLORERS_CLASS_LIST :
-            obj = exp_class.EXPLORERS_CLASS_LIST[ params['explorer'][0] ]()
-            to_rebuild = 'rebuild' in params
-            r_table = params['table'][0] if 'table' in params else ''
-            obj.populate_db(table=r_table,rebuild=to_rebuild)
+        if (
+            "explorer" in params
+            and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
+        ):
+            obj = exp_class.EXPLORERS_CLASS_LIST[params["explorer"][0]]()
+            to_rebuild = "rebuild" in params
+            r_table = params["table"][0] if "table" in params else ""
+            obj.populate_db(table=r_table, rebuild=to_rebuild)
 
         return JsonResponse({"status": 200, "message": "Table Populated."}, status=200)
-    
+
 
 class DROPDOWN(APIView):
     def get(self, request, format=None):
@@ -280,18 +301,22 @@ class I18N(APIView):
     def get(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-        
-        if {"filename", "lang"} <= request.query_params.keys(): # return all
-            queryset = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
+
+        if {"filename", "lang"} <= request.query_params.keys():  # return all
+            queryset = get_object_or_404(
+                i18nJson,
+                filename=request.query_params["filename"],
+                language=request.query_params["lang"],
+            )
             serializer = i18nSerializer(queryset)
             res = serializer.data["translation"]
-        else: # return all 
+        else:  # return all
             queryset = get_list_or_404(i18nJson)
             serializer = i18nSerializer(queryset, many=True)
-            res = {'en-GB' : [], 'ms-MY': []}
+            res = {"en-GB": [], "ms-MY": []}
             for file in serializer.data:
                 res[file["language"]].append(file["filename"])
-        
+
         return JsonResponse(res, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -302,20 +327,77 @@ class I18N(APIView):
             serializer.save()
             return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     def patch(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-        
-        if {"filename", "lang"} <= request.query_params.keys(): # return all
-            i18n_object = get_object_or_404(i18nJson, filename=request.query_params["filename"], language=request.query_params["lang"])
-            serializer = i18nSerializer(instance=i18n_object, data=request.data, partial=True)
+
+        if {"filename", "lang"} <= request.query_params.keys():  # return all
+            i18n_object = get_object_or_404(
+                i18nJson,
+                filename=request.query_params["filename"],
+                language=request.query_params["lang"],
+            )
+            serializer = i18nSerializer(
+                instance=i18n_object, data=request.data, partial=True
+            )
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.validated_data, status=status.HTTP_204_NO_CONTENT)
+                return Response(
+                    serializer.validated_data, status=status.HTTP_204_NO_CONTENT
+                )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        return JsonResponse(data={"detail": "Query parameter filename & lang is required to update i18n object."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return JsonResponse(
+            data={
+                "detail": "Query parameter filename & lang is required to update i18n object."
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+class MODS(APIView):
+    EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
+        name="mods_form",
+        subject="Mods Application | {{ expertise_area }}",
+        content="Hi {{ name }}, we have received your reuqest, and will reply to you within 2 weeks working time.",
+        html_content="Hi <strong>{{ name }}</strong>, we have received your reuqest, and will reply to you within 2 weeks working time.",
+    )
+
+    # TODO: protect access ?
+    def post(self, request, *args, **kwargs):
+        form = ModsDataForm(request.POST)
+        if not form.is_valid():
+            return JsonResponse(
+                data={"errors": form.errors}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        modsData: ModsData = form.save()
+        e = mail.send(
+            recipients=modsData.email,
+            # priority="now",  # TODO: task-queue with celery
+            template="mods_form",
+            context={"expertise_area": modsData.expertise_area, "name": modsData.name},
+        )
+
+        print(e)
+
+        return JsonResponse(
+            data={"message": f"Your request has been received: {e}"},
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request, *args, **kwargs):
+        # wipe all
+        deleted = ModsData.objects.all().delete()
+        return JsonResponse(
+            data={"message": f"Deleted {deleted[0]} form data."},
+            status=status.HTTP_204_NO_CONTENT,
+        )
+
+    def get(self, request, *args, **kwargs):
+        pass
+
 
 """
 Checks which filters have been applied for the data-catalog
@@ -384,7 +466,7 @@ def data_variable_handler(param_list):
 
     if not info:
         info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
-        if len(info) == 0 : # If catalogue doesn't exist
+        if len(info) == 0:  # If catalogue doesn't exist
             return {}
         info = info[0]["catalog_data"]
         cache.set(var_id, info)
@@ -392,7 +474,7 @@ def data_variable_handler(param_list):
     chart_type = info["API"]["chart_type"]
     info = data_variable_chart_handler(info, chart_type, param_list)
 
-    if len(info) == 0: # If catalogues with the filter isn't found
+    if len(info) == 0:  # If catalogues with the filter isn't found
         return {}
     return info
 
@@ -430,7 +512,9 @@ def handle_request(param_list, isDashboard=True):
                 cur_chart_data = cache.get(dbd_name + "_" + k)
 
                 # dashboard endpoint should ignore this unless the chart name is query_values
-                if (isDashboard and k == "query_values") or (not isDashboard and k != "query_values"):
+                if (isDashboard and k == "query_values") or (
+                    not isDashboard and k != "query_values"
+                ):
                     continue
 
                 if not cur_chart_data:
@@ -481,7 +565,8 @@ def get_nested_data(api_params, param_list, data):
                 data = data[key]
             else:
                 raise ParseError(
-                    detail=f'The {a} \'{key}\' is invalid. Please use a valid {a}.')
+                    detail=f"The {a} '{key}' is invalid. Please use a valid {a}."
+                )
         else:
             data = {}
             break
