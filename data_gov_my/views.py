@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from django.contrib.postgres.search import TrigramWordSimilarity
 from django.contrib.postgres.search import SearchVector
 from django.contrib.postgres.search import SearchHeadline
 from data_gov_my.forms import ModsDataForm
-from data_gov_my.serializers import i18nSerializer
+from data_gov_my.serializers import ModsDataSerializer, i18nSerializer
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.exceptions import ParseError
 from post_office.models import EmailTemplate
@@ -356,13 +356,15 @@ class I18N(APIView):
         )
 
 
-class MODS(APIView):
+class MODS(generics.ListAPIView):
     EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
         name="mods_form",
         subject="Mods Application | {{ expertise_area }}",
         content="Hi {{ name }}, we have received your request, and will reply to you as soon as we can.",
         html_content="Hi <strong>{{ name }}</strong>, we have received your request, and will reply to you as soon as we can.",
     )
+    queryset = ModsData.objects.all()
+    serializer_class = ModsDataSerializer
 
     # TODO: protect access ?
     def post(self, request, *args, **kwargs):
@@ -385,16 +387,14 @@ class MODS(APIView):
         )
 
     def delete(self, request, *args, **kwargs):
-        # wipe all
-        deleted = ModsData.objects.all().delete()
+        queryset = ModsData.objects.all()
+        if id := request.query_params.get("id", False):
+            queryset = ModsData.objects.get(id=id)
+        deleted = queryset.delete()
         return JsonResponse(
             data={"message": f"Deleted {deleted[0]} form data."},
             status=status.HTTP_204_NO_CONTENT,
         )
-
-    def get(self, request, *args, **kwargs):
-        pass
-
 
 """
 Checks which filters have been applied for the data-catalog
