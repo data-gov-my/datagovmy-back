@@ -360,8 +360,8 @@ class MODS(APIView):
     EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
         name="mods_form",
         subject="Mods Application | {{ expertise_area }}",
-        content="Hi {{ name }}, we have received your reuqest, and will reply to you within 2 weeks working time.",
-        html_content="Hi <strong>{{ name }}</strong>, we have received your reuqest, and will reply to you within 2 weeks working time.",
+        content="Hi {{ name }}, we have received your request, and will reply to you as soon as we can.",
+        html_content="Hi <strong>{{ name }}</strong>, we have received your request, and will reply to you as soon as we can.",
     )
 
     # TODO: protect access ?
@@ -375,12 +375,9 @@ class MODS(APIView):
         modsData: ModsData = form.save()
         e = mail.send(
             recipients=modsData.email,
-            # priority="now",  # TODO: task-queue with celery
             template="mods_form",
             context={"expertise_area": modsData.expertise_area, "name": modsData.name},
         )
-
-        print(e)
 
         return JsonResponse(
             data={"message": f"Your request has been received: {e}"},
