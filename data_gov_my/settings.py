@@ -177,6 +177,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)
 }
 
+# django-post_office
 EMAIL_BACKEND = 'post_office.EmailBackend'
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
@@ -186,8 +187,22 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TSL")
 
-POST_OFFICE = {
-    "CELERY_ENABLED": True,
-}
+if not DEBUG:
+    POST_OFFICE = {
+        "CELERY_ENABLED": False,
+        "BACKENDS": {
+            "default": "django_ses.SESBackend"
+        }
+    }
+
+    # django-ses
+    AWS_SES_ACCESS_KEY_ID=os.getenv("AWS_SES_ACCESS_KEY_ID")
+    AWS_SES_SECRET_ACCESS_KEY=os.getenv("AWS_SES_SECRET_ACCESS_KEY")
+    USE_SES_V2=os.getenv("USE_SES_V2")
+    AWS_SES_REGION_NAME=os.getenv("AWS_SES_REGION_NAME")
+    AWS_SES_REGION_ENDPOINT=os.getenv("AWS_SES_REGION_ENDPOINT")
+
+# celery (task queue) 
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+

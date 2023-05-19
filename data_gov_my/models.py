@@ -116,8 +116,11 @@ class ElectionDashboard_Party(models.Model) :
     votes_perc = models.FloatField(null=True)
 
 class ModsData(models.Model):
+    LANGUAGE_CHOICES = [('en-GB', 'English'), ('ms-MY', 'Bahasa Melayu')]
+
     expertise_area = models.CharField(max_length=100)
     name = models.CharField(max_length=20)
     email = models.EmailField()
     institution = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='en-GB')

@@ -359,15 +359,26 @@ class I18N(APIView):
 class MODS(generics.ListAPIView):
     EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
         name="mods_form",
-        subject="Mods Application | {{ expertise_area }}",
+        subject="MODS Application | {{ expertise_area }}",
         content="Hi {{ name }}, we have received your request, and will reply to you as soon as we can.",
         html_content="Hi <strong>{{ name }}</strong>, we have received your request, and will reply to you as soon as we can.",
     )
+    # FIXME: i18n for en-GB and ms-MY templates
+    # EMAIL_TEMPLATE_BM = EMAIL_TEMPLATE.translated_templates.get_or_create(
+    #     language="ms-MY",
+    #     subject="Permohonan MODS | {{ expertise_area }}",
+    #     content="Hi {{ name }}, kami telah menerima permintaan anda, dan kami akan membalasnya secepat mungkin.",
+    #     html_content="Hi <strong>{{ name }}</strong>, kami telah menerima permintaan anda, dan kami akan membalasnya secepat mungkin.",
+    # )
+
     queryset = ModsData.objects.all()
     serializer_class = ModsDataSerializer
 
     # TODO: protect access ?
     def post(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
         form = ModsDataForm(request.POST)
         if not form.is_valid():
             return JsonResponse(
@@ -378,7 +389,15 @@ class MODS(generics.ListAPIView):
         e = mail.send(
             recipients=modsData.email,
             template="mods_form",
-            context={"expertise_area": modsData.expertise_area, "name": modsData.name},
+            # language=modsData.language,
+            priority="now",
+            context={
+                "expertise_area": modsData.expertise_area,
+                "name": modsData.name,
+                "email": modsData.email,
+                "institution": modsData.institution,
+                "description": modsData.description,
+            },
         )
 
         return JsonResponse(
@@ -387,6 +406,9 @@ class MODS(generics.ListAPIView):
         )
 
     def delete(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
         queryset = ModsData.objects.all()
         if id := request.query_params.get("id", False):
             queryset = ModsData.objects.get(id=id)
@@ -395,6 +417,7 @@ class MODS(generics.ListAPIView):
             data={"message": f"Deleted {deleted[0]} form data."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
 
 """
 Checks which filters have been applied for the data-catalog
