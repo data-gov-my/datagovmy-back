@@ -390,7 +390,6 @@ class MODS(generics.ListAPIView):
             language="ms-MY",
         )
 
-    # TODO: protect access ?
     def post(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
@@ -421,8 +420,13 @@ class MODS(generics.ListAPIView):
             status=status.HTTP_200_OK,
         )
 
+    def get(self, request, *args, **kwargs):
+        if not is_valid_request(request, os.getenv("MODS_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        return super().get(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+        if not is_valid_request(request, os.getenv("MODS_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
         queryset = ModsData.objects.all()
