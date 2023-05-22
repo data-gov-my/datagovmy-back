@@ -1,3 +1,4 @@
+from typing import Any
 from django.http import JsonResponse
 from rest_framework import status, viewsets, generics
 from rest_framework.decorators import api_view, permission_classes
@@ -48,6 +49,7 @@ import pandas as pd
 import time
 import numpy as np
 import sys
+from pathlib import Path
 
 env = environ.Env()
 environ.Env.read_env()
@@ -357,22 +359,36 @@ class I18N(APIView):
 
 
 class MODS(generics.ListAPIView):
-    EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
-        name="mods_form",
-        subject="MODS Application | {{ expertise_area }}",
-        content="Hi {{ name }}, we have received your request, and will reply to you as soon as we can.",
-        html_content="Hi <strong>{{ name }}</strong>, we have received your request, and will reply to you as soon as we can.",
-    )
-    # FIXME: i18n for en-GB and ms-MY templates
-    # EMAIL_TEMPLATE_BM = EMAIL_TEMPLATE.translated_templates.get_or_create(
-    #     language="ms-MY",
-    #     subject="Permohonan MODS | {{ expertise_area }}",
-    #     content="Hi {{ name }}, kami telah menerima permintaan anda, dan kami akan membalasnya secepat mungkin.",
-    #     html_content="Hi <strong>{{ name }}</strong>, kami telah menerima permintaan anda, dan kami akan membalasnya secepat mungkin.",
-    # )
-
     queryset = ModsData.objects.all()
     serializer_class = ModsDataSerializer
+
+    @staticmethod
+    def get_template_as_text(filename, language="en-GB"):
+        return Path(
+            os.path.join(
+                os.getcwd(),
+                "data_gov_my",
+                "templates",
+                language,
+                filename,
+            )
+        ).read_text()
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
+            name="mods_form",
+            subject="MODS Application | {{ expertise_area }}",
+            content="Thank you for your interest in joining the MODS community. We appreciate your application and will review it carefully.",
+            html_content=self.get_template_as_text("mods-confirmation.html"),
+            language="en-GB",
+        )[0]
+        self.EMAIL_TEMPLATE_BM = self.EMAIL_TEMPLATE.translated_templates.get_or_create(
+            subject="Permohonan MODS | {{ expertise_area }}",
+            content="Terima kasih kerana berminat untuk menyertai komuniti MODS. Kami menghargai permohonan anda dan akan mengkajinya dengan teliti.",
+            html_content=self.get_template_as_text("mods-confirmation.html", "ms-MY"),
+            language="ms-MY",
+        )
 
     # TODO: protect access ?
     def post(self, request, *args, **kwargs):
@@ -389,7 +405,7 @@ class MODS(generics.ListAPIView):
         e = mail.send(
             recipients=modsData.email,
             template="mods_form",
-            # language=modsData.language,
+            language=modsData.language,
             priority="now",
             context={
                 "expertise_area": modsData.expertise_area,
@@ -401,7 +417,7 @@ class MODS(generics.ListAPIView):
         )
 
         return JsonResponse(
-            data={"message": f"Your request has been received: {e}"},
+            data={"Email status": e.STATUS_CHOICES[e.status][1]},
             status=status.HTTP_200_OK,
         )
 
