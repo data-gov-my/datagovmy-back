@@ -21,7 +21,7 @@ from data_gov_my.forms import ModsDataForm
 from data_gov_my.serializers import ModsDataSerializer, i18nSerializer
 from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.exceptions import ParseError
-from post_office.models import EmailTemplate
+from post_office.models import EmailTemplate, Email
 from post_office import mail
 
 from data_gov_my.utils import cron_utils, triggers
@@ -429,12 +429,12 @@ class MODS(generics.ListAPIView):
         if not is_valid_request(request, os.getenv("MODS_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        queryset = ModsData.objects.all()
-        if id := request.query_params.get("id", False):
-            queryset = ModsData.objects.get(id=id)
-        deleted = queryset.delete()
+        deleted_forms = ModsData.objects.all().delete()
+        deleted_emails = Email.objects.all().delete()
         return JsonResponse(
-            data={"message": f"Deleted {deleted[0]} form data."},
+            data={
+                "message": f"Deleted {deleted_forms[0]} form data & {deleted_emails[0]} emails and logs."
+            },
             status=status.HTTP_204_NO_CONTENT,
         )
 
