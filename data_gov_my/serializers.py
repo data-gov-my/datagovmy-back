@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MetaJson, DashboardJson, CatalogJson, NameDashboard_FirstName, i18nJson, ElectionDashboard_Candidates, ElectionDashboard_Seats, ElectionDashboard_Party
+from .models import MetaJson, DashboardJson, CatalogJson, ModsData, NameDashboard_FirstName, i18nJson, ElectionDashboard_Candidates, ElectionDashboard_Seats, ElectionDashboard_Party
 
 class MetaSerializer(serializers.ModelSerializer) :
     class Meta : 
@@ -71,3 +71,9 @@ class i18nSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         i18n_object = i18nJson.objects.filter(filename=instance.filename, language=instance.language).update(**validated_data)
         return i18n_object
+    
+
+class ModsDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ModsData
+        fields = "__all__"
