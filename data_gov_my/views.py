@@ -435,7 +435,7 @@ class MODS(generics.ListAPIView):
             data={
                 "message": f"Deleted {deleted_forms[0]} form data & {deleted_emails[0]} emails and logs."
             },
-            status=status.HTTP_204_NO_CONTENT,
+            status=status.HTTP_200_OK,
         )
 
 
