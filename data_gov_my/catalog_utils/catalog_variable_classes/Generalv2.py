@@ -15,8 +15,8 @@ class GeneralChartsUtil:
 
     # Additional API data
     precision = 1
-    translations = {"en" : {}, "bm" : {}}
-    data_frequency = ''
+    translations = {"en": {}, "bm": {}}
+    data_frequency = ""
 
     # Identifiers
     unique_id = ""
@@ -46,12 +46,12 @@ class GeneralChartsUtil:
         self.full_meta = full_meta
         self.file_data = file_data
         self.cur_data = cur_data
-        self.cur_catalog_data = cur_data['catalog_data']
-        self.catalog_filters = self.cur_catalog_data['catalog_filters']
+        self.cur_catalog_data = cur_data["catalog_data"]
+        self.catalog_filters = self.cur_catalog_data["catalog_filters"]
         self.data_frequency = self.catalog_filters["frequency"]
-        self.metadata_neutral = self.cur_catalog_data['metadata_neutral']
-        self.metadata_lang = self.cur_catalog_data['metadata_lang']
-        self.chart = self.cur_catalog_data['chart']
+        self.metadata_neutral = self.cur_catalog_data["metadata_neutral"]
+        self.metadata_lang = self.cur_catalog_data["metadata_lang"]
+        self.chart = self.cur_catalog_data["chart"]
         self.all_variable_data = all_variable_data
         self.file_src = file_src
 
@@ -60,10 +60,10 @@ class GeneralChartsUtil:
             self.read_from = file_data["link_preview"]
         elif "link_parquet" in file_data:
             self.read_from = file_data["link_parquet"]
-        
+
         # Sets current (int) id of object
         self.cur_id = self.cur_data["id"]
-        
+
         # Creates the unique id
         bucket_name = self.file_data["bucket"]
         file_name = self.file_data["file_name"].replace(".parquet", "")
@@ -81,7 +81,7 @@ class GeneralChartsUtil:
         self.metadata = self.build_metadata_info()
         self.downloads = self.build_downloads_info()
         self.chart_details = self.build_intro_info()
-        
+
         # Sets precision attribute for API
         self.set_precision()
         self.get_translations()
@@ -106,17 +106,19 @@ class GeneralChartsUtil:
     """
     Get precision info
     """
-    def set_precision(self) :
-        if 'precision' in self.chart['chart_filters'] : 
-            self.precision = self.chart['chart_filters']['precision']            
+
+    def set_precision(self):
+        if "precision" in self.chart["chart_filters"]:
+            self.precision = self.chart["chart_filters"]["precision"]
 
     """
     Get language format
     """
-    def get_translations(self) : 
-        if 'translations' in self.cur_catalog_data : 
+
+    def get_translations(self):
+        if "translations" in self.cur_catalog_data:
             self.translations = self.cur_catalog_data["translations"]
-         
+
     """
     Builds the variables table for each catalog variable
     """
@@ -126,9 +128,9 @@ class GeneralChartsUtil:
 
         key_list = list(dict_data.keys())
 
-        for i in range(0, len(dict_data['x'])) :
+        for i in range(0, len(dict_data["x"])):
             data = {}
-            for k in key_list : 
+            for k in key_list:
                 data[k] = dict_data[k][i]
             res.append(data)
 
@@ -141,18 +143,18 @@ class GeneralChartsUtil:
     def build_metadata_info(self):
         res = {}
         res["metadata"] = self.metadata_neutral
-        res["metadata"]["dataset_desc"] = self.file_data['description']
-        res["metadata"]["data_source"] = self.catalog_filters['data_source']
+        res["metadata"]["dataset_desc"] = self.file_data["description"]
+        res["metadata"]["data_source"] = self.catalog_filters["data_source"]
         res["metadata"]["in_dataset"] = []
         res["metadata"]["out_dataset"] = []
         res["metadata"]["url"] = {}
 
-        for i in ["csv", "parquet"] :
+        for i in ["csv", "parquet"]:
             link = ""
-            if f"link_{i}" in self.file_data :
+            if f"link_{i}" in self.file_data:
                 link = self.file_data[f"link_{i}"]
             res["metadata"]["url"][i] = link
-        
+
         bucket_name = self.file_data["bucket"]
         file_name = self.file_data["file_name"].replace(".parquet", "")
 
@@ -160,14 +162,14 @@ class GeneralChartsUtil:
             v_id = str(v["id"])
             if v["id"] != -1:
                 v["unique_id"] = f"{bucket_name}_{file_name}_{v_id}"
-            
+
             append_to = "out_dataset"
 
-            if v["id"] == self.cur_id : 
+            if v["id"] == self.cur_id:
                 v.pop("catalog_data")
                 append_to = "in_dataset"
 
-            if v["id"] != 0 :
+            if v["id"] != 0:
                 res["metadata"][append_to].append(v)
 
         return res["metadata"]
@@ -179,8 +181,8 @@ class GeneralChartsUtil:
     def build_downloads_info(self):
         res = {}
         res["downloads"] = {}
-        res["downloads"]["csv"] = self.metadata['url']['csv']
-        res["downloads"]["parquet"] = self.metadata['url']['parquet']
+        res["downloads"]["csv"] = self.metadata["url"]["csv"]
+        res["downloads"]["parquet"] = self.metadata["url"]["parquet"]
 
         return res["downloads"]
 
@@ -225,29 +227,32 @@ class GeneralChartsUtil:
     def build_db_info(self):
         res = {}
         res["catalog_meta"] = self.full_meta
-        
+
         # Sets catalog names
         catalog_name_en = self.cur_data["title_en"]
         catalog_name_bm = self.cur_data["title_bm"]
         res["catalog_name"] = f"{catalog_name_en} | {catalog_name_bm}"
-        
+
         # Sets catalog category
         res["catalog_category"] = self.file_data["category"]
         catalog_category_en = self.file_data["category_en"]
         catalog_category_bm = self.file_data["category_bm"]
         res["catalog_category_name"] = f"{catalog_category_en} | {catalog_category_bm}"
-        
+
         # Sets catalog subcategory
         res["catalog_subcategory"] = self.file_data["subcategory"]
         catalog_subcategory_en = self.file_data["subcategory_en"]
         catalog_subcategory_bm = self.file_data["subcategory_bm"]
-        res["catalog_subcategory_name"] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
+        res[
+            "catalog_subcategory_name"
+        ] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
 
         # Sets the frequency of the catalog
         res["time_range"] = self.catalog_filters["frequency"]
-        
-        # Sets the geographic and datasource ( multiple )
+
+        # Sets the geographic, demographic and datasource ( multiple )
         res["geographic"] = " | ".join(self.catalog_filters["geographic"])
+        res["demographic"] = " | ".join(self.catalog_filters["demographic"])
         res["data_source"] = " | ".join(self.catalog_filters["data_source"])
 
         # Sets the range of start and end of dataset
