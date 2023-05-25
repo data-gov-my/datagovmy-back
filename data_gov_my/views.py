@@ -448,6 +448,7 @@ def get_filters_applied(param_list):
     default_params = {
         "period": "",
         "geographic": [],
+        "demographic": [],
         "begin": "",
         "end": "",
         "source": [],
@@ -472,6 +473,9 @@ def get_filters_applied(param_list):
         elif k == "geographic":
             for i in v:
                 query |= Q(geographic__contains=i)
+        elif k == "demographic":
+            for i in v:
+                query |= Q(demographic__contains=i)
         elif k == "source":
             for i in v:
                 query |= Q(data_source__contains=i)
