@@ -1,25 +1,17 @@
+import json
 import os
+import shutil
+import zipfile
 from os import listdir
 from os.path import isfile, join
-from data_gov_my.models import MetaJson, DashboardJson
-from data_gov_my.utils import triggers
-from data_gov_my.utils import data_utils
-from data_gov_my.utils import common
-from data_gov_my.catalog_utils import catalog_builder
-
-from data_gov_my.api_handling import cache_search
-
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-from data_gov_my.models import CatalogJson, MetaJson, DashboardJson
-from django.apps import apps
 
 import requests
-import zipfile
-import json
-import shutil
+from django.apps import apps
+from django.core.cache import cache
+
+from data_gov_my.catalog_utils import catalog_builder
+from data_gov_my.models import CatalogJson
+from data_gov_my.utils import common, data_utils, triggers
 
 """
 Creates a directory
@@ -102,6 +94,7 @@ def data_operation(operation, op_method):
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
+
 def i18n_operation(operation, op_method):
     dir_name = "DATAGOVMY_SRC"
     zip_name = "repo.zip"
@@ -120,6 +113,24 @@ def i18n_operation(operation, op_method):
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
 
 
+def forms_operation(operation, op_method):
+    dir_name = "DATAGOVMY_SRC"
+    zip_name = "repo.zip"
+    git_url = os.getenv("GITHUB_URL", "-")
+    # git_token = os.getenv("GITHUB_TOKEN", "-")
+
+    triggers.send_telegram("--- PERFORMING " + op_method + " " + operation + " ---")
+
+    create_directory(dir_name)
+    res = fetch_from_git(zip_name, git_url)
+    if "resp_code" in res and res["resp_code"] == 200:
+        write_as_binary(res["file_name"], res["data"])
+        extract_zip(res["file_name"], dir_name)
+        data_utils.rebuild_forms(operation, op_method)
+    else:
+        triggers.send_telegram("FAILED TO GET SOURCE DATA")
+
+
 def get_latest_info_git(type, commit_id):
     sha_ext = os.getenv("GITHUB_SHA_URL", "-")
     url = "https://api.github.com/repos/data-gov-my/datagovmy-meta/commits/" + sha_ext
@@ -132,9 +143,7 @@ def get_latest_info_git(type, commit_id):
         url += commit_id
         headers_accept = "application/vnd.github+json"
 
-    res = requests.get(
-        url, headers={"Accept": headers_accept}
-    )
+    res = requests.get(url, headers={"Accept": headers_accept})
 
     if res.status_code == 200:
         return str(res.content, "UTF-8")
@@ -222,7 +231,7 @@ def selective_update():
             )
             cache.set("catalog_list", catalog_list)
             # cache_search.set_filter_cache()
-        
+
         if filtered_changes["i18n"]:
             fin_files = [x.replace(".json", "") for x in filtered_changes["i18n"]]
             file_list = ",".join(fin_files)
@@ -238,7 +247,10 @@ def selective_update():
 
             for file in dashboards_validate:
                 routes = ",".join(dashboards_validate[file])
-                if file not in failed_dashboards and revalidate_frontend(route=routes) == 200:
+                if (
+                    file not in failed_dashboards
+                    and revalidate_frontend(route=routes) == 200
+                ):
                     dashboards_validate_status.append(
                         {"status": "✅", "variable": routes}
                     )
@@ -252,10 +264,6 @@ def selective_update():
                     dashboards_validate_status, "-- I18N REVALIDATION STATUS --"
                 )
                 triggers.send_telegram(revalidation_results)
-
-                    
-
-
 
     else:
         triggers.send_telegram("FAILED TO GET SOURCE DATA")
@@ -291,7 +299,8 @@ def remove_deleted_files():
             for m in model_name.objects.values(v["column_name"]).distinct()
         ]
         DIR = os.path.join(
-            os.getcwd(), "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"]
+            os.getcwd(),
+            "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"],
         )
         distinct_dir = [
             f.replace(".json", "") for f in listdir(DIR) if isfile(join(DIR, f))
@@ -324,21 +333,24 @@ Revalidate Frontend
 
 def revalidate_frontend(dashboard=False, route=False):
     endpoint = []
-    if route: 
+    if route:
         endpoint.append(route)
     elif dashboard in common.FRONTEND_ENDPOINTS:
         r = common.FRONTEND_ENDPOINTS[dashboard]
         endpoint.append(r)
     else:
         return -1
-    
+
     endpoint = ",".join(endpoint)
-        
+
     url = os.getenv("FRONTEND_URL", "-")
     fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
 
-    headers = {"Authorization": fe_auth, 'Content-Type': "application/x-www-form-urlencoded"}
-    payload = f'route={endpoint}'
+    headers = {
+        "Authorization": fe_auth,
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+    payload = f"route={endpoint}"
 
     response = requests.post(url, headers=headers, data=payload)
     return response.status_code
