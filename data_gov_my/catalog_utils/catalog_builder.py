@@ -67,7 +67,7 @@ def catalog_update(operation, op_method):
                             cur_catalog_data = cur_data["catalog_data"]
                             chart_type = cur_catalog_data["chart"]["chart_type"]
 
-                            if chart_type in ["HBAR", "BAR", "STACKED_BAR"] : 
+                            if chart_type in ["HBAR", "BAR", "STACKED_BAR", "LINE"] : 
                                 obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
                             if chart_type in ["AREA", "TIMESERIES", "STACKED_AREA"] :
                                 obj = timev2.Timeseries(full_meta, file_data, cur_data, all_variable_data, file_src)

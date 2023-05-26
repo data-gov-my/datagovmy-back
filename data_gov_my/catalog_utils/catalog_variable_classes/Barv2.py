@@ -231,6 +231,12 @@ class Bar(GeneralChartsUtil):
         res["API"]["precision"] = self.precision
         res["API"]["chart_type"] = self.chart["chart_type"]
 
+        # Builds the line config
+        if self.chart_type == "LINE" : 
+            line_types = self.chart['chart_variables']['line_type']
+            for idx, i in enumerate(list(line_types.values())) :
+                res['API']['line_variables'][f'y{idx + 1 }'] = i
+
         return res["API"]
     
     """
