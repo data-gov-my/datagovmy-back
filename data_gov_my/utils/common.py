@@ -33,3 +33,5 @@ REFRESH_VARIABLES = {
         "directory": "/catalog/",
     },
 }
+
+LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]

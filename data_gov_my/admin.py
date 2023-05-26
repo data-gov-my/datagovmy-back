@@ -1,5 +1,6 @@
 from django.contrib import admin
-from data_gov_my.models import i18nJson, ModsData
+from data_gov_my.models import FormData, FormTemplate, i18nJson
 
 admin.site.register(i18nJson)
-admin.site.register(ModsData)
+admin.site.register(FormTemplate)
+admin.site.register(FormData)

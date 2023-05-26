@@ -1,7 +1,12 @@
 import collections
+
+from django.core.validators import validate_email
 from django.db import models
-from django.contrib.postgres.indexes import GinIndex
 from jsonfield import JSONField
+from post_office.models import Email, EmailTemplate
+from rest_framework.exceptions import ValidationError
+
+from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 
 class MetaJson(models.Model):
@@ -66,8 +71,6 @@ class NameDashboard_LastName(models.Model):
 
 
 class i18nJson(models.Model):
-    LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]
-
     filename = models.CharField(max_length=50)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
@@ -129,12 +132,92 @@ class ElectionDashboard_Party(models.Model):
     votes_perc = models.FloatField(null=True)
 
 
-class ModsData(models.Model):
-    LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]
+class FormTemplate(models.Model):
+    form_type = models.CharField(max_length=50, primary_key=True)
+    email_template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE)
+    form_meta = models.JSONField()
 
-    expertise_area = models.CharField(max_length=100)
-    name = models.CharField(max_length=20)
-    email = models.EmailField()
-    institution = models.CharField(max_length=50)
-    description = models.CharField(max_length=500)
+    def __str__(self) -> str:
+        return f"{self.form_type}"
+
+    @classmethod
+    def create(cls, form_type: str, form_meta: dict):
+        form_template = cls(form_type=form_type, form_meta=form_meta)
+        default_template = cls.get_or_create_email_template(
+            form_meta.get("email_template", [])
+        )
+        form_template.email_template = default_template
+        form_template.save()
+        return form_template
+
+    @staticmethod
+    def get_or_create_email_template(email_template_meta):
+        """
+        Helper function to get or create the email template object based on form meta
+        """
+        # first email template in meta is used as the default template
+        meta = email_template_meta[0]
+
+        default_template: EmailTemplate = EmailTemplate.objects.get_or_create(
+            name=meta["name"],
+            subject=meta["subject"],
+            content=meta["content"],
+            html_content=meta["html_content"],
+            language=meta["language"],
+        )[0]
+
+        for i in range(1, len(email_template_meta)):
+            meta = email_template_meta[i]
+            alt_template = default_template.translated_templates.get_or_create(
+                subject=meta["subject"],
+                content=meta["content"],
+                html_content=meta["html_content"],
+                language=meta["language"],
+            )
+
+        return default_template
+
+    def can_send_email(self):
+        return self.form_meta.get("send_email", False)
+
+    def validate_form(self, payload: dict):
+        """
+        Validates form data based on the specified fields in form_meta.
+        """
+        # validate field names
+        validate_fields = self.form_meta.get("validate_fields", [])
+        if not collections.Counter(validate_fields) == collections.Counter(
+            payload.keys()
+        ):
+            raise ValidationError(detail={"Fields required": validate_fields})
+        if "email" in payload:
+            try:
+                validate_email(payload["email"])
+            except Exception as e:
+                raise ValidationError(detail={"email": "Enter a valid email address."})
+        return True
+
+    def create_form_data(self, payload: dict):
+        """
+        Validates the form data (payload), then create and store a new FormData instance
+        """
+        if self.validate_form(payload):
+            lang = payload.get("language", "en-GB")
+            form_data = self.formdata_set.create(
+                language=lang,
+                form_data=payload,
+            )
+            return form_data
+
+
+class FormData(models.Model):
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    form_data = models.JSONField()
+    form_type = models.ForeignKey(FormTemplate, on_delete=models.CASCADE)
+    email = models.OneToOneField(Email, on_delete=models.CASCADE, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.form_type} | {self.language} ({self.id})"
+
+    def get_recipient(self) -> str:
+        return self.form_data.get("email", None)

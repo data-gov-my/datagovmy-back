@@ -1,55 +1,33 @@
-from typing import Any
+import os
+from threading import Thread
+
+import environ
+from django.core.cache import cache
+from django.db.models import Q
 from django.http import JsonResponse
-from rest_framework import status, viewsets, generics
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework import permissions
+from django.shortcuts import get_list_or_404, get_object_or_404
+from post_office import mail
+from post_office.models import Email
+from rest_framework import generics, status
+from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from functools import reduce
-from django.db.models import Q
-from django.db import models
-from django.db import connection
-from django.apps import apps
-from django.db.models.base import ModelBase
-from django.contrib.postgres.search import TrigramWordSimilarity
-from django.contrib.postgres.search import SearchVector
-from django.contrib.postgres.search import SearchHeadline
-from data_gov_my.forms import ModsDataForm
-from data_gov_my.serializers import ModsDataSerializer, i18nSerializer
-from django.shortcuts import get_object_or_404, get_list_or_404
-from rest_framework.exceptions import ParseError
-from post_office.models import EmailTemplate, Email
-from post_office import mail
 
-from data_gov_my.utils import cron_utils, triggers
-from data_gov_my.models import (
-    MetaJson,
-    DashboardJson,
-    CatalogJson,
-    ModsData,
-    NameDashboard_FirstName,
-    NameDashboard_LastName,
-    i18nJson,
-)
-from data_gov_my.api_handling import handle, cache_search
-from data_gov_my.explorers import class_list as exp_class
+from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
     CatalogueDataHandler as cdh,
 )
-
-from threading import Thread
-
-import json
-import os
-import environ
-import pandas as pd
-import time
-import numpy as np
-import sys
-from pathlib import Path
+from data_gov_my.explorers import class_list as exp_class
+from data_gov_my.models import (
+    CatalogJson,
+    DashboardJson,
+    FormData,
+    FormTemplate,
+    MetaJson,
+    i18nJson,
+)
+from data_gov_my.serializers import FormDataSerializer, i18nSerializer
+from data_gov_my.utils import cron_utils
 
 env = environ.Env()
 environ.Env.read_env()
@@ -358,83 +336,59 @@ class I18N(APIView):
         )
 
 
-class MODS(generics.ListAPIView):
-    queryset = ModsData.objects.all()
-    serializer_class = ModsDataSerializer
-
-    @staticmethod
-    def get_template_as_text(filename, language="en-GB"):
-        return Path(
-            os.path.join(
-                os.getcwd(),
-                "data_gov_my",
-                "templates",
-                language,
-                filename,
-            )
-        ).read_text()
-
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self.EMAIL_TEMPLATE = EmailTemplate.objects.get_or_create(
-            name="mods_form",
-            subject="MODS Application | {{ expertise_area }}",
-            content="Thank you for your interest in joining the MODS community. We appreciate your application and will review it carefully.",
-            html_content=self.get_template_as_text("mods-confirmation.html"),
-            language="en-GB",
-        )[0]
-        self.EMAIL_TEMPLATE_BM = self.EMAIL_TEMPLATE.translated_templates.get_or_create(
-            subject="Permohonan MODS | {{ expertise_area }}",
-            content="Terima kasih kerana berminat untuk menyertai komuniti MODS. Kami menghargai permohonan anda dan akan mengkajinya dengan teliti.",
-            html_content=self.get_template_as_text("mods-confirmation.html", "ms-MY"),
-            language="ms-MY",
-        )
+class FORMS(generics.ListAPIView):
+    serializer_class = FormDataSerializer
 
     def post(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        form = ModsDataForm(request.POST)
-        if not form.is_valid():
+        # get FormTemplate instance by request query param, then validate & store new form data
+        form_type = kwargs.get("form_type")
+        template = FormTemplate.objects.get(form_type=form_type)
+        form_data: FormData = template.create_form_data(request.data)
+
+        if template.can_send_email():
+            recipient = form_data.get_recipient()
+            if recipient:
+                email = mail.send(
+                    recipients=recipient,
+                    template=template.email_template,
+                    language=form_data.language,
+                    priority="now",
+                    context=form_data.form_data,
+                )
+                form_data.email = email
+                form_data.save(update_fields=["email"])
+
+        if form_data.email:
             return JsonResponse(
-                data={"errors": form.errors}, status=status.HTTP_400_BAD_REQUEST
+                data={
+                    "Email Recipient": form_data.email.to,
+                    "Email Status": form_data.email.STATUS_CHOICES[
+                        form_data.email.status
+                    ][1],
+                },
+                status=status.HTTP_200_OK,
             )
 
-        modsData: ModsData = form.save()
-        e = mail.send(
-            recipients=modsData.email,
-            template="mods_form",
-            language=modsData.language,
-            priority="now",
-            context={
-                "expertise_area": modsData.expertise_area,
-                "name": modsData.name,
-                "email": modsData.email,
-                "institution": modsData.institution,
-                "description": modsData.description,
-            },
-        )
-
-        return JsonResponse(
-            data={"Email status": e.STATUS_CHOICES[e.status][1]},
-            status=status.HTTP_200_OK,
-        )
-
-    def get(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("MODS_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-        return super().get(request, *args, **kwargs)
+    def get_queryset(self):
+        """
+        This view should return a list of all the form data based on the form type (e.g. /mods)
+        """
+        form_type = self.kwargs["form_type"]
+        return FormData.objects.filter(form_type=form_type)
 
     def delete(self, request, *args, **kwargs):
         if not is_valid_request(request, os.getenv("MODS_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        deleted_forms = ModsData.objects.all().delete()
-        deleted_emails = Email.objects.all().delete()
+        queryset = Email.objects.filter(
+            formdata__form_type=kwargs["form_type"]
+        )  # query email for cascading deletes
+        count, deleted = queryset.delete()
         return JsonResponse(
-            data={
-                "message": f"Deleted {deleted_forms[0]} form data & {deleted_emails[0]} emails and logs."
-            },
+            data={"Total deleted": count, "Data deleted": deleted},
             status=status.HTTP_200_OK,
         )
 

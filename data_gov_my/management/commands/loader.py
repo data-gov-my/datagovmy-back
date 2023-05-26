@@ -1,28 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from data_gov_my.utils import cron_utils
-from data_gov_my.catalog_utils import catalog_builder
-
-from django.core.cache import cache
-
-import os
-import shutil
 import environ
-import importlib
-import pandas as pd
-import numpy as np
-import time
+from django.core.management.base import BaseCommand
 
-from django.db import models
-from django.db import connection
-from django.apps import apps
-from django.utils.module_loading import import_module
-from django.core.management import call_command
-from django.urls import clear_url_caches
-from django.contrib import admin
-from importlib import import_module,reload
+from data_gov_my.catalog_utils import catalog_builder
+from data_gov_my.utils import cron_utils
 
 env = environ.Env()
 environ.Env.read_env()
@@ -59,8 +39,12 @@ class Command(BaseCommand):
         - python manage.py loader DATA_CATALOG REBUILD
         - python manage.py loader DASHBOARDS UPDATE meta_1,meta_2
         """
-
-        if category in ["DATA_CATALOG", "DASHBOARDS", "I18N"] and operation in [
+        if category in [
+            "DATA_CATALOG",
+            "DASHBOARDS",
+            "I18N",
+            "FORMS",
+        ] and operation in [
             "UPDATE",
             "REBUILD",
         ]:
@@ -72,5 +56,7 @@ class Command(BaseCommand):
                 catalog_builder.catalog_operation(command, "MANUAL")
             elif category == "DASHBOARDS":
                 cron_utils.data_operation(command, "MANUAL")
-            else: # i18n
+            elif category == "I18N":  # i18n
                 cron_utils.i18n_operation(command, "MANUAL")
+            else:  # forms
+                cron_utils.forms_operation(command, "MANUAL")
