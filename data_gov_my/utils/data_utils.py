@@ -1,16 +1,12 @@
-from django.core.cache import cache
-from django.conf import settings
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
-from data_gov_my.models import MetaJson, DashboardJson, i18nJson
-from data_gov_my.utils import dashboard_builder
-from data_gov_my.utils import triggers
-from data_gov_my.utils import common
-
+import json
 import os
 from os import listdir
 from os.path import isfile, join
-import json
+
+from django.core.cache import cache
+
+from data_gov_my.models import DashboardJson, FormTemplate, MetaJson, i18nJson
+from data_gov_my.utils import dashboard_builder, triggers
 
 """
 Operations to rebuild all meta, from each dashboard
@@ -120,7 +116,6 @@ def rebuild_dashboard_charts(operation, op_method):
                     chart_list[k]["chart_type"], c_data
                 )
                 if len(res["data"]) > 0:  # If the dict isnt empty
-
                     if "data_as_of" in chart_list[k]:
                         res["data_as_of"] = chart_list[k]["data_as_of"]
 
@@ -160,6 +155,7 @@ def rebuild_dashboard_charts(operation, op_method):
 Operation to rebuild i18n translation files.
 """
 
+
 def rebuild_i18n(operation, op_method):
     opr_data = get_operation_files(operation)
     operation = opr_data["operation"]
@@ -176,7 +172,11 @@ def rebuild_i18n(operation, op_method):
         language_folders = [f for f in listdir(I18N_DIR)]
         i18n_files = []
         for lang in language_folders:
-            file = [os.path.join(lang, f) for f in listdir(os.path.join(I18N_DIR, lang)) if isfile(os.path.join(I18N_DIR, lang, f))]
+            file = [
+                os.path.join(lang, f)
+                for f in listdir(os.path.join(I18N_DIR, lang))
+                if isfile(os.path.join(I18N_DIR, lang, f))
+            ]
             i18n_files.extend(file)
     else:
         i18n_files = [f + ".json" for f in i18n_files]
@@ -192,17 +192,19 @@ def rebuild_i18n(operation, op_method):
             f_meta = os.path.join(I18N_DIR, file)
             f = open(f_meta)
             data = json.load(f)
-            if data["route"]: # do not revalidate invalid routes
-                validate_routes.setdefault(file,[]).append(data["route"])
-            obj, created = i18nJson.objects.update_or_create(filename=filename, language=language, defaults=data)
+            if data["route"]:  # do not revalidate invalid routes
+                validate_routes.setdefault(file, []).append(data["route"])
+            obj, created = i18nJson.objects.update_or_create(
+                filename=filename, language=language, defaults=data
+            )
             obj.save()
-            
+
         except Exception as e:
             failed_notify.append(file)
             failed_obj = {}
             failed_obj["I18N_FILENAME"] = filename
-            failed_obj["I18N_LANGUAGE"] = language 
-            failed_obj["ERROR"] = e 
+            failed_obj["I18N_LANGUAGE"] = language
+            failed_obj["ERROR"] = e
             failed_builds.append(failed_obj)
 
     if len(failed_builds) > 0:
@@ -217,6 +219,48 @@ def rebuild_i18n(operation, op_method):
     validate_info["failed_dashboards"] = failed_notify
     return validate_info
 
+
+def rebuild_forms(operation, op_method):
+    opr_data = get_operation_files(operation)
+    operation = opr_data["operation"]
+    form_files = opr_data["files"]
+
+    FORMS_DIR = os.path.join(
+        os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), "forms"
+    )
+
+    if operation == "REBUILD":
+        FormTemplate.objects.all().delete()
+
+    if not form_files:
+        form_files = [f for f in listdir(FORMS_DIR) if isfile(join(FORMS_DIR, f))]
+    else:
+        form_files = [f + ".json" for f in form_files]
+
+    failed_builds = []
+
+    for meta in form_files:
+        form_type = meta.replace(".json", "")
+        try:
+            f_meta = os.path.join(FORMS_DIR, meta)
+            f = open(f_meta)
+            data = json.load(f)
+
+            obj = FormTemplate.create(form_type=form_type, form_meta=data)
+
+            cache.set("META_" + form_type, data)
+        except Exception as e:
+            failed_obj = {}
+            failed_obj["FORM_NAME"] = form_type
+            failed_obj["ERROR"] = e
+
+            failed_builds.append(failed_obj)
+
+    if len(failed_builds) > 0:
+        err_message = triggers.format_multi_line(failed_builds, "--- FAILED FORM ---")
+        triggers.send_telegram(err_message)
+    else:
+        triggers.send_telegram(f"FORM Built Successfully\n {form_files}")
 
 
 """
