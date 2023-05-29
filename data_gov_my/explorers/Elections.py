@@ -19,7 +19,23 @@ class ELECTIONS(General_Explorer):
     charts = ["candidates", "seats", "party", "full_result", "overall_seat"]
 
     # List of dropdowns within explorer, with own endpoints
-    dropdowns=['candidate_list', "seats_list", "party_list"]
+    dropdowns = {
+        'candidate_list' : {
+            "model" : 'ElectionDashboard_Candidates',
+            "values" : ['name'],
+            "flat" : True
+        },
+        'seats_list' : {
+            "model" : 'ElectionDashboard_Seats',
+            "values" : ['seat_name', 'type'],
+            "flat" : False
+        },
+        'party_list' : {
+            "model" : 'ElectionDashboard_Party',
+            "values" : ['party'],
+            "flat" : True
+        }
+    }
 
     # Data population
     data_populate = {
@@ -52,15 +68,8 @@ class ELECTIONS(General_Explorer):
         # Handles Dropdowns
         if 'dropdown' in request_params and request_params["dropdown"][0] in self.dropdowns :
             dropdown_type = request_params["dropdown"][0]
-            if dropdown_type == 'candidate_list' :
-                res = self.candidate_list()
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if dropdown_type == 'seats_list' : 
-                res = self.seat_list()
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if dropdown_type == 'party_list' : 
-                res = self.party_list()
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
+            res = self.get_dropdown(dropdown_type=dropdown_type)
+            return JsonResponse(res["msg"], status=res["status"], safe=False)
 
         # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
@@ -131,40 +140,22 @@ class ELECTIONS(General_Explorer):
 
         return res
 
-
-
-
     '''
-    Handles Candidate dropdown list
+    Multi-handler dropdown type
     '''
-    def candidate_list(self) :
-        model_name = 'ElectionDashboard_Candidates'
+
+    def get_dropdown(self, dropdown_type='') :
+        model_name = self.dropdowns[dropdown_type]['model']
+        values = self.dropdowns[dropdown_type]['values']
+        flat = self.dropdowns[dropdown_type]['flat']
         model_choice = apps.get_model('data_gov_my', model_name)
-        data = list(model_choice.objects.values_list('name', flat=True).distinct())
-        res = {}
-        res["msg"] = data
-        res["status"] = 200
-        return res
+        data = None
 
-    '''
-    Handles Seat dropdown list
-    '''
-    def seat_list(self) :
-        model_name = 'ElectionDashboard_Seats'
-        model_choice = apps.get_model('data_gov_my', model_name)
-        data = list(model_choice.objects.values('seat_name', 'type').distinct())
-        res = {}
-        res["msg"] = data
-        res["status"] = 200
-        return res
+        if dropdown_type == 'seats_list' : 
+            data = list(model_choice.objects.values(*values).distinct())
+        else : 
+            data = list(model_choice.objects.values_list(*values, flat=flat).distinct())
 
-    '''
-    Handles Party dropdown list
-    '''
-    def party_list(self) :
-        model_name = 'ElectionDashboard_Party'
-        model_choice = apps.get_model('data_gov_my', model_name)
-        data = list(model_choice.objects.values_list('party', flat=True).distinct())
         res = {}
         res["msg"] = data
         res["status"] = 200

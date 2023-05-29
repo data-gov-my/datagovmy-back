@@ -2,20 +2,8 @@ from django.core.cache import cache
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
-# Version 2 code
 from data_gov_my.catalog_utils import general_helper as gh
-from data_gov_my.catalog_utils.catalog_variable_classes import Generalv2 as gv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Barv2 as barv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Timeseriesv2 as timev2
-from data_gov_my.catalog_utils.catalog_variable_classes import Pyramidv2 as pyrv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Heattablev2 as htblv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Choroplethv2 as chrv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Geopointv2 as gptv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Geojsonv2 as geov2
-from data_gov_my.catalog_utils.catalog_variable_classes import Scatterv2 as sctv2
-from data_gov_my.catalog_utils.catalog_variable_classes import Tablev2 as tblv2
-
-
+from data_gov_my.utils import common
 from data_gov_my.utils import cron_utils, data_utils, triggers
 from data_gov_my.models import CatalogJson
 
@@ -24,6 +12,7 @@ from os import listdir
 from os.path import isfile, join
 import pathlib
 import json
+import importlib
 
 
 def catalog_update(operation, op_method):
@@ -67,32 +56,27 @@ def catalog_update(operation, op_method):
                             cur_catalog_data = cur_data["catalog_data"]
                             chart_type = cur_catalog_data["chart"]["chart_type"]
 
-                            if chart_type in ["HBAR", "BAR", "STACKED_BAR", "LINE"] : 
-                                obj = barv2.Bar(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["AREA", "TIMESERIES", "STACKED_AREA"] :
-                                obj = timev2.Timeseries(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["PYRAMID"] : 
-                                obj = pyrv2.Pyramid(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["HEATTABLE"] :
-                                obj = htblv2.Heattable(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["CHOROPLETH", "GEOCHOROPLETH"] :
-                                obj = chrv2.Choropleth(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["GEOPOINT"] : 
-                                obj = gptv2.Geopoint(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["GEOJSON"] :
-                                obj = geov2.Geojson(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["SCATTER"] : 
-                                obj = sctv2.Scatter(full_meta, file_data, cur_data, all_variable_data, file_src)
-                            if chart_type in ["TABLE"] : 
-                                obj = tblv2.Table(full_meta, file_data, cur_data, all_variable_data, file_src)
+                            if chart_type in common.CHART_TYPES : 
+                                args = {
+                                    "full_meta" : full_meta,
+                                    "file_data" : file_data,
+                                    "cur_data" : cur_data,
+                                    "all_variable_data" : all_variable_data,
+                                    "file_src" : file_src
+                                }
 
-                            unique_id = obj.unique_id
-                            db_input = obj.db_input
+                                module_ = f"data_gov_my.catalog_utils.catalog_variable_classes.{common.CHART_TYPES[chart_type]['parent']}"
+                                constructor_ = common.CHART_TYPES[chart_type]['constructor']
+                                class_ = getattr(importlib.import_module(module_), constructor_)
+                                obj = class_(**args)
 
-                            db_obj, created = CatalogJson.objects.update_or_create( id=unique_id, defaults=db_input)
+                                unique_id = obj.unique_id
+                                db_input = obj.db_input
 
-                            cache.set(unique_id, db_input["catalog_data"])
-                            all_builds.append({"status": "✅", "variable": cur_data["name"]})
+                                db_obj, created = CatalogJson.objects.update_or_create( id=unique_id, defaults=db_input)
+
+                                cache.set(unique_id, db_input["catalog_data"])
+                                all_builds.append({"status": "✅", "variable": cur_data["name"]})
                     except Exception as e:
                         all_builds.append(
                             {"status": "❌", "variable": cur_data["name"]}
