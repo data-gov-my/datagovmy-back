@@ -13,6 +13,9 @@ class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200)
     dashboard_meta = models.JSONField()
 
+    def __str__(self) -> str:
+        return f"{self.dashboard_name}"
+
 
 class DashboardJson(models.Model):
     dashboard_name = models.CharField(max_length=200)
@@ -20,6 +23,9 @@ class DashboardJson(models.Model):
     chart_type = models.CharField(max_length=200, null=True)
     api_type = models.CharField(max_length=200, null=True)
     chart_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
+
+    def __str__(self) -> str:
+        return f"{self.dashboard_name} ({self.chart_name})"
 
 
 class CatalogJson(models.Model):
