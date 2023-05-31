@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 
 from data_gov_my.catalog_utils import catalog_builder
 from data_gov_my.utils import cron_utils
-from data_gov_my.utils.DataBuilder import DashboardBuilder, FormBuilder, i18nBuilder
+from data_gov_my.utils.DataBuilder import GeneralDataBuilder
+
 
 env = environ.Env()
 environ.Env.read_env()
@@ -60,15 +61,7 @@ class Command(BaseCommand):
             cron_utils.remove_src_folders()
             if category == "DATA_CATALOG":
                 catalog_builder.catalog_operation(command, "MANUAL")
-            elif category == "DASHBOARDS":
-                DashboardBuilder().build_operation(
-                    manual=True, rebuild=rebuild, meta_files=files
-                )
-            elif category == "I18N":  # i18n
-                i18nBuilder().build_operation(
-                    manual=True, rebuild=rebuild, meta_files=files
-                )
-            else:  # forms
-                FormBuilder().build_operation(
-                    manual=True, rebuild=rebuild, meta_files=files
-                )
+
+            GeneralDataBuilder.build_operation_by_category(
+                manual=True, category=category, rebuild=rebuild, meta_files=files
+            )

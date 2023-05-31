@@ -1,7 +1,15 @@
 import json
 from os.path import isfile, join
 import os
-from data_gov_my.utils.cron_utils import *
+from data_gov_my.utils.cron_utils import (
+    get_latest_info_git,
+    remove_src_folders,
+    create_directory,
+    revalidate_frontend,
+    fetch_from_git,
+    write_as_binary,
+    extract_zip,
+)
 import logging
 from abc import ABC, abstractmethod
 from django.db import models
@@ -14,17 +22,57 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 
 class GeneralDataBuilder(ABC):
-    CATEGORIES = ["DATA_CATALOG", "DASHBOARDS", "I18N", "FORMS"]
-    CATEGORY = ""
-    GITHUB_DIR = ""
+    CATEGORY = ["DATA_CATALOG", "DASHBOARDS", "I18N", "FORMS"]
+    GITHUB_DIR = ["catalog", "dashboards", "i18n", "forms"]
     MODEL = ""
 
     @staticmethod
-    def build_operation_by_category(category, rebuild, files):
+    def build_operation_by_category(
+        manual=True, category=None, rebuild=True, meta_files=[]
+    ):
         """
         Function used to find the concrete children class builder, e.g. DashboardBuilder, and peform accordingly.
         """
-        pass
+        builder_classes = {
+            "DASHBOARDS": DashboardBuilder,
+            "I18N": i18nBuilder,
+            "FORMS": FormBuilder,
+        }
+        Builder: GeneralDataBuilder = builder_classes.get(category, None)
+        if Builder:
+            Builder().build_operation(
+                manual=manual, rebuild=rebuild, meta_files=meta_files
+            )
+
+    @staticmethod
+    def selective_update():
+        latest_sha = get_latest_info_git("SHA", "")
+        data = json.loads(get_latest_info_git("COMMIT", latest_sha))
+        changed_files = [f["filename"] for f in data["files"]]
+        filtered_changes = GeneralDataBuilder.filter_changed_files(changed_files)
+
+        for category, files in filtered_changes.items():
+            GeneralDataBuilder.build_operation_by_category(
+                manual=False, category=category.upper(), rebuild=False, meta_files=files
+            )
+
+    @staticmethod
+    def filter_changed_files(file_list):
+        changed_files = {category: [] for category in GeneralDataBuilder.GITHUB_DIR}
+
+        for f in file_list:
+            f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
+            f_info = f.split("/")
+            if (
+                len(f_info) > 1
+                and f_info[0] in changed_files
+                and os.path.exists(f_path)
+            ):
+                changed_files[f_info[0]].append(
+                    os.path.join(*f_info[1:]).replace(".json", "")
+                )
+
+        return changed_files
 
     @staticmethod
     def refresh_meta_repo():
@@ -96,10 +144,9 @@ class GeneralDataBuilder(ABC):
         for model_obj in objects:
             routes = model_obj.route
             response = revalidate_frontend(routes=routes)
-
-            if response.status_code == 200:
+            if response and response.status_code == 200:
                 successful_routes.extend(response.json()["revalidated"])
-            elif response.status_code == 400:
+            elif response and response.status_code == 400:
                 failed_routes.extend(routes.split(","))
                 failed_info.append(response.json())
 
