@@ -229,7 +229,7 @@ class GeneralMetaBuilder(ABC):
 
         telegram_msg = [
             triggers.format_header(f"Meta Built Status ({self.MODEL.__name__})"),
-            triggers.format_files_with_status_emoji(meta_objects, "✅︎"),
+            triggers.format_files_with_status_emoji(meta_objects, "✅︎") + "\n",
             triggers.format_files_with_status_emoji(
                 [obj["FILE"] for obj in failed], "❌"
             ),
@@ -331,7 +331,7 @@ class DashboardBuilder(GeneralMetaBuilder):
 
         telegram_msg = [
             triggers.format_header(f"Dashboard Charts Built Status (DashboardJson)"),
-            triggers.format_files_with_status_emoji(created_charts, "✅︎"),
+            triggers.format_files_with_status_emoji(created_charts, "✅︎") + "\n",
             triggers.format_files_with_status_emoji(
                 [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed], "❌"
             ),
