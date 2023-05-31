@@ -1,10 +1,6 @@
 import environ
 from django.core.management.base import BaseCommand
-
-from data_gov_my.catalog_utils import catalog_builder
-from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-
 
 env = environ.Env()
 environ.Env.read_env()

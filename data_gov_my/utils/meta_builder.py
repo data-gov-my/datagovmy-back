@@ -1,21 +1,14 @@
 import importlib
 import json
-from os.path import isfile, join
-import os
-from data_gov_my.utils.cron_utils import (
-    get_latest_info_git,
-    remove_src_folders,
-    create_directory,
-    revalidate_frontend,
-    fetch_from_git,
-    write_as_binary,
-    extract_zip,
-)
 import logging
+import os
 from abc import ABC, abstractmethod
-from django.db import models
+from os.path import isfile
+from typing import List
+
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
+
 from data_gov_my.models import (
     CatalogJson,
     DashboardJson,
@@ -23,9 +16,17 @@ from data_gov_my.models import (
     MetaJson,
     i18nJson,
 )
-from data_gov_my.utils import dashboard_builder, triggers, common
-from typing import List
+from data_gov_my.utils import common, dashboard_builder, triggers
 from data_gov_my.utils.common import LANGUAGE_CHOICES
+from data_gov_my.utils.cron_utils import (
+    create_directory,
+    extract_zip,
+    fetch_from_git,
+    get_latest_info_git,
+    remove_src_folders,
+    revalidate_frontend,
+    write_as_binary,
+)
 
 
 class GeneralMetaBuilder(ABC):
