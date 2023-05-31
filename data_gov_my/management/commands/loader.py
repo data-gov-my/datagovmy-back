@@ -22,8 +22,8 @@ class Command(BaseCommand):
 
         if len(kwargs["operation"]) > 2:
             files = kwargs["operation"][2]
-            files = files.split(",")
             command = operation + " " + files
+            files = files.split(",")
         else:
             files = []
 
@@ -61,10 +61,14 @@ class Command(BaseCommand):
             if category == "DATA_CATALOG":
                 catalog_builder.catalog_operation(command, "MANUAL")
             elif category == "DASHBOARDS":
-                # cron_utils.data_operation(command, "MANUAL")
-                DashboardBuilder().build_operation(rebuild, files)
+                DashboardBuilder().build_operation(
+                    manual=True, rebuild=rebuild, meta_files=files
+                )
             elif category == "I18N":  # i18n
-                # cron_utils.i18n_operation(command, "MANUAL")
-                i18nBuilder().build_operation(rebuild, files)
+                i18nBuilder().build_operation(
+                    manual=True, rebuild=rebuild, meta_files=files
+                )
             else:  # forms
-                FormBuilder().build_operation(rebuild, files)
+                FormBuilder().build_operation(
+                    manual=True, rebuild=rebuild, meta_files=files
+                )

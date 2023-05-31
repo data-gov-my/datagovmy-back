@@ -15,9 +15,16 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 class GeneralDataBuilder(ABC):
     CATEGORIES = ["DATA_CATALOG", "DASHBOARDS", "I18N", "FORMS"]
+    CATEGORY = ""
     GITHUB_DIR = ""
     MODEL = ""
-    REVALIDATE = False
+
+    @staticmethod
+    def build_operation_by_category(category, rebuild, files):
+        """
+        Function used to find the concrete children class builder, e.g. DashboardBuilder, and peform accordingly.
+        """
+        pass
 
     @staticmethod
     def refresh_meta_repo():
@@ -67,7 +74,7 @@ class GeneralDataBuilder(ABC):
         return [f for f in os.listdir(meta_dir) if isfile(os.path.join(meta_dir, f))]
 
     def additional_handling(self, rebuild: bool, meta_files, created_objects):
-        pass
+        return created_objects
 
     @abstractmethod
     def update_or_create_meta(self, filename: str, metadata: dict):
@@ -81,27 +88,60 @@ class GeneralDataBuilder(ABC):
         Only applicable if self.model have "route" field
         """
         routes = []
+        telegram_msg = triggers.format_header("REVALIDATION STATUS") + "\n"
+        successful_routes = []
+        failed_routes = []
+        failed_info = []
+
         for model_obj in objects:
-            routes.append(model_obj.route)
+            routes = model_obj.route
+            response = revalidate_frontend(routes=routes)
 
-        revalidate_status = revalidate_frontend(routes=routes)
-        print("REVALIDATE STATUS:", routes, revalidate_status)
+            if response.status_code == 200:
+                successful_routes.extend(response.json()["revalidated"])
+            elif response.status_code == 400:
+                failed_routes.extend(routes.split(","))
+                failed_info.append(response.json())
+
         # TODO: format telegram for revaliadtion status
+        telegram_msg += triggers.format_files_with_status_emoji(successful_routes, "✅︎")
+        telegram_msg += "\n\n"
+        telegram_msg += triggers.format_files_with_status_emoji(failed_routes, "❌")
 
-    def build_operation(self, rebuild=True, meta_files=[]):
+        if len(failed_info) > 0:
+            telegram_msg += "\n\n"
+            telegram_msg += triggers.format_multi_line(
+                failed_info, "FAILED REVALIDATION INFO"
+            )
+
+        triggers.send_telegram(telegram_msg)
+
+    def build_operation(self, manual=True, rebuild=True, meta_files=[]):
         refreshed = self.refresh_meta_repo()
         if not refreshed:
             logging.warning("Github repo has not been refreshed, abort building")
             return False
 
-        # get the operation files
-        if rebuild:
-            self.MODEL.objects.all().delete()
-
         # get meta files (prioritise input files)
         meta_files = (
             [f + ".json" for f in meta_files] if meta_files else self.get_meta_files()
         )
+
+        # send telegram message
+        operation_type = "REBUILD" if rebuild else "UPDATE"
+        trigger_type = "MANUAL" if manual else "SELECTIVE"
+        operation_files = triggers.format_files_with_status_emoji(meta_files, "🔄")
+        triggers.send_telegram(
+            triggers.format_header(
+                f"PERFORMING {self.CATEGORY} {operation_type} ({trigger_type})"
+            )
+            + "\n"
+            + operation_files
+        )
+
+        if rebuild:
+            self.MODEL.objects.all().delete()
+
         failed = []
         meta_objects = []
         for meta in meta_files:
@@ -113,10 +153,25 @@ class GeneralDataBuilder(ABC):
                 created_object.save()
                 meta_objects.append(created_object)
             except Exception as e:
-                failed.append({"file": meta, "error": e})
+                failed.append({"FILE": meta, "ERROR": e})
+
+        telegram_msg = [
+            triggers.format_header(f"Meta Built Status ({self.MODEL.__name__})"),
+            triggers.format_files_with_status_emoji(meta_objects, "✅︎"),
+            triggers.format_files_with_status_emoji(
+                [obj["FILE"] for obj in failed], "❌"
+            ),
+        ]
+
+        if failed:
+            telegram_msg.append(
+                "\n" + triggers.format_multi_line(failed, "Failed Meta - Error logs")
+            )
+
+        triggers.send_telegram("\n".join(telegram_msg))
 
         # iterate through each meta "blueprint" and populate DB accordingly
-        self.additional_handling(rebuild, meta_files, meta_objects)
+        meta_objects = self.additional_handling(rebuild, meta_files, meta_objects)
 
         # TODO: catch exception - telegram inform
         # TODO: revalidate routes
@@ -135,7 +190,7 @@ class GeneralDataBuilder(ABC):
 
 
 class DashboardBuilder(GeneralDataBuilder):
-    CATEGORY = "DASHBOARD"
+    CATEGORY = "DASHBOARDS"
     MODEL = MetaJson
     GITHUB_DIR = "dashboards"
 
@@ -163,16 +218,14 @@ class DashboardBuilder(GeneralDataBuilder):
         if rebuild:
             DashboardJson.objects.all().delete()
 
-        dashboard_list = set()
-        revalidate_routes = []
+        failed = []
+        created_charts = []
+        successful_meta = set()
 
         for meta in created_objects:
             dbd_meta: dict = meta.dashboard_meta
             dbd_name = meta.dashboard_name
-            revalidate_routes.append(meta.route)
             chart_list = dbd_meta["charts"]
-
-            dashboard_list.add(dbd_name)
 
             for k in chart_list.keys():
                 chart_name = k
@@ -199,17 +252,34 @@ class DashboardBuilder(GeneralDataBuilder):
                             defaults=updated_values,
                         )
                         obj.save()
+                        created_charts.append(obj)
+                        successful_meta.add(meta)
                         cache.set(dbd_name + "_" + k, res)
                 except Exception as e:
                     # failed_notify.append(meta)
                     failed_obj = {}
-                    failed_obj["CHART_NAME"] = chart_name
                     failed_obj["DASHBOARD"] = dbd_name
+                    failed_obj["CHART_NAME"] = chart_name
                     failed_obj["ERROR"] = str(e)
                     # failed_builds.append(failed_obj)
-                    print(failed_obj)
+                    failed.append(failed_obj)
 
-        # TODO: telegram notif: success or failure (list of failed charts)
+        telegram_msg = [
+            triggers.format_header(f"Dashboard Charts Built Status (DashboardJson)"),
+            triggers.format_files_with_status_emoji(created_charts, "✅︎"),
+            triggers.format_files_with_status_emoji(
+                [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed], "❌"
+            ),
+        ]
+
+        if failed:
+            telegram_msg.append(
+                "\n" + triggers.format_multi_line(failed, "Failed Meta - Error logs")
+            )
+
+        triggers.send_telegram("\n".join(telegram_msg))
+
+        return successful_meta
 
 
 class i18nBuilder(GeneralDataBuilder):
@@ -245,7 +315,7 @@ class i18nBuilder(GeneralDataBuilder):
 
 
 class FormBuilder(GeneralDataBuilder):
-    CATEGORY = "Form"
+    CATEGORY = "FORMS"
     MODEL = FormTemplate
     GITHUB_DIR = "forms"
 
