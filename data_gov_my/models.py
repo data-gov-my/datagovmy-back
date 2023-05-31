@@ -46,6 +46,9 @@ class CatalogJson(models.Model):
     catalog_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
     file_src = models.CharField(max_length=400, default="")
 
+    def __str__(self) -> str:
+        return f"{self.file_src} - {self.catalog_name}"
+
 
 class NameDashboard_FirstName(models.Model):
     name = models.CharField(max_length=30, primary_key=True)

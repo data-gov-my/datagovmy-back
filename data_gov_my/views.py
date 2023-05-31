@@ -28,7 +28,7 @@ from data_gov_my.models import (
 )
 from data_gov_my.serializers import FormDataSerializer, i18nSerializer
 from data_gov_my.utils import cron_utils
-from data_gov_my.utils.DataBuilder import GeneralDataBuilder
+from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 
 env = environ.Env()
 environ.Env.read_env()
@@ -88,7 +88,7 @@ class CHART(APIView):
 class UPDATE(APIView):
     def post(self, request, format=None):
         if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            thread = Thread(target=GeneralDataBuilder.selective_update)
+            thread = Thread(target=GeneralMetaBuilder.selective_update)
             thread.start()
             return Response(status=status.HTTP_200_OK)
         return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
