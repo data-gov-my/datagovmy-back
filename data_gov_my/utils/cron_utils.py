@@ -331,17 +331,8 @@ Revalidate Frontend
 """
 
 
-def revalidate_frontend(dashboard=False, route=False):
-    endpoint = []
-    if route:
-        endpoint.append(route)
-    elif dashboard in common.FRONTEND_ENDPOINTS:
-        r = common.FRONTEND_ENDPOINTS[dashboard]
-        endpoint.append(r)
-    else:
-        return -1
-
-    endpoint = ",".join(endpoint)
+def revalidate_frontend(routes=[]):
+    endpoint = ",".join(route for route in routes if isinstance(route, str))
 
     url = os.getenv("FRONTEND_URL", "-")
     fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
@@ -352,7 +343,9 @@ def revalidate_frontend(dashboard=False, route=False):
     }
     payload = f"route={endpoint}"
 
-    response = requests.post(url, headers=headers, data=payload)
+    response = requests.post(
+        url, headers=headers, data=payload
+    )  # FIXME: get successful routes in repsonse to show in telegram
     return response.status_code
 
 

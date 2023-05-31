@@ -12,6 +12,7 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200)
     dashboard_meta = models.JSONField()
+    route = models.CharField(max_length=100, null=True)  # routes are comma-separated
 
     def __str__(self) -> str:
         return f"{self.dashboard_name}"
