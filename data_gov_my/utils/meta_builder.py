@@ -1,3 +1,4 @@
+import importlib
 import json
 from os.path import isfile, join
 import os
@@ -15,13 +16,19 @@ from abc import ABC, abstractmethod
 from django.db import models
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
-from data_gov_my.models import DashboardJson, FormTemplate, MetaJson, i18nJson
-from data_gov_my.utils import dashboard_builder, triggers
+from data_gov_my.models import (
+    CatalogJson,
+    DashboardJson,
+    FormTemplate,
+    MetaJson,
+    i18nJson,
+)
+from data_gov_my.utils import dashboard_builder, triggers, common
 from typing import List
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 
-class GeneralDataBuilder(ABC):
+class GeneralMetaBuilder(ABC):
     CATEGORY = ["DATA_CATALOG", "DASHBOARDS", "I18N", "FORMS"]
     GITHUB_DIR = ["catalog", "dashboards", "i18n", "forms"]
     MODEL = ""
@@ -31,14 +38,15 @@ class GeneralDataBuilder(ABC):
         manual=True, category=None, rebuild=True, meta_files=[]
     ):
         """
-        Function used to find the concrete children class builder, e.g. DashboardBuilder, and peform accordingly.
+        Function used to find the concrete children class builder, e.g. DashboardBuilder, and peform building operations accordingly.
         """
         builder_classes = {
             "DASHBOARDS": DashboardBuilder,
             "I18N": i18nBuilder,
             "FORMS": FormBuilder,
+            "DATA_CATALOG": DataCatalogBuilder,
         }
-        Builder: GeneralDataBuilder = builder_classes.get(category, None)
+        Builder: GeneralMetaBuilder = builder_classes.get(category, None)
         if Builder:
             Builder().build_operation(
                 manual=manual, rebuild=rebuild, meta_files=meta_files
@@ -46,19 +54,25 @@ class GeneralDataBuilder(ABC):
 
     @staticmethod
     def selective_update():
+        """
+        Selectively update database objects based on the latest commit in the github repository.
+        """
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
-        filtered_changes = GeneralDataBuilder.filter_changed_files(changed_files)
+        filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
 
         for category, files in filtered_changes.items():
-            GeneralDataBuilder.build_operation_by_category(
+            GeneralMetaBuilder.build_operation_by_category(
                 manual=False, category=category.upper(), rebuild=False, meta_files=files
             )
 
     @staticmethod
-    def filter_changed_files(file_list):
-        changed_files = {category: [] for category in GeneralDataBuilder.GITHUB_DIR}
+    def filter_changed_files(file_list) -> dict:
+        """
+        Maps the files to respective categories and returns a dictionary where the keys are the categories and the values are the corresponding files.
+        """
+        changed_files = {category: [] for category in GeneralMetaBuilder.GITHUB_DIR}
 
         for f in file_list:
             f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
@@ -77,7 +91,7 @@ class GeneralDataBuilder(ABC):
     @staticmethod
     def refresh_meta_repo():
         """
-        Delete local github folder (if any), and re-populate
+        Delete local github folder (if any), and clone the whole github repo content locally.
         """
         # 1. Wipe github
         remove_src_folders()
@@ -96,20 +110,10 @@ class GeneralDataBuilder(ABC):
 
         return False
 
-    def format_failed_object(self, data_name, error):
-        return f"{data_name}: {error}"
-
-    def get_operation_files(operation):
-        opr = operation.split(" ")
-        chosen_opr = opr[0]
-        files = []
-
-        if len(opr) > 1:
-            files = opr[1].split(",")
-
-        return {"operation": chosen_opr, "files": files}
-
     def get_github_directory(self):
+        """
+        Returns the local github directory based on defined category.
+        """
         return os.path.join(
             os.getcwd(),
             "DATAGOVMY_SRC",
@@ -118,6 +122,9 @@ class GeneralDataBuilder(ABC):
         )
 
     def get_meta_files(self):
+        """
+        Returns all the meta json files within the github directory.
+        """
         meta_dir = self.get_github_directory()
         return [f for f in os.listdir(meta_dir) if isfile(os.path.join(meta_dir, f))]
 
@@ -127,13 +134,13 @@ class GeneralDataBuilder(ABC):
     @abstractmethod
     def update_or_create_meta(self, filename: str, metadata: dict):
         """
-        Returns a list of failed objects
+        Updates or creates the database model object based on the metadata taken from github.
         """
         pass
 
     def revalidate_route(self, objects):
         """
-        Only applicable if self.model have "route" field
+        Only applicable if objects (model instances) has "route" field, else will not be called.
         """
         routes = []
         telegram_msg = triggers.format_header("REVALIDATION STATUS") + "\n"
@@ -164,6 +171,17 @@ class GeneralDataBuilder(ABC):
         triggers.send_telegram(telegram_msg)
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[]):
+        """
+        General build operation for all data builder classes.
+        Inherited classes should override `update_or_create_meta()` to control how each meta file is used to update or create model objects.
+        Steps taken:
+        1. Refresh github repository (delete and re-clone)
+        2. Collect meta files (if no meta files provided in input, the whole folder will be taken)
+        3. Calls `update_or_create_meta()` to save metadata into database as model instances.
+        // TODO: should we do `additional_handling(object: ModelObject)` instead of `additional_handling(objects: List[ModelObject])`?
+        4. Calls `additional_handling()`, e.g. each dashboard metadata has multiple charts, these charts are individually updated through `additional_handling()`.
+        5. Revalidates routes if the model instances have `route` field.
+        """
         refreshed = self.refresh_meta_repo()
         if not refreshed:
             logging.warning("Github repo has not been refreshed, abort building")
@@ -197,8 +215,14 @@ class GeneralDataBuilder(ABC):
                 f = open(f_meta)
                 data = json.load(f)
                 created_object = self.update_or_create_meta(meta, data)
-                created_object.save()
-                meta_objects.append(created_object)
+                if isinstance(created_object, list):
+                    for object in created_object:
+                        object.save()
+                    meta_objects.extend(created_object)
+                else:
+                    created_object.save()
+                    meta_objects.append(created_object)
+                f.close()
             except Exception as e:
                 failed.append({"FILE": meta, "ERROR": e})
 
@@ -217,18 +241,15 @@ class GeneralDataBuilder(ABC):
 
         triggers.send_telegram("\n".join(telegram_msg))
 
-        # iterate through each meta "blueprint" and populate DB accordingly
         meta_objects = self.additional_handling(rebuild, meta_files, meta_objects)
-
-        # TODO: catch exception - telegram inform
-        # TODO: revalidate routes
 
         if self.model_has_field("route"):
             self.revalidate_route(meta_objects)
 
-        # TODO: telegram inform successes
-
-    def model_has_field(self, field):
+    def model_has_field(self, field: str) -> bool:
+        """
+        Returns True if model has the input field, else False.
+        """
         try:
             field = self.MODEL._meta.get_field(field)
             return True
@@ -236,15 +257,12 @@ class GeneralDataBuilder(ABC):
             return False
 
 
-class DashboardBuilder(GeneralDataBuilder):
+class DashboardBuilder(GeneralMetaBuilder):
     CATEGORY = "DASHBOARDS"
     MODEL = MetaJson
     GITHUB_DIR = "dashboards"
 
     def update_or_create_meta(self, filename: str, metadata: dict):
-        """
-        meta represents the dashboard metajson file, e.g. blood_donation.json
-        """
         updated_values = {"dashboard_meta": metadata}
         route = metadata.get("route", "")
         obj, created = MetaJson.objects.update_or_create(
@@ -259,8 +277,7 @@ class DashboardBuilder(GeneralDataBuilder):
         self, rebuild: bool, meta_files, created_objects: List[MetaJson]
     ):
         """
-        Dashboard additionally will populate DashboardJson objects based on each charts defined in metajson.
-        Additionally revalidates the routes
+        Update or create new DashboardJson instances (unique chart data) based on each created MetaJson instance.
         """
         if rebuild:
             DashboardJson.objects.all().delete()
@@ -329,12 +346,15 @@ class DashboardBuilder(GeneralDataBuilder):
         return successful_meta
 
 
-class i18nBuilder(GeneralDataBuilder):
+class i18nBuilder(GeneralMetaBuilder):
     CATEGORY = "I18N"
     MODEL = i18nJson
     GITHUB_DIR = "i18n"
 
     def get_meta_files(self):
+        """
+        Returns all meta files under each language sub-folder.
+        """
         meta_dir = self.get_github_directory()
         files = []
         for lang_code, lang_name in LANGUAGE_CHOICES:
@@ -349,9 +369,6 @@ class i18nBuilder(GeneralDataBuilder):
         return files
 
     def update_or_create_meta(self, filename: str, metadata: dict):
-        """
-        meta represents the i18n metajson file, e.g. en-GB/blood_donation.json
-        """
         language, filename = os.path.split(filename)
         filename = filename.replace(".json", "")
 
@@ -361,14 +378,54 @@ class i18nBuilder(GeneralDataBuilder):
         return obj
 
 
-class FormBuilder(GeneralDataBuilder):
+class FormBuilder(GeneralMetaBuilder):
     CATEGORY = "FORMS"
     MODEL = FormTemplate
     GITHUB_DIR = "forms"
 
     def update_or_create_meta(self, filename: str, metadata: dict):
-        """
-        meta represents the dashboard metajson file, e.g. mods.json
-        """
         form_type = filename.replace(".json", "")
         return FormTemplate.create(form_type=form_type, form_meta=metadata)
+
+
+class DataCatalogBuilder(GeneralMetaBuilder):
+    CATEGORY = "DATA_CATALOG"
+    MODEL = CatalogJson
+    GITHUB_DIR = "catalog"
+
+    def update_or_create_meta(self, filename: str, metadata: dict):
+        file_data = metadata["file"]
+        all_variable_data = metadata["file"]["variables"]  # TODO : change variable name
+        full_meta = metadata
+        file_src = filename.replace(".json", "")
+
+        created_objects = []
+
+        for cur_data in all_variable_data:
+            if "catalog_data" in cur_data:  # Checks if the catalog_data is in
+                cur_catalog_data = cur_data["catalog_data"]
+                chart_type = cur_catalog_data["chart"]["chart_type"]
+
+                if chart_type in common.CHART_TYPES:
+                    args = {
+                        "full_meta": full_meta,
+                        "file_data": file_data,
+                        "cur_data": cur_data,
+                        "all_variable_data": all_variable_data,
+                        "file_src": file_src,
+                    }
+
+                    module_ = f"data_gov_my.catalog_utils.catalog_variable_classes.{common.CHART_TYPES[chart_type]['parent']}"
+                    constructor_ = common.CHART_TYPES[chart_type]["constructor"]
+                    class_ = getattr(importlib.import_module(module_), constructor_)
+                    obj = class_(**args)
+
+                    unique_id = obj.unique_id
+                    db_input = obj.db_input
+
+                    db_obj, created = CatalogJson.objects.update_or_create(
+                        id=unique_id, defaults=db_input
+                    )
+                    created_objects.append(db_obj)
+
+        return created_objects
