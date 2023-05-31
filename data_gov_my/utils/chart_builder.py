@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from mergedeep import merge
 from data_gov_my.utils.general_chart_helpers import *
-from data_gov_my.utils.operations import *
 from dateutil.relativedelta import relativedelta
 from data_gov_my.utils.variable_structures import *
 
