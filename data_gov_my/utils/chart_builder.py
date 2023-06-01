@@ -330,8 +330,8 @@ Builds Timeseries Chart
 """
 
 
-def timeseries_chart(file_name: str, variables: Dict):
-    df = pd.read_parquet(file_name)
+def timeseries_chart(filename: str, variables: TimeseriesChartVariables):
+    df = pd.read_parquet(filename)
     df = df.replace({np.nan: None})
 
     DATE_RANGE = ""
@@ -353,38 +353,26 @@ def timeseries_chart(file_name: str, variables: Dict):
 
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
+    
+    keys = variables["keys"]
+    values = variables["values"]
 
-    structure_info = {"key_list": [], "value_obj": []}
+    column_names = list(values.keys())
+    rename_cols = dict(zip(list(values.values()) ,column_names))
+    df = df.rename(columns=rename_cols)
 
-    get_nested_keys(variables, structure_info)
-    keys_list = structure_info["key_list"][::-1]
-    value_obj = structure_info["value_obj"]
+    result = {}
+    if len(keys) >= 1 : 
+        for name, group in df.groupby(keys):
+            current_level = result
+            for i in range(len(name)-1):
+                current_level = current_level.setdefault(name[i], {})
+            current_level[name[-1]] = group[column_names].to_dict('list')
+    else : 
+        for i in column_names : 
+            result[i] = df[i].to_list()
 
-    if len(keys_list) == 0:
-        res = {}
-        for k, v in variables.items():
-            res[k] = df[v].to_list()
-    else:
-        df["u_groups"] = list(df[keys_list].itertuples(index=False, name=None))
-        u_groups_list = df["u_groups"].unique().tolist()
-
-        res = {}
-        for group in u_groups_list:
-            result = {}
-            for b in group[::-1]:
-                result = {b: result}
-            for k, v in value_obj[0].items():
-                group_l = group + (k,)
-                temp_group = group[0] if len(group) == 1 else group
-                set_dict(
-                    result,
-                    list(group_l),
-                    df.groupby(keys_list)[v].get_group(temp_group).to_list(),
-                    "SET",
-                )
-            merge(res, result)
-
-    return res
+    return result
 
 
 """

@@ -62,7 +62,6 @@ class GeneralMetaBuilder(ABC):
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
         filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
-
         for category, files in filtered_changes.items():
             if files:
                 GeneralMetaBuilder.build_operation_by_category(
@@ -78,9 +77,13 @@ class GeneralMetaBuilder(ABC):
         Maps the files to respective categories and returns a dictionary where the keys are the categories and the values are the corresponding files.
         """
         changed_files = {category: [] for category in GeneralMetaBuilder.GITHUB_DIR}
+        meta_dir = os.path.join("DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"))
+        # clone meta repo if needed
+        if not os.path.exists(meta_dir):
+            GeneralMetaBuilder.refresh_meta_repo()
 
         for f in file_list:
-            f_path = "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + "/" + f
+            f_path = os.path.join(meta_dir, f)
             f_info = f.split("/")
             if (
                 len(f_info) > 1

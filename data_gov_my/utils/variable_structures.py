@@ -1,6 +1,10 @@
 from typing import Dict, List, TypedDict
 
 
+class TimeseriesChartVariables(TypedDict) : 
+    keys : List[str]
+    values : List[str]
+
 class BarChartVariables(TypedDict):
     keys: List[str]
     axis_values: List[str]
