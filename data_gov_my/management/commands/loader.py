@@ -1,8 +1,6 @@
 import environ
 from django.core.management.base import BaseCommand
-
-from data_gov_my.catalog_utils import catalog_builder
-from data_gov_my.utils import cron_utils
+from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 
 env = environ.Env()
 environ.Env.read_env()
@@ -17,11 +15,14 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         category = kwargs["operation"][0]
         operation = kwargs["operation"][1]
-        command = operation
 
         if len(kwargs["operation"]) > 2:
             files = kwargs["operation"][2]
-            command = operation + " " + files
+            files = files.split(",")
+        else:
+            files = []
+
+        rebuild = operation == "REBUILD"
 
         """
         CATEGORIES :
@@ -48,15 +49,6 @@ class Command(BaseCommand):
             "UPDATE",
             "REBUILD",
         ]:
-            # Delete all file src
-            # os.remove("repo.zip")
-            # shutil.rmtree("DATAGOVMY_SRC/")
-            cron_utils.remove_src_folders()
-            if category == "DATA_CATALOG":
-                catalog_builder.catalog_operation(command, "MANUAL")
-            elif category == "DASHBOARDS":
-                cron_utils.data_operation(command, "MANUAL")
-            elif category == "I18N":  # i18n
-                cron_utils.i18n_operation(command, "MANUAL")
-            else:  # forms
-                cron_utils.forms_operation(command, "MANUAL")
+            GeneralMetaBuilder.build_operation_by_category(
+                manual=True, category=category, rebuild=rebuild, meta_files=files
+            )

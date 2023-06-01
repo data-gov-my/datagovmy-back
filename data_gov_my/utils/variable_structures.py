@@ -1,4 +1,4 @@
-from typing import List, Dict, TypedDict
+from typing import Dict, List, TypedDict
 
 
 class BarChartVariables(TypedDict):

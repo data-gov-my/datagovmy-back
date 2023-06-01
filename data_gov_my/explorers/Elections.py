@@ -92,54 +92,6 @@ class ELECTIONS(General_Explorer):
 
         return JsonResponse({"400" : "Bad Request."}, status=400)
 
-    def full_result(self, request_params) :
-        required_params = ["type"] # Declare required params
-
-        res = {}
-
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-        
-        c_type = request_params['type'][0]
-        model_name = ''
-        c_serializer = ''
-        c_filters = {}
-        extract_votes_outcome = False
-
-        if c_type == "candidates" or c_type == "seats":
-            election = request_params['election'][0]
-            seat = request_params['seat'][0]
-            model_name = 'ElectionDashboard_Candidates'
-            c_serializer = ElectionCandidateSerializer
-            c_filters = {"election_name" : election, "seat" : seat}
-            extract_votes_outcome = True
-        if c_type == "party" : 
-            election = request_params['election'][0]
-            state = request_params['state'][0]
-            model_name = "ElectionDashboard_Party"
-            c_serializer = ElectionPartySerializer
-            c_filters = {"election_name":election,'state':state}
-
-
-        model_choice = apps.get_model('data_gov_my', model_name)
-        candidates_res = model_choice.objects.filter(**c_filters)
-        data = c_serializer(candidates_res, many=True).data
-
-        # For particular case of full_results
-        if extract_votes_outcome and len(data) > 0 :
-            const_keys = ["voter_turnout", "voter_turnout_perc", "votes_rejected", "votes_rejected_perc"]
-            r = {}
-            r["votes"] = {k: data[0][k] for k in const_keys}
-            r["data"] = [{k: v for k, v in d.items() if k not in const_keys} for d in data]
-            data = r
-
-        res["msg"] = data
-        res["status"] = 200
-
-        return res
-
     '''
     Multi-handler dropdown type
     '''
@@ -202,7 +154,6 @@ class ELECTIONS(General_Explorer):
         required_params = ["seat_name"]
 
         res = {}
-        print(request_params)
         if not all(param in request_params for param in required_params) :
             res["msg"] = {"400" : "Bad request"} 
             res["status"] = 400
@@ -228,7 +179,6 @@ class ELECTIONS(General_Explorer):
         required_params = ["party_name", "state"]
 
         res = {}
-        print(request_params)
         if not all(param in request_params for param in required_params) :
             res["msg"] = {"400" : "Bad request"} 
             res["status"] = 400
@@ -275,15 +225,61 @@ class ELECTIONS(General_Explorer):
         
         model_choice = apps.get_model('data_gov_my', model_name)
 
-        overall_res = None
-        if state == "mys" : 
-            overall_res = model_choice.objects.filter(election_name=election)
-        else : 
-            overall_res = model_choice.objects.filter(election_name=election, state=state)
+        args = {'election_name' : election}
+
+        if state != "mys" : 
+            args['state'] = state
+
+        overall_res = model_choice.objects.filter(**args)
         
         serializer = ElectionOverallSeatSerializer(overall_res, many=True)
 
         res["msg"] = serializer.data
+        res["status"] = 200
+
+        return res
+    
+    '''
+    Returns the full result
+    '''
+    def full_result(self, request_params) :
+        required_params = ["type"] # Declare required params
+
+        res = {}
+
+        if not all(param in request_params for param in required_params) :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+
+        c_type = request_params['type'][0] # Get type
+
+        if c_type != "candidates" and c_type != "party" :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+
+        model_name = f'ElectionDashboard_{c_type.capitalize()}'
+        extract_votes_outcome = (c_type == 'candidates')
+        c_serializer = ElectionCandidateSerializer if extract_votes_outcome else ElectionPartySerializer
+        election = request_params['election'][0]
+        c_filters = {"election_name" : election}
+        req_param = 'seat' if extract_votes_outcome else 'state'
+        c_filters[req_param] = request_params[req_param][0]
+
+        model_choice = apps.get_model('data_gov_my', model_name)
+        candidates_res = model_choice.objects.filter(**c_filters)
+        data = c_serializer(candidates_res, many=True).data
+
+        # For particular case of full_results
+        if extract_votes_outcome and len(data) > 0 :
+            const_keys = ["voter_turnout", "voter_turnout_perc", "votes_rejected", "votes_rejected_perc"]
+            r = {}
+            r["votes"] = {k: data[0][k] for k in const_keys}
+            r["data"] = [{k: v for k, v in d.items() if k not in const_keys} for d in data]
+            data = r
+
+        res["msg"] = data
         res["status"] = 200
 
         return res
