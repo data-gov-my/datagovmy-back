@@ -64,9 +64,13 @@ class GeneralMetaBuilder(ABC):
         filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
 
         for category, files in filtered_changes.items():
-            GeneralMetaBuilder.build_operation_by_category(
-                manual=False, category=category.upper(), rebuild=False, meta_files=files
-            )
+            if files:
+                GeneralMetaBuilder.build_operation_by_category(
+                    manual=False,
+                    category=category.upper(),
+                    rebuild=False,
+                    meta_files=files,
+                )
 
     @staticmethod
     def filter_changed_files(file_list) -> dict:
