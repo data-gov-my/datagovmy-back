@@ -1,6 +1,5 @@
-from data_gov_my.utils.general_chart_helpers import *
 from data_gov_my.utils.chart_builder import *
-import os
+from data_gov_my.utils.general_chart_helpers import *
 
 """
 Segregates chart types,

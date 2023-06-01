@@ -12,6 +12,10 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200)
     dashboard_meta = models.JSONField()
+    route = models.CharField(max_length=100, null=True)  # routes are comma-separated
+
+    def __str__(self) -> str:
+        return f"{self.dashboard_name}"
 
 
 class DashboardJson(models.Model):
@@ -20,6 +24,9 @@ class DashboardJson(models.Model):
     chart_type = models.CharField(max_length=200, null=True)
     api_type = models.CharField(max_length=200, null=True)
     chart_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
+
+    def __str__(self) -> str:
+        return f"{self.dashboard_name} ({self.chart_name})"
 
 
 class CatalogJson(models.Model):
@@ -38,6 +45,9 @@ class CatalogJson(models.Model):
     data_source = models.CharField(max_length=100)
     catalog_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
     file_src = models.CharField(max_length=400, default="")
+
+    def __str__(self) -> str:
+        return f"{self.file_src} - {self.catalog_name}"
 
 
 class NameDashboard_FirstName(models.Model):
