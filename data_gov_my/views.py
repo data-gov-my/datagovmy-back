@@ -88,8 +88,10 @@ class CHART(APIView):
 class UPDATE(APIView):
     def post(self, request, format=None):
         if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            print("Is a valid Request")
             thread = Thread(target=GeneralMetaBuilder.selective_update)
             thread.start()
+            print("Thread has started")
             return Response(status=status.HTTP_200_OK)
         return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
