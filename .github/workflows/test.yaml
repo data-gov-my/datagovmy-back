@@ -28,3 +28,5 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+      env:
+        DJANGO_ALLOWED_HOST: https://127.0.0.1
