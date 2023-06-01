@@ -139,37 +139,62 @@ class GeneralMetaBuilder(ABC):
         """
         pass
 
-    def revalidate_route(self, objects):
+    def revalidate_route(self, objects: List):
         """
         Only applicable if objects (model instances) has "route" field, else will not be called.
         """
+        if len(objects) < 1:
+            return
+
         routes = []
-        telegram_msg = triggers.format_header("REVALIDATION STATUS") + "\n"
-        successful_routes = []
-        failed_routes = []
-        failed_info = []
+
+        triggers.send_telegram(
+            "\n".join(
+                [
+                    triggers.format_header(
+                        f"PERFORMING REVALIDATION ({self.MODEL.__name__})"
+                    ),
+                    triggers.format_files_with_status_emoji(objects, "🔄"),
+                ]
+            )
+        )
 
         for model_obj in objects:
+            successful_routes = []
+            failed_routes = []
+            failed_info = []
+            telegram_msg = (
+                triggers.format_header(
+                    f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS"
+                )
+                + "\n"
+            )
             routes = model_obj.route
+            if not routes:  # current object does not have any routes
+                continue
             response = revalidate_frontend(routes=routes)
             if response and response.status_code == 200:
                 successful_routes.extend(response.json()["revalidated"])
             elif response and response.status_code == 400:
                 failed_routes.extend(routes.split(","))
                 failed_info.append(response.json())
+            else:
+                failed_routes.extend(routes.split(","))
+                failed_info.append({"DB OBJECT": str(model_obj), "ERROR": "Unknown :("})
 
-        # TODO: format telegram for revaliadtion status
-        telegram_msg += triggers.format_files_with_status_emoji(successful_routes, "✅︎")
-        telegram_msg += "\n\n"
-        telegram_msg += triggers.format_files_with_status_emoji(failed_routes, "❌")
-
-        if len(failed_info) > 0:
-            telegram_msg += "\n\n"
-            telegram_msg += triggers.format_multi_line(
-                failed_info, "FAILED REVALIDATION INFO"
+            telegram_msg += triggers.format_files_with_status_emoji(
+                successful_routes, "✅︎"
             )
+            telegram_msg += "\n\n"
+            telegram_msg += triggers.format_files_with_status_emoji(failed_routes, "❌")
 
-        triggers.send_telegram(telegram_msg)
+            if len(failed_info) > 0:
+                telegram_msg += "\n\n"
+                telegram_msg += triggers.format_multi_line(
+                    failed_info, "FAILED REVALIDATION INFO"
+                )
+
+            triggers.send_telegram(telegram_msg)
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[]):
         """
@@ -283,11 +308,11 @@ class DashboardBuilder(GeneralMetaBuilder):
         if rebuild:
             DashboardJson.objects.all().delete()
 
-        failed = []
-        created_charts = []
         successful_meta = set()
 
         for meta in created_objects:
+            failed = []
+            created_charts = []
             dbd_meta: dict = meta.dashboard_meta
             dbd_name = meta.dashboard_name
             chart_list = dbd_meta["charts"]
@@ -320,6 +345,7 @@ class DashboardBuilder(GeneralMetaBuilder):
                         created_charts.append(obj)
                         successful_meta.add(meta)
                         cache.set(dbd_name + "_" + k, res)
+
                 except Exception as e:
                     # failed_notify.append(meta)
                     failed_obj = {}
@@ -329,20 +355,25 @@ class DashboardBuilder(GeneralMetaBuilder):
                     # failed_builds.append(failed_obj)
                     failed.append(failed_obj)
 
-        telegram_msg = [
-            triggers.format_header(f"Dashboard Charts Built Status (DashboardJson)"),
-            triggers.format_files_with_status_emoji(created_charts, "✅︎") + "\n",
-            triggers.format_files_with_status_emoji(
-                [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed], "❌"
-            ),
-        ]
+            # For a single dashboard, send status on all its charts
+            telegram_msg = [
+                triggers.format_header(
+                    f"<code>{dbd_name.upper()}</code> Charts Built Status (DashboardJson)"
+                ),
+                triggers.format_files_with_status_emoji(created_charts, "✅︎") + "\n",
+                triggers.format_files_with_status_emoji(
+                    [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed],
+                    "❌",
+                ),
+            ]
 
-        if failed:
-            telegram_msg.append(
-                "\n" + triggers.format_multi_line(failed, "Failed Meta - Error logs")
-            )
+            if failed:
+                telegram_msg.append(
+                    "\n"
+                    + triggers.format_multi_line(failed, "Failed Meta - Error logs")
+                )
 
-        triggers.send_telegram("\n".join(telegram_msg))
+            triggers.send_telegram("\n".join(telegram_msg))
 
         return successful_meta
 
