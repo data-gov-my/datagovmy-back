@@ -49,7 +49,6 @@ class GeneralMetaBuilder(ABC):
         }
         Builder: GeneralMetaBuilder = builder_classes.get(category, None)
         if Builder:
-            print("Is a valid builder")
             Builder().build_operation(
                 manual=manual, rebuild=rebuild, meta_files=meta_files
             )
@@ -59,12 +58,10 @@ class GeneralMetaBuilder(ABC):
         """
         Selectively update database objects based on the latest commit in the github repository.
         """
-        print("Selective update entered")
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
         filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
-        print(f"Changed files : {filtered_changes}")
         for category, files in filtered_changes.items():
             if files:
                 GeneralMetaBuilder.build_operation_by_category(
@@ -232,7 +229,6 @@ class GeneralMetaBuilder(ABC):
         operation_type = "REBUILD" if rebuild else "UPDATE"
         trigger_type = "MANUAL" if manual else "SELECTIVE"
         operation_files = triggers.format_files_with_status_emoji(meta_files, "🔄")
-        print(f"PERFORMING {self.CATEGORY} {operation_type} ({trigger_type})")
         triggers.send_telegram(
             triggers.format_header(
                 f"PERFORMING {self.CATEGORY} {operation_type} ({trigger_type})"
