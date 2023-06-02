@@ -3,8 +3,6 @@ import pytest
 from data_gov_my.utils.chart_builder import *
 from data_gov_my.utils.variable_structures import *
 
-import pytest
-
 
 @pytest.fixture
 def sample_barchart_data(tmp_path):
@@ -40,9 +38,6 @@ def test_bar_chart(sample_barchart_data):
 
     result = bar_chart(sample_barchart_data, variables)
     assert result == expected_result
-
-
-import pytest
 
 
 @pytest.fixture
