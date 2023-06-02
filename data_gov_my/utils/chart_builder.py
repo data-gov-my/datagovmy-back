@@ -12,7 +12,6 @@ Builds Bar Chart
 
 
 def bar_chart(file_name: str, variables: BarChartVariables):
-
     df = pd.read_parquet(file_name)
 
     if "state" in df.columns:
@@ -61,9 +60,11 @@ def bar_chart(file_name: str, variables: BarChartVariables):
 
     return res
 
+
 """
 Builds Bar Meter
 """
+
 
 def bar_meter(file_name, variables):
     df = pd.read_parquet(file_name)
@@ -77,7 +78,9 @@ def bar_meter(file_name, variables):
 
     group_columns = variables["keys"]
     value_columns = variables["axis_values"]
-    sub_keys = "sub_keys" in variables # For when each obj in axis_values, should be nested
+    sub_keys = (
+        "sub_keys" in variables
+    )  # For when each obj in axis_values, should be nested
 
     def group_to_dict(group):
         result = {} if sub_keys else []
@@ -85,26 +88,31 @@ def bar_meter(file_name, variables):
             for key, value in d.items():
                 x_values = group[key].values
                 y_values = group[value].values
-                if sub_keys : 
-                    result[value] = [{"x": x, "y": y} for x, y in zip(x_values, y_values)]
-                else : 
-                    result.extend([{"x": x, "y": y} for x, y in zip(x_values, y_values)])
-        return result       
+                if sub_keys:
+                    result[value] = [
+                        {"x": x, "y": y} for x, y in zip(x_values, y_values)
+                    ]
+                else:
+                    result.extend(
+                        [{"x": x, "y": y} for x, y in zip(x_values, y_values)]
+                    )
+        return result
 
     if not group_columns:
         return group_to_dict(df)
-    
+
     result = {}
     for name, group in df.groupby(group_columns):
         if len(group_columns) > 1:
             current_level = result
-            for i in range(len(name)-1):
+            for i in range(len(name) - 1):
                 current_level = current_level.setdefault(name[i], {})
             current_level[name[-1]] = group_to_dict(group)
         else:
             result[name] = group_to_dict(group)
-    
+
     return result
+
 
 """
 Builds Choropleth
@@ -120,9 +128,9 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
     def set_dict(d, keys, value):
         d = get_dict(d, keys[:-1])
         d[keys[-1]] = value
-    
+
     df = pd.read_parquet(file_name)
-    
+
     x = variables["x"]
     y = variables["y"]
     keys = variables["keys"] if "keys" in variables else []
@@ -137,14 +145,14 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
         res["y"] = {}
         for col in y:
             res["y"][col] = df[col].tolist()
-        return res 
+        return res
 
-    # filter by keys 
+    # filter by keys
     for key in keys:
         if df[key].dtype == "object":
             df[key] = df[key].astype(str)
         df[key] = df[key].apply(lambda x: x.lower().replace(" ", ","))
-    
+
     # Gets all unique groups
     df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
     u_groups_list = df["u_groups"].unique().tolist()
@@ -157,12 +165,12 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
 
         if len(group) == 1:
             group = group[0]
-        
+
         x_list = df.groupby(keys)[x].get_group(group).to_list()
 
         chart_vals = {"x": x_list, "y": {}}
 
-        # gets y-values for chart 
+        # gets y-values for chart
         for y_col in y:
             y_list = df.groupby(keys)[y_col].get_group(group).to_list()
             chart_vals["y"][y_col] = y_list
@@ -170,7 +178,7 @@ def choropleth_chart(file_name: str, variables: ChoroplethChartVariables):
         final_d = chart_vals
         set_dict(result, group_l, final_d)
         merge(res, result)
-        
+
     return res
 
 
@@ -199,7 +207,7 @@ def custom_chart(file_name: str, variables: CustomChartVariables):
             for n in name[:-1]:
                 current_lvl = current_lvl.setdefault(n, {})
             name = name[-1]
-        current_lvl[name] = group[columns].to_dict('records')[0]
+        current_lvl[name] = group[columns].to_dict("records")[0]
 
     return res
 
@@ -309,8 +317,8 @@ def snapshot_chart(file_name: str, variables: SnapshotChartVariables):
     for k, v in data.items():
         if replace_word != "":
             changed_cols = {x: x.replace(k, replace_word) for x in v}
-        for i in v :
-            if df[i].dtype == "object" :
+        for i in v:
+            if df[i].dtype == "object":
                 df[i] = df[i].astype(str)
 
         df[k] = df[v].rename(columns=changed_cols).apply(lambda s: s.to_dict(), axis=1)
@@ -353,23 +361,25 @@ def timeseries_chart(filename: str, variables: TimeseriesChartVariables):
 
     if "state" in df.columns:
         df["state"].replace(STATE_ABBR, inplace=True)
-    
+
     keys = variables["keys"]
     values = variables["values"]
 
     column_names = list(values.keys())
-    rename_cols = dict(zip(list(values.values()) ,column_names))
+    rename_cols = dict(zip(list(values.values()), column_names))
     df = df.rename(columns=rename_cols)
 
     result = {}
-    if len(keys) >= 1 : 
+    if len(keys) >= 1:
         for name, group in df.groupby(keys):
+            if isinstance(name, str):  # convert to tuple to match newer pandas ver
+                name = (name,)
             current_level = result
-            for i in range(len(name)-1):
+            for i in range(len(name) - 1):
                 current_level = current_level.setdefault(name[i], {})
-            current_level[name[-1]] = group[column_names].to_dict('list')
-    else : 
-        for i in column_names : 
+            current_level[name[-1]] = group[column_names].to_dict("list")
+    else:
+        for i in column_names:
             result[i] = df[i].to_list()
 
     return result
@@ -378,6 +388,8 @@ def timeseries_chart(filename: str, variables: TimeseriesChartVariables):
 """
 Builds Line Chart
 """
+
+
 def line_chart(file_name: str, variables):
     df = pd.read_parquet(file_name)
     df = df.replace({np.nan: None})
@@ -663,7 +675,7 @@ def timeseries_shared(file_name: str, variables):
         for grp in u_groups_list:
             temp_df = grouped_df.get_group(grp)
             val_res = {}
-            for k,v in attributes.items():
+            for k, v in attributes.items():
                 val_res[k] = temp_df[v].to_list()
 
             result = val_res
@@ -686,8 +698,9 @@ def query_values(file_name: str, variables: QueryValuesVariables):
     sort_values = variables.get("sort_values", False)
 
     if sort_values:
-        sort_cols, ascending = sort_values.get(
-            "by", []), sort_values.get("ascending", [])
+        sort_cols, ascending = sort_values.get("by", []), sort_values.get(
+            "ascending", []
+        )
         df = df.sort_values(by=sort_cols, ascending=ascending)
 
     if len(columns) == 1:
