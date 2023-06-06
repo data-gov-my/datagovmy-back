@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.apps import apps
 from data_gov_my.models import DashboardJson
 from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer, ElectionOverallSeatSerializer
-
+from collections import defaultdict
 
 
 class ELECTIONS(General_Explorer):
@@ -36,6 +36,35 @@ class ELECTIONS(General_Explorer):
             "flat" : True
         }
     }
+
+    chart_meta = {
+        "party" : {
+            "model_name" : 'ElectionDashboard_Party',
+            "serializer" : ElectionPartySerializer,
+            "segment_by" : 'type',
+            "params_mapping" : {
+                "party" : "party_name",
+                "state" : "state"
+            }
+        },
+        "seats" : {
+            "model_name" : 'ElectionDashboard_Seats',
+            "serializer" : ElectionSeatSerializer,
+            "segment_by" : None,
+            "params_mapping" : {
+                "seat_name" : "seat_name"
+            }
+        },
+        "candidates" : {
+            "model_name" : 'ElectionDashboard_Candidates',
+            "serializer" : ElectionCandidateSerializer,
+            "segment_by" : 'type',
+            "params_mapping" : {
+                "name" : "name"
+            }
+        }
+    }
+
 
     # Data population
     data_populate = {
@@ -74,22 +103,16 @@ class ELECTIONS(General_Explorer):
         # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
             chart_type = request_params["chart"][0]
-            if chart_type == "candidates" :
-                res = self.candidates_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "seats" :
-                res = self.seats_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "party" :
-                res = self.party_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
             if chart_type == "full_result" :
                 res = self.full_result(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "overall_seat" :
+            elif chart_type == "overall_seat" :
                 res = self.overall_seat(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
-
+            else :
+                res = self.chart_handler(request_params=request_params, chart=chart_type)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+            
         return JsonResponse({"400" : "Bad Request."}, status=400)
 
     '''
@@ -112,99 +135,46 @@ class ELECTIONS(General_Explorer):
         res["msg"] = data
         res["status"] = 200
         return res
-
-
+   
     '''
-    Handles chart for candidates
+    Handles general charts :
+    - Seats
+    - Candidates
+    - Parties
     '''
-    def candidates_chart(self, request_params) :
-        required_params = ["name"] # Declare required params
-
-        res = {}
-
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-
-        model_name = 'ElectionDashboard_Candidates'
+    def chart_handler(self, request_params, chart) :        
+        chart_choice = self.chart_meta[chart]
+        required_params = list(chart_choice["params_mapping"].values())
         
-        name = request_params['name'][0]
-
-        model_choice = apps.get_model('data_gov_my', model_name)
-
-        candidates_parlimen = model_choice.objects.filter(name=name, type="parlimen")
-        candidates_dun = model_choice.objects.filter(name=name, type="dun")
-        res_parlimen = ElectionCandidateSerializer(candidates_parlimen, many=True)
-        res_dun = ElectionCandidateSerializer(candidates_dun, many=True)
-
-        results = {}
-        results['parlimen'] = res_parlimen.data
-        results['dun'] = res_dun.data
-
-        res["msg"] = results
-        res["status"] = 200
-
-        return res
-    
-    '''
-    Handles Seats charts
-    '''
-    def seats_chart(self, request_params) :
-        required_params = ["seat_name"]
-
         res = {}
         if not all(param in request_params for param in required_params) :
             res["msg"] = {"400" : "Bad request"} 
             res["status"] = 400
             return res
-    
-        model_name = 'ElectionDashboard_Seats'
-        
-        name = request_params['seat_name'][0]
-        model_choice = apps.get_model('data_gov_my', model_name)
 
-        candidates_res = model_choice.objects.filter(seat_name=name)
-        serializer = ElectionSeatSerializer(candidates_res, many=True)
+        filters = {k : request_params[v][0] for k, v in chart_choice["params_mapping"].items()}
+        model_choice = apps.get_model('data_gov_my', chart_choice["model_name"])
+        db_data = model_choice.objects.filter(**filters)
+        c_serializer = chart_choice["serializer"]
+        ser_data = c_serializer(db_data, many=True).data
 
-        res["msg"] = serializer.data
+        if chart_choice["segment_by"] :
+            ser_data = self.group_by_type(type=chart_choice["segment_by"], data=ser_data)
+
+        res["msg"] = ser_data
         res["status"] = 200
-
         return res
-    
+
+
     '''
-    Handles Party Charts
+    Segments data by type
     '''
-    def party_chart(self, request_params) : 
-        required_params = ["party_name", "state"]
+    def group_by_type(self, type="", data=[]) :
+        result = defaultdict(list)
+        for d in data:
+            result[d.get(type)].append(d)
+        return result
 
-        res = {}
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-    
-        model_name = 'ElectionDashboard_Party'
-        
-        name = request_params['party_name'][0]
-        state = request_params['state'][0]
-        model_choice = apps.get_model('data_gov_my', model_name)
-
-        party_parlimen = model_choice.objects.filter(party=name, state=state, type='parlimen')
-        party_dun = model_choice.objects.filter(party=name, state=state, type='dun')
-
-        s_parlimen = ElectionPartySerializer(party_parlimen, many=True)
-        s_dun = ElectionPartySerializer(party_dun, many=True)
-
-        result = {}
-        result['parlimen'] = s_parlimen.data
-        result['dun'] = s_dun.data
-
-        res["msg"] = result
-        res["status"] = 200
-
-        return res
-    
     '''
     Handles Overall Seats Charts
     '''
