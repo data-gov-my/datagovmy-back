@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.apps import apps
 from data_gov_my.models import DashboardJson
 from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer, ElectionOverallSeatSerializer
-
+from collections import defaultdict
 
 
 class ELECTIONS(General_Explorer):
@@ -36,6 +36,35 @@ class ELECTIONS(General_Explorer):
             "flat" : True
         }
     }
+
+    chart_meta = {
+        "party" : {
+            "model_name" : 'ElectionDashboard_Party',
+            "serializer" : ElectionPartySerializer,
+            "segment_by" : 'type',
+            "params_mapping" : {
+                "party" : "party_name",
+                "state" : "state"
+            }
+        },
+        "seats" : {
+            "model_name" : 'ElectionDashboard_Seats',
+            "serializer" : ElectionSeatSerializer,
+            "segment_by" : None,
+            "params_mapping" : {
+                "seat_name" : "seat_name"
+            }
+        },
+        "candidates" : {
+            "model_name" : 'ElectionDashboard_Candidates',
+            "serializer" : ElectionCandidateSerializer,
+            "segment_by" : 'type',
+            "params_mapping" : {
+                "name" : "name"
+            }
+        }
+    }
+
 
     # Data population
     data_populate = {
@@ -74,22 +103,16 @@ class ELECTIONS(General_Explorer):
         # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
             chart_type = request_params["chart"][0]
-            if chart_type == "candidates" :
-                res = self.candidates_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "seats" :
-                res = self.seats_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "party" :
-                res = self.party_chart(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
             if chart_type == "full_result" :
                 res = self.full_result(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
-            if chart_type == "overall_seat" :
+            elif chart_type == "overall_seat" :
                 res = self.overall_seat(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
-
+            else :
+                res = self.test(request_params=request_params, chart=chart_type)
+                return JsonResponse(res["msg"], status=res["status"], safe=False)
+            
         return JsonResponse({"400" : "Bad Request."}, status=400)
 
     '''
@@ -172,6 +195,39 @@ class ELECTIONS(General_Explorer):
 
         return res
     
+    def test(self, request_params, chart) :        
+        chart_choice = self.chart_meta[chart]
+        required_params = list(chart_choice["params_mapping"].values())
+        
+        res = {}
+        if not all(param in request_params for param in required_params) :
+            res["msg"] = {"400" : "Bad request"} 
+            res["status"] = 400
+            return res
+
+        filters = {k : request_params[v][0] for k, v in chart_choice["params_mapping"].items()}
+        model_choice = apps.get_model('data_gov_my', chart_choice["model_name"])
+        db_data = model_choice.objects.filter(**filters)
+        c_serializer = chart_choice["serializer"]
+        ser_data = c_serializer(db_data, many=True).data
+
+        if chart_choice["segment_by"] :
+            ser_data = self.group_by_type(type=chart_choice["segment_by"], data=ser_data)
+
+        res["msg"] = ser_data
+        res["status"] = 200
+        return res
+
+
+    '''
+    Segments data by type
+    '''
+    def group_by_type(self, type="", data=[]) :
+        result = defaultdict(list)
+        for d in data:
+            result[d.get(type)].append(d)
+        return result
+
     '''
     Handles Party Charts
     '''
