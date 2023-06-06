@@ -110,7 +110,7 @@ class ELECTIONS(General_Explorer):
                 res = self.overall_seat(request_params=request_params)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
             else :
-                res = self.test(request_params=request_params, chart=chart_type)
+                res = self.chart_handler(request_params=request_params, chart=chart_type)
                 return JsonResponse(res["msg"], status=res["status"], safe=False)
             
         return JsonResponse({"400" : "Bad Request."}, status=400)
@@ -135,67 +135,14 @@ class ELECTIONS(General_Explorer):
         res["msg"] = data
         res["status"] = 200
         return res
-
-
+   
     '''
-    Handles chart for candidates
+    Handles general charts :
+    - Seats
+    - Candidates
+    - Parties
     '''
-    def candidates_chart(self, request_params) :
-        required_params = ["name"] # Declare required params
-
-        res = {}
-
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-
-        model_name = 'ElectionDashboard_Candidates'
-        
-        name = request_params['name'][0]
-
-        model_choice = apps.get_model('data_gov_my', model_name)
-
-        candidates_parlimen = model_choice.objects.filter(name=name, type="parlimen")
-        candidates_dun = model_choice.objects.filter(name=name, type="dun")
-        res_parlimen = ElectionCandidateSerializer(candidates_parlimen, many=True)
-        res_dun = ElectionCandidateSerializer(candidates_dun, many=True)
-
-        results = {}
-        results['parlimen'] = res_parlimen.data
-        results['dun'] = res_dun.data
-
-        res["msg"] = results
-        res["status"] = 200
-
-        return res
-    
-    '''
-    Handles Seats charts
-    '''
-    def seats_chart(self, request_params) :
-        required_params = ["seat_name"]
-
-        res = {}
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-    
-        model_name = 'ElectionDashboard_Seats'
-        
-        name = request_params['seat_name'][0]
-        model_choice = apps.get_model('data_gov_my', model_name)
-
-        candidates_res = model_choice.objects.filter(seat_name=name)
-        serializer = ElectionSeatSerializer(candidates_res, many=True)
-
-        res["msg"] = serializer.data
-        res["status"] = 200
-
-        return res
-    
-    def test(self, request_params, chart) :        
+    def chart_handler(self, request_params, chart) :        
         chart_choice = self.chart_meta[chart]
         required_params = list(chart_choice["params_mapping"].values())
         
@@ -228,39 +175,6 @@ class ELECTIONS(General_Explorer):
             result[d.get(type)].append(d)
         return result
 
-    '''
-    Handles Party Charts
-    '''
-    def party_chart(self, request_params) : 
-        required_params = ["party_name", "state"]
-
-        res = {}
-        if not all(param in request_params for param in required_params) :
-            res["msg"] = {"400" : "Bad request"} 
-            res["status"] = 400
-            return res
-    
-        model_name = 'ElectionDashboard_Party'
-        
-        name = request_params['party_name'][0]
-        state = request_params['state'][0]
-        model_choice = apps.get_model('data_gov_my', model_name)
-
-        party_parlimen = model_choice.objects.filter(party=name, state=state, type='parlimen')
-        party_dun = model_choice.objects.filter(party=name, state=state, type='dun')
-
-        s_parlimen = ElectionPartySerializer(party_parlimen, many=True)
-        s_dun = ElectionPartySerializer(party_dun, many=True)
-
-        result = {}
-        result['parlimen'] = s_parlimen.data
-        result['dun'] = s_dun.data
-
-        res["msg"] = result
-        res["status"] = 200
-
-        return res
-    
     '''
     Handles Overall Seats Charts
     '''
