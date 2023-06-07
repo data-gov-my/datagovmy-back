@@ -290,3 +290,24 @@ def test_line_chart_nested_multi_layer(sample_line_data):
     assert result == expected_result
 
 
+def test_custom_chart(sample_barchart_data):
+    variables = {
+        "keys": ["state", "period"],
+        "columns": ["age_group", "new_donors", "old_donors"],
+    }
+
+    expected_result = {
+        "California": {
+            "2020": {"age_group": "18-24", "new_donors": 100, "old_donors": 1},
+            "2021": {"age_group": "25-34", "new_donors": 200, "old_donors": 2},
+        },
+        "New York": {
+            "2020": {"age_group": "18-24", "new_donors": 150, "old_donors": 3},
+            "2021": {"age_group": "25-34", "new_donors": 250, "old_donors": 4},
+        },
+    }
+
+    result = custom_chart(sample_barchart_data, variables)
+    assert result == expected_result
+
+
