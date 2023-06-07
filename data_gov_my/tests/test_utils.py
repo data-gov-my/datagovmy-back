@@ -13,6 +13,7 @@ def sample_barchart_data(tmp_path):
         "period": ["2020", "2021", "2020", "2021"],
         "age_group": ["18-24", "25-34", "18-24", "25-34"],
         "new_donors": [100, 200, 150, 250],
+        "old_donors": [1, 2, 3, 4],
     }
     df = pd.DataFrame(data)
     df.to_parquet(file_name)
@@ -37,6 +38,66 @@ def test_bar_chart(sample_barchart_data):
     }
 
     result = bar_chart(sample_barchart_data, variables)
+    assert result == expected_result
+
+
+"""
+Bar meter
+"""
+
+
+def test_barmeter_simple(sample_barchart_data):
+    """
+    Returns bar chart data in [{x:0,y:0},{...}] format
+    """
+    variables = {
+        "keys": ["state"],
+        "axis_values": [{"age_group": "new_donors"}],
+    }
+
+    expected_result = {
+        "California": [{"x": "18-24", "y": 100}, {"x": "25-34", "y": 200}],
+        "New York": [{"x": "18-24", "y": 150}, {"x": "25-34", "y": 250}],
+    }
+
+    result = bar_meter(sample_barchart_data, variables)
+    assert result == expected_result
+
+
+def test_barmeter_subkeys(sample_barchart_data):
+    """
+    Returns bar chart data in {"sub_key": [{x:0,y:0},{...}] } format
+    """
+    variables = {
+        "keys": ["state", "period"],
+        "axis_values": [{"age_group": "new_donors"}, {"age_group": "old_donors"}],
+        "sub_keys": True,
+    }
+
+    expected_result = {
+        "California": {
+            "2020": {
+                "new_donors": [{"x": "18-24", "y": 100}],
+                "old_donors": [{"x": "18-24", "y": 1}],
+            },
+            "2021": {
+                "new_donors": [{"x": "25-34", "y": 200}],
+                "old_donors": [{"x": "25-34", "y": 2}],
+            },
+        },
+        "New York": {
+            "2020": {
+                "new_donors": [{"x": "18-24", "y": 150}],
+                "old_donors": [{"x": "18-24", "y": 3}],
+            },
+            "2021": {
+                "new_donors": [{"x": "25-34", "y": 250}],
+                "old_donors": [{"x": "25-34", "y": 4}],
+            },
+        },
+    }
+
+    result = bar_meter(sample_barchart_data, variables)
     assert result == expected_result
 
 
