@@ -615,3 +615,41 @@ def test_metrics_table(sample_metrics_table_data):
     result = metrics_table(sample_metrics_table_data, variables)
     assert result == expected_result
 
+
+def test_query_values_simple(sample_barchart_data):
+    variables = {"columns": ["state"]}
+    expected_result = ["California", "New York"]
+    result = query_values(sample_barchart_data, variables)
+    assert result == expected_result
+
+
+def test_query_values_flat(sample_barchart_data):
+    variables = {"columns": ["state", "period"], "flat": True}
+    expected_result = [
+        {"state": "California", "period": "2020"},
+        {"state": "California", "period": "2021"},
+        {"state": "New York", "period": "2020"},
+        {"state": "New York", "period": "2021"},
+    ]
+    result = query_values(sample_barchart_data, variables)
+    assert result == expected_result
+
+
+# def test_query_values_nested_single_layer(sample_barchart_data):
+#     # FIXME: 'C': {'a': {'l': {'i': {'f': {'o': {'r': {'n': {'i': {'a':
+#     variables = {"columns": ["state", "period"], "flat": False}
+#     expected_result = {"California": ["2020", "2021"], "New York": ["2020", "2021"]}
+#     result = query_values(sample_barchart_data, variables)
+#     assert result == expected_result
+
+
+def test_query_values_nested_multi_layer(sample_barchart_data):
+    variables = {"columns": ["state", "period", "age_group"], "flat": False}
+    expected_result = {
+        "California": {"2020": ["18-24"], "2021": ["25-34"]},
+        "New York": {"2020": ["18-24"], "2021": ["25-34"]},
+    }
+    result = query_values(sample_barchart_data, variables)
+    assert result == expected_result
+
+
