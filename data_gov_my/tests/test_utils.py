@@ -592,3 +592,26 @@ def test_choropleth_chart(sample_choropleth_data):
     assert result == expected_result
 
 
+@pytest.fixture
+def sample_metrics_table_data(tmp_path):
+    # Create a temporary test file with sample data
+    file_name = tmp_path / "test_file.parquet"
+    data = {
+        "lang": ["bm", "bm", "bm", "en", "en", "en"],
+        "fruit": ["nanas", "epal", "tembikai", "pineapple", "apple", "watermelon"],
+    }
+
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_metrics_table(sample_metrics_table_data):
+    variables = {"keys": ["lang"], "obj_attr": {"fruit": "fruit"}}
+    expected_result = {
+        "bm": [{"fruit": "nanas"}, {"fruit": "epal"}, {"fruit": "tembikai"}],
+        "en": [{"fruit": "pineapple"}, {"fruit": "apple"}, {"fruit": "watermelon"}],
+    }
+    result = metrics_table(sample_metrics_table_data, variables)
+    assert result == expected_result
+
