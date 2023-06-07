@@ -460,3 +460,135 @@ def test_waffle_chart(sample_waffle_data):
     result = waffle_chart(sample_waffle_data, variables)
     assert result == expected_result
 
+
+@pytest.fixture
+def sample_choropleth_data(tmp_path):
+    # Create a temporary test file with sample data
+    file_name = tmp_path / "test_file.parquet"
+    data = {
+        "state": [
+            "Johor",
+            "Kedah",
+            "Kelantan",
+            "Melaka",
+            "Negeri Sembilan",
+            "Pahang",
+            "Perak",
+            "Pulau Pinang",
+            "Sabah",
+            "Sarawak",
+            "Selangor",
+            "Terengganu",
+            "W.P. Kuala Lumpur",
+            "Perlis",
+            "W.P. Labuan",
+            "W.P. Putrajaya",
+        ],
+        "y1": [
+            0.43,
+            0.39,
+            0.27,
+            0.73,
+            0.7,
+            0.85,
+            0.69,
+            0.05,
+            0.62,
+            0.08,
+            0.83,
+            0.89,
+            0.12,
+            0.91,
+            0.72,
+            0.49,
+        ],
+        "y2": [
+            334,
+            548,
+            852,
+            300,
+            497,
+            799,
+            493,
+            495,
+            633,
+            471,
+            497,
+            575,
+            536,
+            778,
+            506,
+            520,
+        ],
+    }
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_choropleth_chart(sample_choropleth_data):
+    variables = {"x": "state", "y": ["y1", "y2"]}
+
+    expected_result = {
+        "x": [
+            "jhr",
+            "kdh",
+            "ktn",
+            "mlk",
+            "nsn",
+            "phg",
+            "prk",
+            "png",
+            "sbh",
+            "swk",
+            "sgr",
+            "trg",
+            "kul",
+            "pls",
+            "lbn",
+            "pjy",
+        ],
+        "y": {
+            "y1": [
+                0.43,
+                0.39,
+                0.27,
+                0.73,
+                0.7,
+                0.85,
+                0.69,
+                0.05,
+                0.62,
+                0.08,
+                0.83,
+                0.89,
+                0.12,
+                0.91,
+                0.72,
+                0.49,
+            ],
+            "y2": [
+                334,
+                548,
+                852,
+                300,
+                497,
+                799,
+                493,
+                495,
+                633,
+                471,
+                497,
+                575,
+                536,
+                778,
+                506,
+                520,
+            ],
+        },
+    }
+
+    result = choropleth_chart(sample_choropleth_data, variables)
+    assert result == expected_result
+
+
