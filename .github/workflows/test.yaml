@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - staging
+      - test/chart-builders
   pull_request:
     branches:
       - main
