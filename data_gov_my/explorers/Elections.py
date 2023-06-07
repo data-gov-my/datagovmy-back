@@ -91,7 +91,6 @@ class ELECTIONS(General_Explorer):
     Dafault API handler
     '''
 
-    # TODO: Handle this better
     def handle_api(self, request_params):
         
         # Handles Dropdowns
@@ -170,7 +169,7 @@ class ELECTIONS(General_Explorer):
     Segments data by type
     '''
     def group_by_type(self, type="", data=[]) :
-        result = defaultdict(list)
+        result = {"parlimen" : [], "dun" : []}
         for d in data:
             result[d.get(type)].append(d)
         return result
