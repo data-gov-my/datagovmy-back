@@ -3,6 +3,19 @@ import pytest
 from data_gov_my.utils.chart_builder import *
 from data_gov_my.utils.variable_structures import *
 
+"""
+TODO 
+not created test cases:
+snapshot_chart, 
+helpers_custom, map_lat_lon, jitter_chart
+failed test-cases:
+timeseries_shared (WIP), query_values (WIP), heatmap (WIP) 
+"""
+
+"""
+Bar chart
+"""
+
 
 @pytest.fixture
 def sample_barchart_data(tmp_path):
@@ -653,3 +666,64 @@ def test_query_values_nested_multi_layer(sample_barchart_data):
     assert result == expected_result
 
 
+def test_heatmap_chart_simple(sample_line_data):
+    variables = {
+        "cols": ["y1"],
+        "id": "state",
+        "keys": ["state"],
+        "null_values": None,
+        "replace_vals": {},
+        "dict_rename": {},
+        "row_format": "upper",
+        "operation": "SET",
+    }
+    expected_result = {
+        "California": {
+            "data": [
+                {"x": "Y1", "y": 100},
+                {"x": "Y1", "y": 200},
+                {"x": "Y1", "y": 150},
+                {"x": "Y1", "y": 170},
+            ],
+            "id": "California",
+        },
+        "New York": {
+            "data": [
+                {"x": "Y1", "y": 120},
+                {"x": "Y1", "y": 180},
+                {"x": "Y1", "y": 140},
+                {"x": "Y1", "y": 160},
+            ],
+            "id": "New York",
+        },
+        "Texas": {
+            "data": [
+                {"x": "Y1", "y": 130},
+                {"x": "Y1", "y": 110},
+                {"x": "Y1", "y": 135},
+                {"x": "Y1", "y": 155},
+            ],
+            "id": "Texas",
+        },
+    }
+    result = heatmap_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
+def test_heatmap_chart_multi_cols(sample_line_data):
+    """
+    FIXME: y2 seems to have no effect? fix and update expected results
+    """
+    variables = {
+        "cols": ["y1", "y2"],
+        "id": "state",
+        "keys": ["period"],
+        "null_values": None,
+        "replace_vals": {},
+        "dict_rename": {},
+        "row_format": "upper",
+        "operation": "SET",
+    }
+    expected_result = []
+    result = heatmap_chart(sample_line_data, variables)
+    assert result == expected_result
