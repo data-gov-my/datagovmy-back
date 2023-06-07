@@ -190,3 +190,103 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
 #     result = timeseries_shared(sample_timeseries_data, variables)
 #     assert result == expected_result
 
+
+"""
+Line Chart
+"""
+
+
+@pytest.fixture
+def sample_line_data(tmp_path):
+    file_name = tmp_path / "test_file.parquet"
+    data = {
+        "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        "state": [
+            "California",
+            "California",
+            "California",
+            "California",
+            "New York",
+            "New York",
+            "New York",
+            "New York",
+            "Texas",
+            "Texas",
+            "Texas",
+            "Texas",
+        ],
+        "period": [
+            "daily",
+            "daily",
+            "monthly",
+            "monthly",
+            "daily",
+            "daily",
+            "monthly",
+            "monthly",
+            "daily",
+            "daily",
+            "monthly",
+            "monthly",
+        ],
+        "y1": [100, 200, 150, 170, 120, 180, 140, 160, 130, 110, 135, 155],
+        "y2": [50, 80, 120, 140, 90, 160, 110, 130, 100, 70, 90, 110],
+    }
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_line_chart_simple(sample_line_data):
+    variables = {"x": "x", "y": "y1"}
+
+    expected_result = {
+        "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        "y": [100, 200, 150, 170, 120, 180, 140, 160, 130, 110, 135, 155],
+    }
+
+    result = line_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
+def test_line_chart_nested_single_layer(sample_line_data):
+    """
+    TODO: update test to fit after refactoring (assuming that variables structure will change)
+    """
+    variables = {"state": {"x": "x", "y": "y1"}}
+
+    expected_result = {
+        "California": {"x": [1, 2, 3, 4], "y": [100, 200, 150, 170]},
+        "New York": {"x": [5, 6, 7, 8], "y": [120, 180, 140, 160]},
+        "Texas": {"x": [9, 10, 11, 12], "y": [130, 110, 135, 155]},
+    }
+
+    result = line_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
+def test_line_chart_nested_multi_layer(sample_line_data):
+    """
+    TODO: update test to fit after refactoring (assuming that variables structure will change)
+    """
+    variables = {"state": {"period": {"x": "x", "y": "y1"}}}
+
+    expected_result = {
+        "California": {
+            "daily": {"x": [1, 2], "y": [100, 200]},
+            "monthly": {"x": [3, 4], "y": [150, 170]},
+        },
+        "New York": {
+            "daily": {"x": [5, 6], "y": [120, 180]},
+            "monthly": {"x": [7, 8], "y": [140, 160]},
+        },
+        "Texas": {
+            "daily": {"x": [9, 10], "y": [130, 110]},
+            "monthly": {"x": [11, 12], "y": [135, 155]},
+        },
+    }
+
+    result = line_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
