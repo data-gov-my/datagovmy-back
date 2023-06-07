@@ -311,3 +311,152 @@ def test_custom_chart(sample_barchart_data):
     assert result == expected_result
 
 
+@pytest.fixture
+def sample_waffle_data(tmp_path):
+    file_name = tmp_path / "test_file.parquet"
+    data = {
+        "state": [
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+            "Malaysia",
+        ],
+        "age_group": [
+            "child",
+            "child",
+            "child",
+            "child",
+            "child",
+            "child",
+            "adult",
+            "adult",
+            "adult",
+            "adult",
+            "adult",
+            "adult",
+            "elderly",
+            "elderly",
+            "elderly",
+            "elderly",
+            "elderly",
+            "elderly",
+        ],
+        "dose": [
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+            "dose1",
+            "dose2",
+        ],
+        "metric": [
+            "total",
+            "total",
+            "daily",
+            "daily",
+            "perc",
+            "perc",
+            "total",
+            "total",
+            "daily",
+            "daily",
+            "perc",
+            "perc",
+            "total",
+            "total",
+            "daily",
+            "daily",
+            "perc",
+            "perc",
+        ],
+        "value": [34, 3, 88, 27, 6, 45, 13, 100, 2, 99, 99, 70, 62, 61, 87, 90, 10, 63],
+    }
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_waffle_chart(sample_waffle_data):
+    variables = {
+        "wanted": [],
+        "groups": ["state", "age_group", "dose"],
+        "dict_keys": ["metric", "value"],
+        "data_arr": {"id": "dose", "label": "dose", "value": {"metric": "perc"}},
+    }
+
+    expected_result = {
+        "mys": {
+            "child": {
+                "dose1": {
+                    "total": 34,
+                    "daily": 88,
+                    "perc": 6,
+                    "data": [{"id": "dose1", "label": "dose1", "value": 6}],
+                },
+                "dose2": {
+                    "total": 3,
+                    "daily": 27,
+                    "perc": 45,
+                    "data": [{"id": "dose2", "label": "dose2", "value": 45}],
+                },
+            },
+            "adult": {
+                "dose1": {
+                    "total": 13,
+                    "daily": 2,
+                    "perc": 99,
+                    "data": [{"id": "dose1", "label": "dose1", "value": 99}],
+                },
+                "dose2": {
+                    "total": 100,
+                    "daily": 99,
+                    "perc": 70,
+                    "data": [{"id": "dose2", "label": "dose2", "value": 70}],
+                },
+            },
+            "elderly": {
+                "dose1": {
+                    "total": 62,
+                    "daily": 87,
+                    "perc": 10,
+                    "data": [{"id": "dose1", "label": "dose1", "value": 10}],
+                },
+                "dose2": {
+                    "total": 61,
+                    "daily": 90,
+                    "perc": 63,
+                    "data": [{"id": "dose2", "label": "dose2", "value": 63}],
+                },
+            },
+        }
+    }
+
+    result = waffle_chart(sample_waffle_data, variables)
+    assert result == expected_result
+
