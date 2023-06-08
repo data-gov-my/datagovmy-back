@@ -6,7 +6,6 @@ from data_gov_my.utils.variable_structures import *
 """
 TODO 
 not created test cases:
-snapshot_chart, 
 helpers_custom, map_lat_lon, jitter_chart
 failed test-cases:
 timeseries_shared (WIP), query_values (WIP), heatmap (WIP) 
@@ -726,4 +725,37 @@ def test_heatmap_chart_multi_cols(sample_line_data):
     }
     expected_result = []
     result = heatmap_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
+"""
+Snapshot chart
+"""
+
+
+def test_snapshot_chart(sample_line_data):
+    """ """
+    variables = {
+        "main_key": "state",
+        "replace_word": "",
+        "null_vals": None,
+        "data": {
+            "y": ["y1", "y2"],
+        },
+    }
+    expected_result = [
+        {"y": {"y1": 100, "y2": 50}, "index": 0, "state": "California"},
+        {"y": {"y1": 200, "y2": 80}, "index": 1, "state": "California"},
+        {"y": {"y1": 150, "y2": 120}, "index": 2, "state": "California"},
+        {"y": {"y1": 170, "y2": 140}, "index": 3, "state": "California"},
+        {"y": {"y1": 120, "y2": 90}, "index": 4, "state": "New York"},
+        {"y": {"y1": 180, "y2": 160}, "index": 5, "state": "New York"},
+        {"y": {"y1": 140, "y2": 110}, "index": 6, "state": "New York"},
+        {"y": {"y1": 160, "y2": 130}, "index": 7, "state": "New York"},
+        {"y": {"y1": 130, "y2": 100}, "index": 8, "state": "Texas"},
+        {"y": {"y1": 110, "y2": 70}, "index": 9, "state": "Texas"},
+        {"y": {"y1": 135, "y2": 90}, "index": 10, "state": "Texas"},
+        {"y": {"y1": 155, "y2": 110}, "index": 11, "state": "Texas"},
+    ]
+    result = snapshot_chart(sample_line_data, variables)
     assert result == expected_result
