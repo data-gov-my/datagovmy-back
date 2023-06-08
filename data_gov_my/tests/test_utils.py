@@ -5,8 +5,8 @@ from data_gov_my.utils.variable_structures import *
 
 """
 TODO 
-not created test cases:
-helpers_custom, map_lat_lon, jitter_chart
+chart builders that have no test case
+- helpers_custom, jitter_chart
 failed test-cases:
 timeseries_shared (WIP), query_values (WIP), heatmap (WIP) 
 """
@@ -758,4 +758,46 @@ def test_snapshot_chart(sample_line_data):
         {"y": {"y1": 155, "y2": 110}, "index": 11, "state": "Texas"},
     ]
     result = snapshot_chart(sample_line_data, variables)
+    assert result == expected_result
+
+
+@pytest.fixture
+def sample_map_lat_long_data(tmp_path):
+    # Create a temporary test file with sample data
+    file_name = tmp_path / "test_file.parquet"
+    data = {
+        "state": ["California", "California", "New York", "New York", "Texas"],
+        "district": [
+            "Los Angeles",
+            "San Francisco",
+            "New York City",
+            "Buffalo",
+            "Houston",
+        ],
+        "lat": [34.0522, 37.7749, 40.7128, 42.8864, 29.7604],  # Latitude values
+        "long": [-118.2437, -122.4194, -74.0060, -78.8784, -95.3698],  # Longitude value
+    }
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_map_lat_long_chart(sample_map_lat_long_data):
+    variables = {
+        "keys": ["state", "district"],
+        "values": ["lat", "long"],  # Updated column names
+        "null_vals": -1,
+    }
+    expected_result = {
+        "California": {
+            "los-angeles": [{"lat": 34.0522, "long": -118.2437}],
+            "san-francisco": [{"lat": 37.7749, "long": -122.4194}],
+        },
+        "New York": {
+            "new-york-city": [{"lat": 40.7128, "long": -74.006}],
+            "buffalo": [{"lat": 42.8864, "long": -78.8784}],
+        },
+        "Texas": {"houston": [{"lat": 29.7604, "long": -95.3698}]},
+    }
+    result = map_lat_lon(sample_map_lat_long_data, variables)
     assert result == expected_result
