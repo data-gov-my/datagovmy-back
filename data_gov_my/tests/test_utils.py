@@ -3,13 +3,6 @@ import pytest
 from data_gov_my.utils.chart_builder import *
 from data_gov_my.utils.variable_structures import *
 
-"""
-TODO 
-chart builders that have no test case
-- helpers_custom, jitter_chart
-failed test-cases:
-timeseries_shared (WIP), query_values (WIP), heatmap (WIP) 
-"""
 
 """
 Bar chart
@@ -186,21 +179,21 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
     assert result == expected_result
 
 
-# def test_timeseries_shared_chart_nested(sample_timeseries_data):
-#     variables = {
-#         "keys": ["state"],
-#         "constant": {"x": "date"},
-#         "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
-#     }
-#     # FIXME: find out why KeyError: ('California',) is happening, then fix the expected results accordingly.
-#     expected_result = {
-#         "x": [1577836800000, 1577923200000, 1578009600000],
-#         "daily": [100, 200, 150, 120, 180, 140],
-#         "line_daily": [90, 190, 160, 130, 170, 150],
-#     }
+def test_timeseries_shared_chart_nested(sample_timeseries_data):
+    variables = {
+        "keys": ["state"],
+        "constant": {"x": "date"},
+        "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
+    }
+    # FIXME: find out why KeyError: ('California',) is happening, then fix the expected results accordingly.
+    expected_result = {
+        "x": [1577836800000, 1577923200000, 1578009600000],
+        "daily": [100, 200, 150, 120, 180, 140],
+        "line_daily": [90, 190, 160, 130, 170, 150],
+    }
 
-#     result = timeseries_shared(sample_timeseries_data, variables)
-#     assert result == expected_result
+    result = timeseries_shared(sample_timeseries_data, variables)
+    assert result == expected_result
 
 
 """
@@ -302,6 +295,11 @@ def test_line_chart_nested_multi_layer(sample_line_data):
     assert result == expected_result
 
 
+"""
+Custom Chart
+"""
+
+
 def test_custom_chart(sample_barchart_data):
     variables = {
         "keys": ["state", "period"],
@@ -321,6 +319,11 @@ def test_custom_chart(sample_barchart_data):
 
     result = custom_chart(sample_barchart_data, variables)
     assert result == expected_result
+
+
+"""
+Waffle Chart
+"""
 
 
 @pytest.fixture
@@ -473,6 +476,11 @@ def test_waffle_chart(sample_waffle_data):
     assert result == expected_result
 
 
+"""
+Choropleth
+"""
+
+
 @pytest.fixture
 def sample_choropleth_data(tmp_path):
     # Create a temporary test file with sample data
@@ -604,6 +612,11 @@ def test_choropleth_chart(sample_choropleth_data):
     assert result == expected_result
 
 
+"""
+Metrics Table
+"""
+
+
 @pytest.fixture
 def sample_metrics_table_data(tmp_path):
     # Create a temporary test file with sample data
@@ -628,6 +641,11 @@ def test_metrics_table(sample_metrics_table_data):
     assert result == expected_result
 
 
+"""
+Query values (Dropdown)
+"""
+
+
 def test_query_values_simple(sample_barchart_data):
     variables = {"columns": ["state"]}
     expected_result = ["California", "New York"]
@@ -647,12 +665,12 @@ def test_query_values_flat(sample_barchart_data):
     assert result == expected_result
 
 
-# def test_query_values_nested_single_layer(sample_barchart_data):
-#     # FIXME: 'C': {'a': {'l': {'i': {'f': {'o': {'r': {'n': {'i': {'a':
-#     variables = {"columns": ["state", "period"], "flat": False}
-#     expected_result = {"California": ["2020", "2021"], "New York": ["2020", "2021"]}
-#     result = query_values(sample_barchart_data, variables)
-#     assert result == expected_result
+def test_query_values_nested_single_layer(sample_barchart_data):
+    # FIXME: 'C': {'a': {'l': {'i': {'f': {'o': {'r': {'n': {'i': {'a':...
+    variables = {"columns": ["state", "period"], "flat": False}
+    expected_result = {"California": ["2020", "2021"], "New York": ["2020", "2021"]}
+    result = query_values(sample_barchart_data, variables)
+    assert result == expected_result
 
 
 def test_query_values_nested_multi_layer(sample_barchart_data):
@@ -663,6 +681,11 @@ def test_query_values_nested_multi_layer(sample_barchart_data):
     }
     result = query_values(sample_barchart_data, variables)
     assert result == expected_result
+
+
+"""
+Heatmap
+"""
 
 
 def test_heatmap_chart_simple(sample_line_data):
@@ -711,7 +734,7 @@ def test_heatmap_chart_simple(sample_line_data):
 
 def test_heatmap_chart_multi_cols(sample_line_data):
     """
-    FIXME: y2 seems to have no effect? fix and update expected results
+    FIXME: y2 seems to have no effect? should be appended to the data array in res
     """
     variables = {
         "cols": ["y1", "y2"],
@@ -723,7 +746,41 @@ def test_heatmap_chart_multi_cols(sample_line_data):
         "row_format": "upper",
         "operation": "SET",
     }
-    expected_result = []
+    expected_result = {
+        "daily": {
+            "id": "California",
+            "data": [
+                {"x": "Y1", "y": 100},
+                {"x": "Y1", "y": 200},
+                {"x": "Y1", "y": 120},
+                {"x": "Y1", "y": 180},
+                {"x": "Y1", "y": 130},
+                {"x": "Y1", "y": 110},
+                {"x": "Y2", "y": 50},
+                {"x": "Y2", "y": 80},
+                {"x": "Y2", "y": 120},
+                {"x": "Y2", "y": 140},
+                {"x": "Y2", "y": 90},
+                {"x": "Y2", "y": 160},
+            ],
+        },
+        "monthly": {
+            "id": "California",
+            "data": [
+                {"x": "Y1", "y": 150},
+                {"x": "Y1", "y": 170},
+                {"x": "Y1", "y": 140},
+                {"x": "Y1", "y": 160},
+                {"x": "Y1", "y": 135},
+                {"x": "Y1", "y": 155},
+                {"x": "Y2", "y": 130},
+                {"x": "Y2", "y": 100},
+                {"x": "Y2", "y": 70},
+                {"x": "Y2", "y": 90},
+                {"x": "Y2", "y": 110},
+            ],
+        },
+    }
     result = heatmap_chart(sample_line_data, variables)
     assert result == expected_result
 
@@ -759,6 +816,11 @@ def test_snapshot_chart(sample_line_data):
     ]
     result = snapshot_chart(sample_line_data, variables)
     assert result == expected_result
+
+
+"""
+Map Lat Long
+"""
 
 
 @pytest.fixture
@@ -800,4 +862,64 @@ def test_map_lat_long_chart(sample_map_lat_long_data):
         "Texas": {"houston": [{"lat": 29.7604, "long": -95.3698}]},
     }
     result = map_lat_lon(sample_map_lat_long_data, variables)
+    assert result == expected_result
+
+
+"""
+Helpers Custom 
+"""
+
+
+@pytest.fixture
+def sample_helpers_custom_data(tmp_path):
+    # Create a temporary test file with sample data
+    file_name = tmp_path / "test_file.parquet"
+    data = data = {
+        "state": [
+            "New York",
+            "New York",
+            "California",
+            "California",
+            "Texas",
+            "Texas",
+            "Florida",
+            "Florida",
+        ],
+        "district": [
+            "District 1",
+            "District 2",
+            "District 3",
+            "District 4",
+            "District 5",
+            "District 6",
+            "District 7",
+            "District 8",
+        ],
+        "type": [
+            "Type A",
+            "Type B",
+            "Type C",
+            "Type A",
+            "Type B",
+            "Type C",
+            "Type A",
+            "Type B",
+        ],
+    }
+    df = pd.DataFrame(data)
+    df.to_parquet(file_name)
+    return str(file_name)
+
+
+def test_helpers_custom(sample_helpers_custom_data):
+    expected_result = {
+        "facility_types": ["Type A", "Type B", "Type C"],
+        "state_district_mapping": {
+            "New York": ["District 1", "District 2"],
+            "California": ["District 3", "District 4"],
+            "Texas": ["District 5", "District 6"],
+            "Florida": ["District 7", "District 8"],
+        },
+    }
+    result = helpers_custom(sample_helpers_custom_data)
     assert result == expected_result
