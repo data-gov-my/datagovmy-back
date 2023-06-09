@@ -62,11 +62,15 @@ class GeneralMetaBuilder(ABC):
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
         filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
+        category_mapper = dict(
+            zip(GeneralMetaBuilder.GITHUB_DIR, GeneralMetaBuilder.CATEGORY)
+        )
+
         for category, files in filtered_changes.items():
             if files:
                 GeneralMetaBuilder.build_operation_by_category(
                     manual=False,
-                    category=category.upper(),
+                    category=category_mapper[category],
                     rebuild=False,
                     meta_files=files,
                 )
