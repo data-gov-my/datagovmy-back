@@ -52,7 +52,8 @@ class ELECTIONS(General_Explorer):
             "serializer" : ElectionSeatSerializer,
             "segment_by" : None,
             "params_mapping" : {
-                "seat_name" : "seat_name"
+                "seat_name" : "seat_name",
+                "type" : "type"
             }
         },
         "candidates" : {
