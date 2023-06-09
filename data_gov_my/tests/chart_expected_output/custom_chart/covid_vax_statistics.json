@@ -1,0 +1,559 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidvax_02_timeseries_keystats.parquet",
+        "variables": {
+            "keys": [
+                "state",
+                "chart_type"
+            ],
+            "columns": [
+                "latest",
+                "total"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "jhr": {
+            "daily": {
+                "latest": 20,
+                "total": 8897215
+            },
+            "daily_adol": {
+                "latest": 1,
+                "total": 695456
+            },
+            "daily_adult": {
+                "latest": 19,
+                "total": 7757934
+            },
+            "daily_booster": {
+                "latest": 15,
+                "total": 2157598
+            },
+            "daily_booster2": {
+                "latest": 3,
+                "total": 87986
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 443825
+            },
+            "daily_primary": {
+                "latest": 2,
+                "total": 6651631
+            }
+        },
+        "kdh": {
+            "daily": {
+                "latest": 10,
+                "total": 4132264
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 417659
+            },
+            "daily_adult": {
+                "latest": 10,
+                "total": 3553372
+            },
+            "daily_booster": {
+                "latest": 8,
+                "total": 755967
+            },
+            "daily_booster2": {
+                "latest": 2,
+                "total": 21973
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 161233
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 3354324
+            }
+        },
+        "ktn": {
+            "daily": {
+                "latest": 13,
+                "total": 2821186
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 360602
+            },
+            "daily_adult": {
+                "latest": 12,
+                "total": 2379103
+            },
+            "daily_booster": {
+                "latest": 11,
+                "total": 343072
+            },
+            "daily_booster2": {
+                "latest": 1,
+                "total": 6145
+            },
+            "daily_child": {
+                "latest": 1,
+                "total": 81481
+            },
+            "daily_primary": {
+                "latest": 1,
+                "total": 2471969
+            }
+        },
+        "kul": {
+            "daily": {
+                "latest": 24,
+                "total": 8335779
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 345030
+            },
+            "daily_adult": {
+                "latest": 24,
+                "total": 7714319
+            },
+            "daily_booster": {
+                "latest": 15,
+                "total": 1745777
+            },
+            "daily_booster2": {
+                "latest": 8,
+                "total": 166183
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 276430
+            },
+            "daily_primary": {
+                "latest": 1,
+                "total": 6423819
+            }
+        },
+        "kvy": {
+            "daily": {
+                "latest": 86,
+                "total": 23541244
+            },
+            "daily_adol": {
+                "latest": 6,
+                "total": 1437716
+            },
+            "daily_adult": {
+                "latest": 78,
+                "total": 21130938
+            },
+            "daily_booster": {
+                "latest": 46,
+                "total": 5930408
+            },
+            "daily_booster2": {
+                "latest": 32,
+                "total": 425567
+            },
+            "daily_child": {
+                "latest": 2,
+                "total": 972590
+            },
+            "daily_primary": {
+                "latest": 8,
+                "total": 17185269
+            }
+        },
+        "lbn": {
+            "daily": {
+                "latest": 0,
+                "total": 226281
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 19952
+            },
+            "daily_adult": {
+                "latest": 0,
+                "total": 194656
+            },
+            "daily_booster": {
+                "latest": 0,
+                "total": 50212
+            },
+            "daily_booster2": {
+                "latest": 0,
+                "total": 1038
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 11673
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 175031
+            }
+        },
+        "mlk": {
+            "daily": {
+                "latest": 34,
+                "total": 2147735
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 174114
+            },
+            "daily_adult": {
+                "latest": 34,
+                "total": 1852502
+            },
+            "daily_booster": {
+                "latest": 3,
+                "total": 549375
+            },
+            "daily_booster2": {
+                "latest": 30,
+                "total": 23656
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 121119
+            },
+            "daily_primary": {
+                "latest": 1,
+                "total": 1574704
+            }
+        },
+        "mys": {
+            "daily": {
+                "latest": 385,
+                "total": 72602147
+            },
+            "daily_adol": {
+                "latest": 7,
+                "total": 5849078
+            },
+            "daily_adult": {
+                "latest": 271,
+                "total": 63424555
+            },
+            "daily_booster": {
+                "latest": 170,
+                "total": 16323650
+            },
+            "daily_booster2": {
+                "latest": 115,
+                "total": 817478
+            },
+            "daily_child": {
+                "latest": 107,
+                "total": 3328514
+            },
+            "daily_primary": {
+                "latest": 100,
+                "total": 55461019
+            }
+        },
+        "nsn": {
+            "daily": {
+                "latest": 8,
+                "total": 2744094
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 223935
+            },
+            "daily_adult": {
+                "latest": 8,
+                "total": 2396569
+            },
+            "daily_booster": {
+                "latest": 6,
+                "total": 664822
+            },
+            "daily_booster2": {
+                "latest": 0,
+                "total": 29261
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 123590
+            },
+            "daily_primary": {
+                "latest": 2,
+                "total": 2050011
+            }
+        },
+        "phg": {
+            "daily": {
+                "latest": 7,
+                "total": 3177137
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 301916
+            },
+            "daily_adult": {
+                "latest": 7,
+                "total": 2733122
+            },
+            "daily_booster": {
+                "latest": 2,
+                "total": 634859
+            },
+            "daily_booster2": {
+                "latest": 5,
+                "total": 17272
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 142099
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 2525006
+            }
+        },
+        "pjy": {
+            "daily": {
+                "latest": 3,
+                "total": 427019
+            },
+            "daily_adol": {
+                "latest": 1,
+                "total": 32234
+            },
+            "daily_adult": {
+                "latest": 2,
+                "total": 364626
+            },
+            "daily_booster": {
+                "latest": 1,
+                "total": 86578
+            },
+            "daily_booster2": {
+                "latest": 2,
+                "total": 8329
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 30159
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 332112
+            }
+        },
+        "pls": {
+            "daily": {
+                "latest": 1,
+                "total": 511627
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 49003
+            },
+            "daily_adult": {
+                "latest": 1,
+                "total": 445868
+            },
+            "daily_booster": {
+                "latest": 1,
+                "total": 80124
+            },
+            "daily_booster2": {
+                "latest": 0,
+                "total": 1346
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 16756
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 430157
+            }
+        },
+        "png": {
+            "daily": {
+                "latest": 15,
+                "total": 4368160
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 272540
+            },
+            "daily_adult": {
+                "latest": 15,
+                "total": 3937422
+            },
+            "daily_booster": {
+                "latest": 10,
+                "total": 1088574
+            },
+            "daily_booster2": {
+                "latest": 4,
+                "total": 33052
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 158198
+            },
+            "daily_primary": {
+                "latest": 1,
+                "total": 3246534
+            }
+        },
+        "prk": {
+            "daily": {
+                "latest": 12,
+                "total": 5211706
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 431317
+            },
+            "daily_adult": {
+                "latest": 12,
+                "total": 4556363
+            },
+            "daily_booster": {
+                "latest": 8,
+                "total": 1174527
+            },
+            "daily_booster2": {
+                "latest": 2,
+                "total": 42192
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 224026
+            },
+            "daily_primary": {
+                "latest": 2,
+                "total": 3994987
+            }
+        },
+        "sbh": {
+            "daily": {
+                "latest": 31,
+                "total": 5969941
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 660905
+            },
+            "daily_adult": {
+                "latest": 31,
+                "total": 5055964
+            },
+            "daily_booster": {
+                "latest": 15,
+                "total": 940044
+            },
+            "daily_booster2": {
+                "latest": 12,
+                "total": 21504
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 253072
+            },
+            "daily_primary": {
+                "latest": 4,
+                "total": 5008393
+            }
+        },
+        "sgr": {
+            "daily": {
+                "latest": 59,
+                "total": 14778446
+            },
+            "daily_adol": {
+                "latest": 5,
+                "total": 1060452
+            },
+            "daily_adult": {
+                "latest": 52,
+                "total": 13051993
+            },
+            "daily_booster": {
+                "latest": 30,
+                "total": 4098053
+            },
+            "daily_booster2": {
+                "latest": 22,
+                "total": 251055
+            },
+            "daily_child": {
+                "latest": 2,
+                "total": 666001
+            },
+            "daily_primary": {
+                "latest": 7,
+                "total": 10429338
+            }
+        },
+        "swk": {
+            "daily": {
+                "latest": 139,
+                "total": 6636167
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 544277
+            },
+            "daily_adult": {
+                "latest": 35,
+                "total": 5540492
+            },
+            "daily_booster": {
+                "latest": 36,
+                "total": 1593285
+            },
+            "daily_booster2": {
+                "latest": 24,
+                "total": 100446
+            },
+            "daily_child": {
+                "latest": 104,
+                "total": 551398
+            },
+            "daily_primary": {
+                "latest": 79,
+                "total": 4942436
+            }
+        },
+        "trg": {
+            "daily": {
+                "latest": 9,
+                "total": 2217390
+            },
+            "daily_adol": {
+                "latest": 0,
+                "total": 259686
+            },
+            "daily_adult": {
+                "latest": 9,
+                "total": 1890250
+            },
+            "daily_booster": {
+                "latest": 9,
+                "total": 360783
+            },
+            "daily_booster2": {
+                "latest": 0,
+                "total": 6040
+            },
+            "daily_child": {
+                "latest": 0,
+                "total": 67454
+            },
+            "daily_primary": {
+                "latest": 0,
+                "total": 1850567
+            }
+        }
+    }
+}

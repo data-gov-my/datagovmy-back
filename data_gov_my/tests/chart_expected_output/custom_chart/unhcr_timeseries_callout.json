@@ -1,0 +1,50 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/unhcr_timeseries_callout.parquet",
+        "variables": {
+            "keys": [
+                "chart",
+                "variable"
+            ],
+            "columns": [
+                "value"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "arrivals": {
+            "this_month": {
+                "value": 236
+            },
+            "this_year": {
+                "value": 236
+            }
+        },
+        "overall": {
+            "this_month": {
+                "value": 185323
+            },
+            "this_year": {
+                "value": 185323
+            }
+        },
+        "registrations": {
+            "this_month": {
+                "value": 4137
+            },
+            "this_year": {
+                "value": 4137
+            }
+        },
+        "resettlements": {
+            "this_month": {
+                "value": 2275
+            },
+            "this_year": {
+                "value": 2275
+            }
+        }
+    }
+}

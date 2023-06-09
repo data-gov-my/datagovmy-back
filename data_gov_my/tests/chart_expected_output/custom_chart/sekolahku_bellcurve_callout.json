@@ -1,0 +1,733 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/sekolahku_bellcurve_callout.parquet",
+        "variables": {
+            "keys": [
+                "state",
+                "level",
+                "chart"
+            ],
+            "columns": [
+                "callout"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "jhr": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 1.968184737648607
+                },
+                "gpa": {
+                    "callout": 0.21023637512116347
+                },
+                "household_income": {
+                    "callout": 910.3308916393029
+                },
+                "max_ethnic": {
+                    "callout": 95.76271186440678
+                },
+                "st_ratio": {
+                    "callout": 9.724137931034482
+                },
+                "students": {
+                    "callout": 212.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.42871075428113
+                },
+                "gpa": {
+                    "callout": 0.15261116719944534
+                },
+                "household_income": {
+                    "callout": 3405.1528163677694
+                },
+                "max_ethnic": {
+                    "callout": 76.248821866164
+                },
+                "st_ratio": {
+                    "callout": 11.210526315789474
+                },
+                "students": {
+                    "callout": 793.0
+                }
+            }
+        },
+        "kdh": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.19877220852035
+                },
+                "gpa": {
+                    "callout": 0.23486712908298346
+                },
+                "household_income": {
+                    "callout": 1125.0315736297043
+                },
+                "max_ethnic": {
+                    "callout": 98.95470383275261
+                },
+                "st_ratio": {
+                    "callout": 9.644444444444444
+                },
+                "students": {
+                    "callout": 262.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.4166959342351302
+                },
+                "gpa": {
+                    "callout": 0.1513277753684418
+                },
+                "household_income": {
+                    "callout": 2984.339479666582
+                },
+                "max_ethnic": {
+                    "callout": 96.1439588688946
+                },
+                "st_ratio": {
+                    "callout": 10.933333333333334
+                },
+                "students": {
+                    "callout": 695.0
+                }
+            }
+        },
+        "ktn": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.212762079119865
+                },
+                "gpa": {
+                    "callout": 0.2363614906777035
+                },
+                "household_income": {
+                    "callout": 1550.1389239706998
+                },
+                "max_ethnic": {
+                    "callout": 99.39572075361471
+                },
+                "st_ratio": {
+                    "callout": 9.719211822660098
+                },
+                "students": {
+                    "callout": 361.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.5700132918456242
+                },
+                "gpa": {
+                    "callout": 0.167704736784012
+                },
+                "household_income": {
+                    "callout": 2808.2849204344534
+                },
+                "max_ethnic": {
+                    "callout": 98.18181818181819
+                },
+                "st_ratio": {
+                    "callout": 9.448275862068966
+                },
+                "students": {
+                    "callout": 654.0
+                }
+            }
+        },
+        "kul": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 0.5868937990185734
+                },
+                "gpa": {
+                    "callout": 0.0626904693073494
+                },
+                "household_income": {
+                    "callout": 2434.705733771154
+                },
+                "max_ethnic": {
+                    "callout": 87.35730593607306
+                },
+                "st_ratio": {
+                    "callout": 14.168439716312056
+                },
+                "students": {
+                    "callout": 567.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 0.5977449808877866
+                },
+                "gpa": {
+                    "callout": 0.06384956433452116
+                },
+                "household_income": {
+                    "callout": 3491.0330891639305
+                },
+                "max_ethnic": {
+                    "callout": 69.73992464079672
+                },
+                "st_ratio": {
+                    "callout": 11.311228070175439
+                },
+                "students": {
+                    "callout": 813.0
+                }
+            }
+        },
+        "lbn": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 1.8007986284043056
+                },
+                "gpa": {
+                    "callout": 0.19235662624393188
+                },
+                "household_income": {
+                    "callout": 2241.4751199797925
+                },
+                "max_ethnic": {
+                    "callout": 69.6588868940754
+                },
+                "st_ratio": {
+                    "callout": 14.27027027027027
+                },
+                "students": {
+                    "callout": 522.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.0927518794050464
+                },
+                "gpa": {
+                    "callout": 0.1167249138957463
+                },
+                "household_income": {
+                    "callout": 2192.093963122001
+                },
+                "max_ethnic": {
+                    "callout": 68.23579584397386
+                },
+                "st_ratio": {
+                    "callout": 11.538726333907057
+                },
+                "students": {
+                    "callout": 510.5
+                }
+            }
+        },
+        "mlk": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 1.7077159984044412
+                },
+                "gpa": {
+                    "callout": 0.18241378178244325
+                },
+                "household_income": {
+                    "callout": 1039.1513008335437
+                },
+                "max_ethnic": {
+                    "callout": 95.40864944108485
+                },
+                "st_ratio": {
+                    "callout": 9.245421245421245
+                },
+                "students": {
+                    "callout": 242.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.2095884337793594
+                },
+                "gpa": {
+                    "callout": 0.12920509078333262
+                },
+                "household_income": {
+                    "callout": 3276.3324071735283
+                },
+                "max_ethnic": {
+                    "callout": 87.29946524064172
+                },
+                "st_ratio": {
+                    "callout": 10.151162790697674
+                },
+                "students": {
+                    "callout": 763.0
+                }
+            }
+        },
+        "mys": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.3576649858471215
+                },
+                "gpa": {
+                    "callout": 0.2518396423329458
+                },
+                "household_income": {
+                    "callout": 888.8608234402627
+                },
+                "max_ethnic": {
+                    "callout": 96.18263473053892
+                },
+                "st_ratio": {
+                    "callout": 9.285714285714286
+                },
+                "students": {
+                    "callout": 207.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.3637234122416126
+                },
+                "gpa": {
+                    "callout": 0.14566938833194426
+                },
+                "household_income": {
+                    "callout": 3173.276079818136
+                },
+                "max_ethnic": {
+                    "callout": 90.60460556921646
+                },
+                "st_ratio": {
+                    "callout": 10.924242424242424
+                },
+                "students": {
+                    "callout": 739.0
+                }
+            }
+        },
+        "nsn": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.2963996920870873
+                },
+                "gpa": {
+                    "callout": 0.245295442982924
+                },
+                "household_income": {
+                    "callout": 800.8335438241979
+                },
+                "max_ethnic": {
+                    "callout": 95.08572808500362
+                },
+                "st_ratio": {
+                    "callout": 9.15340909090909
+                },
+                "students": {
+                    "callout": 186.5
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.6514713066871547
+                },
+                "gpa": {
+                    "callout": 0.17640587008581224
+                },
+                "household_income": {
+                    "callout": 2683.75852488002
+                },
+                "max_ethnic": {
+                    "callout": 88.40361445783132
+                },
+                "st_ratio": {
+                    "callout": 10.56338028169014
+                },
+                "students": {
+                    "callout": 625.0
+                }
+            }
+        },
+        "phg": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 3.6165083887214795
+                },
+                "gpa": {
+                    "callout": 0.3863060208202004
+                },
+                "household_income": {
+                    "callout": 841.6266734023743
+                },
+                "max_ethnic": {
+                    "callout": 96.58094681472824
+                },
+                "st_ratio": {
+                    "callout": 8.922619047619047
+                },
+                "students": {
+                    "callout": 196.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 2.2504551937406823
+                },
+                "gpa": {
+                    "callout": 0.2403877711549998
+                },
+                "household_income": {
+                    "callout": 2116.94872442536
+                },
+                "max_ethnic": {
+                    "callout": 91.3232541545589
+                },
+                "st_ratio": {
+                    "callout": 8.888544891640867
+                },
+                "students": {
+                    "callout": 493.0
+                }
+            }
+        },
+        "pjy": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 1.136153815208056
+                },
+                "gpa": {
+                    "callout": 0.1213609958050936
+                },
+                "household_income": {
+                    "callout": 5942.914877494317
+                },
+                "max_ethnic": {
+                    "callout": 97.68985667083209
+                },
+                "st_ratio": {
+                    "callout": 15.0
+                },
+                "students": {
+                    "callout": 1384.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.0017389275821165
+                },
+                "gpa": {
+                    "callout": 0.1070031470746147
+                },
+                "household_income": {
+                    "callout": 4946.703713058853
+                },
+                "max_ethnic": {
+                    "callout": 96.94602272727273
+                },
+                "st_ratio": {
+                    "callout": 13.28735632183908
+                },
+                "students": {
+                    "callout": 1152.0
+                }
+            }
+        },
+        "pls": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.2551002123012553
+                },
+                "gpa": {
+                    "callout": 0.24088393995758492
+                },
+                "household_income": {
+                    "callout": 1208.7648396059612
+                },
+                "max_ethnic": {
+                    "callout": 98.65536723163842
+                },
+                "st_ratio": {
+                    "callout": 9.567251461988304
+                },
+                "students": {
+                    "callout": 281.5
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.226311841524153
+                },
+                "gpa": {
+                    "callout": 0.1309914417069451
+                },
+                "household_income": {
+                    "callout": 2814.7259408941654
+                },
+                "max_ethnic": {
+                    "callout": 96.66449207828518
+                },
+                "st_ratio": {
+                    "callout": 9.366178861788619
+                },
+                "students": {
+                    "callout": 655.5
+                }
+            }
+        },
+        "png": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 0.9749768179594412
+                },
+                "gpa": {
+                    "callout": 0.10414448812353051
+                },
+                "household_income": {
+                    "callout": 1816.3677696387977
+                },
+                "max_ethnic": {
+                    "callout": 93.98422090729784
+                },
+                "st_ratio": {
+                    "callout": 10.933333333333334
+                },
+                "students": {
+                    "callout": 423.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 0.7800081427301999
+                },
+                "gpa": {
+                    "callout": 0.08331844128031535
+                },
+                "household_income": {
+                    "callout": 3153.9530184389996
+                },
+                "max_ethnic": {
+                    "callout": 88.29238818825768
+                },
+                "st_ratio": {
+                    "callout": 11.123759305210918
+                },
+                "students": {
+                    "callout": 734.5
+                }
+            }
+        },
+        "prk": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.0587584897950673
+                },
+                "gpa": {
+                    "callout": 0.21991122777505806
+                },
+                "household_income": {
+                    "callout": 626.9259914119727
+                },
+                "max_ethnic": {
+                    "callout": 96.62921348314607
+                },
+                "st_ratio": {
+                    "callout": 7.9411764705882355
+                },
+                "students": {
+                    "callout": 146.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 0.9840563884347837
+                },
+                "gpa": {
+                    "callout": 0.10511434422894553
+                },
+                "household_income": {
+                    "callout": 2621.4953271028035
+                },
+                "max_ethnic": {
+                    "callout": 88.08337115318119
+                },
+                "st_ratio": {
+                    "callout": 9.420833333333334
+                },
+                "students": {
+                    "callout": 610.5
+                }
+            }
+        },
+        "sbh": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 3.7703381417985944
+                },
+                "gpa": {
+                    "callout": 0.40273771498695504
+                },
+                "household_income": {
+                    "callout": 665.572114170245
+                },
+                "max_ethnic": {
+                    "callout": 97.14285714285714
+                },
+                "st_ratio": {
+                    "callout": 8.928571428571429
+                },
+                "students": {
+                    "callout": 155.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.7153290425620562
+                },
+                "gpa": {
+                    "callout": 0.18322698736051637
+                },
+                "household_income": {
+                    "callout": 3825.966153068957
+                },
+                "max_ethnic": {
+                    "callout": 94.61279461279462
+                },
+                "st_ratio": {
+                    "callout": 13.32183908045977
+                },
+                "students": {
+                    "callout": 891.0
+                }
+            }
+        },
+        "sgr": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 1.3959357835867583
+                },
+                "gpa": {
+                    "callout": 0.14911023006601387
+                },
+                "household_income": {
+                    "callout": 2733.1396817378127
+                },
+                "max_ethnic": {
+                    "callout": 92.24651169780859
+                },
+                "st_ratio": {
+                    "callout": 14.274024024024024
+                },
+                "students": {
+                    "callout": 636.5
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.202377759472909
+                },
+                "gpa": {
+                    "callout": 0.12843486530633877
+                },
+                "household_income": {
+                    "callout": 5281.63677696388
+                },
+                "max_ethnic": {
+                    "callout": 73.89179199112078
+                },
+                "st_ratio": {
+                    "callout": 13.761363636363637
+                },
+                "students": {
+                    "callout": 1230.0
+                }
+            }
+        },
+        "swk": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 3.816318672977221
+                },
+                "gpa": {
+                    "callout": 0.40764923574830847
+                },
+                "household_income": {
+                    "callout": 382.1672139429149
+                },
+                "max_ethnic": {
+                    "callout": 91.02564102564102
+                },
+                "st_ratio": {
+                    "callout": 6.75
+                },
+                "students": {
+                    "callout": 89.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.9077567810179359
+                },
+                "gpa": {
+                    "callout": 0.20378161794568161
+                },
+                "household_income": {
+                    "callout": 3873.2003031068452
+                },
+                "max_ethnic": {
+                    "callout": 76.37959866220736
+                },
+                "st_ratio": {
+                    "callout": 12.709677419354838
+                },
+                "students": {
+                    "callout": 902.0
+                }
+            }
+        },
+        "trg": {
+            "primary": {
+                "closest_school_dist": {
+                    "callout": 2.446622517633096
+                },
+                "gpa": {
+                    "callout": 0.26134185453115255
+                },
+                "household_income": {
+                    "callout": 1378.3783783783786
+                },
+                "max_ethnic": {
+                    "callout": 99.52267031214399
+                },
+                "st_ratio": {
+                    "callout": 10.279914529914532
+                },
+                "students": {
+                    "callout": 321.0
+                }
+            },
+            "secondary": {
+                "closest_school_dist": {
+                    "callout": 1.7428245400467242
+                },
+                "gpa": {
+                    "callout": 0.18616398489573543
+                },
+                "household_income": {
+                    "callout": 2782.520838595605
+                },
+                "max_ethnic": {
+                    "callout": 98.6867518232155
+                },
+                "st_ratio": {
+                    "callout": 9.666477595008509
+                },
+                "students": {
+                    "callout": 648.0
+                }
+            }
+        }
+    }
+}

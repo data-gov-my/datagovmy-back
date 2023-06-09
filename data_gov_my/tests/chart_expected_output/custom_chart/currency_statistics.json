@@ -1,0 +1,195 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/currency_timeseries_callout.parquet",
+        "variables": {
+            "keys": [
+                "chart_type",
+                "chart"
+            ],
+            "columns": [
+                "callout"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "growth_mom": {
+            "coin_1": {
+                "callout": -5.774541304015557e-05
+            },
+            "coin_10": {
+                "callout": 0.27565293910347677
+            },
+            "coin_20": {
+                "callout": 0.28863689686002836
+            },
+            "coin_5": {
+                "callout": 0.22765826875736916
+            },
+            "coin_50": {
+                "callout": 0.34842810952675496
+            },
+            "coin_others": {
+                "callout": 0.029237861405428944
+            },
+            "coin_rm1": {
+                "callout": 0.016062236578862077
+            },
+            "coin_rm5": {
+                "callout": 0.0
+            },
+            "note_1": {
+                "callout": 1.422161731503957
+            },
+            "note_10": {
+                "callout": 4.452352849290375
+            },
+            "note_100": {
+                "callout": 2.5207857639426345
+            },
+            "note_1000": {
+                "callout": 0.0
+            },
+            "note_2": {
+                "callout": -0.002195341765975911
+            },
+            "note_20": {
+                "callout": 4.305844670398273
+            },
+            "note_5": {
+                "callout": 3.684813331914616
+            },
+            "note_50": {
+                "callout": 2.2585916145099416
+            },
+            "note_500": {
+                "callout": 0.0
+            },
+            "note_others": {
+                "callout": 0.0
+            },
+            "total": {
+                "callout": 2.4835492319889907
+            }
+        },
+        "growth_yoy": {
+            "coin_1": {
+                "callout": -0.0015036688133185372
+            },
+            "coin_10": {
+                "callout": 3.8939355672808817
+            },
+            "coin_20": {
+                "callout": 4.3099506999462855
+            },
+            "coin_5": {
+                "callout": 2.93989821274927
+            },
+            "coin_50": {
+                "callout": 4.969345960878435
+            },
+            "coin_others": {
+                "callout": 0.17853828735177046
+            },
+            "coin_rm1": {
+                "callout": 0.04845264449360176
+            },
+            "coin_rm5": {
+                "callout": 0.0
+            },
+            "note_1": {
+                "callout": 3.69867517580047
+            },
+            "note_10": {
+                "callout": 5.849530911976686
+            },
+            "note_100": {
+                "callout": 15.899867184972827
+            },
+            "note_1000": {
+                "callout": -0.03281445476732703
+            },
+            "note_2": {
+                "callout": -0.05859964922928507
+            },
+            "note_20": {
+                "callout": -1.2869684878343057
+            },
+            "note_5": {
+                "callout": 5.476903642324071
+            },
+            "note_50": {
+                "callout": -0.27977826535520167
+            },
+            "note_500": {
+                "callout": -0.0003346619412369911
+            },
+            "note_others": {
+                "callout": 0.004611447148983316
+            },
+            "total": {
+                "callout": 6.622207500927568
+            }
+        },
+        "value": {
+            "coin_1": {
+                "callout": 43293457.0
+            },
+            "coin_10": {
+                "callout": 933949070.0
+            },
+            "coin_20": {
+                "callout": 1240305533.0
+            },
+            "coin_5": {
+                "callout": 246319510.0
+            },
+            "coin_50": {
+                "callout": 1474172286.0
+            },
+            "coin_others": {
+                "callout": 65923542.0
+            },
+            "coin_rm1": {
+                "callout": 32373045.0
+            },
+            "coin_rm5": {
+                "callout": 9716280.0
+            },
+            "note_1": {
+                "callout": 3155381271.0
+            },
+            "note_10": {
+                "callout": 8115958810.0
+            },
+            "note_100": {
+                "callout": 70600143350.0
+            },
+            "note_1000": {
+                "callout": 24371500.0
+            },
+            "note_2": {
+                "callout": 125171384.0
+            },
+            "note_20": {
+                "callout": 4108112040.0
+            },
+            "note_5": {
+                "callout": 3162080418.0
+            },
+            "note_50": {
+                "callout": 72679884700.0
+            },
+            "note_500": {
+                "callout": 74702000.0
+            },
+            "note_others": {
+                "callout": 7807020.0
+            },
+            "total": {
+                "callout": 166099700000.0
+            }
+        }
+    }
+}

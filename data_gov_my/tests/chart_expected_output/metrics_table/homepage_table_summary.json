@@ -1,0 +1,249 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/homepage_top.parquet",
+        "variables": {
+            "keys": [
+                "time_period",
+                "chart_type"
+            ],
+            "obj_attr": {
+                "id": "id",
+                "name_en": "name_en",
+                "name_bm": "name_bm",
+                "agency": "agency_abbr",
+                "count": "count"
+            }
+        }
+    },
+    "chart_type": "metrics_table",
+    "expected_results": {
+        "today": {
+            "dashboard_views": [
+                {
+                    "id": "/dashboard/name-popularity",
+                    "name_en": "Baby Name Popularity",
+                    "name_bm": "Populariti Nama Bayi",
+                    "agency_abbr": "jpn",
+                    "count": 11223
+                },
+                {
+                    "id": "/dashboard/birthday-explorer",
+                    "name_en": "Birthday Explorer",
+                    "name_bm": "Populariti Hari Lahir",
+                    "agency_abbr": "jpn",
+                    "count": 10101
+                },
+                {
+                    "id": "/dashboard/blood-donation",
+                    "name_en": "Blood Donation",
+                    "name_bm": "Pendermaan Darah",
+                    "agency_abbr": "pdn",
+                    "count": 9091
+                },
+                {
+                    "id": "/dashboard/interest-rates",
+                    "name_en": "Interest Rates",
+                    "name_bm": "Kadar Faedah",
+                    "agency_abbr": "bnm",
+                    "count": 8182
+                },
+                {
+                    "id": "/dashboard/international-reserves",
+                    "name_en": "International Reserves",
+                    "name_bm": "Rizab Antarabangsa",
+                    "agency_abbr": "bnm",
+                    "count": 7363
+                }
+            ],
+            "dataset_views": [
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_choropleth_0",
+                    "name_en": "Choropleth",
+                    "name_bm": "Choropleth",
+                    "agency_abbr": "mampu",
+                    "count": 11223
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_geodata_0",
+                    "name_en": "Geodata",
+                    "name_bm": "Geodata",
+                    "agency_abbr": "mampu",
+                    "count": 10101
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_heattable_0",
+                    "name_en": "Heattable",
+                    "name_bm": "Jadual Haba",
+                    "agency_abbr": "mampu",
+                    "count": 9091
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_pyramid_0",
+                    "name_en": "Pyramid",
+                    "name_bm": "Piramid",
+                    "agency_abbr": "mampu",
+                    "count": 8182
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_bar_4_0",
+                    "name_en": "Timeseries",
+                    "name_bm": "Siri Masa",
+                    "agency_abbr": "mampu",
+                    "count": 7363
+                }
+            ]
+        },
+        "last_month": {
+            "dashboard_views": [
+                {
+                    "id": "/dashboard/name-popularity",
+                    "name_en": "Baby Name Popularity",
+                    "name_bm": "Populariti Nama Bayi",
+                    "agency_abbr": "jpn",
+                    "count": 374098
+                },
+                {
+                    "id": "/dashboard/birthday-explorer",
+                    "name_en": "Birthday Explorer",
+                    "name_bm": "Populariti Hari Lahir",
+                    "agency_abbr": "jpn",
+                    "count": 336688
+                },
+                {
+                    "id": "/dashboard/blood-donation",
+                    "name_en": "Blood Donation",
+                    "name_bm": "Pendermaan Darah",
+                    "agency_abbr": "pdn",
+                    "count": 303020
+                },
+                {
+                    "id": "/dashboard/interest-rates",
+                    "name_en": "Interest Rates",
+                    "name_bm": "Kadar Faedah",
+                    "agency_abbr": "bnm",
+                    "count": 272718
+                },
+                {
+                    "id": "/dashboard/international-reserves",
+                    "name_en": "International Reserves",
+                    "name_bm": "Rizab Antarabangsa",
+                    "agency_abbr": "bnm",
+                    "count": 245446
+                }
+            ],
+            "dataset_views": [
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_choropleth_0",
+                    "name_en": "Choropleth",
+                    "name_bm": "Choropleth",
+                    "agency_abbr": "mampu",
+                    "count": 374098
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_geodata_0",
+                    "name_en": "Geodata",
+                    "name_bm": "Geodata",
+                    "agency_abbr": "mampu",
+                    "count": 336688
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_heattable_0",
+                    "name_en": "Heattable",
+                    "name_bm": "Jadual Haba",
+                    "agency_abbr": "mampu",
+                    "count": 303020
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_pyramid_0",
+                    "name_en": "Pyramid",
+                    "name_bm": "Piramid",
+                    "agency_abbr": "mampu",
+                    "count": 272718
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_bar_4_0",
+                    "name_en": "Timeseries",
+                    "name_bm": "Siri Masa",
+                    "agency_abbr": "mampu",
+                    "count": 245446
+                }
+            ]
+        },
+        "all_time": {
+            "dashboard_views": [
+                {
+                    "id": "/dashboard/name-popularity",
+                    "name_en": "Baby Name Popularity",
+                    "name_bm": "Populariti Nama Bayi",
+                    "agency_abbr": "jpn",
+                    "count": 935245
+                },
+                {
+                    "id": "/dashboard/birthday-explorer",
+                    "name_en": "Birthday Explorer",
+                    "name_bm": "Populariti Hari Lahir",
+                    "agency_abbr": "jpn",
+                    "count": 841721
+                },
+                {
+                    "id": "/dashboard/blood-donation",
+                    "name_en": "Blood Donation",
+                    "name_bm": "Pendermaan Darah",
+                    "agency_abbr": "pdn",
+                    "count": 757549
+                },
+                {
+                    "id": "/dashboard/interest-rates",
+                    "name_en": "Interest Rates",
+                    "name_bm": "Kadar Faedah",
+                    "agency_abbr": "bnm",
+                    "count": 681794
+                },
+                {
+                    "id": "/dashboard/international-reserves",
+                    "name_en": "International Reserves",
+                    "name_bm": "Rizab Antarabangsa",
+                    "agency_abbr": "bnm",
+                    "count": 613615
+                }
+            ],
+            "dataset_views": [
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_choropleth_0",
+                    "name_en": "Choropleth",
+                    "name_bm": "Choropleth",
+                    "agency_abbr": "mampu",
+                    "count": 935245
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_geodata_0",
+                    "name_en": "Geodata",
+                    "name_bm": "Geodata",
+                    "agency_abbr": "mampu",
+                    "count": 841721
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_heattable_0",
+                    "name_en": "Heattable",
+                    "name_bm": "Jadual Haba",
+                    "agency_abbr": "mampu",
+                    "count": 757549
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_pyramid_0",
+                    "name_en": "Pyramid",
+                    "name_bm": "Piramid",
+                    "agency_abbr": "mampu",
+                    "count": 681794
+                },
+                {
+                    "id": "/data-catalogue/dgmy-public-mwe_mwe_bar_4_0",
+                    "name_en": "Timeseries",
+                    "name_bm": "Siri Masa",
+                    "agency_abbr": "mampu",
+                    "count": 613615
+                }
+            ]
+        }
+    }
+}
