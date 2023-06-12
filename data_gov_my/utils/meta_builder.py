@@ -300,11 +300,10 @@ class DashboardBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "dashboards"
 
     def update_or_create_meta(self, filename: str, metadata: dict):
-        updated_values = {"dashboard_meta": metadata}
+        updated_values = {"dashboard_meta": metadata, "route": route}
         route = metadata.get("route", "")
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata["dashboard_name"],
-            route=route,
             defaults=updated_values,
         )
         cache.set("META_" + metadata["dashboard_name"], metadata)
