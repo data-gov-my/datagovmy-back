@@ -673,7 +673,8 @@ def timeseries_shared(file_name: str, variables):
         grouped_df = df.groupby(keys)
 
         for grp in u_groups_list:
-            temp_df = grouped_df.get_group(grp)
+            cur_grp = grp[0] if len(grp) == 1 else grp
+            temp_df = grouped_df.get_group(cur_grp)
             val_res = {}
             for k, v in attributes.items():
                 val_res[k] = temp_df[v].to_list()

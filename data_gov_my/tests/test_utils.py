@@ -185,11 +185,17 @@ def test_timeseries_shared_chart_nested(sample_timeseries_data):
         "constant": {"x": "date"},
         "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
     }
-    # FIXME: find out why KeyError: ('California',) is happening, then fix the expected results accordingly.
+
     expected_result = {
-        "x": [1577836800000, 1577923200000, 1578009600000],
-        "daily": [100, 200, 150, 120, 180, 140],
-        "line_daily": [90, 190, 160, 130, 170, 150],
+        'x': [1577836800000, 1577923200000, 1578009600000], 
+        'California': {
+            'daily': [100, 200, 150], 
+            'line_daily': [90, 190, 160]
+        }, 
+        'New York': {
+            'daily': [120, 180, 140], 
+            'line_daily': [130, 170, 150]
+        }
     }
 
     result = timeseries_shared(sample_timeseries_data, variables)
