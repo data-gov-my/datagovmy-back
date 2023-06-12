@@ -98,16 +98,18 @@ class DASHBOARD(APIView):
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        try:
+            param_list = dict(request.GET)
+            params_req = ["dashboard"]
 
-        param_list = dict(request.GET)
-        params_req = ["dashboard"]
-
-        if all(p in param_list for p in params_req):
-            res = handle_request(param_list)
-            res = handle.dashboard_additional_handling(param_list, res)
-            return JsonResponse(res, safe=False)
-        else:
-            return JsonResponse({}, safe=False)
+            if all(p in param_list for p in params_req):
+                res = handle_request(param_list)
+                res = handle.dashboard_additional_handling(param_list, res)
+                return JsonResponse(res, safe=False)
+            else:
+                return JsonResponse({}, safe=False)
+        except Exception as e:
+            return JsonResponse({"Error": str(e)}, status=500)
 
 
 class DATA_VARIABLE(APIView):
