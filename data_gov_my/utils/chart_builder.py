@@ -714,7 +714,8 @@ def query_values(file_name: str, variables: QueryValuesVariables):
     res = {}
     for keys, v in df.groupby(columns[:-1])[columns[-1]]:
         d = res
-        val = list(set(v))
+        val = v.unique().tolist()
+        keys = [keys] if isinstance(keys, str) else keys
         for k in keys:
             if k not in d:
                 d[k] = {}

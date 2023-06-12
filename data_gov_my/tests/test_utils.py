@@ -672,7 +672,6 @@ def test_query_values_flat(sample_barchart_data):
 
 
 def test_query_values_nested_single_layer(sample_barchart_data):
-    # FIXME: 'C': {'a': {'l': {'i': {'f': {'o': {'r': {'n': {'i': {'a':...
     variables = {"columns": ["state", "period"], "flat": False}
     expected_result = {"California": ["2020", "2021"], "New York": ["2020", "2021"]}
     result = query_values(sample_barchart_data, variables)
