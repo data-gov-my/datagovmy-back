@@ -275,11 +275,15 @@ def heatmap_chart(file_name: str, variables: HeatmapChartVariables):
         cur_id = cur_id if isinstance(cur_id, str) else int(cur_id)
 
         group = [str(group)] if isinstance(group, str) else [str(i) for i in group]
-        data_arr = (
-            data_arr[0]["data"]
-            if len(data_arr) == 1
-            else [x["data"][0] for x in data_arr]
-        )
+
+        if len(data_arr) == 1: 
+            data_arr = data_arr[0]["data"]
+        else : 
+            temp_arr = []
+            for x in data_arr : 
+                temp_arr.extend(x['data'])
+            data_arr = temp_arr
+
         final_dict = {"id": cur_id, "data": data_arr}
 
         set_dict(result, group, final_dict, "SET")

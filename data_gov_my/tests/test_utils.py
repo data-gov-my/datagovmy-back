@@ -738,9 +738,6 @@ def test_heatmap_chart_simple(sample_line_data):
 
 
 def test_heatmap_chart_multi_cols(sample_line_data):
-    """
-    FIXME: y2 seems to have no effect? should be appended to the data array in res
-    """
     variables = {
         "cols": ["y1", "y2"],
         "id": "state",
@@ -752,39 +749,38 @@ def test_heatmap_chart_multi_cols(sample_line_data):
         "operation": "SET",
     }
     expected_result = {
-        "daily": {
-            "id": "California",
-            "data": [
-                {"x": "Y1", "y": 100},
-                {"x": "Y1", "y": 200},
-                {"x": "Y1", "y": 120},
-                {"x": "Y1", "y": 180},
-                {"x": "Y1", "y": 130},
-                {"x": "Y1", "y": 110},
-                {"x": "Y2", "y": 50},
-                {"x": "Y2", "y": 80},
-                {"x": "Y2", "y": 120},
-                {"x": "Y2", "y": 140},
-                {"x": "Y2", "y": 90},
-                {"x": "Y2", "y": 160},
-            ],
-        },
-        "monthly": {
-            "id": "California",
-            "data": [
-                {"x": "Y1", "y": 150},
-                {"x": "Y1", "y": 170},
-                {"x": "Y1", "y": 140},
-                {"x": "Y1", "y": 160},
-                {"x": "Y1", "y": 135},
-                {"x": "Y1", "y": 155},
-                {"x": "Y2", "y": 130},
-                {"x": "Y2", "y": 100},
-                {"x": "Y2", "y": 70},
-                {"x": "Y2", "y": 90},
-                {"x": "Y2", "y": 110},
-            ],
-        },
+        'daily': {
+            'id': 'California', 
+            'data': [
+                {'x': 'Y1', 'y': 100}, 
+                {'x': 'Y2', 'y': 50}, 
+                {'x': 'Y1', 'y': 200}, 
+                {'x': 'Y2', 'y': 80}, 
+                {'x': 'Y1', 'y': 120}, 
+                {'x': 'Y2', 'y': 90}, 
+                {'x': 'Y1', 'y': 180}, 
+                {'x': 'Y2', 'y': 160}, 
+                {'x': 'Y1', 'y': 130}, 
+                {'x': 'Y2', 'y': 100}, 
+                {'x': 'Y1', 'y': 110}, 
+                {'x': 'Y2', 'y': 70}]
+        }, 
+        'monthly': {
+            'id': 'California', 
+            'data': [
+                {'x': 'Y1', 'y': 150}, 
+                {'x': 'Y2', 'y': 120}, 
+                {'x': 'Y1', 'y': 170}, 
+                {'x': 'Y2', 'y': 140}, 
+                {'x': 'Y1', 'y': 140}, 
+                {'x': 'Y2', 'y': 110}, 
+                {'x': 'Y1', 'y': 160}, 
+                {'x': 'Y2', 'y': 130}, 
+                {'x': 'Y1', 'y': 135}, 
+                {'x': 'Y2', 'y': 90}, 
+                {'x': 'Y1', 'y': 155}, 
+                {'x': 'Y2', 'y': 110}]
+        }
     }
     result = heatmap_chart(sample_line_data, variables)
     assert result == expected_result

@@ -3,13 +3,10 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/dashboards_all.parquet",
         "variables": {
             "keys": [
-                "lang",
                 "category"
             ],
             "obj_attr": {
-                "route": "id",
                 "name": "name",
-                "description": "description",
                 "agency": "agency",
                 "views": "views"
             }
