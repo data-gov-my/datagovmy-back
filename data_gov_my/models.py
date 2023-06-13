@@ -114,6 +114,9 @@ class ElectionDashboard_Candidates(models.Model):
     voter_turnout_perc = models.FloatField(null=True, default=None)
     votes_rejected = models.IntegerField(null=True)
     votes_rejected_perc = models.FloatField(null=True, default=None)
+    majority = models.IntegerField(default=0)
+    majority_perc = models.FloatField(null=True, default=None)
+    slug = models.CharField(max_length=100, default='')
 
 
 class ElectionDashboard_Seats(models.Model):
@@ -127,6 +130,7 @@ class ElectionDashboard_Seats(models.Model):
     majority_perc = models.FloatField(null=True)
     seat_name = models.CharField(max_length=100)
     state = models.CharField(max_length=50, null=True)
+    slug = models.CharField(max_length=100, default='')
 
 
 class ElectionDashboard_Party(models.Model):
@@ -140,6 +144,11 @@ class ElectionDashboard_Party(models.Model):
     seats_perc = models.FloatField(null=True)
     votes = models.IntegerField()
     votes_perc = models.FloatField(null=True)
+
+class ElectionDashboard_Dropdown(models.Model) : 
+    state = models.CharField(max_length=100, default='')
+    election = models.CharField(max_length=50, default='')
+    date = models.IntegerField(default=0)
 
 
 class FormTemplate(models.Model):

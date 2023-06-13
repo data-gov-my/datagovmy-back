@@ -98,7 +98,6 @@ class DASHBOARD(APIView):
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         params_req = ["dashboard"]
 

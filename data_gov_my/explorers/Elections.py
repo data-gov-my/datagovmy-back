@@ -34,6 +34,11 @@ class ELECTIONS(General_Explorer):
             "model" : 'ElectionDashboard_Party',
             "values" : ['party'],
             "flat" : True
+        },
+        'election_list' : {
+            "model" : 'ElectionDashboard_Dropdown',
+            "values" : ['state', 'election', 'date'],
+            "flat" : False
         }
     }
 
@@ -52,7 +57,7 @@ class ELECTIONS(General_Explorer):
             "serializer" : ElectionSeatSerializer,
             "segment_by" : None,
             "params_mapping" : {
-                "seat_name" : "seat_name",
+                "slug" : "seat_name",
                 "type" : "type"
             }
         },
@@ -61,7 +66,7 @@ class ELECTIONS(General_Explorer):
             "serializer" : ElectionCandidateSerializer,
             "segment_by" : 'type',
             "params_mapping" : {
-                "name" : "name"
+                "slug" : "name"
             }
         }
     }
@@ -71,7 +76,8 @@ class ELECTIONS(General_Explorer):
     data_populate = {
         'ElectionDashboard_Candidates' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_candidates.parquet',
         'ElectionDashboard_Seats' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_seats_winner.parquet',
-        'ElectionDashboard_Party' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_parties.parquet'
+        'ElectionDashboard_Party' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_parties.parquet',
+        'ElectionDashboard_Dropdown' : 'https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/elections_dates.parquet'
     }
 
     # API related
@@ -128,6 +134,10 @@ class ELECTIONS(General_Explorer):
 
         if dropdown_type == 'seats_list' : 
             data = list(model_choice.objects.values(*values).distinct())
+        elif dropdown_type == 'election_list' :
+            data = defaultdict(list)
+            for x in list(model_choice.objects.values()) :
+                data[x.get('state')].append({ 'name' : x['election'], 'year' : str(x['date']) })
         else : 
             data = list(model_choice.objects.values_list(*values, flat=flat).distinct())
 
@@ -243,7 +253,7 @@ class ELECTIONS(General_Explorer):
 
         # For particular case of full_results
         if extract_votes_outcome and len(data) > 0 :
-            const_keys = ["voter_turnout", "voter_turnout_perc", "votes_rejected", "votes_rejected_perc"]
+            const_keys = ["voter_turnout", "voter_turnout_perc", "votes_rejected", "votes_rejected_perc", "majority", "majority_perc"]
             r = {}
             r["votes"] = {k: data[0][k] for k in const_keys}
             r["data"] = [{k: v for k, v in d.items() if k not in const_keys} for d in data]
