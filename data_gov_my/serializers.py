@@ -58,6 +58,8 @@ class ElectionCandidateSerializer(serializers.ModelSerializer):
             "voter_turnout_perc",
             "votes_rejected",
             "votes_rejected_perc",
+            "majority",
+            "majority_perc"
         ]
 
     def get_votes(self, obj):
