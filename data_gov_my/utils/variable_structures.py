@@ -1,5 +1,7 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypedDict, Any
+from pydantic import BaseModel, validator, ValidationError
 
+## TODO: GeneralChartVariable - common fields for all variables, e.g. keys, null_vals
 
 class TimeseriesChartVariables(TypedDict) : 
     keys : List[str]
@@ -28,10 +30,10 @@ class SnapshotChartVariables(TypedDict):
     data: Dict[str, Dict[str, List[str]]]
 
 
-class CustomChartVariables(TypedDict):
-    keys: List[str]
+class CustomChartVariables(BaseModel):
+    keys: list[str]
     columns: List[str]
-    null_vals: str | int | None
+    null_vals: str | int | None = None
 
 
 class ChoroplethChartVariables(TypedDict):

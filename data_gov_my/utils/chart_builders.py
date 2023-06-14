@@ -95,3 +95,29 @@ class ChartBuilder(ABC):
         pass
 
 
+class CustomBuilder(ChartBuilder):
+    CHART_TYPE = "custom_chart"
+    VARIABLE_MODEL = CustomChartVariables
+
+    def process_df_to_chart_data(
+        self, df: pd.DataFrame, variables: CustomChartVariables
+    ) -> dict:
+        keys = variables.keys
+        columns = variables.columns
+        res = {}
+        grouped = df.groupby(keys)
+        for name, group in grouped:
+            current_lvl = res
+            if isinstance(name, tuple):
+                for n in name[:-1]:
+                    current_lvl = current_lvl.setdefault(n, {})
+                name = name[-1]
+            current_lvl[name] = group[columns].to_dict("records")[0]
+
+        return res
+
+if __name__ == "__main__":
+    v = {"keys": ["chart"], "columns": ["callout1", "callout2"], "null_vals": 0}
+    url = "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/homepage_timeseries_callout.parquet"
+    builder = ChartBuilder.create("custom_chart")
+    chart = builder.build_chart(url, v)
