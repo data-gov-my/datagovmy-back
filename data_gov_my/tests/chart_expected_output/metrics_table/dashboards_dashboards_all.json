@@ -14,561 +14,229 @@
     },
     "chart_type": "metrics_table",
     "expected_results": {
-        "en": {
-            "Healthcare": [
-                {
-                    "id": "/dashboard/999-tracker",
-                    "name": "Emergency Response",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MERS 999",
-                    "views": 89666
-                },
-                {
-                    "id": "/dashboard/blood-donation",
-                    "name": "Blood Donation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PDN",
-                    "views": 13413
-                },
-                {
-                    "id": "/dashboard/covid-19",
-                    "name": "COVID-19",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoH",
-                    "views": 45015
-                },
-                {
-                    "id": "/dashboard/hospital-bed-utilisation",
-                    "name": "Hospital Bed Utilisation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoH",
-                    "views": 40716
-                },
-                {
-                    "id": "/dashboard/organ-donation",
-                    "name": "Organ Donation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "NTRC",
-                    "views": 43147
-                },
-                {
-                    "id": "/dashboard/peka-b40",
-                    "name": "Peka B40",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PHCorp",
-                    "views": 40755
-                }
-            ],
-            "Transport": [
-                {
-                    "id": "/dashboard/car-popularity",
-                    "name": "Car Popularity Explorer",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPJ",
-                    "views": 11850
-                },
-                {
-                    "id": "/dashboard/public-transportation",
-                    "name": "Public Transportation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoT",
-                    "views": 84984
-                }
-            ],
-            "Demography": [
-                {
-                    "id": "/dashboard/circle-of-life",
-                    "name": "The Circle of Life",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 47846
-                },
-                {
-                    "id": "/dashboard/immigration",
-                    "name": "Immigration",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "Imigresen",
-                    "views": 91331
-                },
-                {
-                    "id": "/dashboard/name-popularity",
-                    "name": "Baby Name Popularity",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 86330
-                },
-                {
-                    "id": "/dashboard/birthday-explorer",
-                    "name": "Birthday Popularity",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 86330
-                }
-            ],
-            "Public Finances": [
-                {
-                    "id": "/dashboard/civil-service",
-                    "name": "The Civil Service",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPA",
-                    "views": 59225
-                },
-                {
-                    "id": "/dashboard/public-contracting",
-                    "name": "Public Contracting",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoF",
-                    "views": 66798
-                }
-            ],
-            "Economy": [
-                {
-                    "id": "/dashboard/consumer-prices",
-                    "name": "Inflation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "DOSM",
-                    "views": 25352
-                },
-                {
-                    "id": "/dashboard/gdp",
-                    "name": "Gross Domestic Product (GDP)",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "DOSM",
-                    "views": 83334
-                },
-                {
-                    "id": "/dashboard/income-taxation",
-                    "name": "Income Taxation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "LHDN",
-                    "views": 49364
-                },
-                {
-                    "id": "/dashboard/poverty",
-                    "name": "Poverty",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "ICU JPM",
-                    "views": 80180
-                },
-                {
-                    "id": "/dashboard/public-pension",
-                    "name": "Public Pensions",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "KWAP",
-                    "views": 31049
-                },
-                {
-                    "id": "/dashboard/retirement-readiness",
-                    "name": "Retirement Readiness",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "EPF",
-                    "views": 12854
-                },
-                {
-                    "id": "/dashboard/social-security",
-                    "name": "Social Security",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PERKESO",
-                    "views": 35139
-                }
-            ],
-            "Public Safety": [
-                {
-                    "id": "/dashboard/crime",
-                    "name": "Crime",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PDRM",
-                    "views": 26264
-                },
-                {
-                    "id": "/dashboard/fire-and-rescue",
-                    "name": "Fire and Rescue",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BOMBA",
-                    "views": 64744
-                }
-            ],
-            "Financial Sector": [
-                {
-                    "id": "/dashboard/currency-in-circulation",
-                    "name": "Currency in Circulation",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 24287
-                },
-                {
-                    "id": "/dashboard/exchange-rates",
-                    "name": "Exchange Rates",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MAMPU",
-                    "views": 54624
-                },
-                {
-                    "id": "/dashboard/interest-rates",
-                    "name": "Interest Rates",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 89590
-                },
-                {
-                    "id": "/dashboard/international-reserves",
-                    "name": "International Reserves",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 53771
-                },
-                {
-                    "id": "/dashboard/money-supply",
-                    "name": "Money Supply",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 71688
-                },
-                {
-                    "id": "/dashboard/reserve-money",
-                    "name": "Reserve Money",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 22986
-                }
-            ],
-            "Democracy": [
-                {
-                    "id": "/dashboard/election-explorer",
-                    "name": "Election Result Exporer",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "SPR",
-                    "views": 46744
-                }
-            ],
-            "Environment": [
-                {
-                    "id": "/dashboard/flood-warning",
-                    "name": "Flood Warning",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPS",
-                    "views": 31047
-                },
-                {
-                    "id": "/dashboard/weather-and-climate",
-                    "name": "Weather and Climate",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "Met",
-                    "views": 67277
-                }
-            ],
-            "Digitalisation": [
-                {
-                    "id": "/dashboard/government-site-tracker",
-                    "name": "Government Site Tracker",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MAMPU",
-                    "views": 55982
-                },
-                {
-                    "id": "/dashboard/internet-penetration",
-                    "name": "Internet Penetration",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MCMC",
-                    "views": 79438
-                }
-            ],
-            "Government Programs": [
-                {
-                    "id": "/dashboard/peoples-income-initiative",
-                    "name": "The People's Income Initiative (IPR)",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "KE",
-                    "views": 76676
-                }
-            ],
-            "Education": [
-                {
-                    "id": "/dashboard/sekolahku",
-                    "name": "Sekolahku",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoE",
-                    "views": 46922
-                }
-            ]
-        },
-        "bm": {
-            "Demografi": [
-                {
-                    "id": "/dashboard/name-popularity",
-                    "name": "Populariti Nama Bayi",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 86330
-                },
-                {
-                    "id": "/dashboard/birthday-explorer",
-                    "name": "Populariti Hari Lahir",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 86330
-                },
-                {
-                    "id": "/dashboard/circle-of-life",
-                    "name": "Kitaran Kehidupan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPN",
-                    "views": 68725
-                },
-                {
-                    "id": "/dashboard/immigration",
-                    "name": "Imigresen",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "Imigresen",
-                    "views": 37362
-                }
-            ],
-            "Kesihatan": [
-                {
-                    "id": "/dashboard/999-tracker",
-                    "name": "Tindak Balas Kecemasan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MERS 999",
-                    "views": 86330
-                },
-                {
-                    "id": "/dashboard/blood-donation",
-                    "name": "Pendermaan Darah",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PDN",
-                    "views": 95984
-                },
-                {
-                    "id": "/dashboard/covid-19",
-                    "name": "COVID-19",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoH",
-                    "views": 12550
-                },
-                {
-                    "id": "/dashboard/hospital-bed-utilisation",
-                    "name": "Penggunaan Katil Hospital",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoH",
-                    "views": 82890
-                },
-                {
-                    "id": "/dashboard/organ-donation",
-                    "name": "Pendermaan Organ",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "NTRC",
-                    "views": 94666
-                },
-                {
-                    "id": "/dashboard/peka-b40",
-                    "name": "Peka B40",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PHCorp",
-                    "views": 61206
-                }
-            ],
-            "Pengangkutan": [
-                {
-                    "id": "/dashboard/car-popularity",
-                    "name": "Populariti Kenderaan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPJ",
-                    "views": 13197
-                },
-                {
-                    "id": "/dashboard/public-transportation",
-                    "name": "Pengangkutan Awam",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoT",
-                    "views": 11218
-                }
-            ],
-            "Kewangan Awam": [
-                {
-                    "id": "/dashboard/civil-service",
-                    "name": "Perkhidmatan Awam",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPA",
-                    "views": 10218
-                },
-                {
-                    "id": "/dashboard/public-contracting",
-                    "name": "Kontrak Awam",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoF",
-                    "views": 28678
-                }
-            ],
-            "Ekonomi": [
-                {
-                    "id": "/dashboard/consumer-prices",
-                    "name": "Inflasi",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "DOSM",
-                    "views": 29576
-                },
-                {
-                    "id": "/dashboard/gdp",
-                    "name": "Keluaran dalam Negeri Kasar (KDNK)",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "DOSM",
-                    "views": 15903
-                },
-                {
-                    "id": "/dashboard/income-taxation",
-                    "name": "Cukai Pendapatan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "LHDN",
-                    "views": 20812
-                },
-                {
-                    "id": "/dashboard/poverty",
-                    "name": "Kemiskinan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "ICU JPM",
-                    "views": 49061
-                },
-                {
-                    "id": "/dashboard/public-pension",
-                    "name": "Pencen Awam",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "KWAP",
-                    "views": 95639
-                },
-                {
-                    "id": "/dashboard/retirement-readiness",
-                    "name": "Kesediaan Bersara",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "EPF",
-                    "views": 31996
-                },
-                {
-                    "id": "/dashboard/social-security",
-                    "name": "Keselamatan Sosial",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PERKESO",
-                    "views": 44882
-                }
-            ],
-            "Keselamatan Awam": [
-                {
-                    "id": "/dashboard/crime",
-                    "name": "Jenayah",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "PDRM",
-                    "views": 93942
-                },
-                {
-                    "id": "/dashboard/fire-and-rescue",
-                    "name": "Bomba dan Penyelamat",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BOMBA",
-                    "views": 33344
-                }
-            ],
-            "Sektor Kewangan": [
-                {
-                    "id": "/dashboard/currency-in-circulation",
-                    "name": "Mata Wang dalam Edaran",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 21725
-                },
-                {
-                    "id": "/dashboard/exchange-rates",
-                    "name": "Kadar Pertukaran Ringgit",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MAMPU",
-                    "views": 34216
-                },
-                {
-                    "id": "/dashboard/interest-rates",
-                    "name": "Kadar Faedah",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 88997
-                },
-                {
-                    "id": "/dashboard/international-reserves",
-                    "name": "Rizab Antarabangsa",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 17458
-                },
-                {
-                    "id": "/dashboard/money-supply",
-                    "name": "Penawaran Wang",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 35167
-                },
-                {
-                    "id": "/dashboard/reserve-money",
-                    "name": "Wang Rizab",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "BNM",
-                    "views": 80690
-                }
-            ],
-            "Demokrasi": [
-                {
-                    "id": "/dashboard/election-explorer",
-                    "name": "Keputusan Pilihan Raya",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "SPR",
-                    "views": 43228
-                }
-            ],
-            "Alam Sekitar": [
-                {
-                    "id": "/dashboard/flood-warning",
-                    "name": "Amaran Banjir",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "JPS",
-                    "views": 77738
-                },
-                {
-                    "id": "/dashboard/weather-and-climate",
-                    "name": "Cuaca dan Iklim",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "Met",
-                    "views": 54370
-                }
-            ],
-            "Digitalisasi": [
-                {
-                    "id": "/dashboard/government-site-tracker",
-                    "name": "Penggunaan Portal Kerajaan",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MAMPU",
-                    "views": 75675
-                },
-                {
-                    "id": "/dashboard/internet-penetration",
-                    "name": "Capaian Internet",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MCMC",
-                    "views": 30734
-                }
-            ],
-            "Program Kerajaan": [
-                {
-                    "id": "/dashboard/peoples-income-initiative",
-                    "name": "Inisiatif Pendapatan Rakyat (IPR)",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "KE",
-                    "views": 37972
-                }
-            ],
-            "Pendidikan": [
-                {
-                    "id": "/dashboard/sekolahku",
-                    "name": "Sekolahku",
-                    "description": "A short and sweet description of what this dashboard gives you!",
-                    "agency": "MoE",
-                    "views": 64962
-                }
-            ]
-        }
+        "democracy": [
+          {
+            "name": "election-explorer",
+            "agency": "spr",
+            "views": 46744
+          }
+        ],
+        "demography": [
+          {
+            "name": "name-popularity",
+            "agency": "jpn",
+            "views": 86330
+          },
+          {
+            "name": "birthday-explorer",
+            "agency": "jpn",
+            "views": 86330
+          },
+          {
+            "name": "immigration",
+            "agency": "imigresen",
+            "views": 91331
+          },
+          {
+            "name": "refugee-situation",
+            "agency": "unhcr",
+            "views": 100
+          },
+          {
+            "name": "circle-of-life",
+            "agency": "jpn",
+            "views": 47846
+          },
+          {
+            "name": "orang-asli",
+            "agency": "jakoa",
+            "views": 100
+          }
+        ],
+        "digitalisation": [
+          {
+            "name": "government-site-tracker",
+            "agency": "mampu",
+            "views": 55982
+          },
+          {
+            "name": "internet-penetration",
+            "agency": "mcmc",
+            "views": 79438
+          }
+        ],
+        "economy": [
+          {
+            "name": "gdp",
+            "agency": "dosm",
+            "views": 83334
+          },
+          {
+            "name": "income-taxation",
+            "agency": "lhdn",
+            "views": 49364
+          },
+          {
+            "name": "inflation",
+            "agency": "dosm",
+            "views": 25352
+          },
+          {
+            "name": "poverty",
+            "agency": "icu-jpm",
+            "views": 80180
+          },
+          {
+            "name": "public-pension",
+            "agency": "kwap",
+            "views": 31049
+          },
+          {
+            "name": "retirement-readiness",
+            "agency": "epf",
+            "views": 12854
+          },
+          {
+            "name": "social-security",
+            "agency": "perkeso",
+            "views": 35139
+          }
+        ],
+        "education": [
+          {
+            "name": "sekolahku",
+            "agency": "moe",
+            "views": 46922
+          }
+        ],
+        "environment": [
+          {
+            "name": "flood-warning",
+            "agency": "jps",
+            "views": 31047
+          },
+          {
+            "name": "weather-and-climate",
+            "agency": "met",
+            "views": 67277
+          }
+        ],
+        "financial-sector": [
+          {
+            "name": "currency-in-circulation",
+            "agency": "bnm",
+            "views": 24287
+          },
+          {
+            "name": "exchange-rates",
+            "agency": "mampu",
+            "views": 54624
+          },
+          {
+            "name": "interest-rates",
+            "agency": "bnm",
+            "views": 89590
+          },
+          {
+            "name": "international-reserves",
+            "agency": "bnm",
+            "views": 53771
+          },
+          {
+            "name": "money-supply",
+            "agency": "bnm",
+            "views": 71688
+          },
+          {
+            "name": "reserve-money",
+            "agency": "bnm",
+            "views": 22986
+          }
+        ],
+        "government-programs": [
+          {
+            "name": "ipr",
+            "agency": "ke",
+            "views": 76676
+          }
+        ],
+        "healthcare": [
+          {
+            "name": "blood-donation",
+            "agency": "pdn",
+            "views": 13413
+          },
+          {
+            "name": "covid-19",
+            "agency": "moh",
+            "views": 45015
+          },
+          {
+            "name": "covid-vaccination",
+            "agency": "moh",
+            "views": 100
+          },
+          {
+            "name": "emergency-response",
+            "agency": "mers-999",
+            "views": 89666
+          },
+          {
+            "name": "hospital-bed-utilisation",
+            "agency": "moh",
+            "views": 40716
+          },
+          {
+            "name": "organ-donation",
+            "agency": "ntrc",
+            "views": 43147
+          },
+          {
+            "name": "peka-b40",
+            "agency": "phcorp",
+            "views": 40755
+          }
+        ],
+        "public-finances": [
+          {
+            "name": "public-contracting",
+            "agency": "mof",
+            "views": 66798
+          },
+          {
+            "name": "civil-service",
+            "agency": "jpa",
+            "views": 59225
+          }
+        ],
+        "public-safety": [
+          {
+            "name": "crime",
+            "agency": "pdrm",
+            "views": 26264
+          },
+          {
+            "name": "fire-and-rescue",
+            "agency": "bomba",
+            "views": 64744
+          }
+        ],
+        "transport": [
+          {
+            "name": "car-popularity",
+            "agency": "jpj",
+            "views": 11850
+          },
+          {
+            "name": "ktmb-explorer",
+            "agency": "ktmb",
+            "views": 100
+          },
+          {
+            "name": "public-transportation",
+            "agency": "mot",
+            "views": 84984
+          }
+        ]
     }
 }
