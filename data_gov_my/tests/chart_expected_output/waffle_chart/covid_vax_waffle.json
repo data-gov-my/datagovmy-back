@@ -1,0 +1,4569 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidvax_01_waffle.parquet",
+        "variables": {
+            "wanted": [
+                "adult",
+                "child",
+                "elderly",
+                "adolescent",
+                "total"
+            ],
+            "groups": [
+                "state",
+                "age_group",
+                "dose"
+            ],
+            "dict_keys": [
+                "metric",
+                "value"
+            ],
+            "data_arr": {
+                "id": "dose",
+                "label": "dose",
+                "value": {
+                    "metric": "perc"
+                }
+            }
+        }
+    },
+    "chart_type": "waffle_chart",
+    "expected_results": {
+        "mys": {
+            "total": {
+                "booster1": {
+                    "total": 16323650.0,
+                    "daily": 170.0,
+                    "perc": 49.984995605856,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 49.984995605856
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 817478.0,
+                    "daily": 115.0,
+                    "perc": 2.5032167583771985,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.5032167583771985
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 28133144.0,
+                    "daily": 36.0,
+                    "perc": 86.14709818079376,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 86.14709818079376
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 27546075.0,
+                    "daily": 64.0,
+                    "perc": 84.3494217184012,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 84.3494217184012
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 6287.0,
+                    "daily": 26.0,
+                    "perc": 0.1770736515983664,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1770736515983664
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 20.0,
+                    "daily": 0.0,
+                    "perc": 0.000563300943529,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.000563300943529
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1776970.0,
+                    "daily": 27.0,
+                    "perc": 50.0484438811435,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 50.0484438811435
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1545376.0,
+                    "daily": 54.0,
+                    "perc": 43.5255879453598,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 43.5255879453598
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 60550.0,
+                    "daily": 4.0,
+                    "perc": 1.9460692935655972,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 1.9460692935655972
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 462.0,
+                    "daily": 0.0,
+                    "perc": 0.01484862119946,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.01484862119946
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2931998.0,
+                    "daily": 0.0,
+                    "perc": 94.23404255319149,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.23404255319149
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2857443.0,
+                    "daily": 3.0,
+                    "perc": 91.8378543420968,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 91.8378543420968
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 16256813.0,
+                    "daily": 140.0,
+                    "perc": 69.09501364320263,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 69.09501364320263
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 816996.0,
+                    "daily": 115.0,
+                    "perc": 3.4724118292092045,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 3.4724118292092045
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 23424176.0,
+                    "daily": 9.0,
+                    "perc": 99.55787523057438,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.55787523057438
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 23143256.0,
+                    "daily": 7.0,
+                    "perc": 98.36390374104266,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 98.36390374104266
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 2623750.0,
+                    "daily": 18.0,
+                    "perc": 71.90326116744313,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 71.90326116744313
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 222158.0,
+                    "daily": 11.0,
+                    "perc": 6.088188544806796,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.088188544806796
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 3475911.0,
+                    "daily": 1.0,
+                    "perc": 95.2565360372705,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 95.2565360372705
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 3452507.0,
+                    "daily": 0.0,
+                    "perc": 94.61515483694164,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 94.61515483694164
+                        }
+                    ]
+                }
+            }
+        },
+        "kvy": {
+            "total": {
+                "booster1": {
+                    "total": 5930408.0,
+                    "daily": 46.0,
+                    "perc": 70.45080662405854,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 70.45080662405854
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 425567.0,
+                    "daily": 32.0,
+                    "perc": 5.055560835372662,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 5.055560835372662
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 8682408.0,
+                    "daily": 3.0,
+                    "perc": 103.143434151441,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 103.143434151441
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 8518862.0,
+                    "daily": 5.0,
+                    "perc": 101.20057497208296,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 101.20057497208296
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 1921.0,
+                    "daily": 0.0,
+                    "perc": 0.2146128924142553,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.2146128924142553
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 10.0,
+                    "daily": 0.0,
+                    "perc": 0.0011171936096525,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0011171936096525
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 519453.0,
+                    "daily": 0.0,
+                    "perc": 58.03295721148475,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 58.03295721148475
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 451238.0,
+                    "daily": 2.0,
+                    "perc": 50.41202100323986,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 50.41202100323986
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 22163.0,
+                    "daily": 4.0,
+                    "perc": 3.082475660639777,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 3.082475660639777
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 199.0,
+                    "daily": 0.0,
+                    "perc": 0.0276773296244784,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0276773296244784
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 716101.0,
+                    "daily": 0.0,
+                    "perc": 99.59680111265646,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.59680111265646
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 699314.0,
+                    "daily": 2.0,
+                    "perc": 97.26203059805285,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.26203059805285
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 5906324.0,
+                    "daily": 42.0,
+                    "perc": 95.54375748163966,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 95.54375748163966
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 425358.0,
+                    "daily": 32.0,
+                    "perc": 6.880811414151218,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.880811414151218
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 7446854.0,
+                    "daily": 3.0,
+                    "perc": 120.4641690122618,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 120.4641690122618
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 7368310.0,
+                    "daily": 1.0,
+                    "perc": 119.19360056941343,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 119.19360056941343
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 782876.0,
+                    "daily": 3.0,
+                    "perc": 94.59594006766554,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 94.59594006766554
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 106161.0,
+                    "daily": 5.0,
+                    "perc": 12.82757370710488,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 12.82757370710488
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 897710.0,
+                    "daily": 0.0,
+                    "perc": 108.47148380860318,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 108.47148380860318
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 891925.0,
+                    "daily": 0.0,
+                    "perc": 107.77247462542292,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 107.77247462542292
+                        }
+                    ]
+                }
+            }
+        },
+        "jhr": {
+            "total": {
+                "booster1": {
+                    "total": 2157598.0,
+                    "daily": 15.0,
+                    "perc": 56.86568973696695,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 56.86568973696695
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 87986.0,
+                    "daily": 3.0,
+                    "perc": 2.318960518686416,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.318960518686416
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 3356217.0,
+                    "daily": 1.0,
+                    "perc": 88.45651257182014,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.45651257182014
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 3302378.0,
+                    "daily": 1.0,
+                    "perc": 87.03753096832007,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 87.03753096832007
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 575.0,
+                    "daily": 0.0,
+                    "perc": 0.1403123474865788,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1403123474865788
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1.0,
+                    "daily": 0.0,
+                    "perc": 0.0002440214738897,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0002440214738897
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 233692.0,
+                    "daily": 0.0,
+                    "perc": 57.02586627623231,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 57.02586627623231
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 209562.0,
+                    "daily": 0.0,
+                    "perc": 51.13762811127379,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 51.13762811127379
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 8503.0,
+                    "daily": 0.0,
+                    "perc": 2.4026561175473296,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 2.4026561175473296
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 58.0,
+                    "daily": 0.0,
+                    "perc": 0.0163888103984176,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0163888103984176
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 347371.0,
+                    "daily": 0.0,
+                    "perc": 98.15512856739193,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 98.15512856739193
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 339542.0,
+                    "daily": 1.0,
+                    "perc": 95.94292172930209,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 95.94292172930209
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 2148520.0,
+                    "daily": 15.0,
+                    "perc": 78.60247311041194,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 78.60247311041194
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 87927.0,
+                    "daily": 3.0,
+                    "perc": 3.2167630057803467,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 3.2167630057803467
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2775154.0,
+                    "daily": 1.0,
+                    "perc": 101.5275481085827,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 101.5275481085827
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2753274.0,
+                    "daily": 0.0,
+                    "perc": 100.72707982732128,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 100.72707982732128
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 354477.0,
+                    "daily": 0.0,
+                    "perc": 79.55049371633753,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 79.55049371633753
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 27802.0,
+                    "daily": 0.0,
+                    "perc": 6.239228007181328,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.239228007181328
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 437956.0,
+                    "daily": 0.0,
+                    "perc": 98.28456014362658,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 98.28456014362658
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 435746.0,
+                    "daily": 0.0,
+                    "perc": 97.78859964093355,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.78859964093355
+                        }
+                    ]
+                }
+            }
+        },
+        "kdh": {
+            "total": {
+                "booster1": {
+                    "total": 755967.0,
+                    "daily": 8.0,
+                    "perc": 34.462390590809626,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 34.462390590809626
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 21973.0,
+                    "daily": 2.0,
+                    "perc": 1.0016867250182349,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.0016867250182349
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1698602.0,
+                    "daily": 0.0,
+                    "perc": 77.43444566010211,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 77.43444566010211
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1666176.0,
+                    "daily": 0.0,
+                    "perc": 75.9562363238512,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 75.9562363238512
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 90.0,
+                    "daily": 0.0,
+                    "perc": 0.0354191263282172,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0354191263282172
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 86976.0,
+                    "daily": 0.0,
+                    "perc": 34.22904368358914,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 34.22904368358914
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 74171.0,
+                    "daily": 0.0,
+                    "perc": 29.189689098780008,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 29.189689098780008
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 1929.0,
+                    "daily": 0.0,
+                    "perc": 0.9198855507868384,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.9198855507868384
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 15.0,
+                    "daily": 0.0,
+                    "perc": 0.0071530758226037,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0071530758226037
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 210775.0,
+                    "daily": 0.0,
+                    "perc": 100.51263710061993,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 100.51263710061993
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 205033.0,
+                    "daily": 0.0,
+                    "perc": 97.77443967572724,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.77443967572724
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 753948.0,
+                    "daily": 8.0,
+                    "perc": 48.491638795986624,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 48.491638795986624
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 21958.0,
+                    "daily": 2.0,
+                    "perc": 1.4122716748134807,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.4122716748134807
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1400851.0,
+                    "daily": 0.0,
+                    "perc": 90.09846925649602,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 90.09846925649602
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1386972.0,
+                    "daily": 0.0,
+                    "perc": 89.205814252637,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 89.205814252637
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 148712.0,
+                    "daily": 4.0,
+                    "perc": 52.678710591569256,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 52.678710591569256
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 4379.0,
+                    "daily": 0.0,
+                    "perc": 1.55118668083599,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.55118668083599
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 250242.0,
+                    "daily": 0.0,
+                    "perc": 88.64399574920297,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.64399574920297
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 248228.0,
+                    "daily": 0.0,
+                    "perc": 87.93057031526745,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 87.93057031526745
+                        }
+                    ]
+                }
+            }
+        },
+        "ktn": {
+            "total": {
+                "booster1": {
+                    "total": 343072.0,
+                    "daily": 11.0,
+                    "perc": 17.78588833013635,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 17.78588833013635
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 6145.0,
+                    "daily": 1.0,
+                    "perc": 0.3185753538286069,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.3185753538286069
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1253390.0,
+                    "daily": 0.0,
+                    "perc": 64.97952200736171,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 64.97952200736171
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1227108.0,
+                    "daily": 1.0,
+                    "perc": 63.61698377313495,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 63.61698377313495
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 46.0,
+                    "daily": 0.0,
+                    "perc": 0.0169304379830695,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0169304379830695
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 43705.0,
+                    "daily": 0.0,
+                    "perc": 16.08575634891424,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 16.08575634891424
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 37731.0,
+                    "daily": 1.0,
+                    "perc": 13.887007729112993,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 13.887007729112993
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 897.0,
+                    "daily": 0.0,
+                    "perc": 0.424715909090909,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.424715909090909
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 9.0,
+                    "daily": 0.0,
+                    "perc": 0.0042613636363636,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0042613636363636
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 182503.0,
+                    "daily": 0.0,
+                    "perc": 86.4124053030303,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 86.4124053030303
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 177263.0,
+                    "daily": 0.0,
+                    "perc": 83.9313446969697,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 83.9313446969697
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 342129.0,
+                    "daily": 11.0,
+                    "perc": 27.1811392706761,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 27.1811392706761
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 6136.0,
+                    "daily": 1.0,
+                    "perc": 0.4874870898546119,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.4874870898546119
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1027182.0,
+                    "daily": 0.0,
+                    "perc": 81.60657821561928,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 81.60657821561928
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1012114.0,
+                    "daily": 0.0,
+                    "perc": 80.40947008818623,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 80.40947008818623
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 72537.0,
+                    "daily": 5.0,
+                    "perc": 35.89163780306779,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 35.89163780306779
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1420.0,
+                    "daily": 1.0,
+                    "perc": 0.70262246412667,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.70262246412667
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 169658.0,
+                    "daily": 0.0,
+                    "perc": 83.9475507174666,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 83.9475507174666
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 168433.0,
+                    "daily": 0.0,
+                    "perc": 83.3414151410193,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 83.3414151410193
+                        }
+                    ]
+                }
+            }
+        },
+        "mlk": {
+            "total": {
+                "booster1": {
+                    "total": 549375.0,
+                    "daily": 3.0,
+                    "perc": 58.581253998720406,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 58.581253998720406
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 23656.0,
+                    "daily": 30.0,
+                    "perc": 2.522499466837279,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.522499466837279
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 795763.0,
+                    "daily": 0.0,
+                    "perc": 84.85423331200683,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 84.85423331200683
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 782105.0,
+                    "daily": 1.0,
+                    "perc": 83.3978460226061,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 83.3978460226061
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 99.0,
+                    "daily": 0.0,
+                    "perc": 0.1008146639511201,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1008146639511201
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 2.0,
+                    "daily": 0.0,
+                    "perc": 0.0020366598778004,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0020366598778004
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 64085.0,
+                    "daily": 0.0,
+                    "perc": 65.25967413441956,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 65.25967413441956
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 56934.0,
+                    "daily": 0.0,
+                    "perc": 57.97759674134419,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 57.97759674134419
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 1770.0,
+                    "daily": 0.0,
+                    "perc": 2.067757009345794,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 2.067757009345794
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 14.0,
+                    "daily": 0.0,
+                    "perc": 0.0163551401869158,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0163551401869158
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 87268.0,
+                    "daily": 0.0,
+                    "perc": 101.94859813084112,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 101.94859813084112
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 85088.0,
+                    "daily": 0.0,
+                    "perc": 99.40186915887853,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 99.40186915887853
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 547506.0,
+                    "daily": 3.0,
+                    "perc": 80.0798595875384,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 80.0798595875384
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 23640.0,
+                    "daily": 30.0,
+                    "perc": 3.4576568670469503,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 3.4576568670469503
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 644410.0,
+                    "daily": 0.0,
+                    "perc": 94.2533274828141,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.2533274828141
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 640083.0,
+                    "daily": 1.0,
+                    "perc": 93.62044756472136,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 93.62044756472136
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 99770.0,
+                    "daily": 0.0,
+                    "perc": 80.98214285714286,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 80.98214285714286
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 7401.0,
+                    "daily": 0.0,
+                    "perc": 6.007305194805195,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.007305194805195
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 114786.0,
+                    "daily": 0.0,
+                    "perc": 93.17045454545456,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 93.17045454545456
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 114356.0,
+                    "daily": 0.0,
+                    "perc": 92.82142857142858,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 92.82142857142858
+                        }
+                    ]
+                }
+            }
+        },
+        "nsn": {
+            "total": {
+                "booster1": {
+                    "total": 664822.0,
+                    "daily": 6.0,
+                    "perc": 58.89113296128975,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 58.89113296128975
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 29261.0,
+                    "daily": 0.0,
+                    "perc": 2.591992204801134,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.591992204801134
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1033813.0,
+                    "daily": 1.0,
+                    "perc": 91.57702187970592,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 91.57702187970592
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1018333.0,
+                    "daily": 1.0,
+                    "perc": 90.20577553370538,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 90.20577553370538
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 102.0,
+                    "daily": 0.0,
+                    "perc": 0.0870307167235494,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0870307167235494
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1.0,
+                    "daily": 0.0,
+                    "perc": 0.0008532423208191,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0008532423208191
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 65697.0,
+                    "daily": 0.0,
+                    "perc": 56.05546075085325,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 56.05546075085325
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 57791.0,
+                    "daily": 0.0,
+                    "perc": 49.30972696245734,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 49.30972696245734
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 1543.0,
+                    "daily": 0.0,
+                    "perc": 1.4570349386213408,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 1.4570349386213408
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 17.0,
+                    "daily": 0.0,
+                    "perc": 0.0160528800755429,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0160528800755429
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 111803.0,
+                    "daily": 0.0,
+                    "perc": 105.57412653446649,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 105.57412653446649
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 110582.0,
+                    "daily": 0.0,
+                    "perc": 104.42115203021716,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 104.42115203021716
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 663177.0,
+                    "daily": 6.0,
+                    "perc": 80.9542236328125,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 80.9542236328125
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 29243.0,
+                    "daily": 0.0,
+                    "perc": 3.5697021484375,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 3.5697021484375
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 856313.0,
+                    "daily": 1.0,
+                    "perc": 104.53039550781249,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 104.53039550781249
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 849960.0,
+                    "daily": 1.0,
+                    "perc": 103.7548828125,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 103.7548828125
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 120851.0,
+                    "daily": 0.0,
+                    "perc": 80.40652029274784,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 80.40652029274784
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 9579.0,
+                    "daily": 0.0,
+                    "perc": 6.373253493013972,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.373253493013972
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 150293.0,
+                    "daily": 1.0,
+                    "perc": 99.99534264803724,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.99534264803724
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 149620.0,
+                    "daily": 0.0,
+                    "perc": 99.54757152361942,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 99.54757152361942
+                        }
+                    ]
+                }
+            }
+        },
+        "phg": {
+            "total": {
+                "booster1": {
+                    "total": 634859.0,
+                    "daily": 2.0,
+                    "perc": 37.68380127025584,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 37.68380127025584
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 17272.0,
+                    "daily": 5.0,
+                    "perc": 1.0252270433905146,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.0252270433905146
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1280755.0,
+                    "daily": 0.0,
+                    "perc": 76.02273401792604,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 76.02273401792604
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1254292.0,
+                    "daily": 0.0,
+                    "perc": 74.45194990205971,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 74.45194990205971
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 168.0,
+                    "daily": 0.0,
+                    "perc": 0.087227414330218,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.087227414330218
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1.0,
+                    "daily": 0.0,
+                    "perc": 0.0005192107995846,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0005192107995846
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 76553.0,
+                    "daily": 0.0,
+                    "perc": 39.74714434060228,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 39.74714434060228
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 65380.0,
+                    "daily": 0.0,
+                    "perc": 33.94600207684319,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 33.94600207684319
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 2320.0,
+                    "daily": 0.0,
+                    "perc": 1.3488372093023255,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 1.3488372093023255
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 14.0,
+                    "daily": 0.0,
+                    "perc": 0.0081395348837209,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0081395348837209
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 151633.0,
+                    "daily": 0.0,
+                    "perc": 88.15872093023256,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.15872093023256
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 148009.0,
+                    "daily": 0.0,
+                    "perc": 86.0517441860465,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 86.0517441860465
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 632371.0,
+                    "daily": 2.0,
+                    "perc": 53.22988215488216,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 53.22988215488216
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 17257.0,
+                    "daily": 5.0,
+                    "perc": 1.4526094276094277,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.4526094276094277
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1052569.0,
+                    "daily": 0.0,
+                    "perc": 88.60008417508418,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.60008417508418
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1040903.0,
+                    "daily": 0.0,
+                    "perc": 87.61809764309764,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 87.61809764309764
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 109900.0,
+                    "daily": 0.0,
+                    "perc": 55.47703180212014,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 55.47703180212014
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 5480.0,
+                    "daily": 0.0,
+                    "perc": 2.766279656739021,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.766279656739021
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 163964.0,
+                    "daily": 0.0,
+                    "perc": 82.76829883897022,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 82.76829883897022
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 163177.0,
+                    "daily": 0.0,
+                    "perc": 82.37102473498233,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 82.37102473498233
+                        }
+                    ]
+                }
+            }
+        },
+        "prk": {
+            "total": {
+                "booster1": {
+                    "total": 1174527.0,
+                    "daily": 8.0,
+                    "perc": 46.812554802710245,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 46.812554802710245
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 42192.0,
+                    "daily": 2.0,
+                    "perc": 1.6816261458748507,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.6816261458748507
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2025894.0,
+                    "daily": 1.0,
+                    "perc": 80.74507772020726,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 80.74507772020726
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1983808.0,
+                    "daily": 1.0,
+                    "perc": 79.06767636508569,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 79.06767636508569
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 215.0,
+                    "daily": 0.0,
+                    "perc": 0.0896954526491447,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0896954526491447
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 2.0,
+                    "daily": 0.0,
+                    "perc": 0.0008343763037129,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0008343763037129
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 120221.0,
+                    "daily": 0.0,
+                    "perc": 50.15477680433875,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 50.15477680433875
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 103588.0,
+                    "daily": 0.0,
+                    "perc": 43.2156862745098,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 43.2156862745098
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 6402.0,
+                    "daily": 0.0,
+                    "perc": 2.807894736842105,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 2.807894736842105
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 43.0,
+                    "daily": 0.0,
+                    "perc": 0.018859649122807,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.018859649122807
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 215965.0,
+                    "daily": 0.0,
+                    "perc": 94.72149122807018,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.72149122807018
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 209010.0,
+                    "daily": 0.0,
+                    "perc": 91.67105263157896,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 91.67105263157896
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 1167910.0,
+                    "daily": 8.0,
+                    "perc": 62.18571961024439,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 62.18571961024439
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 42147.0,
+                    "daily": 2.0,
+                    "perc": 2.244129705553485,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.244129705553485
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1689708.0,
+                    "daily": 1.0,
+                    "perc": 89.96901123475854,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 89.96901123475854
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1671210.0,
+                    "daily": 1.0,
+                    "perc": 88.98407965497044,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 88.98407965497044
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 270681.0,
+                    "daily": 0.0,
+                    "perc": 66.01975609756097,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 66.01975609756097
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 18206.0,
+                    "daily": 1.0,
+                    "perc": 4.440487804878049,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 4.440487804878049
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 360095.0,
+                    "daily": 0.0,
+                    "perc": 87.8280487804878,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 87.8280487804878
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 357793.0,
+                    "daily": 0.0,
+                    "perc": 87.26658536585366,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 87.26658536585366
+                        }
+                    ]
+                }
+            }
+        },
+        "pls": {
+            "total": {
+                "booster1": {
+                    "total": 80124.0,
+                    "daily": 1.0,
+                    "perc": 31.35968688845401,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 31.35968688845401
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1346.0,
+                    "daily": 0.0,
+                    "perc": 0.5268101761252446,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.5268101761252446
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 217162.0,
+                    "daily": 0.0,
+                    "perc": 84.9949119373777,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 84.9949119373777
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 213649.0,
+                    "daily": 0.0,
+                    "perc": 83.61996086105675,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 83.61996086105675
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 7.0,
+                    "daily": 0.0,
+                    "perc": 0.0240549828178694,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0240549828178694
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 9205.0,
+                    "daily": 0.0,
+                    "perc": 31.63230240549828,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 31.63230240549828
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 7545.0,
+                    "daily": 0.0,
+                    "perc": 25.9278350515464,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 25.9278350515464
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 88.0,
+                    "daily": 0.0,
+                    "perc": 0.3826086956521739,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.3826086956521739
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 24677.0,
+                    "daily": 0.0,
+                    "perc": 107.29130434782608,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 107.29130434782608
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 24239.0,
+                    "daily": 0.0,
+                    "perc": 105.38695652173912,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 105.38695652173912
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 80029.0,
+                    "daily": 1.0,
+                    "perc": 43.94783086216364,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 43.94783086216364
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1346.0,
+                    "daily": 0.0,
+                    "perc": 0.7391543108182318,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.7391543108182318
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 183280.0,
+                    "daily": 0.0,
+                    "perc": 100.64799560680945,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 100.64799560680945
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 181865.0,
+                    "daily": 0.0,
+                    "perc": 99.87095002745744,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 99.87095002745744
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 18006.0,
+                    "daily": 0.0,
+                    "perc": 49.60330578512397,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 49.60330578512397
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 330.0,
+                    "daily": 0.0,
+                    "perc": 0.9090909090909092,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.9090909090909092
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 34031.0,
+                    "daily": 0.0,
+                    "perc": 93.74931129476585,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 93.74931129476585
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 33821.0,
+                    "daily": 0.0,
+                    "perc": 93.17079889807162,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 93.17079889807162
+                        }
+                    ]
+                }
+            }
+        },
+        "png": {
+            "total": {
+                "booster1": {
+                    "total": 1088574.0,
+                    "daily": 10.0,
+                    "perc": 61.3557659790328,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 61.3557659790328
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 33052.0,
+                    "daily": 4.0,
+                    "perc": 1.862924134821328,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.862924134821328
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1636111.0,
+                    "daily": 0.0,
+                    "perc": 92.21683012061774,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 92.21683012061774
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1615004.0,
+                    "daily": 1.0,
+                    "perc": 91.02716717393756,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 91.02716717393756
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 172.0,
+                    "daily": 0.0,
+                    "perc": 0.1105398457583547,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1105398457583547
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 83265.0,
+                    "daily": 0.0,
+                    "perc": 53.51221079691517,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 53.51221079691517
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 74762.0,
+                    "daily": 0.0,
+                    "perc": 48.04755784061697,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 48.04755784061697
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 2444.0,
+                    "daily": 0.0,
+                    "perc": 1.7532281205164992,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 1.7532281205164992
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 11.0,
+                    "daily": 0.0,
+                    "perc": 0.0078909612625538,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0078909612625538
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 136311.0,
+                    "daily": 0.0,
+                    "perc": 97.78407460545192,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 97.78407460545192
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 133784.0,
+                    "daily": 0.0,
+                    "perc": 95.9713055954089,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 95.9713055954089
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 1085958.0,
+                    "daily": 10.0,
+                    "perc": 79.01899148657499,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 79.01899148657499
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 33041.0,
+                    "daily": 4.0,
+                    "perc": 2.4042057774867205,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 2.4042057774867205
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1416535.0,
+                    "daily": 0.0,
+                    "perc": 103.07320090227752,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 103.07320090227752
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1406458.0,
+                    "daily": 1.0,
+                    "perc": 102.33995488612383,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 102.33995488612383
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 204613.0,
+                    "daily": 1.0,
+                    "perc": 82.63852988691438,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 82.63852988691438
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 11337.0,
+                    "daily": 1.0,
+                    "perc": 4.578756058158319,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 4.578756058158319
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 241760.0,
+                    "daily": 0.0,
+                    "perc": 97.64135702746366,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 97.64135702746366
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 240838.0,
+                    "daily": 0.0,
+                    "perc": 97.26898222940224,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.26898222940224
+                        }
+                    ]
+                }
+            }
+        },
+        "sbh": {
+            "total": {
+                "booster1": {
+                    "total": 940044.0,
+                    "daily": 15.0,
+                    "perc": 24.528219178082196,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 24.528219178082196
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 21504.0,
+                    "daily": 12.0,
+                    "perc": 0.561095890410959,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.561095890410959
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2615625.0,
+                    "daily": 2.0,
+                    "perc": 68.24853228962819,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 68.24853228962819
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2526871.0,
+                    "daily": 2.0,
+                    "perc": 65.93270711024137,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 65.93270711024137
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 772.0,
+                    "daily": 0.0,
+                    "perc": 0.1878345498783455,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1878345498783455
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 2.0,
+                    "daily": 0.0,
+                    "perc": 0.0004866180048661,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0004866180048661
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 141562.0,
+                    "daily": 0.0,
+                    "perc": 34.44330900243309,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 34.44330900243309
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 110817.0,
+                    "daily": 0.0,
+                    "perc": 26.962773722627738,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 26.962773722627738
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 4843.0,
+                    "daily": 0.0,
+                    "perc": 1.136320976067574,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 1.136320976067574
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 36.0,
+                    "daily": 0.0,
+                    "perc": 0.008446738620366,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.008446738620366
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 334651.0,
+                    "daily": 0.0,
+                    "perc": 78.51970905678085,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 78.51970905678085
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 322264.0,
+                    "daily": 0.0,
+                    "perc": 75.61332707648991,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 75.61332707648991
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 934429.0,
+                    "daily": 15.0,
+                    "perc": 34.397003607450486,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 34.397003607450486
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 21466.0,
+                    "daily": 12.0,
+                    "perc": 0.7901789000957079,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.7901789000957079
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2139412.0,
+                    "daily": 2.0,
+                    "perc": 78.75329455937569,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 78.75329455937569
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2093790.0,
+                    "daily": 2.0,
+                    "perc": 77.07391592431716,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 77.07391592431716
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 118745.0,
+                    "daily": 1.0,
+                    "perc": 47.68875502008032,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 47.68875502008032
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 3980.0,
+                    "daily": 0.0,
+                    "perc": 1.5983935742971886,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.5983935742971886
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 229208.0,
+                    "daily": 0.0,
+                    "perc": 92.05140562248997,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 92.05140562248997
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 225759.0,
+                    "daily": 0.0,
+                    "perc": 90.66626506024096,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 90.66626506024096
+                        }
+                    ]
+                }
+            }
+        },
+        "swk": {
+            "total": {
+                "booster1": {
+                    "total": 1593285.0,
+                    "daily": 36.0,
+                    "perc": 56.405458986795054,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 56.405458986795054
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 100446.0,
+                    "daily": 24.0,
+                    "perc": 3.555988246539456,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 3.555988246539456
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2510362.0,
+                    "daily": 28.0,
+                    "perc": 88.87180939568805,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.87180939568805
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2433271.0,
+                    "daily": 51.0,
+                    "perc": 86.14263461606542,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 86.14263461606542
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 2050.0,
+                    "daily": 26.0,
+                    "perc": 0.7167832167832168,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.7167832167832168
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1.0,
+                    "daily": 0.0,
+                    "perc": 0.0003496503496503,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0003496503496503
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 289446.0,
+                    "daily": 27.0,
+                    "perc": 101.2048951048951,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 101.2048951048951
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 259901.0,
+                    "daily": 51.0,
+                    "perc": 90.87447552447551,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 90.87447552447551
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 6339.0,
+                    "daily": 0.0,
+                    "perc": 2.1919087136929463,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 2.1919087136929463
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 37.0,
+                    "daily": 0.0,
+                    "perc": 0.0127939142461964,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0127939142461964
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 272324.0,
+                    "daily": 0.0,
+                    "perc": 94.16459197787,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.16459197787
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 265591.0,
+                    "daily": 0.0,
+                    "perc": 91.83644536652837,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 91.83644536652837
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 1584896.0,
+                    "daily": 10.0,
+                    "perc": 76.70954939257538,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 76.70954939257538
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 100408.0,
+                    "daily": 24.0,
+                    "perc": 4.859784134359421,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 4.859784134359421
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 1948592.0,
+                    "daily": 1.0,
+                    "perc": 94.31256957552876,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.31256957552876
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 1907779.0,
+                    "daily": 0.0,
+                    "perc": 92.33720536276076,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 92.33720536276076
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 263464.0,
+                    "daily": 0.0,
+                    "perc": 75.64283663508469,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 75.64283663508469
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 24812.0,
+                    "daily": 3.0,
+                    "perc": 7.123743898937697,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 7.123743898937697
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 313048.0,
+                    "daily": 0.0,
+                    "perc": 89.87884008039046,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 89.87884008039046
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 310630.0,
+                    "daily": 0.0,
+                    "perc": 89.1846109675567,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 89.1846109675567
+                        }
+                    ]
+                }
+            }
+        },
+        "sgr": {
+            "total": {
+                "booster1": {
+                    "total": 4098053.0,
+                    "daily": 30.0,
+                    "perc": 70.45080662405854,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 70.45080662405854
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 251055.0,
+                    "daily": 22.0,
+                    "perc": 5.055560835372662,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 5.055560835372662
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 5261839.0,
+                    "daily": 3.0,
+                    "perc": 103.143434151441,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 103.143434151441
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 5180974.0,
+                    "daily": 4.0,
+                    "perc": 101.20057497208296,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 101.20057497208296
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 1387.0,
+                    "daily": 0.0,
+                    "perc": 0.2146128924142553,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.2146128924142553
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 8.0,
+                    "daily": 0.0,
+                    "perc": 0.0011171936096525,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0011171936096525
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 342372.0,
+                    "daily": 0.0,
+                    "perc": 58.03295721148475,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 58.03295721148475
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 322266.0,
+                    "daily": 2.0,
+                    "perc": 50.41202100323986,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 50.41202100323986
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 14287.0,
+                    "daily": 3.0,
+                    "perc": 3.082475660639777,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 3.082475660639777
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 128.0,
+                    "daily": 0.0,
+                    "perc": 0.0276773296244784,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0276773296244784
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 529465.0,
+                    "daily": 0.0,
+                    "perc": 99.59680111265646,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.59680111265646
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 516612.0,
+                    "daily": 2.0,
+                    "perc": 97.26203059805285,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.26203059805285
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 4082379.0,
+                    "daily": 27.0,
+                    "perc": 95.54375748163966,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 95.54375748163966
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 250919.0,
+                    "daily": 22.0,
+                    "perc": 6.880811414151218,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.880811414151218
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 4390002.0,
+                    "daily": 3.0,
+                    "perc": 120.4641690122618,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 120.4641690122618
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 4342096.0,
+                    "daily": 0.0,
+                    "perc": 119.19360056941343,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 119.19360056941343
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 533386.0,
+                    "daily": 3.0,
+                    "perc": 94.59594006766554,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 94.59594006766554
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 64971.0,
+                    "daily": 3.0,
+                    "perc": 12.82757370710488,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 12.82757370710488
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 576096.0,
+                    "daily": 0.0,
+                    "perc": 108.47148380860318,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 108.47148380860318
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 572013.0,
+                    "daily": 0.0,
+                    "perc": 107.77247462542292,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 107.77247462542292
+                        }
+                    ]
+                }
+            }
+        },
+        "trg": {
+            "total": {
+                "booster1": {
+                    "total": 360783.0,
+                    "daily": 9.0,
+                    "perc": 28.292267879548305,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 28.292267879548305
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 6040.0,
+                    "daily": 0.0,
+                    "perc": 0.473651191969887,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.473651191969887
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 937372.0,
+                    "daily": 0.0,
+                    "perc": 73.50784190715181,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 73.50784190715181
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 918855.0,
+                    "daily": 0.0,
+                    "perc": 72.05575595984944,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 72.05575595984944
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 58.0,
+                    "daily": 0.0,
+                    "perc": 0.0324566312255176,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.0324566312255176
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 36607.0,
+                    "daily": 0.0,
+                    "perc": 20.48517067711248,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 20.48517067711248
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 30798.0,
+                    "daily": 0.0,
+                    "perc": 17.23447118074986,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 17.23447118074986
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 540.0,
+                    "daily": 0.0,
+                    "perc": 0.391304347826087,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.391304347826087
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 5.0,
+                    "daily": 0.0,
+                    "perc": 0.0036231884057971,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0036231884057971
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 130917.0,
+                    "daily": 0.0,
+                    "perc": 94.86739130434782,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.86739130434782
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 128244.0,
+                    "daily": 0.0,
+                    "perc": 92.9304347826087,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 92.9304347826087
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 360185.0,
+                    "daily": 9.0,
+                    "perc": 43.81812652068127,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 43.81812652068127
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 6035.0,
+                    "daily": 0.0,
+                    "perc": 0.7341849148418491,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.7341849148418491
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 769848.0,
+                    "daily": 0.0,
+                    "perc": 93.65547445255474,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 93.65547445255474
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 759813.0,
+                    "daily": 0.0,
+                    "perc": 92.4346715328467,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 92.4346715328467
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 53981.0,
+                    "daily": 4.0,
+                    "perc": 44.94671107410491,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 44.94671107410491
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1117.0,
+                    "daily": 0.0,
+                    "perc": 0.9300582847626976,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.9300582847626976
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 106177.0,
+                    "daily": 0.0,
+                    "perc": 88.40716069941715,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 88.40716069941715
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 105325.0,
+                    "daily": 0.0,
+                    "perc": 87.6977518734388,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 87.6977518734388
+                        }
+                    ]
+                }
+            }
+        },
+        "kul": {
+            "total": {
+                "booster1": {
+                    "total": 1745777.0,
+                    "daily": 15.0,
+                    "perc": 70.45080662405854,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 70.45080662405854
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 166183.0,
+                    "daily": 8.0,
+                    "perc": 5.055560835372662,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 5.055560835372662
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 3254025.0,
+                    "daily": 0.0,
+                    "perc": 103.143434151441,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 103.143434151441
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 3172251.0,
+                    "daily": 1.0,
+                    "perc": 101.20057497208296,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 101.20057497208296
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 464.0,
+                    "daily": 0.0,
+                    "perc": 0.2146128924142553,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.2146128924142553
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 2.0,
+                    "daily": 0.0,
+                    "perc": 0.0011171936096525,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0011171936096525
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 162899.0,
+                    "daily": 0.0,
+                    "perc": 58.03295721148475,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 58.03295721148475
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 113065.0,
+                    "daily": 0.0,
+                    "perc": 50.41202100323986,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 50.41202100323986
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 6248.0,
+                    "daily": 0.0,
+                    "perc": 3.082475660639777,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 3.082475660639777
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 69.0,
+                    "daily": 0.0,
+                    "perc": 0.0276773296244784,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0276773296244784
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 171314.0,
+                    "daily": 0.0,
+                    "perc": 99.59680111265646,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.59680111265646
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 167419.0,
+                    "daily": 0.0,
+                    "perc": 97.26203059805285,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.26203059805285
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 1739065.0,
+                    "daily": 15.0,
+                    "perc": 95.54375748163966,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 95.54375748163966
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 166112.0,
+                    "daily": 8.0,
+                    "perc": 6.880811414151218,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.880811414151218
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 2919812.0,
+                    "daily": 0.0,
+                    "perc": 120.4641690122618,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 120.4641690122618
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 2891767.0,
+                    "daily": 1.0,
+                    "perc": 119.19360056941343,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 119.19360056941343
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 242852.0,
+                    "daily": 0.0,
+                    "perc": 94.59594006766554,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 94.59594006766554
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 40378.0,
+                    "daily": 1.0,
+                    "perc": 12.82757370710488,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 12.82757370710488
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 313000.0,
+                    "daily": 0.0,
+                    "perc": 108.47148380860318,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 108.47148380860318
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 311457.0,
+                    "daily": 0.0,
+                    "perc": 107.77247462542292,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 107.77247462542292
+                        }
+                    ]
+                }
+            }
+        },
+        "lbn": {
+            "total": {
+                "booster1": {
+                    "total": 50212.0,
+                    "daily": 0.0,
+                    "perc": 50.16183816183816,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 50.16183816183816
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1038.0,
+                    "daily": 0.0,
+                    "perc": 1.036963036963037,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.036963036963037
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 89670.0,
+                    "daily": 0.0,
+                    "perc": 89.58041958041957,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 89.58041958041957
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 85363.0,
+                    "daily": 0.0,
+                    "perc": 85.27772227772228,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 85.27772227772228
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 12.0,
+                    "daily": 0.0,
+                    "perc": 0.1025641025641025,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.1025641025641025
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 6503.0,
+                    "daily": 0.0,
+                    "perc": 55.58119658119658,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 55.58119658119658
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 5158.0,
+                    "daily": 0.0,
+                    "perc": 44.085470085470085,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 44.085470085470085
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 769.0,
+                    "daily": 0.0,
+                    "perc": 7.466019417475728,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 7.466019417475728
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 4.0,
+                    "daily": 0.0,
+                    "perc": 0.0388349514563106,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0388349514563106
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 9699.0,
+                    "daily": 0.0,
+                    "perc": 94.16504854368932,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 94.16504854368932
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 9480.0,
+                    "daily": 0.0,
+                    "perc": 92.03883495145632,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 92.03883495145632
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 49431.0,
+                    "daily": 0.0,
+                    "perc": 71.22622478386167,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 71.22622478386167
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 1034.0,
+                    "daily": 0.0,
+                    "perc": 1.4899135446685878,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.4899135446685878
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 73468.0,
+                    "daily": 0.0,
+                    "perc": 105.86167146974064,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 105.86167146974064
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 70725.0,
+                    "daily": 0.0,
+                    "perc": 101.9092219020173,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 101.9092219020173
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 5137.0,
+                    "daily": 0.0,
+                    "perc": 60.435294117647054,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 60.435294117647054
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 154.0,
+                    "daily": 0.0,
+                    "perc": 1.811764705882353,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 1.811764705882353
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 6983.0,
+                    "daily": 0.0,
+                    "perc": 82.15294117647059,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 82.15294117647059
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 6856.0,
+                    "daily": 0.0,
+                    "perc": 80.65882352941176,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 80.65882352941176
+                        }
+                    ]
+                }
+            }
+        },
+        "pjy": {
+            "total": {
+                "booster1": {
+                    "total": 86578.0,
+                    "daily": 1.0,
+                    "perc": 70.45080662405854,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 70.45080662405854
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 8329.0,
+                    "daily": 2.0,
+                    "perc": 5.055560835372662,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 5.055560835372662
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 166544.0,
+                    "daily": 0.0,
+                    "perc": 103.143434151441,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 103.143434151441
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 165637.0,
+                    "daily": 0.0,
+                    "perc": 101.20057497208296,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 101.20057497208296
+                        }
+                    ]
+                }
+            },
+            "child": {
+                "booster1": {
+                    "total": 70.0,
+                    "daily": 0.0,
+                    "perc": 0.2146128924142553,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 0.2146128924142553
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 0.0,
+                    "daily": 0.0,
+                    "perc": 0.0011171936096525,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0011171936096525
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 14182.0,
+                    "daily": 0.0,
+                    "perc": 58.03295721148475,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 58.03295721148475
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 15907.0,
+                    "daily": 0.0,
+                    "perc": 50.41202100323986,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 50.41202100323986
+                        }
+                    ]
+                }
+            },
+            "adolescent": {
+                "booster1": {
+                    "total": 1628.0,
+                    "daily": 1.0,
+                    "perc": 3.082475660639777,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 3.082475660639777
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 2.0,
+                    "daily": 0.0,
+                    "perc": 0.0276773296244784,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 0.0276773296244784
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 15322.0,
+                    "daily": 0.0,
+                    "perc": 99.59680111265646,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 99.59680111265646
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 15283.0,
+                    "daily": 0.0,
+                    "perc": 97.26203059805285,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 97.26203059805285
+                        }
+                    ]
+                }
+            },
+            "adult": {
+                "booster1": {
+                    "total": 84880.0,
+                    "daily": 0.0,
+                    "perc": 95.54375748163966,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 95.54375748163966
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 8327.0,
+                    "daily": 2.0,
+                    "perc": 6.880811414151218,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 6.880811414151218
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 137040.0,
+                    "daily": 0.0,
+                    "perc": 120.4641690122618,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 120.4641690122618
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 134447.0,
+                    "daily": 0.0,
+                    "perc": 119.19360056941343,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 119.19360056941343
+                        }
+                    ]
+                }
+            },
+            "elderly": {
+                "booster1": {
+                    "total": 6638.0,
+                    "daily": 0.0,
+                    "perc": 94.59594006766554,
+                    "data": [
+                        {
+                            "id": "booster1",
+                            "label": "booster1",
+                            "value": 94.59594006766554
+                        }
+                    ]
+                },
+                "booster2": {
+                    "total": 812.0,
+                    "daily": 1.0,
+                    "perc": 12.82757370710488,
+                    "data": [
+                        {
+                            "id": "booster2",
+                            "label": "booster2",
+                            "value": 12.82757370710488
+                        }
+                    ]
+                },
+                "dose1": {
+                    "total": 8614.0,
+                    "daily": 0.0,
+                    "perc": 108.47148380860318,
+                    "data": [
+                        {
+                            "id": "dose1",
+                            "label": "dose1",
+                            "value": 108.47148380860318
+                        }
+                    ]
+                },
+                "dose2": {
+                    "total": 8455.0,
+                    "daily": 0.0,
+                    "perc": 107.77247462542292,
+                    "data": [
+                        {
+                            "id": "dose2",
+                            "label": "dose2",
+                            "value": 107.77247462542292
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

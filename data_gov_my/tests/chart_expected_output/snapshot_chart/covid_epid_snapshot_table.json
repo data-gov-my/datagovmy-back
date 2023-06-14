@@ -1,0 +1,371 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidepid_04_snapshot_table.parquet",
+        "variables": {
+            "main_key": "state",
+            "replace_word": "",
+            "null_vals": null,
+            "data": {
+                "deaths": [
+                    "deaths",
+                    "deaths_100k",
+                    "deaths_trend"
+                ],
+                "cases": [
+                    "cases",
+                    "cases_100k",
+                    "cases_posrate",
+                    "cases_trend"
+                ],
+                "admitted": [
+                    "admitted",
+                    "util_hosp",
+                    "admitted_trend"
+                ]
+            }
+        }
+    },
+    "chart_type": "snapshot_chart",
+    "expected_results": [
+        {
+            "deaths": {
+                "deaths": 2,
+                "deaths_100k": "0.04971414367387522",
+                "deaths_trend": "100.0"
+            },
+            "cases": {
+                "cases": 208,
+                "cases_100k": "5.170270942083023",
+                "cases_posrate": "1.8324376706898071",
+                "cases_trend": "2.4630541871921263"
+            },
+            "admitted": {
+                "admitted": 143,
+                "util_hosp": "83.55329949238579",
+                "admitted_trend": "17.21311475409837"
+            },
+            "index": 0,
+            "state": "jhr"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "-100.0"
+            },
+            "cases": {
+                "cases": 115,
+                "cases_100k": "5.29539070774048",
+                "cases_posrate": "3.2522624434389145",
+                "cases_trend": "5.504587155963292"
+            },
+            "admitted": {
+                "admitted": 76,
+                "util_hosp": "55.323122898767274",
+                "admitted_trend": "-17.391304347826086"
+            },
+            "index": 1,
+            "state": "kdh"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 262,
+                "cases_100k": "14.320852691992346",
+                "cases_posrate": "4.075283869964225",
+                "cases_trend": "285.29411764705884"
+            },
+            "admitted": {
+                "admitted": 36,
+                "util_hosp": "66.97707736389685",
+                "admitted_trend": "19.999999999999996"
+            },
+            "index": 2,
+            "state": "ktn"
+        },
+        {
+            "deaths": {
+                "deaths": 10,
+                "deaths_100k": "0.027565676065510625",
+                "deaths_trend": "42.85714285714286"
+            },
+            "cases": {
+                "cases": 5297,
+                "cases_100k": "16.22393179100109",
+                "cases_posrate": "3.9190009026205592",
+                "cases_trend": "55.1552431165788"
+            },
+            "admitted": {
+                "admitted": 2114,
+                "util_hosp": "69.64183345380225",
+                "admitted_trend": "10.391644908616193"
+            },
+            "index": 3,
+            "state": "mys"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.09927529038022435",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 471,
+                "cases_100k": "46.75866176908567",
+                "cases_posrate": "12.996688741721854",
+                "cases_trend": "113.12217194570135"
+            },
+            "admitted": {
+                "admitted": 31,
+                "util_hosp": "76.03758809710259",
+                "admitted_trend": "93.75"
+            },
+            "index": 4,
+            "state": "mlk"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 171,
+                "cases_100k": "10.605308856363184",
+                "cases_posrate": "2.7377521613832854",
+                "cases_trend": "83.87096774193547"
+            },
+            "admitted": {
+                "admitted": 40,
+                "util_hosp": "63.09880239520959",
+                "admitted_trend": "-2.4390243902439046"
+            },
+            "index": 5,
+            "state": "nsn"
+        },
+        {
+            "deaths": {
+                "deaths": 1,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 186,
+                "cases_100k": "15.390980554406289",
+                "cases_posrate": "2.975523916173412",
+                "cases_trend": "121.42857142857144"
+            },
+            "admitted": {
+                "admitted": 59,
+                "util_hosp": "66.18937644341801",
+                "admitted_trend": "78.78787878787878"
+            },
+            "index": 6,
+            "state": "phg"
+        },
+        {
+            "deaths": {
+                "deaths": 3,
+                "deaths_100k": "0.07931472081218274",
+                "deaths_trend": "50.0"
+            },
+            "cases": {
+                "cases": 351,
+                "cases_100k": "13.91973350253807",
+                "cases_posrate": "3.7982902283302673",
+                "cases_trend": "197.45762711864407"
+            },
+            "admitted": {
+                "admitted": 106,
+                "util_hosp": "65.12084888976223",
+                "admitted_trend": "58.20895522388059"
+            },
+            "index": 7,
+            "state": "prk"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 38,
+                "cases_100k": "13.144240747146315",
+                "cases_posrate": "3.359858532272325",
+                "cases_trend": "322.22222222222223"
+            },
+            "admitted": {
+                "admitted": 4,
+                "util_hosp": "77.11340206185568",
+                "admitted_trend": "-42.85714285714286"
+            },
+            "index": 8,
+            "state": "pls"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 137,
+                "cases_100k": "7.880356629278114",
+                "cases_posrate": "3.1108083560399638",
+                "cases_trend": "6.20155038759691"
+            },
+            "admitted": {
+                "admitted": 24,
+                "util_hosp": "75.93158216249236",
+                "admitted_trend": "26.315789473684205"
+            },
+            "index": 9,
+            "state": "png"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 32,
+                "cases_100k": "0.9436468826182899",
+                "cases_posrate": "0.2589834898025251",
+                "cases_trend": "60.00000000000001"
+            },
+            "admitted": {
+                "admitted": 561,
+                "util_hosp": "70.7481464839362",
+                "admitted_trend": "-1.5789473684210575"
+            },
+            "index": 10,
+            "state": "sbh"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 221,
+                "cases_100k": "8.94591968911917",
+                "cases_posrate": "2.231421647819063",
+                "cases_trend": "114.5631067961165"
+            },
+            "admitted": {
+                "admitted": 76,
+                "util_hosp": "69.45768772348033",
+                "admitted_trend": "68.88888888888889"
+            },
+            "index": 11,
+            "state": "swk"
+        },
+        {
+            "deaths": {
+                "deaths": 4,
+                "deaths_100k": "0.042623323482609686",
+                "deaths_trend": "100.0"
+            },
+            "cases": {
+                "cases": 1595,
+                "cases_100k": "22.66140031825415",
+                "cases_posrate": "4.245860618644519",
+                "cases_trend": "46.73413063477461"
+            },
+            "admitted": {
+                "admitted": 706,
+                "util_hosp": "81.20874587458746",
+                "admitted_trend": "11.708860759493668"
+            },
+            "index": 12,
+            "state": "sgr"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.08423180592991913",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 96,
+                "cases_100k": "8.086253369272237",
+                "cases_posrate": "1.8819839247206431",
+                "cases_trend": "45.45454545454546"
+            },
+            "admitted": {
+                "admitted": 35,
+                "util_hosp": "70.16077170418006",
+                "admitted_trend": "52.17391304347827"
+            },
+            "index": 13,
+            "state": "trg"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "-100.0"
+            },
+            "cases": {
+                "cases": 1279,
+                "cases_100k": "65.74145463891031",
+                "cases_posrate": "8.188744477879506",
+                "cases_trend": "29.716024340770787"
+            },
+            "admitted": {
+                "admitted": 127,
+                "util_hosp": "53.931398416886545",
+                "admitted_trend": "17.59259259259258"
+            },
+            "index": 14,
+            "state": "kul"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 8,
+                "cases_100k": "8.342022940563087",
+                "cases_posrate": "0.8205128205128205",
+                "cases_trend": "-66.66666666666667"
+            },
+            "admitted": {
+                "admitted": 0,
+                "util_hosp": "47.72727272727273",
+                "admitted_trend": "None"
+            },
+            "index": 15,
+            "state": "lbn"
+        },
+        {
+            "deaths": {
+                "deaths": 0,
+                "deaths_100k": "0.0",
+                "deaths_trend": "None"
+            },
+            "cases": {
+                "cases": 127,
+                "cases_100k": "106.54362416107382",
+                "cases_posrate": "8.893557422969188",
+                "cases_trend": "35.106382978723396"
+            },
+            "admitted": {
+                "admitted": 90,
+                "util_hosp": "85.44839255499154",
+                "admitted_trend": "-18.181818181818176"
+            },
+            "index": 16,
+            "state": "pjy"
+        }
+    ]
+}

@@ -1,0 +1,114 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/dashboards_top.parquet",
+        "variables": {
+            "keys": [
+                "time_period"
+            ],
+            "obj_attr": {
+                "name": "name",
+                "agency": "agency",
+                "views": "views"
+            }
+        }
+    },
+    "chart_type": "metrics_table",
+    "expected_results": {
+        "today": [
+          {
+            "name": "name-popularity",
+            "agency": "jpn",
+            "views": 11223
+          },
+          {
+            "name": "birthday-explorer",
+            "agency": "jpn",
+            "views": 10101
+          },
+          {
+            "name": "blood-donation",
+            "agency": "pdn",
+            "views": 9091
+          },
+          {
+            "name": "interest-rates",
+            "agency": "bnm",
+            "views": 8182
+          },
+          {
+            "name": "international-reserves",
+            "agency": "bnm",
+            "views": 7363
+          },
+          {
+            "name": "reserve-money",
+            "agency": "bnm",
+            "views": 6627
+          }
+        ],
+        "last_month": [
+          {
+            "name": "name-popularity",
+            "agency": "jpn",
+            "views": 374098
+          },
+          {
+            "name": "birthday-explorer",
+            "agency": "jpn",
+            "views": 336688
+          },
+          {
+            "name": "blood-donation",
+            "agency": "pdn",
+            "views": 303020
+          },
+          {
+            "name": "interest-rates",
+            "agency": "bnm",
+            "views": 272718
+          },
+          {
+            "name": "international-reserves",
+            "agency": "bnm",
+            "views": 245446
+          },
+          {
+            "name": "reserve-money",
+            "agency": "bnm",
+            "views": 220902
+          }
+        ],
+        "all_time": [
+          {
+            "name": "name-popularity",
+            "agency": "jpn",
+            "views": 935245
+          },
+          {
+            "name": "birthday-explorer",
+            "agency": "jpn",
+            "views": 841721
+          },
+          {
+            "name": "blood-donation",
+            "agency": "pdn",
+            "views": 757549
+          },
+          {
+            "name": "interest-rates",
+            "agency": "bnm",
+            "views": 681794
+          },
+          {
+            "name": "international-reserves",
+            "agency": "bnm",
+            "views": 613615
+          },
+          {
+            "name": "reserve-money",
+            "agency": "bnm",
+            "views": 552254
+          }
+        ]
+    }
+}
