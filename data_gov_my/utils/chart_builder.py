@@ -630,7 +630,7 @@ def metrics_table(file_name: str, variables: MetricsTableVariables):
 
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"])
-        df["date"] = df["date"].values.astype(np.int64) // 10**6
+        df["date"] = df["date"].dt.strftime("%Y-%m-%d")
 
     df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
     u_groups_list = df["u_groups"].unique().tolist()

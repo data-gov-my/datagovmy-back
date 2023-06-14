@@ -104,7 +104,7 @@ class DASHBOARD(APIView):
         if all(p in param_list for p in params_req):
             res = handle_request(param_list)
             res = handle.dashboard_additional_handling(param_list, res)
-            return JsonResponse(dict(res), safe=False)
+            return JsonResponse(res, safe=False)
         else:
             return JsonResponse({}, safe=False)
 
