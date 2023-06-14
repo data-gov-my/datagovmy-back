@@ -275,11 +275,15 @@ def heatmap_chart(file_name: str, variables: HeatmapChartVariables):
         cur_id = cur_id if isinstance(cur_id, str) else int(cur_id)
 
         group = [str(group)] if isinstance(group, str) else [str(i) for i in group]
-        data_arr = (
-            data_arr[0]["data"]
-            if len(data_arr) == 1
-            else [x["data"][0] for x in data_arr]
-        )
+
+        if len(data_arr) == 1: 
+            data_arr = data_arr[0]["data"]
+        else : 
+            temp_arr = []
+            for x in data_arr : 
+                temp_arr.extend(x['data'])
+            data_arr = temp_arr
+
         final_dict = {"id": cur_id, "data": data_arr}
 
         set_dict(result, group, final_dict, "SET")
@@ -673,7 +677,8 @@ def timeseries_shared(file_name: str, variables):
         grouped_df = df.groupby(keys)
 
         for grp in u_groups_list:
-            temp_df = grouped_df.get_group(grp)
+            cur_grp = grp[0] if len(grp) == 1 else grp
+            temp_df = grouped_df.get_group(cur_grp)
             val_res = {}
             for k, v in attributes.items():
                 val_res[k] = temp_df[v].to_list()
@@ -713,7 +718,8 @@ def query_values(file_name: str, variables: QueryValuesVariables):
     res = {}
     for keys, v in df.groupby(columns[:-1])[columns[-1]]:
         d = res
-        val = list(set(v))
+        val = v.unique().tolist()
+        keys = [keys] if isinstance(keys, str) else keys
         for k in keys:
             if k not in d:
                 d[k] = {}

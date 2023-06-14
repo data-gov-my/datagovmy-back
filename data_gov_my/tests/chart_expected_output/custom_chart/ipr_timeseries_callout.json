@@ -1,0 +1,597 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ipr_timeseries_callout.parquet",
+        "variables": {
+            "keys": [
+                "state",
+                "chart",
+                "variable"
+            ],
+            "columns": [
+                "value"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "jhr": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 773
+                },
+                "daily": {
+                    "value": 3
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 1507
+                },
+                "daily": {
+                    "value": 5
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 829
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 3109
+                },
+                "daily": {
+                    "value": 9
+                }
+            }
+        },
+        "kdh": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 453
+                },
+                "daily": {
+                    "value": 3
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 832
+                },
+                "daily": {
+                    "value": 4
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 619
+                },
+                "daily": {
+                    "value": 2
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 1904
+                },
+                "daily": {
+                    "value": 9
+                }
+            }
+        },
+        "ktn": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 148
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 397
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 315
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 860
+                },
+                "daily": {
+                    "value": 1
+                }
+            }
+        },
+        "kul": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 475
+                },
+                "daily": {
+                    "value": 3
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 1554
+                },
+                "daily": {
+                    "value": 3
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 537
+                },
+                "daily": {
+                    "value": 2
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 2566
+                },
+                "daily": {
+                    "value": 8
+                }
+            }
+        },
+        "lbn": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 13
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 33
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 13
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 59
+                },
+                "daily": {
+                    "value": 0
+                }
+            }
+        },
+        "mlk": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 199
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 422
+                },
+                "daily": {
+                    "value": 2
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 279
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 900
+                },
+                "daily": {
+                    "value": 2
+                }
+            }
+        },
+        "mys": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 7231
+                },
+                "daily": {
+                    "value": 20
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 15867
+                },
+                "daily": {
+                    "value": 58
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 9933
+                },
+                "daily": {
+                    "value": 34
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 33031
+                },
+                "daily": {
+                    "value": 112
+                }
+            }
+        },
+        "nsn": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 514
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 909
+                },
+                "daily": {
+                    "value": 4
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 535
+                },
+                "daily": {
+                    "value": 2
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 1958
+                },
+                "daily": {
+                    "value": 6
+                }
+            }
+        },
+        "phg": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 263
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 585
+                },
+                "daily": {
+                    "value": 2
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 509
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 1357
+                },
+                "daily": {
+                    "value": 4
+                }
+            }
+        },
+        "pjy": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 22
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 72
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 39
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 133
+                },
+                "daily": {
+                    "value": 2
+                }
+            }
+        },
+        "pls": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 41
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 87
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 66
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 194
+                },
+                "daily": {
+                    "value": 0
+                }
+            }
+        },
+        "png": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 442
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 782
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 328
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 1552
+                },
+                "daily": {
+                    "value": 0
+                }
+            }
+        },
+        "prk": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 770
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 1263
+                },
+                "daily": {
+                    "value": 4
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 908
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 2941
+                },
+                "daily": {
+                    "value": 5
+                }
+            }
+        },
+        "sbh": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 627
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 1419
+                },
+                "daily": {
+                    "value": 5
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 1729
+                },
+                "daily": {
+                    "value": 5
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 3775
+                },
+                "daily": {
+                    "value": 11
+                }
+            }
+        },
+        "sgr": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 2148
+                },
+                "daily": {
+                    "value": 8
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 5136
+                },
+                "daily": {
+                    "value": 27
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 2335
+                },
+                "daily": {
+                    "value": 13
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 9619
+                },
+                "daily": {
+                    "value": 48
+                }
+            }
+        },
+        "swk": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 211
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 521
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 565
+                },
+                "daily": {
+                    "value": 6
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 1297
+                },
+                "daily": {
+                    "value": 6
+                }
+            }
+        },
+        "trg": {
+            "ikhsan": {
+                "cumul": {
+                    "value": 132
+                },
+                "daily": {
+                    "value": 1
+                }
+            },
+            "insan": {
+                "cumul": {
+                    "value": 348
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "intan": {
+                "cumul": {
+                    "value": 327
+                },
+                "daily": {
+                    "value": 0
+                }
+            },
+            "overall": {
+                "cumul": {
+                    "value": 807
+                },
+                "daily": {
+                    "value": 1
+                }
+            }
+        }
+    }
+}

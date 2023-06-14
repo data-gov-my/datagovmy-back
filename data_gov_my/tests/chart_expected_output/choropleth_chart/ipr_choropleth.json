@@ -1,0 +1,57 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ipr_choropleth_state.parquet",
+        "variables": {
+            "x": "state",
+            "y": [
+                "value"
+            ],
+            "keys": [
+                "variable"
+            ]
+        }
+    },
+    "chart_type": "choropleth_chart",
+    "expected_results": {
+        "absolute": {
+            "x": [
+                "jhr",
+                "kdh",
+                "ktn",
+                "mlk",
+                "nsn",
+                "phg",
+                "prk",
+                "pls",
+                "png",
+                "sbh",
+                "swk",
+                "sgr",
+                "trg",
+                "kul",
+                "lbn",
+                "pjy"
+            ],
+            "y": {
+                "value": [
+                    3109,
+                    1904,
+                    860,
+                    900,
+                    1958,
+                    1357,
+                    2941,
+                    194,
+                    1552,
+                    3775,
+                    1297,
+                    9619,
+                    807,
+                    2566,
+                    59,
+                    133
+                ]
+            }
+        }
+    }
+}

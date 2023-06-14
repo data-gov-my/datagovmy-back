@@ -1,0 +1,30 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/homepage_timeseries_callout.parquet",
+        "variables": {
+            "keys": [
+                "chart"
+            ],
+            "columns": [
+                "callout1",
+                "callout2"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "downloads": {
+            "callout1": 52,
+            "callout2": 2654
+        },
+        "users": {
+            "callout1": 2347,
+            "callout2": 300460
+        },
+        "views": {
+            "callout1": 234,
+            "callout2": 30011
+        }
+    }
+}

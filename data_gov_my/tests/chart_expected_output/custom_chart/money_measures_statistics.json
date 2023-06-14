@@ -1,0 +1,132 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/moneymeasures_timeseries_callout.parquet",
+        "variables": {
+            "keys": [
+                "chart_type",
+                "chart"
+            ],
+            "columns": [
+                "callout"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "custom_chart",
+    "expected_results": {
+        "growth_mom": {
+            "m1_currency": {
+                "callout": 2.8274585825031506
+            },
+            "m1_deposit_demand": {
+                "callout": -1.3715838942324754
+            },
+            "m1_total": {
+                "callout": -0.3506122050702887
+            },
+            "m2_deposit_fixed": {
+                "callout": 0.0812604516764015
+            },
+            "m2_deposit_fx": {
+                "callout": 2.4366740821383903
+            },
+            "m2_deposit_other": {
+                "callout": 1.1552825222919338
+            },
+            "m2_deposit_saving": {
+                "callout": 0.49564007569609103
+            },
+            "m2_nid": {
+                "callout": 13.934839924764809
+            },
+            "m2_repo": {
+                "callout": -17.545071359653708
+            },
+            "m2_total": {
+                "callout": 0.3677440869606974
+            },
+            "m3_deposit_other": {
+                "callout": 22.997480765339027
+            },
+            "m3_total": {
+                "callout": 0.4413742262755038
+            }
+        },
+        "growth_yoy": {
+            "m1_currency": {
+                "callout": 5.3830163232477135
+            },
+            "m1_deposit_demand": {
+                "callout": 1.7266387740198619
+            },
+            "m1_total": {
+                "callout": 2.6199651778820776
+            },
+            "m2_deposit_fixed": {
+                "callout": 5.570519382830308
+            },
+            "m2_deposit_fx": {
+                "callout": 23.314043685085338
+            },
+            "m2_deposit_other": {
+                "callout": -0.35966086304172196
+            },
+            "m2_deposit_saving": {
+                "callout": -3.4942277569592894
+            },
+            "m2_nid": {
+                "callout": -35.24469741519833
+            },
+            "m2_repo": {
+                "callout": 802507480.0
+            },
+            "m2_total": {
+                "callout": 4.391669003136478
+            },
+            "m3_deposit_other": {
+                "callout": 18.776260355389063
+            },
+            "m3_total": {
+                "callout": 4.442065810699947
+            }
+        },
+        "value_rm": {
+            "m1_currency": {
+                "callout": 150754311614.54
+            },
+            "m1_deposit_demand": {
+                "callout": 450103681630.0
+            },
+            "m1_total": {
+                "callout": 600857993244.5399
+            },
+            "m2_deposit_fixed": {
+                "callout": 970431905007.0001
+            },
+            "m2_deposit_fx": {
+                "callout": 242049333004.0
+            },
+            "m2_deposit_other": {
+                "callout": 220321672025.99997
+            },
+            "m2_deposit_saving": {
+                "callout": 230592840347.0
+            },
+            "m2_nid": {
+                "callout": 2145398531.9999998
+            },
+            "m2_repo": {
+                "callout": 200626895.0
+            },
+            "m2_total": {
+                "callout": 2266599769055.5396
+            },
+            "m3_deposit_other": {
+                "callout": 9067099438.000471
+            },
+            "m3_total": {
+                "callout": 2275666868493.54
+            }
+        }
+    }
+}
