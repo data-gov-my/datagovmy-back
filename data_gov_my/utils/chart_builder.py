@@ -276,12 +276,12 @@ def heatmap_chart(file_name: str, variables: HeatmapChartVariables):
 
         group = [str(group)] if isinstance(group, str) else [str(i) for i in group]
 
-        if len(data_arr) == 1: 
+        if len(data_arr) == 1:
             data_arr = data_arr[0]["data"]
-        else : 
+        else:
             temp_arr = []
-            for x in data_arr : 
-                temp_arr.extend(x['data'])
+            for x in data_arr:
+                temp_arr.extend(x["data"])
             data_arr = temp_arr
 
         final_dict = {"id": cur_id, "data": data_arr}
@@ -624,6 +624,13 @@ def metrics_table(file_name: str, variables: MetricsTableVariables):
     cols = list(attr.keys())
 
     df = pd.read_parquet(file_name)
+
+    if "state" in df.columns:
+        df["state"].replace(STATE_ABBR, inplace=True)
+
+    if "date" in df.columns:
+        df["date"] = pd.to_datetime(df["date"])
+        df["date"] = df["date"].dt.strftime("%Y-%m-%d")
 
     df["u_groups"] = list(df[keys].itertuples(index=False, name=None))
     u_groups_list = df["u_groups"].unique().tolist()
