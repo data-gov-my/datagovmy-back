@@ -6,8 +6,8 @@
                 "state",
                 "period"
             ],
-            "axis_values": [
-                "age",
+            "x": "age",
+            "y": [
                 "screened"
             ]
         }

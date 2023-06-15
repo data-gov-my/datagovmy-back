@@ -6,8 +6,8 @@
                 "variable",
                 "metric"
             ],
-            "axis_values": {
-                "x": "age",
+            "x": "age",
+            "y": {
                 "unvax": "unvax",
                 "partialvax": "partialvax",
                 "fullyvax": "fullyvax",

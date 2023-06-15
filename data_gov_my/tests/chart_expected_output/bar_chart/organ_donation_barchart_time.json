@@ -6,8 +6,8 @@
                 "state",
                 "type"
             ],
-            "axis_values": [
-                "period",
+            "x": "period",
+            "y": [
                 "new_donors"
             ]
         }

@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-# from data_gov_my.utils.variable_structures import *
+from data_gov_my.utils.variable_structures import *
 
-from variable_structures import *
+# from variable_structures import *
 
 STATE_ABBR = {
     "Johor": "jhr",
@@ -101,6 +101,8 @@ class ChartBuilder(ABC):
             if isinstance(name, str):
                 name = (name,)
 
+            name = [str(n) for n in name]
+
             if len(variables.keys) > 1:
                 current_level = result
                 for i in range(len(name) - 1):
@@ -180,12 +182,12 @@ if __name__ == "__main__":
         "variables": {
             "keys": ["variable", "metric"],
             "x": "age",
-            "y": [
-                "unvax",
-                "partialvax",
-                "fullyvax",
-                "boosted",
-            ],
+            "y": {
+                "unvax": "unvax",
+                "partialvax": "partialvax",
+                "fullyvax": "fullyvax",
+                "boosted": "boosted",
+            },
         },
     }
     url = params["input"]

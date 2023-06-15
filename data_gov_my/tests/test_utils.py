@@ -27,10 +27,7 @@ def sample_barchart_data(tmp_path):
 
 
 def test_bar_chart(sample_barchart_data):
-    variables = {
-        "keys": ["state", "period"],
-        "axis_values": ["age_group", "new_donors"],
-    }
+    variables = {"keys": ["state", "period"], "x": "age_group", "y": ["new_donors"]}
 
     expected_result = {
         "California": {
@@ -43,7 +40,9 @@ def test_bar_chart(sample_barchart_data):
         },
     }
 
-    result = bar_chart(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_chart")
+    # result = custom_chart(sample_barchart_data, variables)
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 

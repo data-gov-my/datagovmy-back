@@ -5,8 +5,8 @@
             "keys": [
                 "period"
             ],
-            "axis_values": [
-                "country",
+            "x": "country",
+            "y": [
                 "pct_change"
             ]
         }

@@ -6,8 +6,8 @@
                 "period",
                 "state"
             ],
-            "axis_values": [
-                "variable",
+            "x": "variable",
+            "y": [
                 "value"
             ]
         }

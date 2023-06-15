@@ -6,8 +6,8 @@
                 "state",
                 "period"
             ],
-            "axis_values": [
-                "age_group",
+            "x": "age_group",
+            "y": [
                 "new_donors"
             ]
         }

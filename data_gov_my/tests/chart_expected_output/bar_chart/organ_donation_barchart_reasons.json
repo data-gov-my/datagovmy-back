@@ -6,8 +6,8 @@
                 "state",
                 "period"
             ],
-            "axis_values": [
-                "reason",
+            "x": "reason",
+            "y": [
                 "pledgers"
             ]
         }
