@@ -64,8 +64,9 @@ def test_barmeter_simple(sample_barchart_data):
         "California": [{"x": "18-24", "y": 100}, {"x": "25-34", "y": 200}],
         "New York": [{"x": "18-24", "y": 150}, {"x": "25-34", "y": 250}],
     }
-
-    result = bar_meter(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_meter")
+    result = builder.build_chart(sample_barchart_data, variables)
+    # result = bar_meter(sample_barchart_data, variables)
     assert result == expected_result
 
 
