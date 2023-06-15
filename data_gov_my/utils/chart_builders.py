@@ -6,6 +6,7 @@ import pandas as pd
 from pydantic import BaseModel
 
 from data_gov_my.utils.variable_structures import *
+from data_gov_my.utils.variable_structures import GeneralChartVariables
 
 # from variable_structures import *
 
@@ -127,7 +128,7 @@ class BarChartBuilder(ChartBuilder):
     def group_to_data(self, variables: BarChartVariables, group: pd.DataFrame):
         res = {}
         res["x"] = group[variables.x].tolist()
-        # {renamed: actualcol}
+        # TODO: maybe best to invert - list should maintain col name, axis values renamed. (y1..y4 needs to be manually defined.)
         if isinstance(variables.y, list):
             if len(variables.y) == 1:
                 res["y"] = group[variables.y[0]].tolist()
@@ -154,6 +155,23 @@ class LineBuilder(ChartBuilder):
 
 class BarmeterBuilder(ChartBuilder):
     CHART_TYPE = "bar_meter"
+    VARIABLE_MODEL = BarMeterVariables
+
+    def group_to_data(self, variables: BarMeterVariables, group: pd.DataFrame):
+        result = {} if variables.sub_keys else []
+        for d in variables.axis_values:
+            for key, value in d.items():
+                x_values = group[key].values
+                y_values = group[value].values
+                if variables.sub_keys:
+                    result[value] = [
+                        {"x": x, "y": y} for x, y in zip(x_values, y_values)
+                    ]
+                else:
+                    result.extend(
+                        [{"x": x, "y": y} for x, y in zip(x_values, y_values)]
+                    )
+        return result
 
 
 class CustomBuilder(ChartBuilder):  # DONE
@@ -178,17 +196,11 @@ if __name__ == "__main__":
     chart_type = "bar_chart"
 
     params = {
-        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidepid_05_bar.parquet",
         "variables": {
-            "keys": ["variable", "metric"],
-            "x": "age",
-            "y": {
-                "unvax": "unvax",
-                "partialvax": "partialvax",
-                "fullyvax": "fullyvax",
-                "boosted": "boosted",
-            },
+            "axis_values": [{"variable": "value"}],
+            "keys": ["state", "period", "chart"],
         },
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/blood_02_barcharts.parquet",
     }
     url = params["input"]
     variables = params["variables"]

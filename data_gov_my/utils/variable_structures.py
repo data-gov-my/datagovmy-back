@@ -24,7 +24,6 @@ class TimeseriesChartVariables(TypedDict):
 
 
 class BarChartVariables(GeneralChartVariables):
-    # axis_values: list[str] | dict[str, str]
     x: str
     y: list[str] | dict[str, str]
     # @validator("axis_values")
@@ -37,15 +36,18 @@ class BarChartVariables(GeneralChartVariables):
     #     return v
 
 
-class BarMeterVariables(TypedDict):
-    axis_values: List[Dict]
-    keys: List[str]
-    null_vals: str | int | None
-    add_key: Dict[str, str]
-    wanted: List[str]
-    id_needed: bool
-    condition: Dict[str, str | int | None]
-    post_operation: str
+class BarMeterVariables(GeneralChartVariables):
+    axis_values: list[dict[str, str]]
+    sub_keys: bool = False
+
+    @validator("axis_values")
+    def axis_values_pair_length(cls, v):
+        for pair in v:
+            if len(pair) != 1:
+                raise ValueError(
+                    f"Each dictionary in axis_values should only 1 key (not {len(pair)})"
+                )
+        return v
 
 
 class SnapshotChartVariables(TypedDict):
