@@ -24,16 +24,17 @@ class TimeseriesChartVariables(TypedDict):
 
 
 class BarChartVariables(GeneralChartVariables):
-    axis_values: list[str] | dict[str, str]
-
-    @validator("axis_values")
-    def axis_values_list_length(cls, v):
-        """
-        If axis values is in list form, it must be of length two for x-axis and y-axis respectively.
-        """
-        if isinstance(v, list) and len(v) != 2:
-            raise ValueError(f"Length of axis values list must be 2 (not {len(v)})")
-        return v
+    # axis_values: list[str] | dict[str, str]
+    x: str
+    y: list[str] | dict[str, str]
+    # @validator("axis_values")
+    # def axis_values_list_length(cls, v):
+    #     """
+    #     If axis values is in list form, it must be of length two for x-axis and y-axis respectively.
+    #     """
+    #     if isinstance(v, list) and len(v) != 2:
+    #         raise ValueError(f"Length of axis values list must be 2 (not {len(v)})")
+    #     return v
 
 
 class BarMeterVariables(TypedDict):

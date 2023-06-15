@@ -5,9 +5,9 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
-from data_gov_my.utils.variable_structures import *
+# from data_gov_my.utils.variable_structures import *
 
-# from variable_structures import *
+from variable_structures import *
 
 STATE_ABBR = {
     "Johor": "jhr",
@@ -86,7 +86,7 @@ class ChartBuilder(ABC):
         df = df.fillna(np.nan).replace({np.nan: variables.null_vals})
 
         if not variables.keys:
-            return self.group_to_data(df)
+            return self.group_to_data(variables, df)
 
         result = {}
         value_cols = (
@@ -96,7 +96,7 @@ class ChartBuilder(ABC):
                 set(df.columns) ^ set(variables.keys)
             )  # else, take all possible columns excluding key columns
         )
-        df_groupby = df.groupby(variables.keys)[value_cols]
+        df_groupby = df.groupby(variables.keys)
         for name, group in df_groupby:
             if isinstance(name, str):
                 name = (name,)
@@ -105,21 +105,16 @@ class ChartBuilder(ABC):
                 current_level = result
                 for i in range(len(name) - 1):
                     current_level = current_level.setdefault(name[i], {})
-                current_level[name[-1]] = self.group_to_data(group)
+                current_level[name[-1]] = self.group_to_data(
+                    variables, group
+                )  ### children class must define how to handle each groups
             else:
                 assert len(name) == 1
-                result[name[0]] = self.group_to_data(group)
+                result[name[0]] = self.group_to_data(variables, group)
         return result
 
     @abstractmethod
-    def group_to_data(self, group):
-        pass
-
-    ## abstract method for common steps
-    def process_df_to_chart_data(self, df: pd.DataFrame, variables: BaseModel) -> dict:
-        """
-        Given dataframe, generate data in dict format to be returned as the chart data.
-        """
+    def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
         pass
 
 
@@ -127,8 +122,20 @@ class BarChartBuilder(ChartBuilder):
     CHART_TYPE = "bar_chart"
     VARIABLE_MODEL = BarChartVariables
 
-    def process_df_to_chart_data(self, df: pd.DataFrame, variables: BaseModel) -> dict:
-        return {}
+    def group_to_data(self, variables: BarChartVariables, group: pd.DataFrame):
+        res = {}
+        res["x"] = group[variables.x].tolist()
+        # {renamed: actualcol}
+        if isinstance(variables.y, list):
+            if len(variables.y) == 1:
+                res["y"] = group[variables.y[0]].tolist()
+                return res
+            variables.y = {f"y{i+1}": col for i, col in enumerate(variables.y)}
+
+        for y_axis_label, col in variables.y.items():
+            res[y_axis_label] = group[col].tolist()
+
+        return res
 
 
 class HeatMapBuilder(ChartBuilder):
@@ -151,8 +158,8 @@ class CustomBuilder(ChartBuilder):  # DONE
     CHART_TYPE = "custom_chart"
     VARIABLE_MODEL = CustomChartVariables
 
-    def group_to_data(self, group):
-        return group.to_dict("records")[0]
+    def group_to_data(self, variables: CustomChartVariables, group: pd.DataFrame):
+        return group[variables.value_columns].to_dict("records")[0]
 
 
 class SnapshotBuilder(ChartBuilder):
@@ -166,32 +173,21 @@ class WaffleBuilder(ChartBuilder):
 import pprint
 
 if __name__ == "__main__":
-    chart_type = "custom_chart"
+    chart_type = "bar_chart"
 
     params = {
-        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/sekolahku_school_info.parquet",
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidepid_05_bar.parquet",
         "variables": {
-            "keys": ["code"],
-            "value_columns": [
-                "code",
-                "school",
-                "state",
-                "ppd",
-                "city",
-                "postcode",
-                "lat",
-                "lon",
-                "strata",
-                "type",
-                "level",
-                "funding_status",
-                "students",
-                "teachers",
+            "keys": ["variable", "metric"],
+            "x": "age",
+            "y": [
+                "unvax",
+                "partialvax",
+                "fullyvax",
+                "boosted",
             ],
-            "null_vals": None,
         },
     }
-
     url = params["input"]
     variables = params["variables"]
 
