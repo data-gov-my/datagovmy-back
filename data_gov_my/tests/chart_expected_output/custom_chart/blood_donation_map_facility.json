@@ -6,7 +6,7 @@
                 "state",
                 "hospital"
             ],
-            "columns": [
+            "value_columns": [
                 "lat",
                 "lon"
             ],

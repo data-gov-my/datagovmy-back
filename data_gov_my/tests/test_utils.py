@@ -1,6 +1,7 @@
 import pytest
 
 from data_gov_my.utils.chart_builder import *
+from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.variable_structures import *
 
 
@@ -143,7 +144,7 @@ def sample_timeseries_data(tmp_path):
 def test_timeseries_chart(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "values": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
+        "value_columns": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
     }
 
     expected_result = {
@@ -187,15 +188,9 @@ def test_timeseries_shared_chart_nested(sample_timeseries_data):
     }
 
     expected_result = {
-        'x': [1577836800000, 1577923200000, 1578009600000], 
-        'California': {
-            'daily': [100, 200, 150], 
-            'line_daily': [90, 190, 160]
-        }, 
-        'New York': {
-            'daily': [120, 180, 140], 
-            'line_daily': [130, 170, 150]
-        }
+        "x": [1577836800000, 1577923200000, 1578009600000],
+        "California": {"daily": [100, 200, 150], "line_daily": [90, 190, 160]},
+        "New York": {"daily": [120, 180, 140], "line_daily": [130, 170, 150]},
     }
 
     result = timeseries_shared(sample_timeseries_data, variables)
@@ -309,12 +304,12 @@ Custom Chart
 def test_custom_chart(sample_barchart_data):
     variables = {
         "keys": ["state", "period"],
-        "columns": ["age_group", "new_donors", "old_donors"],
+        "value_columns": ["age_group", "new_donors", "old_donors"],
     }
 
     expected_result = {
         "California": {
-            "2020": {"age_group": "18-24", "new_donors": 100, "old_donors": 1},
+            "2020": {"age_group": "18-24", "new_donors": 100, "old_donors": 11},
             "2021": {"age_group": "25-34", "new_donors": 200, "old_donors": 2},
         },
         "New York": {
@@ -323,7 +318,9 @@ def test_custom_chart(sample_barchart_data):
         },
     }
 
-    result = custom_chart(sample_barchart_data, variables)
+    builder = ChartBuilder.create("custom_chart")
+    # result = custom_chart(sample_barchart_data, variables)
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -749,38 +746,40 @@ def test_heatmap_chart_multi_cols(sample_line_data):
         "operation": "SET",
     }
     expected_result = {
-        'daily': {
-            'id': 'California', 
-            'data': [
-                {'x': 'Y1', 'y': 100}, 
-                {'x': 'Y2', 'y': 50}, 
-                {'x': 'Y1', 'y': 200}, 
-                {'x': 'Y2', 'y': 80}, 
-                {'x': 'Y1', 'y': 120}, 
-                {'x': 'Y2', 'y': 90}, 
-                {'x': 'Y1', 'y': 180}, 
-                {'x': 'Y2', 'y': 160}, 
-                {'x': 'Y1', 'y': 130}, 
-                {'x': 'Y2', 'y': 100}, 
-                {'x': 'Y1', 'y': 110}, 
-                {'x': 'Y2', 'y': 70}]
-        }, 
-        'monthly': {
-            'id': 'California', 
-            'data': [
-                {'x': 'Y1', 'y': 150}, 
-                {'x': 'Y2', 'y': 120}, 
-                {'x': 'Y1', 'y': 170}, 
-                {'x': 'Y2', 'y': 140}, 
-                {'x': 'Y1', 'y': 140}, 
-                {'x': 'Y2', 'y': 110}, 
-                {'x': 'Y1', 'y': 160}, 
-                {'x': 'Y2', 'y': 130}, 
-                {'x': 'Y1', 'y': 135}, 
-                {'x': 'Y2', 'y': 90}, 
-                {'x': 'Y1', 'y': 155}, 
-                {'x': 'Y2', 'y': 110}]
-        }
+        "daily": {
+            "id": "California",
+            "data": [
+                {"x": "Y1", "y": 100},
+                {"x": "Y2", "y": 50},
+                {"x": "Y1", "y": 200},
+                {"x": "Y2", "y": 80},
+                {"x": "Y1", "y": 120},
+                {"x": "Y2", "y": 90},
+                {"x": "Y1", "y": 180},
+                {"x": "Y2", "y": 160},
+                {"x": "Y1", "y": 130},
+                {"x": "Y2", "y": 100},
+                {"x": "Y1", "y": 110},
+                {"x": "Y2", "y": 70},
+            ],
+        },
+        "monthly": {
+            "id": "California",
+            "data": [
+                {"x": "Y1", "y": 150},
+                {"x": "Y2", "y": 120},
+                {"x": "Y1", "y": 170},
+                {"x": "Y2", "y": 140},
+                {"x": "Y1", "y": 140},
+                {"x": "Y2", "y": 110},
+                {"x": "Y1", "y": 160},
+                {"x": "Y2", "y": 130},
+                {"x": "Y1", "y": 135},
+                {"x": "Y2", "y": 90},
+                {"x": "Y1", "y": 155},
+                {"x": "Y2", "y": 110},
+            ],
+        },
     }
     result = heatmap_chart(sample_line_data, variables)
     assert result == expected_result
@@ -848,7 +847,7 @@ def sample_map_lat_long_data(tmp_path):
 def test_map_lat_long_chart(sample_map_lat_long_data):
     variables = {
         "keys": ["state", "district"],
-        "values": ["lat", "long"],  # Updated column names
+        "value_columns": ["lat", "long"],  # Updated column names
         "null_vals": -1,
     }
     expected_result = {

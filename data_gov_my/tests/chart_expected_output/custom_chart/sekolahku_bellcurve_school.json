@@ -5,7 +5,7 @@
             "keys": [
                 "code"
             ],
-            "columns": [
+            "value_columns": [
                 "students",
                 "st_ratio",
                 "max_ethnic",
