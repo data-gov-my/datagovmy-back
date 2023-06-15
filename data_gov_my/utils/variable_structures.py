@@ -3,13 +3,37 @@ from pydantic import BaseModel, validator, ValidationError
 
 ## TODO: GeneralChartVariable - common fields for all variables, e.g. keys, null_vals
 
-class TimeseriesChartVariables(TypedDict) : 
-    keys : List[str]
-    values : List[str]
 
-class BarChartVariables(TypedDict):
+class GeneralChartVariables(BaseModel):
+    """
+    Commonly shared properties for all charts
+    keys: used as keys in the resulted nested dictionary data
+    values: columns that contain the actual values of chart data, e.g. y-values
+    rename: dict
+    """
+
+    keys: list[str]
+    value_columns: list[str] = None
+    rename_cols: dict[str, str] = {}
+    null_vals: str | int | None = None
+
+
+class TimeseriesChartVariables(TypedDict):
     keys: List[str]
-    axis_values: List[str]
+    values: List[str]
+
+
+class BarChartVariables(GeneralChartVariables):
+    axis_values: list[str] | dict[str, str]
+
+    @validator("axis_values")
+    def axis_values_list_length(cls, v):
+        """
+        If axis values is in list form, it must be of length two for x-axis and y-axis respectively.
+        """
+        if isinstance(v, list) and len(v) != 2:
+            raise ValueError(f"Length of axis values list must be 2 (not {len(v)})")
+        return v
 
 
 class BarMeterVariables(TypedDict):
@@ -30,10 +54,8 @@ class SnapshotChartVariables(TypedDict):
     data: Dict[str, Dict[str, List[str]]]
 
 
-class CustomChartVariables(BaseModel):
-    keys: list[str]
-    columns: List[str]
-    null_vals: str | int | None = None
+class CustomChartVariables(GeneralChartVariables):
+    pass
 
 
 class ChoroplethChartVariables(TypedDict):
