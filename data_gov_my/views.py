@@ -498,9 +498,14 @@ def handle_request(param_list, isDashboard=True):
             dbd_info if isinstance(dbd_info, dict) else dbd_info[0]["dashboard_meta"]
         )
         params_req = dbd_info["required_params"]
+        params_opt = dbd_info.get("optional_params", [])
 
     res = {}
-    if all(p in param_list for p in params_req) or not isDashboard:
+    if (
+        all(p in param_list for p in params_req)
+        or all(p in param_list for p in params_opt)
+        or not isDashboard
+    ):
         data = dbd_info["charts"]
 
         if len(data) > 0:
@@ -535,7 +540,7 @@ def handle_request(param_list, isDashboard=True):
                 elif api_type == "dynamic":
                     if len(api_params) > 0:
                         cur_chart_data = get_nested_data(
-                            api_params, param_list, cur_chart_data["data"]
+                            dbd_info, api_params, param_list, cur_chart_data["data"]
                         )
 
                     if len(cur_chart_data) > 0:
@@ -553,14 +558,17 @@ based on keys within dictionary
 """
 
 
-def get_nested_data(api_params, param_list, data):
+def get_nested_data(dbd_info, api_params, param_list, data):
     for a in api_params:
+        optional = a in dbd_info.get("optional_params", [])
         if a in param_list:
             key = (
                 param_list[a][0] if "__FIXED__" not in a else a.replace("__FIXED__", "")
             )
             if key in data:
                 data = data[key]
+            elif optional:
+                data = {}
             else:
                 raise ParseError(
                     detail=f"The {a} '{key}' is invalid. Please use a valid {a}."
