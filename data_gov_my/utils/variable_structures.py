@@ -1,5 +1,5 @@
 from typing import Dict, List, TypedDict, Any
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, validator, ValidationError, root_validator
 
 ## TODO: GeneralChartVariable - common fields for all variables, e.g. keys, null_vals
 
@@ -124,12 +124,19 @@ class LatLonVariables(TypedDict):
     null_vals: str | int | None
 
 
-class SortValuesVariables(TypedDict):
-    by: List[str]
-    ascending: List[bool]
+class _SortValues(BaseModel):
+    by: list[str]
+    ascending: list[bool]
+
+    @root_validator
+    def sort_values_length(cls, values):
+        by, asc = values.get("by", []), values.get("ascending", [])
+        if len(by) != len(asc):
+            raise ValueError(f"'by' and 'ascending' must be the same length")
+        return values
 
 
-class QueryValuesVariables(TypedDict):
-    flat: bool
-    columns: List[str]
-    sort_values: SortValuesVariables
+class QueryValuesVariables(GeneralChartVariables):
+    flat: bool = False
+    columns: list[str] = []  # similar to keys
+    sort_values: _SortValues = {}
