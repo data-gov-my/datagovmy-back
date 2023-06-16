@@ -10,6 +10,14 @@ from data_gov_my.utils.variable_structures import GeneralChartVariables
 
 # from variable_structures import *
 
+"""
+TODO:
+1 add barmeter to existing charts - seem to have missed this earlier
+2 add documentation to all the charts + validation format rationale, e.g. len(v) == 2: why
+3 write down possible suggestions (if big change to format) for roshen to review: 
+  changing existing structure <-- must refer to FE existing components data format!
+"""
+
 STATE_ABBR = {
     "Johor": "jhr",
     "Kedah": "kdh",
@@ -335,6 +343,42 @@ class MetricsTableBuilder(ChartBuilder):
 
 class QueryValuesBuilder(ChartBuilder):
     CHART_TYPE = "query_values"
+    VARIABLE_MODEL = QueryValuesVariables
+
+    def group_to_data(self):
+        pass
+
+    def build_chart(self, file_name: str, variables: QueryValuesVariables) -> str:
+        df = pd.read_parquet(file_name)
+        variables: QueryValuesVariables = self.VARIABLE_MODEL(**variables)
+
+        if variables.sort_values:
+            sort_cols, ascending = (
+                variables.sort_values.by,
+                variables.sort_values.ascending,
+            )
+            df = df.sort_values(by=sort_cols, ascending=ascending)
+
+        if len(variables.columns) == 1:
+            return list(df[variables.columns[0]].unique())
+
+        if variables.flat:
+            keys = df.drop_duplicates(subset=variables.columns)[variables.columns]
+            return keys.to_dict(orient="records")
+
+        res = {}
+        for keys, v in df.groupby(variables.columns[:-1])[variables.columns[-1]]:
+            d = res
+            val = v.unique().tolist()
+            keys = [keys] if isinstance(keys, str) else keys
+            for k in keys:
+                if k not in d:
+                    d[k] = {}
+                parent = d
+                d = d[k]
+            parent[k] = val
+
+        return res
 
 
 import pprint
