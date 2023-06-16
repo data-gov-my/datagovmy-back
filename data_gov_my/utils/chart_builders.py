@@ -6,6 +6,7 @@ import pandas as pd
 from pydantic import BaseModel
 
 from data_gov_my.utils.variable_structures import *
+from data_gov_my.utils.variable_structures import GeneralChartVariables
 
 # from variable_structures import *
 
@@ -262,10 +263,33 @@ class SnapshotBuilder(ChartBuilder):
 
 class WaffleBuilder(ChartBuilder):
     CHART_TYPE = "waffle_chart"
+    VARIABLE_MODEL = WaffleChartVariables
+
+    def group_to_data(self, variables: WaffleChartVariables, group: pd.DataFrame):
+        pass
 
 
 class HelpersCustomBuilder(ChartBuilder):
     CHART_TYPE = "helpers_custom"
+    VARIABLE_MODEL = None
+
+    def group_to_data(self):
+        pass
+
+    def build_chart(self, file_name: str) -> str:
+        df = pd.read_parquet(file_name)
+        df["state"].replace(STATE_ABBR, inplace=True)
+
+        state_mapping = {}
+        state_mapping["facility_types"] = df["type"].unique().tolist()
+        state_mapping["state_district_mapping"] = {}
+
+        for state in df["state"].unique():
+            state_mapping["state_district_mapping"][state] = (
+                df.groupby("state").get_group(state)["district"].unique().tolist()
+            )
+
+        return state_mapping
 
 
 class MapLatLonBuilder(ChartBuilder):

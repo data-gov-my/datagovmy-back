@@ -931,5 +931,6 @@ def test_helpers_custom(sample_helpers_custom_data):
             "Florida": ["District 7", "District 8"],
         },
     }
-    result = helpers_custom(sample_helpers_custom_data)
+    builder = ChartBuilder.create("helpers_custom")
+    result = builder.build_chart(sample_helpers_custom_data)
     assert result == expected_result
