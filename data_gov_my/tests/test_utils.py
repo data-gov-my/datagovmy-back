@@ -244,14 +244,14 @@ def sample_line_data(tmp_path):
 
 
 def test_line_chart_simple(sample_line_data):
-    variables = {"x": "x", "y": "y1"}
+    variables = {"rename_cols": {"y1": "y"}, "x": "x", "y": ["y"]}
 
     expected_result = {
         "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         "y": [100, 200, 150, 170, 120, 180, 140, 160, 130, 110, 135, 155],
     }
-
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
@@ -259,7 +259,7 @@ def test_line_chart_nested_single_layer(sample_line_data):
     """
     TODO: update test to fit after refactoring (assuming that variables structure will change)
     """
-    variables = {"state": {"x": "x", "y": "y1"}}
+    variables = {"rename_cols": {"y1": "y"}, "keys": ["state"], "x": "x", "y": ["y"]}
 
     expected_result = {
         "California": {"x": [1, 2, 3, 4], "y": [100, 200, 150, 170]},
@@ -267,7 +267,8 @@ def test_line_chart_nested_single_layer(sample_line_data):
         "Texas": {"x": [9, 10, 11, 12], "y": [130, 110, 135, 155]},
     }
 
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
@@ -275,7 +276,12 @@ def test_line_chart_nested_multi_layer(sample_line_data):
     """
     TODO: update test to fit after refactoring (assuming that variables structure will change)
     """
-    variables = {"state": {"period": {"x": "x", "y": "y1"}}}
+    variables = {
+        "rename_cols": {"y1": "y"},
+        "keys": ["state", "period"],
+        "x": "x",
+        "y": ["y"],
+    }
 
     expected_result = {
         "California": {
@@ -292,7 +298,8 @@ def test_line_chart_nested_multi_layer(sample_line_data):
         },
     }
 
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 

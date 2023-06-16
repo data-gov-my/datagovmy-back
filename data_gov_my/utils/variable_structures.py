@@ -12,7 +12,7 @@ class GeneralChartVariables(BaseModel):
     rename: dict
     """
 
-    keys: list[str]
+    keys: list[str] = []
     value_columns: list[str] = None
     rename_cols: dict[str, str] = {}
     null_vals: str | int | None = None
@@ -21,6 +21,10 @@ class GeneralChartVariables(BaseModel):
 class TimeseriesChartVariables(TypedDict):
     keys: List[str]
     values: List[str]
+
+
+class TimeseriesChartVariables(GeneralChartVariables):
+    DATE_RANGE: Any
 
 
 class BarChartVariables(GeneralChartVariables):
@@ -36,10 +40,16 @@ class BarChartVariables(GeneralChartVariables):
     #     return v
 
 
+class LineChartVariables(GeneralChartVariables):
+    x: str
+    y: list[str]
+
+
 class BarMeterVariables(GeneralChartVariables):
     axis_values: list[dict[str, str]]
     sub_keys: bool = False
 
+    # FIXME: why not just dict[str,str]? why is list required?
     @validator("axis_values")
     def axis_values_pair_length(cls, v):
         for pair in v:

@@ -6,7 +6,6 @@ import pandas as pd
 from pydantic import BaseModel
 
 from data_gov_my.utils.variable_structures import *
-from data_gov_my.utils.variable_structures import GeneralChartVariables
 
 # from variable_structures import *
 
@@ -86,6 +85,9 @@ class ChartBuilder(ABC):
 
         df = df.fillna(np.nan).replace({np.nan: variables.null_vals})
 
+        # rename cols
+        df.rename(columns=variables.rename_cols, inplace=True)
+
         if not variables.keys:
             return self.group_to_data(variables, df)
 
@@ -151,6 +153,14 @@ class TimeseriesBuilder(ChartBuilder):
 
 class LineBuilder(ChartBuilder):
     CHART_TYPE = "line_chart"
+    VARIABLE_MODEL = LineChartVariables
+
+    def group_to_data(self, variables: LineChartVariables, group: pd.DataFrame):
+        res = {}
+        res["x"] = group[variables.x].tolist()
+        for col in variables.y:
+            res[col] = group[col].tolist()
+        return res
 
 
 class BarmeterBuilder(ChartBuilder):
@@ -193,14 +203,11 @@ class WaffleBuilder(ChartBuilder):
 import pprint
 
 if __name__ == "__main__":
-    chart_type = "bar_chart"
+    chart_type = "line_chart"
 
     params = {
-        "variables": {
-            "axis_values": [{"variable": "value"}],
-            "keys": ["state", "period", "chart"],
-        },
-        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/blood_02_barcharts.parquet",
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/sekolahku_bellcurve_curve.parquet",
+        "variables": {"keys": ["state", "level", "chart"], "x": "x", "y": ["y"]},
     }
     url = params["input"]
     variables = params["variables"]
