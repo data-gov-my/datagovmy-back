@@ -9,7 +9,7 @@
                 "adolescent",
                 "total"
             ],
-            "groups": [
+            "keys": [
                 "state",
                 "age_group",
                 "dose"

@@ -19,7 +19,7 @@ def get_chart_types(charts=[]):
     return chart_types
 
 
-@pytest.mark.parametrize("chart_type", get_chart_types(["snapshot_chart"]))
+@pytest.mark.parametrize("chart_type", get_chart_types(["waffle_chart"]))
 def test_all_chart_builders(chart_type):
     path = os.path.join(os.getcwd(), "data_gov_my", "tests", "chart_expected_output/")
     files = [f for f in os.listdir(os.path.join(path, chart_type))]
@@ -31,17 +31,10 @@ def test_all_chart_builders(chart_type):
             chart_type = data["chart_type"]
             chart_param = data["chart_param"]
             expected_results = data["expected_results"]
-            # results = build_chart(chart_type, chart_param)
-            try:
-                builder = ChartBuilder.create(chart_type)
-                results = builder.build_chart(
-                    chart_param["input"], chart_param["variables"]
-                )
-                if expected_results != json.loads(json.dumps(results)):
-                    failed.append([pathlib.PurePath(file).name, "Output not right"])
-            except Exception as e:
-                failed.append([pathlib.PurePath(file).name, e])
-
-    assert len(failed) == 0, "\n".join(
-        [f"\n{file}:\n {reason}\n" for file, reason in failed]
-    )
+            builder = ChartBuilder.create(chart_type)
+            results = builder.build_chart(
+                chart_param["input"], chart_param["variables"]
+            )
+            assert expected_results == json.loads(
+                json.dumps(results)
+            ), f"FAILED: {pathlib.PurePath(file).name}"

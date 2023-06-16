@@ -103,11 +103,19 @@ class HeatmapChartVariables(GeneralChartVariables):
     pass
 
 
-class WaffleChartVariables(TypedDict):
-    wanted: List[str]
-    groups: List[str]
-    dict_keys: List[str]
-    data_arr: Dict[str, Dict | str]
+class WaffleChartVariables(GeneralChartVariables):
+    wanted: list[str]
+    # groups: list[str] # replaced by keys for consistency
+    dict_keys: list[str]
+    data_arr: dict[str, dict | str]
+
+    @validator("dict_keys")
+    def dict_keys_length(cls, v):
+        if len(v) != 2:
+            raise ValueError(
+                f"dict_keys must have exactly 2 elements, key col & val col (not {len(v)})"
+            )
+        return v
 
 
 class LatLonVariables(TypedDict):

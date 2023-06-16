@@ -265,8 +265,29 @@ class WaffleBuilder(ChartBuilder):
     CHART_TYPE = "waffle_chart"
     VARIABLE_MODEL = WaffleChartVariables
 
+    def additional_preprocessing(
+        self, variables: WaffleChartVariables, df: pd.DataFrame
+    ):
+        if len(variables.wanted) > 0:
+            # FIXME: seems too specific for covid data, do we have to generalise it? (specify what column)
+            df = df[df["age_group"].isin(variables.wanted)]
+        return df
+
     def group_to_data(self, variables: WaffleChartVariables, group: pd.DataFrame):
-        pass
+        _key, _value = variables.dict_keys
+        res = pd.Series(group[_value].values, index=group[_key]).to_dict()
+        data = {}
+        for k, v in variables.data_arr.items():
+            if isinstance(v, str):
+                data[k] = group[v].unique()[0]
+            else:
+                # FIXME: might be misunderstanding how this works, based on the singular waffle example
+                col = next(iter(v))
+                data[k] = group.loc[group[col] == v[col], k].iloc[0]
+        res["data"] = [
+            data
+        ]  # FIXME: why is the structure like this? (need to wrap around list)
+        return res
 
 
 class HelpersCustomBuilder(ChartBuilder):

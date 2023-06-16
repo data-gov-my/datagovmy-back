@@ -327,7 +327,6 @@ def test_custom_chart(sample_barchart_data):
     }
 
     builder = ChartBuilder.create("custom_chart")
-    # result = custom_chart(sample_barchart_data, variables)
     result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
@@ -431,7 +430,7 @@ def sample_waffle_data(tmp_path):
 def test_waffle_chart(sample_waffle_data):
     variables = {
         "wanted": [],
-        "groups": ["state", "age_group", "dose"],
+        "keys": ["state", "age_group", "dose"],
         "dict_keys": ["metric", "value"],
         "data_arr": {"id": "dose", "label": "dose", "value": {"metric": "perc"}},
     }
@@ -483,7 +482,8 @@ def test_waffle_chart(sample_waffle_data):
         }
     }
 
-    result = waffle_chart(sample_waffle_data, variables)
+    builder = ChartBuilder.create("waffle_chart")
+    result = builder.build_chart(sample_waffle_data, variables)
     assert result == expected_result
 
 
