@@ -337,6 +337,35 @@ class JitterBuilder(ChartBuilder):
 
 class PyramidBuilder(ChartBuilder):
     CHART_TYPE = "pyramid_chart"
+    VARIABLE_MODEL = PyramidChartVariables
+
+    def group_to_data(self):
+        pass
+
+    def build_chart(self, file_name: str, variables: PyramidChartVariables) -> str:
+        """
+        TODO: this is taken directly from chart_builder function,
+        there are no relevant test cases or existing active charts for reference - should make them and update accordingly.
+        """
+        col_range = variables["col_range"]
+        suffix = variables["suffix"]
+        keys = variables["keys"]
+
+        df = pd.read_parquet(file_name)
+
+        df[keys] = df[keys].apply(lambda x: x.lower().replace(" ", "_"))
+        res = {}
+
+        for k in df[keys].unique().tolist():
+            res[k] = {}
+            res[k]["x"] = list(col_range.keys())
+            cur_df = df.groupby(keys).get_group(k)
+
+            for s, v in suffix.items():
+                s_values = [i + s for i in list(col_range.values())]
+                res[k][v] = cur_df[s_values].values.tolist()[0]
+
+        return res
 
 
 class MetricsTableBuilder(ChartBuilder):

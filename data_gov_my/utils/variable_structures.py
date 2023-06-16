@@ -73,9 +73,9 @@ class MetricsTableVariables(GeneralChartVariables):
     pass
 
 
-class PyramidChartVariables(TypedDict):
-    col_range: Dict[str, str]
-    suffix: Dict[str, str]
+class PyramidChartVariables(GeneralChartVariables):
+    col_range: dict[str, str]
+    suffix: dict[str, str]
     keys: str
 
 
