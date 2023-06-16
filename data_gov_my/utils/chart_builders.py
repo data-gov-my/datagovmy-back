@@ -16,6 +16,8 @@ TODO:
 2 add documentation to all the charts + validation format rationale, e.g. len(v) == 2: why
 3 write down possible suggestions (if big change to format) for roshen to review: 
   changing existing structure <-- must refer to FE existing components data format!
+
+4.Establish convention - rename_cols operation, variables afterwards will assume new column name, e.g. metrics table abbreviation (homepage_table_summary)
 """
 
 STATE_ABBR = {
@@ -339,6 +341,14 @@ class PyramidBuilder(ChartBuilder):
 
 class MetricsTableBuilder(ChartBuilder):
     CHART_TYPE = "metrics_table"
+    VARIABLE_MODEL = MetricsTableVariables
+    # FIXME: should combine with custom_chart with a variables.first = False ?
+
+    def group_to_data(self, variables: MetricsTableVariables, group: pd.DataFrame):
+        if variables.value_columns:
+            return group[variables.value_columns].to_dict("records")
+        else:
+            return []
 
 
 class QueryValuesBuilder(ChartBuilder):
