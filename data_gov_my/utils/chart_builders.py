@@ -174,6 +174,21 @@ class HeatMapBuilder(ChartBuilder):
 class TimeseriesBuilder(ChartBuilder):
     CHART_TYPE = "timeseries_chart"
 
+    def format_date(self, df: pd.DataFrame, column="date", format="%Y-%m-%d"):
+        df[column] = pd.to_datetime(df[column])
+        df[column] = df[column].values.astype(np.int64) // 10**6
+        return df
+
+    def additional_preprocessing(
+        self, variables: GeneralChartVariables, df: pd.DataFrame
+    ):
+        return super().additional_preprocessing(variables, df)
+
+
+class TimeseriesSharedBuilder(ChartBuilder):
+    CHART_TYPE = "timeseries_shared"
+    # TODO: should this be combined w timeseriesbuilder, w shared=True/False option?
+
 
 class LineBuilder(ChartBuilder):
     CHART_TYPE = "line_chart"
@@ -212,16 +227,69 @@ class CustomBuilder(ChartBuilder):  # DONE
     CHART_TYPE = "custom_chart"
     VARIABLE_MODEL = CustomChartVariables
 
+    # FIXME: why not combine this w metrics table? seems quite similar
+
     def group_to_data(self, variables: CustomChartVariables, group: pd.DataFrame):
         return group[variables.value_columns].to_dict("records")[0]
 
 
 class SnapshotBuilder(ChartBuilder):
     CHART_TYPE = "snapshot_chart"
+    VARIABLE_MODEL = SnapshotChartVariables
+
+    def group_to_data(self, variables: SnapshotChartVariables, group: pd.DataFrame):
+        record_list = list(variables.data.keys())
+        record_list.append("index")
+        record_list.append(variables.main_key)
+        group["index"] = range(len(group[variables.main_key]))
+        changed_cols = {}
+        for k, v in variables.data.items():
+            if variables.replace_word != "":
+                changed_cols = {x: x.replace(k, variables.replace_word) for x in v}
+            for i in v:
+                if group[i].dtype == "object":
+                    group[i] = group[i].astype(str)
+
+            group[k] = (
+                group[v]
+                .rename(columns=changed_cols)
+                .apply(lambda s: s.to_dict(), axis=1)
+            )
+
+        res_dict = group[record_list].to_dict(orient="records")
+        return res_dict
 
 
 class WaffleBuilder(ChartBuilder):
     CHART_TYPE = "waffle_chart"
+
+
+class HelpersCustomBuilder(ChartBuilder):
+    CHART_TYPE = "helpers_custom"
+
+
+class MapLatLonBuilder(ChartBuilder):
+    CHART_TYPE = "map_lat_lon"
+
+
+class ChoroplethBuilder(ChartBuilder):
+    CHART_TYPE = "choropleth_chart"
+
+
+class JitterBuilder(ChartBuilder):
+    CHART_TYPE = "jitter_chart"
+
+
+class PyramidBuilder(ChartBuilder):
+    CHART_TYPE = "pyramid_chart"
+
+
+class MetricsTableBuilder(ChartBuilder):
+    CHART_TYPE = "metrics_table"
+
+
+class QueryValuesBuilder(ChartBuilder):
+    CHART_TYPE = "query_values"
 
 
 import pprint

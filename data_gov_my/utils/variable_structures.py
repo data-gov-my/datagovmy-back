@@ -31,14 +31,6 @@ class TimeseriesChartVariables(GeneralChartVariables):
 class BarChartVariables(GeneralChartVariables):
     x: str
     y: list[str] | dict[str, str]
-    # @validator("axis_values")
-    # def axis_values_list_length(cls, v):
-    #     """
-    #     If axis values is in list form, it must be of length two for x-axis and y-axis respectively.
-    #     """
-    #     if isinstance(v, list) and len(v) != 2:
-    #         raise ValueError(f"Length of axis values list must be 2 (not {len(v)})")
-    #     return v
 
 
 class LineChartVariables(GeneralChartVariables):
@@ -61,11 +53,10 @@ class BarMeterVariables(GeneralChartVariables):
         return v
 
 
-class SnapshotChartVariables(TypedDict):
+class SnapshotChartVariables(GeneralChartVariables):
     main_key: str
     replace_word: str
-    null_vals: str | int | None
-    data: Dict[str, Dict[str, List[str]]]
+    data: Dict[str, list[str]]
 
 
 class CustomChartVariables(GeneralChartVariables):

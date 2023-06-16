@@ -1,3 +1,4 @@
+import pprint
 import pytest
 
 from data_gov_my.utils.chart_builder import *
@@ -821,7 +822,9 @@ def test_snapshot_chart(sample_line_data):
         {"y": {"y1": 135, "y2": 90}, "index": 10, "state": "Texas"},
         {"y": {"y1": 155, "y2": 110}, "index": 11, "state": "Texas"},
     ]
-    result = snapshot_chart(sample_line_data, variables)
+
+    builder = ChartBuilder.create("snapshot_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
