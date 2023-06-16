@@ -88,6 +88,8 @@ class ChartBuilder(ABC):
         # rename cols
         df.rename(columns=variables.rename_cols, inplace=True)
 
+        df = self.additional_preprocessing(variables, df)
+
         if not variables.keys:
             return self.group_to_data(variables, df)
 
@@ -122,6 +124,11 @@ class ChartBuilder(ABC):
     def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
         pass
 
+    def additional_preprocessing(
+        self, variables: GeneralChartVariables, df: pd.DataFrame
+    ):
+        return df
+
 
 class BarChartBuilder(ChartBuilder):
     CHART_TYPE = "bar_chart"
@@ -130,7 +137,8 @@ class BarChartBuilder(ChartBuilder):
     def group_to_data(self, variables: BarChartVariables, group: pd.DataFrame):
         res = {}
         res["x"] = group[variables.x].tolist()
-        # TODO: maybe best to invert - list should maintain col name, axis values renamed. (y1..y4 needs to be manually defined.)
+        # FIXME: restrict y to list[str] only, instead must use rename_cols variable to rename?
+        # maybe best to invert - list should maintain col name, axis values renamed. (y1..y4 needs to be manually defined.)
         if isinstance(variables.y, list):
             if len(variables.y) == 1:
                 res["y"] = group[variables.y[0]].tolist()
@@ -145,6 +153,22 @@ class BarChartBuilder(ChartBuilder):
 
 class HeatMapBuilder(ChartBuilder):
     CHART_TYPE = "heatmap_chart"
+    VARIABLE_MODEL = HeatmapChartVariables
+
+    # def additional_preprocessing(
+    #     self, variables: HeatmapChartVariables, df: pd.DataFrame
+    # ):
+    #     df["id"] = df[variables.id]
+    #     return df
+
+    def group_to_data(self, variables: HeatmapChartVariables, group: pd.DataFrame):
+        # TODO: in future, is 'id' column necessary?
+        group.replace(variables.replace_vals, regex=True, inplace=True)
+        data = group[variables.value_columns].transform(
+            lambda x: [{"x": x.name, "y": y} for y in x]
+        )
+        data = data.to_numpy().flatten().tolist()
+        return data
 
 
 class TimeseriesBuilder(ChartBuilder):
@@ -203,11 +227,15 @@ class WaffleBuilder(ChartBuilder):
 import pprint
 
 if __name__ == "__main__":
-    chart_type = "line_chart"
+    chart_type = "heatmap_chart"
 
     params = {
-        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/sekolahku_bellcurve_curve.parquet",
-        "variables": {"keys": ["state", "level", "chart"], "x": "x", "y": ["y"]},
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/blood_01_stock_snapshot.parquet",
+        "variables": {
+            "value_columns": ["a", "b", "ab", "o"],
+            "keys": ["state"],
+            "replace_vals": {"High": 0, "Safe": 1, "Low": 2, "Mid": 3},
+        },
     }
     url = params["input"]
     variables = params["variables"]

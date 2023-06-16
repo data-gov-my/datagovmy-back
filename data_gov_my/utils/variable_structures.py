@@ -16,6 +16,7 @@ class GeneralChartVariables(BaseModel):
     value_columns: list[str] = None
     rename_cols: dict[str, str] = {}
     null_vals: str | int | None = None
+    replace_vals: dict[str, str | int] = {}
 
 
 class TimeseriesChartVariables(TypedDict):
@@ -104,6 +105,11 @@ class HeatmapChartVariables(TypedDict):
     dict_rename: Dict[str, str]
     row_format: str
     operation: str
+
+
+class HeatmapChartVariables(GeneralChartVariables):
+    # id: str
+    pass
 
 
 class WaffleChartVariables(TypedDict):
