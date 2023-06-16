@@ -69,9 +69,8 @@ class ChoroplethChartVariables(TypedDict):
     keys: List[str]  # filters
 
 
-class MetricsTableVariables(TypedDict):
-    keys: List[str]
-    obj_attr: Dict[str, str]
+class MetricsTableVariables(GeneralChartVariables):
+    pass
 
 
 class PyramidChartVariables(TypedDict):

@@ -643,12 +643,13 @@ def sample_metrics_table_data(tmp_path):
 
 
 def test_metrics_table(sample_metrics_table_data):
-    variables = {"keys": ["lang"], "obj_attr": {"fruit": "fruit"}}
+    variables = {"keys": ["lang"], "value_columns": ["fruit"]}
     expected_result = {
         "bm": [{"fruit": "nanas"}, {"fruit": "epal"}, {"fruit": "tembikai"}],
         "en": [{"fruit": "pineapple"}, {"fruit": "apple"}, {"fruit": "watermelon"}],
     }
-    result = metrics_table(sample_metrics_table_data, variables)
+    builder = ChartBuilder.create("metrics_table")
+    result = builder.build_chart(sample_metrics_table_data, variables)
     assert result == expected_result
 
 
