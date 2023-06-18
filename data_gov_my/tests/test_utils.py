@@ -145,7 +145,7 @@ def sample_timeseries_data(tmp_path):
 def test_timeseries_chart(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "value_columns": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
+        "values": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
     }
 
     expected_result = {
@@ -161,7 +161,8 @@ def test_timeseries_chart(sample_timeseries_data):
         },
     }
 
-    result = timeseries_chart(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_chart")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 

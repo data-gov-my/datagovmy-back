@@ -19,13 +19,9 @@ class GeneralChartVariables(BaseModel):
     replace_vals: dict[str, str | int] = {}
 
 
-class TimeseriesChartVariables(TypedDict):
-    keys: List[str]
-    values: List[str]
-
-
 class TimeseriesChartVariables(GeneralChartVariables):
-    DATE_RANGE: Any
+    # DATE_RANGE: Any
+    values: dict[str, str]
 
 
 class BarChartVariables(GeneralChartVariables):

@@ -184,16 +184,25 @@ class HeatMapBuilder(ChartBuilder):
 
 class TimeseriesBuilder(ChartBuilder):
     CHART_TYPE = "timeseries_chart"
+    VARIABLE_MODEL = TimeseriesChartVariables
 
     def format_date(self, df: pd.DataFrame, column="date", format="%Y-%m-%d"):
+        """
+        FIXME: DATA_RANGE in variables not handled - can't find existing samples for it?
+        """
         df[column] = pd.to_datetime(df[column])
+
         df[column] = df[column].values.astype(np.int64) // 10**6
         return df
 
-    def additional_preprocessing(
-        self, variables: GeneralChartVariables, df: pd.DataFrame
-    ):
-        return super().additional_preprocessing(variables, df)
+    def group_to_data(self, variables: TimeseriesChartVariables, group: pd.DataFrame):
+        """
+        FIXME: values should perhaps be removed and standardised to value_columns and rename_cols..?
+        """
+        res = {}
+        for key, col in variables.values.items():
+            res[key] = group[col].tolist()
+        return res
 
 
 class TimeseriesSharedBuilder(ChartBuilder):
