@@ -1,4 +1,3 @@
-import pprint
 import pytest
 
 from data_gov_my.utils.chart_builder import *
@@ -178,7 +177,8 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
         "line_daily": [90, 190, 160, 130, 170, 150],
     }
 
-    result = timeseries_shared(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_shared")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 
@@ -194,8 +194,8 @@ def test_timeseries_shared_chart_nested(sample_timeseries_data):
         "California": {"daily": [100, 200, 150], "line_daily": [90, 190, 160]},
         "New York": {"daily": [120, 180, 140], "line_daily": [130, 170, 150]},
     }
-
-    result = timeseries_shared(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_shared")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 

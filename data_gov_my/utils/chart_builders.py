@@ -4,11 +4,7 @@ from django.utils.text import slugify
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel
-
 from data_gov_my.utils.variable_structures import *
-from data_gov_my.utils.variable_structures import GeneralChartVariables
-
-# from variable_structures import *
 
 """
 TODO:
@@ -102,38 +98,47 @@ class ChartBuilder(ABC):
         df = self.additional_preprocessing(variables, df)
 
         if not variables.keys:
-            return self.group_to_data(variables, df)
+            result = self.group_to_data(variables, df)
 
-        result = {}
-        value_cols = (
-            variables.value_columns  # if value columns are defined, take as it is
-            if variables.value_columns
-            else list(
-                set(df.columns) ^ set(variables.keys)
-            )  # else, take all possible columns excluding key columns
-        )
-        df_groupby = df.groupby(variables.keys)
-        for name, group in df_groupby:
-            if isinstance(name, str):
-                name = (name,)
+        else:
+            result = {}
+            value_cols = (
+                variables.value_columns  # if value columns are defined, take as it is
+                if variables.value_columns
+                else list(
+                    set(df.columns) ^ set(variables.keys)
+                )  # else, take all possible columns excluding key columns
+            )
+            df_groupby = df.groupby(variables.keys)
+            for name, group in df_groupby:
+                if isinstance(name, str):
+                    name = (name,)
 
-            name = [str(n) for n in name]
+                name = [str(n) for n in name]
 
-            if len(variables.keys) > 1:
-                current_level = result
-                for i in range(len(name) - 1):
-                    current_level = current_level.setdefault(name[i], {})
-                current_level[name[-1]] = self.group_to_data(
-                    variables, group
-                )  ### children class must define how to handle each groups
-            else:
-                assert len(name) == 1
-                result[name[0]] = self.group_to_data(variables, group)
+                if len(variables.keys) > 1:
+                    current_level = result
+                    for i in range(len(name) - 1):
+                        current_level = current_level.setdefault(name[i], {})
+                    current_level[name[-1]] = self.group_to_data(
+                        variables, group
+                    )  ### children class must define how to handle each groups
+                else:
+                    assert len(name) == 1
+                    result[name[0]] = self.group_to_data(variables, group)
+
+        result = self.additional_postprocessing(variables, df, result)
+
         return result
 
     @abstractmethod
     def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
         pass
+
+    def additional_postprocessing(
+        self, variables: GeneralChartVariables, df: pd.DataFrame, result: dict
+    ):
+        return result
 
     def additional_preprocessing(
         self, variables: GeneralChartVariables, df: pd.DataFrame
@@ -207,7 +212,33 @@ class TimeseriesBuilder(ChartBuilder):
 
 class TimeseriesSharedBuilder(ChartBuilder):
     CHART_TYPE = "timeseries_shared"
+    VARIABLE_MODEL = TimeseriesSharedVariables
     # TODO: should this be combined w timeseriesbuilder, w shared=True/False option?
+
+    def format_date(self, df: pd.DataFrame, column="date", format="%Y-%m-%d"):
+        """
+        FIXME: DATA_RANGE in variables not handled - can't find existing samples for it?
+        """
+        df[column] = pd.to_datetime(df[column])
+
+        df[column] = df[column].values.astype(np.int64) // 10**6
+        return df
+
+    def additional_postprocessing(
+        self, variables: TimeseriesSharedVariables, df: pd.DataFrame, result: dict
+    ):
+        for key, col in variables.constant.items():
+            result[key] = df[col].unique().tolist()
+        return result
+
+    def group_to_data(self, variables: TimeseriesSharedVariables, group: pd.DataFrame):
+        """
+        FIXME: values should perhaps be removed and standardised to value_columns and rename_cols..?
+        """
+        res = {}
+        for key, col in variables.attributes.items():
+            res[key] = group[col].tolist()
+        return res
 
 
 class LineBuilder(ChartBuilder):
@@ -448,24 +479,3 @@ class QueryValuesBuilder(ChartBuilder):
             parent[k] = val
 
         return res
-
-
-import pprint
-
-if __name__ == "__main__":
-    chart_type = "heatmap_chart"
-
-    params = {
-        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/blood_01_stock_snapshot.parquet",
-        "variables": {
-            "value_columns": ["a", "b", "ab", "o"],
-            "keys": ["state"],
-            "replace_vals": {"High": 0, "Safe": 1, "Low": 2, "Mid": 3},
-        },
-    }
-    url = params["input"]
-    variables = params["variables"]
-
-    builder = ChartBuilder.create(chart_type)
-    chart: pd.DataFrame = builder.build_chart(url, variables)
-    pprint.pprint(chart)

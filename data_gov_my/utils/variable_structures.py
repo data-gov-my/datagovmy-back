@@ -24,6 +24,11 @@ class TimeseriesChartVariables(GeneralChartVariables):
     values: dict[str, str]
 
 
+class TimeseriesSharedVariables(GeneralChartVariables):
+    constant: dict[str, str]
+    attributes: dict[str, str]
+
+
 class BarChartVariables(GeneralChartVariables):
     x: str
     y: list[str] | dict[str, str]
