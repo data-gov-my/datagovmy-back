@@ -19,7 +19,7 @@ def get_chart_types(charts=[]):
     return chart_types
 
 
-@pytest.mark.parametrize("chart_type", get_chart_types(["metrics_table"]))
+@pytest.mark.parametrize("chart_type", get_chart_types(["choropleth_chart"]))
 def test_all_chart_builders(chart_type):
     path = os.path.join(os.getcwd(), "data_gov_my", "tests", "chart_expected_output/")
     files = [f for f in os.listdir(os.path.join(path, chart_type))]

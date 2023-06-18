@@ -619,7 +619,8 @@ def test_choropleth_chart(sample_choropleth_data):
         },
     }
 
-    result = choropleth_chart(sample_choropleth_data, variables)
+    builder = ChartBuilder.create("choropleth_chart")
+    result = builder.build_chart(sample_choropleth_data, variables)
     assert result == expected_result
 
 

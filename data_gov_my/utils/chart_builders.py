@@ -325,10 +325,31 @@ class HelpersCustomBuilder(ChartBuilder):
 
 class MapLatLonBuilder(ChartBuilder):
     CHART_TYPE = "map_lat_lon"
+    VARIABLE_MODEL = GeneralChartVariables
+
+    def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
+        if variables.value_columns:
+            return group[variables.value_columns].to_dict("records")
+        else:
+            return []
 
 
 class ChoroplethBuilder(ChartBuilder):
     CHART_TYPE = "choropleth_chart"
+    VARIABLE_MODEL = ChoroplethChartVariables
+
+    # FIXME: consumer_price_index_choropleth fails bc district not slugified - should it be?
+
+    def group_to_data(self, variables: ChoroplethChartVariables, group: pd.DataFrame):
+        """
+        FIXME: Exactly the same as line chart / bar chart - should it be the same then?
+        """
+        res = {}
+        res["x"] = group[variables.x].tolist()
+        res["y"] = {}
+        for col in variables.y:
+            res["y"][col] = group[col].tolist()
+        return res
 
 
 class JitterBuilder(ChartBuilder):

@@ -63,10 +63,9 @@ class CustomChartVariables(GeneralChartVariables):
     pass
 
 
-class ChoroplethChartVariables(TypedDict):
+class ChoroplethChartVariables(GeneralChartVariables):
     x: str
-    y: List[str]  # alow multiple y columns
-    keys: List[str]  # filters
+    y: list[str]  # alow multiple y columns
 
 
 class MetricsTableVariables(GeneralChartVariables):
