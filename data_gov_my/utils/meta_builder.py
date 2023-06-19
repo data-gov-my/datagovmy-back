@@ -215,7 +215,6 @@ class GeneralMetaBuilder(ABC):
         1. Refresh github repository (delete and re-clone)
         2. Collect meta files (if no meta files provided in input, the whole folder will be taken)
         3. Calls `update_or_create_meta()` to save metadata into database as model instances.
-        // TODO: should we do `additional_handling(object: ModelObject)` instead of `additional_handling(objects: List[ModelObject])`?
         4. Calls `additional_handling()`, e.g. each dashboard metadata has multiple charts, these charts are individually updated through `additional_handling()`.
         5. Revalidates routes if the model instances have `route` field.
         """
