@@ -318,7 +318,7 @@ def test_custom_chart(sample_barchart_data):
 
     expected_result = {
         "California": {
-            "2020": {"age_group": "18-24", "new_donors": 100, "old_donors": 11},
+            "2020": {"age_group": "18-24", "new_donors": 100, "old_donors": 1},
             "2021": {"age_group": "25-34", "new_donors": 200, "old_donors": 2},
         },
         "New York": {
@@ -879,7 +879,8 @@ def test_map_lat_long_chart(sample_map_lat_long_data):
         },
         "Texas": {"houston": [{"lat": 29.7604, "long": -95.3698}]},
     }
-    result = map_lat_lon(sample_map_lat_long_data, variables)
+    builder = ChartBuilder.create("map_lat_lon")
+    result = builder.build_chart(sample_map_lat_long_data, variables)
     assert result == expected_result
 
 
