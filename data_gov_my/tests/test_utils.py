@@ -41,7 +41,6 @@ def test_bar_chart(sample_barchart_data):
     }
 
     builder = ChartBuilder.create("bar_chart")
-    # result = custom_chart(sample_barchart_data, variables)
     result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
@@ -708,96 +707,73 @@ Heatmap
 
 def test_heatmap_chart_simple(sample_line_data):
     variables = {
-        "cols": ["y1"],
-        "id": "state",
+        "rename_cols": {"y1": "Y1"},
+        "value_columns": ["Y1"],
         "keys": ["state"],
-        "null_values": None,
-        "replace_vals": {},
-        "dict_rename": {},
-        "row_format": "upper",
-        "operation": "SET",
     }
     expected_result = {
-        "California": {
-            "data": [
-                {"x": "Y1", "y": 100},
-                {"x": "Y1", "y": 200},
-                {"x": "Y1", "y": 150},
-                {"x": "Y1", "y": 170},
-            ],
-            "id": "California",
-        },
-        "New York": {
-            "data": [
-                {"x": "Y1", "y": 120},
-                {"x": "Y1", "y": 180},
-                {"x": "Y1", "y": 140},
-                {"x": "Y1", "y": 160},
-            ],
-            "id": "New York",
-        },
-        "Texas": {
-            "data": [
-                {"x": "Y1", "y": 130},
-                {"x": "Y1", "y": 110},
-                {"x": "Y1", "y": 135},
-                {"x": "Y1", "y": 155},
-            ],
-            "id": "Texas",
-        },
+        "California": [
+            {"x": "Y1", "y": 100},
+            {"x": "Y1", "y": 200},
+            {"x": "Y1", "y": 150},
+            {"x": "Y1", "y": 170},
+        ],
+        "New York": [
+            {"x": "Y1", "y": 120},
+            {"x": "Y1", "y": 180},
+            {"x": "Y1", "y": 140},
+            {"x": "Y1", "y": 160},
+        ],
+        "Texas": [
+            {"x": "Y1", "y": 130},
+            {"x": "Y1", "y": 110},
+            {"x": "Y1", "y": 135},
+            {"x": "Y1", "y": 155},
+        ],
     }
-    result = heatmap_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("heatmap_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
 def test_heatmap_chart_multi_cols(sample_line_data):
     variables = {
-        "cols": ["y1", "y2"],
-        "id": "state",
+        "rename_cols": {"y1": "Y1", "y2": "Y2"},
+        "value_columns": ["Y1", "Y2"],
         "keys": ["period"],
-        "null_values": None,
-        "replace_vals": {},
-        "dict_rename": {},
-        "row_format": "upper",
-        "operation": "SET",
     }
     expected_result = {
-        "daily": {
-            "id": "California",
-            "data": [
-                {"x": "Y1", "y": 100},
-                {"x": "Y2", "y": 50},
-                {"x": "Y1", "y": 200},
-                {"x": "Y2", "y": 80},
-                {"x": "Y1", "y": 120},
-                {"x": "Y2", "y": 90},
-                {"x": "Y1", "y": 180},
-                {"x": "Y2", "y": 160},
-                {"x": "Y1", "y": 130},
-                {"x": "Y2", "y": 100},
-                {"x": "Y1", "y": 110},
-                {"x": "Y2", "y": 70},
-            ],
-        },
-        "monthly": {
-            "id": "California",
-            "data": [
-                {"x": "Y1", "y": 150},
-                {"x": "Y2", "y": 120},
-                {"x": "Y1", "y": 170},
-                {"x": "Y2", "y": 140},
-                {"x": "Y1", "y": 140},
-                {"x": "Y2", "y": 110},
-                {"x": "Y1", "y": 160},
-                {"x": "Y2", "y": 130},
-                {"x": "Y1", "y": 135},
-                {"x": "Y2", "y": 90},
-                {"x": "Y1", "y": 155},
-                {"x": "Y2", "y": 110},
-            ],
-        },
+        "daily": [
+            {"x": "Y1", "y": 100},
+            {"x": "Y2", "y": 50},
+            {"x": "Y1", "y": 200},
+            {"x": "Y2", "y": 80},
+            {"x": "Y1", "y": 120},
+            {"x": "Y2", "y": 90},
+            {"x": "Y1", "y": 180},
+            {"x": "Y2", "y": 160},
+            {"x": "Y1", "y": 130},
+            {"x": "Y2", "y": 100},
+            {"x": "Y1", "y": 110},
+            {"x": "Y2", "y": 70},
+        ],
+        "monthly": [
+            {"x": "Y1", "y": 150},
+            {"x": "Y2", "y": 120},
+            {"x": "Y1", "y": 170},
+            {"x": "Y2", "y": 140},
+            {"x": "Y1", "y": 140},
+            {"x": "Y2", "y": 110},
+            {"x": "Y1", "y": 160},
+            {"x": "Y2", "y": 130},
+            {"x": "Y1", "y": 135},
+            {"x": "Y2", "y": 90},
+            {"x": "Y1", "y": 155},
+            {"x": "Y2", "y": 110},
+        ],
     }
-    result = heatmap_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("heatmap_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
