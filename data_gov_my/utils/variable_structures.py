@@ -85,19 +85,7 @@ class JitterChartVariables(GeneralChartVariables):
     tooltip: bool
 
 
-class HeatmapChartVariables(TypedDict):
-    cols: List[str]
-    id: str
-    keys: List[str]
-    null_values: str | int | None
-    replace_vals: Dict[str, str | int]
-    dict_rename: Dict[str, str]
-    row_format: str
-    operation: str
-
-
 class HeatmapChartVariables(GeneralChartVariables):
-    # id: str
     pass
 
 
