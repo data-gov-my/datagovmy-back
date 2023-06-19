@@ -1,9 +1,8 @@
+import pandas as pd
 import pytest
 
-from data_gov_my.utils.chart_builder import *
 from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.variable_structures import *
-
 
 """
 Bar chart
@@ -65,7 +64,6 @@ def test_barmeter_simple(sample_barchart_data):
     }
     builder = ChartBuilder.create("bar_meter")
     result = builder.build_chart(sample_barchart_data, variables)
-    # result = bar_meter(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -102,7 +100,8 @@ def test_barmeter_subkeys(sample_barchart_data):
         },
     }
 
-    result = bar_meter(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_meter")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 

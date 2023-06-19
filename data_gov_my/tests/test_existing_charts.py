@@ -1,10 +1,11 @@
-import os
-import pytest
 import json
-from data_gov_my.utils.chart_builders import ChartBuilder
-from data_gov_my.utils.dashboard_builder import *
-from data_gov_my.utils.variable_structures import *
+import os
 import pathlib
+
+import pytest
+
+from data_gov_my.utils.chart_builders import ChartBuilder
+from data_gov_my.utils.variable_structures import *
 
 
 # get list of chart builders

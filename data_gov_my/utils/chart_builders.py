@@ -1,11 +1,13 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from django.utils.text import slugify
+
 import numpy as np
 import pandas as pd
+from django.utils.text import slugify
 from pydantic import BaseModel
-from data_gov_my.utils.variable_structures import *
 
+from data_gov_my.utils.variable_structures import *
 
 STATE_ABBR = {
     "Johor": "jhr",
