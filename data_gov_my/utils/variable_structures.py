@@ -79,10 +79,9 @@ class PyramidChartVariables(GeneralChartVariables):
     keys: str
 
 
-class JitterChartVariables(TypedDict):
-    keys: str
+class JitterChartVariables(GeneralChartVariables):
     id: str
-    columns: Dict[str, List[str]]
+    columns: dict[str, list[str]]
     tooltip: bool
 
 

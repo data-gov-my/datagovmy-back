@@ -76,10 +76,7 @@ class ChartBuilder(ABC):
         df[column] = df[column].dt.strftime(format)
         return df
 
-    def build_chart(self, file_name: str, variables: GeneralChartVariables) -> str:
-        variables = self.VARIABLE_MODEL(**variables)
-        df = pd.read_parquet(file_name)
-
+    def pre_process(self, df: pd.DataFrame, variables: GeneralChartVariables):
         # pre-process column values (column names are considered reserve names)
         if "state" in df.columns:
             df["state"].replace(STATE_ABBR, inplace=True)
@@ -96,6 +93,24 @@ class ChartBuilder(ABC):
         df.rename(columns=variables.rename_cols, inplace=True)
 
         df = self.additional_preprocessing(variables, df)
+
+        return df
+
+    def additional_preprocessing(
+        self, variables: GeneralChartVariables, df: pd.DataFrame
+    ):
+        return df
+
+    def additional_postprocessing(
+        self, variables: GeneralChartVariables, df: pd.DataFrame, result: dict
+    ):
+        return result
+
+    def build_chart(self, file_name: str, variables: GeneralChartVariables) -> str:
+        variables = self.VARIABLE_MODEL(**variables)
+        df = pd.read_parquet(file_name)
+
+        df = self.pre_process(df, variables)
 
         if not variables.keys:
             result = self.group_to_data(variables, df)
@@ -134,16 +149,6 @@ class ChartBuilder(ABC):
     @abstractmethod
     def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
         pass
-
-    def additional_postprocessing(
-        self, variables: GeneralChartVariables, df: pd.DataFrame, result: dict
-    ):
-        return result
-
-    def additional_preprocessing(
-        self, variables: GeneralChartVariables, df: pd.DataFrame
-    ):
-        return df
 
 
 class BarChartBuilder(ChartBuilder):
@@ -394,6 +399,46 @@ class ChoroplethBuilder(ChartBuilder):
 
 class JitterBuilder(ChartBuilder):
     CHART_TYPE = "jitter_chart"
+    VARIABLE_MODEL = JitterChartVariables
+
+    def group_to_data(self, variables: GeneralChartVariables, group: pd.DataFrame):
+        pass
+
+    def build_chart(self, file_name: str, variables: JitterChartVariables) -> str:
+        df: pd.DataFrame = pd.read_parquet(file_name)
+        res = {}
+
+        df[variables.keys] = df[variables.keys].apply(
+            lambda x: x.lower().replace(" ", "_")
+        )
+        key_vals = (
+            df[variables.keys].unique().tolist()
+        )  # Handles just 1 key ( as of now )
+
+        for k in key_vals:
+            res[k] = {}
+
+            for key, val in variables.columns.items():
+                res[k][key] = []
+
+                for col in val:
+                    x_val = col + "_x"
+                    y_val = col + "_y"
+
+                    cols_rename = {x_val: "x", y_val: "y", id: "id"}
+                    cols_inv = ["area", x_val, y_val]
+
+                    if variables.tooltip:
+                        t_val = col + "_t"
+                        cols_rename[t_val] = "tooltip"
+                        cols_inv.append(t_val)
+
+                    temp_df = df.groupby(variables.keys).get_group(k)[cols_inv]
+                    temp_df = temp_df.rename(columns=cols_rename)
+                    data = temp_df.to_dict("records")
+                    res[k][key].append({"key": col, "data": data})
+
+        return res
 
 
 class PyramidBuilder(ChartBuilder):
