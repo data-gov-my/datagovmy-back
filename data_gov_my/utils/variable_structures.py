@@ -8,8 +8,10 @@ class GeneralChartVariables(BaseModel):
     """
     Commonly shared properties for all charts
     keys: used as keys in the resulted nested dictionary data
-    values: columns that contain the actual values of chart data, e.g. y-values
-    rename: dict
+    value_columns: columns that contain the actual values of chart data, e.g. y-values
+    rename_cols: Dictionary used to rename column names, this should be reflected during pre-processing phase.
+    null_vals: Value used to replace nan values, this should be reflected during pre-processing phase.
+    replace_vals: Dictionary used to replace df values, this should be reflected during pre-processing phase.
     """
 
     keys: list[str] = []
