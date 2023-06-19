@@ -43,6 +43,7 @@ class ChartBuilder(ABC):
     General abstract class that contains common methods to build charts. This class should be extended to build cocnrete charts, e.g. timeseries.
     """
 
+    VARIABLE_MODEL = GeneralChartVariables
     subclasses = {}
 
     def __init_subclass__(cls, **kwargs) -> None:
