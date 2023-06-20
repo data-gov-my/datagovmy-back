@@ -131,6 +131,11 @@ class ElectionDashboard_Seats(models.Model):
     seat_name = models.CharField(max_length=100)
     state = models.CharField(max_length=50, null=True)
     slug = models.CharField(max_length=100, default='')
+    voter_turnout = models.IntegerField(null=True)
+    voter_turnout_perc = models.FloatField(null=True, default=None)
+    votes_rejected = models.IntegerField(null=True)
+    votes_rejected_perc = models.FloatField(null=True, default=None)
+
 
 
 class ElectionDashboard_Party(models.Model):
