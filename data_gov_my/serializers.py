@@ -94,13 +94,21 @@ class ElectionPartySerializer(serializers.ModelSerializer):
 
 class ElectionOverallSeatSerializer(serializers.ModelSerializer):
     majority = serializers.SerializerMethodField()
+    voter_turnout = serializers.SerializerMethodField()
+    votes_rejected = serializers.SerializerMethodField()
 
     class Meta:
         model = ElectionDashboard_Seats
-        fields = ["seat", "date", "party", "name", "majority"]
+        fields = ["seat", "date", "party", "name", "majority", "voter_turnout", "votes_rejected"]
 
     def get_majority(self, obj):
         return {"abs": obj.majority, "perc": obj.majority_perc}
+
+    def get_voter_turnout(self, obj):
+        return {"abs": obj.voter_turnout, "perc": obj.voter_turnout_perc}
+
+    def get_votes_rejected(self, obj):
+        return {"abs": obj.votes_rejected, "perc": obj.votes_rejected_perc}
 
 
 class i18nSerializer(serializers.ModelSerializer):
