@@ -90,7 +90,9 @@ class ChartBuilder(ABC):
         if "state" in df.columns:
             df["state"].replace(STATE_ABBR, inplace=True)
 
-        if "district" in df.columns:  # District usually uses has spaces and Uppercase
+        if (
+            "district" in df.columns and "district" in variables.keys
+        ):  # District usually uses has spaces and Uppercase
             df["district"] = df["district"].apply(slugify)
 
         if "date" in df.columns:
