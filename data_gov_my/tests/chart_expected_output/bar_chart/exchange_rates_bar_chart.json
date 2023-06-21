@@ -5,9 +5,13 @@
             "keys": [
                 "period"
             ],
-            "x": "country",
+            "rename_cols": {
+                "country": "x",
+                "pct_change": "y"
+            },
+            "x": "x",
             "y": [
-                "pct_change"
+                "y"
             ]
         }
     },

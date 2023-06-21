@@ -6,9 +6,13 @@
                 "period",
                 "state"
             ],
-            "x": "variable",
+            "rename_cols": {
+                "variable": "x",
+                "value": "y"
+            },
+            "x": "x",
             "y": [
-                "value"
+                "y"
             ]
         }
     },

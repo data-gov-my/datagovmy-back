@@ -6,9 +6,13 @@
                 "state",
                 "period"
             ],
-            "x": "age",
+            "rename_cols": {
+                "age": "x",
+                "screened": "y"
+            },
+            "x": "x",
             "y": [
-                "screened"
+                "y"
             ]
         }
     },

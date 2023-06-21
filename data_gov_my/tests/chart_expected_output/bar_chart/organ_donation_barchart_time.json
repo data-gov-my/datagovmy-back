@@ -6,9 +6,13 @@
                 "state",
                 "type"
             ],
-            "x": "period",
+            "rename_cols": {
+                "period": "x",
+                "new_donors": "y"
+            },
+            "x": "x",
             "y": [
-                "new_donors"
+                "y"
             ]
         }
     },

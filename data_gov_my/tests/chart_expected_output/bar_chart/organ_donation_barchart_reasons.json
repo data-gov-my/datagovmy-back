@@ -6,9 +6,13 @@
                 "state",
                 "period"
             ],
-            "x": "reason",
+            "rename_cols": {
+                "reason": "x",
+                "pledgers": "y"
+            },
+            "x": "x",
             "y": [
-                "pledgers"
+                "y"
             ]
         }
     },
