@@ -5,13 +5,20 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "deaths_inpatient": "deaths_inp_dod",
-                "deaths_brought_in": "deaths_bid_dod",
-                "tooltip": "deaths_dod",
-                "line": "deaths_dod_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "deaths_inp_dod": "deaths_inpatient",
+                "deaths_bid_dod": "deaths_brought_in",
+                "deaths_dod": "tooltip",
+                "deaths_dod_7dma": "line"
+            },
+            "value_columns": [
+                "x",
+                "deaths_inpatient",
+                "deaths_brought_in",
+                "tooltip",
+                "line"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

@@ -5,13 +5,20 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "type_a": "stock_a",
-                "type_b": "stock_b",
-                "type_ab": "stock_ab",
-                "type_o": "stock_o"
-            }
+            "rename_cols": {
+                "date": "x",
+                "stock_a": "type_a",
+                "stock_b": "type_b",
+                "stock_ab": "type_ab",
+                "stock_o": "type_o"
+            },
+            "value_columns": [
+                "x",
+                "type_a",
+                "type_b",
+                "type_ab",
+                "type_o"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

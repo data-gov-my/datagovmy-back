@@ -3,14 +3,17 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/interestrates_timeseries.parquet",
         "variables": {
             "keys": [],
-            "values": {
-                "x": "date",
-                "deposit_fixed_12mo": "deposit_fixed_12mo",
-                "deposit_saving": "deposit_saving",
-                "base": "base",
-                "walr": "walr",
-                "recession": "recession"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "deposit_fixed_12mo",
+                "deposit_saving",
+                "base",
+                "walr",
+                "recession"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

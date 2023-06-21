@@ -6,11 +6,15 @@
                 "state",
                 "hospital"
             ],
-            "values": {
-                "x": "date",
-                "daily": "daily",
-                "line": "daily_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "daily_7dma": "line"
+            },
+            "value_columns": [
+                "x",
+                "daily",
+                "line"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

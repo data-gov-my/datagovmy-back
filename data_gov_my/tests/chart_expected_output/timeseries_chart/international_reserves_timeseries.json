@@ -3,13 +3,16 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/intlreserves_timeseries.parquet",
         "variables": {
             "keys": [],
-            "values": {
-                "x": "date",
-                "reserves_usd": "reserves_usd",
-                "import_months": "import_months",
-                "ed_scale": "ed_scale",
-                "recession": "recession"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "reserves_usd",
+                "import_months",
+                "ed_scale",
+                "recession"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

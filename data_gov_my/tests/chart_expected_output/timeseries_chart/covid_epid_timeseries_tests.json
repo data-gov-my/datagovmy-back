@@ -5,12 +5,16 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "tests_pcr": "tests_pcr",
-                "tests_rtk": "tests_rtk",
-                "tooltip": "tests_posrate_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "tests_posrate_7dma": "tooltip"
+            },
+            "value_columns": [
+                "x",
+                "tests_pcr",
+                "tests_rtk",
+                "tooltip"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

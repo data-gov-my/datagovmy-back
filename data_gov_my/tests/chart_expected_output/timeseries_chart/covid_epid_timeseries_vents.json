@@ -5,11 +5,15 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "vent": "vent",
-                "line": "vent_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "vent_7dma": "line"
+            },
+            "value_columns": [
+                "x",
+                "vent",
+                "line"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

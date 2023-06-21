@@ -5,11 +5,15 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "daily": "daily",
-                "line_daily": "daily_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "daily_7dma": "line_daily"
+            },
+            "value_columns": [
+                "x",
+                "daily",
+                "line_daily"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

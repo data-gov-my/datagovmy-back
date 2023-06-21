@@ -5,20 +5,23 @@
             "keys": [
                 "chart_type"
             ],
-            "values": {
-                "x": "date",
-                "total": "total",
-                "currency": "currency",
-                "reserves_required": "reserves_required",
-                "reserves_excess": "reserves_excess",
-                "net_claims_gov": "net_claims_gov",
-                "claims_gov": "claims_gov",
-                "deposits_gov": "deposits_gov",
-                "claims_private": "claims_private",
-                "external": "external",
-                "others": "others",
-                "recession": "recession"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "total",
+                "currency",
+                "reserves_required",
+                "reserves_excess",
+                "net_claims_gov",
+                "claims_gov",
+                "deposits_gov",
+                "claims_private",
+                "external",
+                "others",
+                "recession"
+            ]
         }
     },
     "chart_type": "timeseries_chart",
