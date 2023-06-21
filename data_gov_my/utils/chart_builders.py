@@ -257,10 +257,6 @@ class HeatMapBuilder(ChartBuilder):
 
 
 class TimeseriesBuilder(ChartBuilder):
-    """
-    FIXME: DATA_RANGE in variables not handled as of now, don't see an existing chart for it (?)
-    """
-
     CHART_TYPE = "timeseries_chart"
     VARIABLE_MODEL = TimeseriesChartVariables
 
@@ -283,8 +279,7 @@ class TimeseriesBuilder(ChartBuilder):
 
 class TimeseriesSharedBuilder(ChartBuilder):
     """
-    FIXME: DATA_RANGE in variables not handled as of now, don't see an existing chart for it (?)
-    TODO: should this be combined w timeseriesbuilder, w shared=True/False option?
+    TODO: should this be combined w timeseriesbuilder, w shared=True/False option? ANS: YES
     """
 
     CHART_TYPE = "timeseries_shared"
@@ -423,34 +418,6 @@ class WaffleBuilder(ChartBuilder):
             data
         ]  # FIXME: why is the structure like this? (need to wrap around list)
         return res
-
-
-class HelpersCustomBuilder(ChartBuilder):
-    """
-    TODO: this is taken directly from chart_builder function,
-    there are no relevant test cases or existing active charts for reference - should make them and update accordingly.
-    """
-
-    CHART_TYPE = "helpers_custom"
-    VARIABLE_MODEL = None
-
-    def group_to_data(self):
-        pass
-
-    def build_chart(self, file_name: str) -> str:
-        df = pd.read_parquet(file_name)
-        df["state"].replace(STATE_ABBR, inplace=True)
-
-        state_mapping = {}
-        state_mapping["facility_types"] = df["type"].unique().tolist()
-        state_mapping["state_district_mapping"] = {}
-
-        for state in df["state"].unique():
-            state_mapping["state_district_mapping"][state] = (
-                df.groupby("state").get_group(state)["district"].unique().tolist()
-            )
-
-        return state_mapping
 
 
 class MapLatLonBuilder(ChartBuilder):
