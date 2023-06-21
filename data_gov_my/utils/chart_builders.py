@@ -250,10 +250,6 @@ class LineBuilder(ChartBuilder):
 
 
 class BarmeterBuilder(ChartBuilder):
-    """
-    FIXME: for axis values, why not just dict[str,str], instead of list[dict[str, str]]?
-    """
-
     CHART_TYPE = "bar_meter"
     VARIABLE_MODEL = BarMeterVariables
 
@@ -328,10 +324,6 @@ class WaffleBuilder(ChartBuilder):
 
 
 class MapLatLonBuilder(ChartBuilder):
-    """
-    TODO: add test cases for maplatlon based on https://github.com/MoH-Malaysia/kkmnow-back/blob/main/kkmnow/management/commands/META_JSON/facilities.json
-    """
-
     CHART_TYPE = "map_lat_lon"
     VARIABLE_MODEL = GeneralChartVariables
 
@@ -356,10 +348,6 @@ class ChoroplethBuilder(ChartBuilder):
 
 
 class JitterBuilder(ChartBuilder):
-    """
-    TODO: add test cases for maplatlon based on https://github.com/dosm-malaysia/aksara-data/blob/main/dashboards/kawasanku_electoral.json
-    """
-
     CHART_TYPE = "jitter_chart"
     VARIABLE_MODEL = JitterChartVariables
 
@@ -369,6 +357,7 @@ class JitterBuilder(ChartBuilder):
     def build_chart(self, file_name: str, variables: JitterChartVariables) -> str:
         df: pd.DataFrame = pd.read_parquet(file_name)
         res = {}
+        variables = self.VARIABLE_MODEL(**variables)
 
         df[variables.keys] = df[variables.keys].apply(
             lambda x: x.lower().replace(" ", "_")

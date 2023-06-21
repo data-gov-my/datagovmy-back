@@ -1,8 +1,6 @@
 from typing import Dict, List, TypedDict, Any
 from pydantic import BaseModel, validator, ValidationError, root_validator
 
-## TODO: GeneralChartVariable - common fields for all variables, e.g. keys, null_vals
-
 
 class GeneralChartVariables(BaseModel):
     """

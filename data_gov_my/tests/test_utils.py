@@ -264,9 +264,6 @@ def test_line_chart_simple(sample_line_data):
 
 
 def test_line_chart_nested_single_layer(sample_line_data):
-    """
-    TODO: updated test to fit after refactoring (assuming that variables structure will change)
-    """
     variables = {"rename_cols": {"y1": "y"}, "keys": ["state"], "x": "x", "y": ["y"]}
 
     expected_result = {
@@ -281,9 +278,6 @@ def test_line_chart_nested_single_layer(sample_line_data):
 
 
 def test_line_chart_nested_multi_layer(sample_line_data):
-    """
-    TODO: updated test to fit after refactoring (assuming that variables structure will change)
-    """
     variables = {
         "rename_cols": {"y1": "y"},
         "keys": ["state", "period"],

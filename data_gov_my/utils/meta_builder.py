@@ -336,9 +336,6 @@ class DashboardBuilder(GeneralMetaBuilder):
                 api_type = chart_list[k]["api_type"]
                 try:
                     res = {}
-                    # res["data"] = dashboard_builder.build_chart(chart_type, c_data)
-                    # FIXME: alot breaking changes - chart fails to build - due to variables format change
-                    # need to update the variables in metajson to fix this
                     builder = ChartBuilder.create(chart_type)
                     chart_data = builder.build_chart(
                         c_data["input"], c_data["variables"]
@@ -444,7 +441,7 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
     def update_or_create_meta(self, filename: str, metadata: dict):
         file_data = metadata["file"]
-        all_variable_data = metadata["file"]["variables"]  # TODO : change variable name
+        all_variable_data = metadata["file"]["variables"]
         full_meta = metadata
         file_src = filename.replace(".json", "")
 
