@@ -103,6 +103,8 @@ class ChartBuilder(ABC):
         # rename cols & vals
         df.rename(columns=variables.rename_cols, inplace=True)
         df.replace(to_replace=variables.replace_vals, inplace=True)
+        for col, wanted in variables.filter.items():
+            df = df[df[col].isin(wanted)]
         df = self.additional_preprocessing(variables, df)
 
         return df
@@ -311,14 +313,6 @@ class WaffleBuilder(ChartBuilder):
     CHART_TYPE = "waffle_chart"
     VARIABLE_MODEL = WaffleChartVariables
 
-    def additional_preprocessing(
-        self, variables: WaffleChartVariables, df: pd.DataFrame
-    ):
-        if len(variables.wanted) > 0:
-            # FIXME: seems too specific for covid data, do we have to generalise it? (specify what column)
-            df = df[df["age_group"].isin(variables.wanted)]
-        return df
-
     def group_to_data(self, variables: WaffleChartVariables, group: pd.DataFrame):
         _key, _value = variables.dict_keys
         res = pd.Series(group[_value].values, index=group[_key]).to_dict()
@@ -327,12 +321,9 @@ class WaffleBuilder(ChartBuilder):
             if isinstance(v, str):
                 data[k] = group[v].unique()[0]
             else:
-                # FIXME: might be misunderstanding how this works, based on the singular waffle example
                 col = next(iter(v))
                 data[k] = group.loc[group[col] == v[col], k].iloc[0]
-        res["data"] = [
-            data
-        ]  # FIXME: why is the structure like this? (need to wrap around list)
+        res["data"] = [data]
         return res
 
 

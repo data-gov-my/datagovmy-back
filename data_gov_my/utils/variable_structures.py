@@ -12,6 +12,7 @@ class GeneralChartVariables(BaseModel):
     rename_cols: Dictionary used to rename column names, this should be reflected during pre-processing phase.
     null_vals: Value used to replace nan values, this should be reflected during pre-processing phase.
     replace_vals: Dictionary used to replace df values, this should be reflected during pre-processing phase.
+    filter: Dictionary used to filter valid values by column, this should be reflected during pre-processing phase.
     """
 
     keys: list[str] = []
@@ -19,6 +20,7 @@ class GeneralChartVariables(BaseModel):
     rename_cols: dict[str, str] = {}
     null_vals: str | int | None = None
     replace_vals: dict[str, str | int] = {}
+    filter: dict[str, list[str]] = {}
 
 
 class TimeseriesChartVariables(GeneralChartVariables):
@@ -39,7 +41,6 @@ class BarMeterVariables(GeneralChartVariables):
     axis_values: list[dict[str, str]]
     sub_keys: bool = False
 
-    # FIXME: why not just dict[str,str]? why is list required?
     @validator("axis_values")
     def axis_values_pair_length(cls, v):
         for pair in v:
@@ -86,8 +87,6 @@ class HeatmapChartVariables(GeneralChartVariables):
 
 
 class WaffleChartVariables(GeneralChartVariables):
-    wanted: list[str]
-    # groups: list[str] # replaced by keys for consistency
     dict_keys: list[str]
     data_arr: dict[str, dict | str]
 
