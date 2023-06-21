@@ -2,13 +2,15 @@
     "chart_param": {
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidvax_01_waffle.parquet",
         "variables": {
-            "wanted": [
-                "adult",
-                "child",
-                "elderly",
-                "adolescent",
-                "total"
-            ],
+            "filter": {
+                "age_group": [
+                    "adult",
+                    "child",
+                    "elderly",
+                    "adolescent",
+                    "total"
+                ]
+            },
             "keys": [
                 "state",
                 "age_group",

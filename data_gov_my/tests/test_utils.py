@@ -436,7 +436,7 @@ def sample_waffle_data(tmp_path):
 
 def test_waffle_chart(sample_waffle_data):
     variables = {
-        "wanted": [],
+        "filter": {"state": ["mys"]},
         "keys": ["state", "age_group", "dose"],
         "dict_keys": ["metric", "value"],
         "data_arr": {"id": "dose", "label": "dose", "value": {"metric": "perc"}},
