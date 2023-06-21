@@ -4,6 +4,7 @@ from threading import Thread
 import environ
 from django.core.cache import cache
 from django.db.models import Q
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
 from post_office import mail
@@ -25,6 +26,7 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     i18nJson,
+    ViewCount
 )
 from data_gov_my.serializers import FormDataSerializer, i18nSerializer
 from data_gov_my.utils import cron_utils
@@ -391,6 +393,43 @@ class FORMS(generics.ListAPIView):
             data={"Total deleted": count, "Data deleted": deleted},
             status=status.HTTP_200_OK,
         )
+
+
+class VIEW_COUNT(APIView) :
+    def post(self, request, format=None):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+
+        id = request.query_params.get("id", None)
+        type = request.query_params.get("type", None)
+        metric = request.query_params.get("metric", None)
+
+        default_values = {"type" : ['dashboard', 'data-catalogue'],  
+                          "metric" : ['view_count', 'download_png', 'download_csv', 'download_svg', 'download_parquet']}
+
+        # Checks if all parameters have values
+        if not all([id, type, metric]) :
+            return JsonResponse({"status": 400, "message": "Parameters id, type and metric must be supplied"}, status=400)
+        
+        # Checks if parameter 'type' and 'metric' has appropriate values
+        for k, v in default_values.items() : 
+            if request.query_params.get(k) not in v : 
+                pos_values = ", ".join(v)
+                return JsonResponse({"status" : 400, "message" : f"Parameter '{k}' has to hold either values : {pos_values}"}, status=400)
+        
+        # Get the object and increment the relevant count
+        metric = 'all_time_view' if metric == 'view_count' else metric # Change field name
+        ViewCount.objects.filter(id=id, type=type).update(**{metric : F(metric) + 1}) # Avoids race condition
+        res = ViewCount.objects.filter(id=id, type=type).values().first()
+
+        if not res : 
+            return JsonResponse({"status" : 404, "message" : "ID not found"}, status=404)
+
+        if type == 'dashboard' : 
+            for i in ['csv', 'parquet', 'png', 'svg'] : 
+                res.pop(f"download_{i}")
+
+        return JsonResponse(res, safe=False)
 
 
 """
