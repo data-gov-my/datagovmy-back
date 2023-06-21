@@ -244,26 +244,8 @@ class BarChartBuilder(ChartBuilder):
 
 
 class HeatMapBuilder(ChartBuilder):
-    """
-    TODO:
-    - `id` column is removed:
-    If its alright i'd like to remove the ID column (based on existing implementation), or atleast enforce id should only be the last value in keys column for correctness,
-    since it feels logically inacurrate if the id column != last value in keys column, e.g. refer to test case test_heatmap_chart_multi_cols() expected results,
-    the id is California, but data includes all states.
-
-    Referring to FE heatmap component, doesn't seem like there's an ID required.
-
-    Since there are no existing active charts using it, perhaps should KIV till its needed and adjust accordingly then.
-    """
-
     CHART_TYPE = "heatmap_chart"
     VARIABLE_MODEL = HeatmapChartVariables
-
-    # def additional_preprocessing(
-    #     self, variables: HeatmapChartVariables, df: pd.DataFrame
-    # ):
-    #     df["id"] = df[variables.id]
-    #     return df
 
     def group_to_data(self, variables: HeatmapChartVariables, group: pd.DataFrame):
         group.replace(variables.replace_vals, regex=True, inplace=True)
