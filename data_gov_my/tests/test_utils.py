@@ -26,7 +26,12 @@ def sample_barchart_data(tmp_path):
 
 
 def test_bar_chart(sample_barchart_data):
-    variables = {"keys": ["state", "period"], "x": "age_group", "y": ["new_donors"]}
+    variables = {
+        "keys": ["state", "period"],
+        "rename_cols": {"age_group": "x", "new_donors": "y"},
+        "x": "x",
+        "y": ["y"],
+    }
 
     expected_result = {
         "California": {
@@ -142,7 +147,8 @@ def sample_timeseries_data(tmp_path):
 def test_timeseries_chart(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "values": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "value_columns": ["x", "daily", "line_daily"],
     }
 
     expected_result = {
@@ -166,8 +172,9 @@ def test_timeseries_chart(sample_timeseries_data):
 def test_timeseries_shared_chart_simple(sample_timeseries_data):
     variables = {
         "keys": [],
-        "constant": {"x": "date"},
-        "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "constants": ["x"],
+        "value_columns": ["daily", "line_daily"],
     }
     expected_result = {
         "x": [1577836800000, 1577923200000, 1578009600000],
@@ -175,7 +182,7 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
         "line_daily": [90, 190, 160, 130, 170, 150],
     }
 
-    builder = ChartBuilder.create("timeseries_shared")
+    builder = ChartBuilder.create("timeseries_chart")
     result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
@@ -183,8 +190,9 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
 def test_timeseries_shared_chart_nested(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "constant": {"x": "date"},
-        "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "constants": ["x"],
+        "value_columns": ["daily", "line_daily"],
     }
 
     expected_result = {
@@ -192,7 +200,7 @@ def test_timeseries_shared_chart_nested(sample_timeseries_data):
         "California": {"daily": [100, 200, 150], "line_daily": [90, 190, 160]},
         "New York": {"daily": [120, 180, 140], "line_daily": [130, 170, 150]},
     }
-    builder = ChartBuilder.create("timeseries_shared")
+    builder = ChartBuilder.create("timeseries_chart")
     result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 

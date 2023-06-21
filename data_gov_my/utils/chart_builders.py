@@ -181,40 +181,6 @@ class ChartBuilder(ABC):
 
 
 class BarChartBuilder(ChartBuilder):
-    """
-    FIXME:
-    - Suggest restricting BarCharVariables `y` to list[str] only, instead must use rename_cols variable to rename?
-    - In general, perhaps best to standardise `rename_cols` being called first, then remaining variables can directly reference the
-      new column name, instead of having to use a dict. This applies to other charts as well (e.g. timeseries)
-      e.g.:
-
-      ## OLD
-    "variables": {
-            "keys": [
-                "variable",
-                "metric"
-            ],
-            "x": "age",
-            "y": {
-                "unvaccinated": "unvax",
-                "partialvax": "partialvax",
-                "fullyvax": "fullyvax",
-                "boosted": "boosted"
-            }
-        }
-
-      ## PROPOSED NEW
-    "variables": {
-            "keys": [
-                "variable",
-                "metric"
-            ],
-            "rename_cols": {"unvax": "unvaccinated"}
-            "x": "age",
-            "y": ["unvaccinated", "partialvax", "fullyvax", "boosted]
-        }
-    """
-
     CHART_TYPE = "bar_chart"
     VARIABLE_MODEL = BarChartVariables
 
@@ -223,23 +189,12 @@ class BarChartBuilder(ChartBuilder):
         Converts grouped data into a format suitable for generating a bar chart.
         - The resulting dictionary has the following structure:
             - "x": A list of x-axis values obtained from the `variables.x` column of the `group` DataFrame.
-            - "y" or "y1", "y2", ...: Depending on the structure of `variables.y`, the corresponding y-axis values are included in the dictionary.
-            If 'variables.y' is a list containing a single string, the resulting dictionary will have a single "y" key for the y-axis values.
-            If `variables.y` is a list containing multiple strings, the y-axis values are obtained from that column and stored under the key "y{i}".
-            If 'variables.y' is a dictionary mapping labels to column names, each column's values are stored under the respective label in the dictionary.
-
+            - "y": A list of y-axis values obtained from the `variables.y` column of the `group` DataFrame.
         """
         res = {}
-        res["x"] = group[variables.x].tolist()
-        if isinstance(variables.y, list):
-            if len(variables.y) == 1:
-                res["y"] = group[variables.y[0]].tolist()
-                return res
-            variables.y = {f"y{i+1}": col for i, col in enumerate(variables.y)}
-
-        for y_axis_label, col in variables.y.items():
-            res[y_axis_label] = group[col].tolist()
-
+        res[variables.x] = group[variables.x].tolist()
+        for col in variables.y:
+            res[col] = group[col].tolist()
         return res
 
 
@@ -248,7 +203,6 @@ class HeatMapBuilder(ChartBuilder):
     VARIABLE_MODEL = HeatmapChartVariables
 
     def group_to_data(self, variables: HeatmapChartVariables, group: pd.DataFrame):
-        group.replace(variables.replace_vals, regex=True, inplace=True)
         data = group[variables.value_columns].transform(
             lambda x: [{"x": x.name, "y": y} for y in x]
         )
@@ -267,59 +221,27 @@ class TimeseriesBuilder(ChartBuilder):
         df[column] = df[column].values.astype(np.int64) // 10**6
         return df
 
-    def group_to_data(self, variables: TimeseriesChartVariables, group: pd.DataFrame):
-        """
-        FIXME: `values` should perhaps be removed and standardised to `value_columns` and `rename_cols`..?
-        """
-        res = {}
-        for key, col in variables.values.items():
-            res[key] = group[col].tolist()
-        return res
-
-
-class TimeseriesSharedBuilder(ChartBuilder):
-    """
-    TODO: should this be combined w timeseriesbuilder, w shared=True/False option? ANS: YES
-    """
-
-    CHART_TYPE = "timeseries_shared"
-    VARIABLE_MODEL = TimeseriesSharedVariables
-
-    def format_date(self, df: pd.DataFrame, column="date", format="%Y-%m-%d"):
-        df[column] = pd.to_datetime(df[column])
-
-        df[column] = df[column].values.astype(np.int64) // 10**6
-        return df
-
     def additional_postprocessing(
-        self, variables: TimeseriesSharedVariables, df: pd.DataFrame, result: dict
+        self, variables: TimeseriesChartVariables, df: pd.DataFrame, result: dict
     ):
-        for key, col in variables.constant.items():
-            result[key] = df[col].unique().tolist()
+        for col in variables.constants:
+            result[col] = df[col].unique().tolist()
         return result
 
-    def group_to_data(self, variables: TimeseriesSharedVariables, group: pd.DataFrame):
-        """
-        FIXME: values should perhaps be removed and standardised to value_columns and rename_cols..?
-        """
+    def group_to_data(self, variables: TimeseriesChartVariables, group: pd.DataFrame):
         res = {}
-        for key, col in variables.attributes.items():
-            res[key] = group[col].tolist()
+        for col in variables.value_columns:
+            res[col] = group[col].tolist()
         return res
 
 
 class LineBuilder(ChartBuilder):
-    """
-    FIXME: Currently, variables.y only supports list[str], instead of dict[str,str] like bar_chart, if decided on whether to decouple renaming and choosing y columns,
-    this can remain as it is, else should update accoridngly.
-    """
-
     CHART_TYPE = "line_chart"
     VARIABLE_MODEL = LineChartVariables
 
     def group_to_data(self, variables: LineChartVariables, group: pd.DataFrame):
         res = {}
-        res["x"] = group[variables.x].tolist()
+        res[variables.x] = group[variables.x].tolist()
         for col in variables.y:
             res[col] = group[col].tolist()
         return res
@@ -350,13 +272,7 @@ class BarmeterBuilder(ChartBuilder):
         return result
 
 
-class CustomBuilder(ChartBuilder):  # DONE
-    """
-    TODO:
-    - Should we combine this with metrics_table, and add a `only_first` option for custom chart? The implementation is very similar, but custom builder
-    returns the first item in the list, instead of the full list like metrics table.
-    """
-
+class CustomBuilder(ChartBuilder):
     CHART_TYPE = "custom_chart"
     VARIABLE_MODEL = CustomChartVariables
 
@@ -422,8 +338,7 @@ class WaffleBuilder(ChartBuilder):
 
 class MapLatLonBuilder(ChartBuilder):
     """
-    TODO:
-    This one may need more concrete examples for a proper implementation? Perhaps this should also be absored into custom charts (with metrics table)
+    TODO: add test cases for maplatlon based on https://github.com/MoH-Malaysia/kkmnow-back/blob/main/kkmnow/management/commands/META_JSON/facilities.json
     """
 
     CHART_TYPE = "map_lat_lon"
@@ -440,12 +355,7 @@ class ChoroplethBuilder(ChartBuilder):
     CHART_TYPE = "choropleth_chart"
     VARIABLE_MODEL = ChoroplethChartVariables
 
-    # FIXME: consumer_price_index_choropleth fails bc district not slugified - should it be?
-
     def group_to_data(self, variables: ChoroplethChartVariables, group: pd.DataFrame):
-        """
-        FIXME: The logic seems to be the same as line chart / bar chart - should they be the combined?
-        """
         res = {}
         res["x"] = group[variables.x].tolist()
         res["y"] = {}
@@ -456,8 +366,7 @@ class ChoroplethBuilder(ChartBuilder):
 
 class JitterBuilder(ChartBuilder):
     """
-    TODO: this is taken directly from chart_builder function,
-    there are no relevant test cases or existing active charts for reference - should make them and update accordingly.
+    TODO: add test cases for maplatlon based on https://github.com/dosm-malaysia/aksara-data/blob/main/dashboards/kawasanku_electoral.json
     """
 
     CHART_TYPE = "jitter_chart"
@@ -504,11 +413,6 @@ class JitterBuilder(ChartBuilder):
 
 
 class PyramidBuilder(ChartBuilder):
-    """
-    TODO: this is taken directly from chart_builder function,
-    there are no relevant test cases or existing active charts for reference - should make them and update accordingly.
-    """
-
     CHART_TYPE = "pyramid_chart"
     VARIABLE_MODEL = PyramidChartVariables
 
@@ -538,10 +442,6 @@ class PyramidBuilder(ChartBuilder):
 
 
 class MetricsTableBuilder(ChartBuilder):
-    """
-    # FIXME: should combine with custom_chart with a variables.first = False ?
-    """
-
     CHART_TYPE = "metrics_table"
     VARIABLE_MODEL = MetricsTableVariables
 

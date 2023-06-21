@@ -22,18 +22,12 @@ class GeneralChartVariables(BaseModel):
 
 
 class TimeseriesChartVariables(GeneralChartVariables):
-    # DATE_RANGE: Any
-    values: dict[str, str]
-
-
-class TimeseriesSharedVariables(GeneralChartVariables):
-    constant: dict[str, str]
-    attributes: dict[str, str]
+    constants: list[str] = []
 
 
 class BarChartVariables(GeneralChartVariables):
     x: str
-    y: list[str] | dict[str, str]
+    y: list[str]
 
 
 class LineChartVariables(GeneralChartVariables):
