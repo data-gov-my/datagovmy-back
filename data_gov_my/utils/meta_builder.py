@@ -3,11 +3,12 @@ import json
 import logging
 import os
 from abc import ABC, abstractmethod
-from os.path import isfile
+from os.path import isfile, join
 from typing import List
 
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
+from django.apps import apps
 
 from data_gov_my.models import (
     CatalogJson,
@@ -15,6 +16,7 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     i18nJson,
+    ViewCount
 )
 from data_gov_my.utils import common, dashboard_builder, triggers
 from data_gov_my.utils.common import LANGUAGE_CHOICES
@@ -207,6 +209,28 @@ class GeneralMetaBuilder(ABC):
 
             triggers.send_telegram(telegram_msg)
 
+    def remove_deleted_files(self) : 
+        """
+        Removes the deleted files in the repo, from the db
+        TODO: Remove the entries from view_count as well
+        """
+        for i in ['dashboards', 'catalog'] : 
+            _DIR = os.path.join(os.getcwd(),"DATAGOVMY_SRC",os.getenv("GITHUB_DIR", "-"),i)
+            
+            column = 'dashboard_name' if i == 'dashboards' else 'file_src'
+            model_name = 'DashboardJson' if i == 'dashboards' else 'CatalogJson'
+            model = apps.get_model("data_gov_my", model_name)
+
+            distinct_db = [ m[column] for m in model.objects.values(column).distinct() ] # Change model here
+            distinct_dir = [ f.replace(".json", "") for f in os.listdir(_DIR) if isfile(join(_DIR, f)) ]
+            diff = list(set(distinct_db) - set(distinct_dir))
+            if diff:
+                query = { f"{column}__in": diff}
+                model.objects.filter(**query).delete
+                if i == 'dashboards' : 
+                    MetaJson.objects.filter(**query).delete()
+                ViewCount.objects.filter(**{"id__in" : diff}).delete() # Deletes entry from view count
+
     def build_operation(self, manual=True, rebuild=True, meta_files=[]):
         """
         General build operation for all data builder classes.
@@ -223,6 +247,9 @@ class GeneralMetaBuilder(ABC):
         if not refreshed:
             logging.warning("Github repo has not been refreshed, abort building")
             return False
+
+        # Remove from db, deleted meta jsons
+        self.remove_deleted_files()
 
         # get meta files (prioritise input files)
         meta_files = (
@@ -306,8 +333,15 @@ class DashboardBuilder(GeneralMetaBuilder):
             dashboard_name=metadata["dashboard_name"],
             defaults=updated_values,
         )
+
+        ViewCount.objects.get_or_create(
+            id=metadata['dashboard_name'], 
+            type='dashboard'
+        )
+
         cache.set("META_" + metadata["dashboard_name"], metadata)
         return obj
+
 
     def additional_handling(
         self, rebuild: bool, meta_files, created_objects: List[MetaJson]
@@ -468,6 +502,12 @@ class DataCatalogBuilder(GeneralMetaBuilder):
                     db_obj, created = CatalogJson.objects.update_or_create(
                         id=unique_id, defaults=db_input
                     )
+
+                    ViewCount.objects.get_or_create(
+                        id=unique_id, 
+                        type='data-catalogue'
+                    )
+
                     created_objects.append(db_obj)
 
         return created_objects
