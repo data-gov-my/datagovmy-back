@@ -6,12 +6,15 @@
                 "country",
                 "period"
             ],
-            "values": {
-                "x": "date",
-                "immigration": "immigration",
-                "emigration": "emigration",
-                "net_migration": "net_migration"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "immigration",
+                "emigration",
+                "net_migration"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

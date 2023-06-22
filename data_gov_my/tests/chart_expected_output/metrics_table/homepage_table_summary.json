@@ -6,13 +6,16 @@
                 "time_period",
                 "chart_type"
             ],
-            "obj_attr": {
-                "id": "id",
-                "name_en": "name_en",
-                "name_bm": "name_bm",
-                "agency": "agency_abbr",
-                "count": "count"
-            }
+            "rename_cols": {
+                "agency": "agency_abbr"
+            },
+            "value_columns": [
+                "id",
+                "name_en",
+                "name_bm",
+                "agency_abbr",
+                "count"
+            ]
         }
     },
     "chart_type": "metrics_table",

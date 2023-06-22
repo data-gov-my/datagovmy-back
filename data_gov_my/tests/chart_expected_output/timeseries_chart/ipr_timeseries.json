@@ -5,13 +5,16 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "ikhsan": "ikhsan",
-                "insan": "insan",
-                "intan": "intan",
-                "overall": "overall"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "ikhsan",
+                "insan",
+                "intan",
+                "overall"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

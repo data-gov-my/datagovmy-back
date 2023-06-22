@@ -1,0 +1,2905 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/blood_02_barcharts.parquet",
+        "variables": {
+            "axis_values": [
+                {
+                    "variable": "value"
+                }
+            ],
+            "keys": [
+                "state",
+                "period",
+                "chart"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "bar_meter",
+    "expected_results": {
+        "jhr": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 23.891156462585034
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.3061224489795915
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.802721088435373
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 44.0
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.510204081632654
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 26.77551020408163
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 53.714285714285715
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.21768707482993196
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.78231292517007
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 22.53061224489796
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 77.46938775510203
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.23809523809524
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 4.054421768707483
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 4.707482993197279
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.603699564354628
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.958602285427548
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.190201400451613
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.24749674976621
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.89599251876012
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 24.22279497297174
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 55.88121250826814
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.17106493624980043
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.82893506375021
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 22.083342836940904
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 77.9166571630591
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.39201240791004
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.60572953493146
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 7.002258057158498
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.925764192139738
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.475982532751091
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 25.0
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 47.59825327510917
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.03056768558952
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 24.23580786026201
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.73362445414847
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.21834061135371177
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.78165938864629
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 23.90829694323144
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 76.09170305676855
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.0480349344978
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 5.021834061135371
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 3.9301310043668125
+                    }
+                ]
+            }
+        },
+        "kdh": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.071063104036384
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.3439454235361
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.254690164866403
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.330301307561115
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 18.419556566230813
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 18.47640704945992
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 63.10403638430927
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.17055144968732233
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.82944855031268
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 16.71404206935759
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 83.28595793064241
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 78.11256395679364
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.762364980102331
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 20.125071063104034
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.662193216288262
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.342494714587738
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.00808897876643
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.987223090357574
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.289456751539664
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 24.25314826730398
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 56.45739498115636
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.38146888500781323
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.61853111499218
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 14.334957257100836
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 85.66504274289916
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 77.00615865428809
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.605938045776266
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 20.387903299935655
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.465753424657535
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.657534246575342
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.493150684931507
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 44.38356164383562
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 23.28767123287671
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 15.890410958904111
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 60.82191780821918
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.547945205479452
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.45205479452055
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 23.28767123287671
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 76.71232876712328
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 79.17808219178082
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.36986301369863
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 19.45205479452055
+                    }
+                ]
+            }
+        },
+        "ktn": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.429065743944637
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 7.0588235294117645
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.166089965397923
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.346020761245676
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.99307958477509
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 34.186851211072664
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 47.82006920415225
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.5536332179930795
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.44636678200692
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 24.498269896193772
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 75.50173010380622
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 73.35640138408304
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.384083044982699
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 25.259515570934255
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 26.906608749612165
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.6087496121625815
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.037852932050885
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.44678870617437
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 18.943906676594686
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 29.883345743360636
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 51.17274758004468
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.44055596922313234
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.55944403077687
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 27.19657483246463
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 72.80342516753538
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 75.77562670637874
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.5936957061305534
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 21.630677587490695
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 21.828908554572273
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.604719764011799
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 31.268436578171094
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.29793510324484
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.10914454277286
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 30.08849557522124
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 52.8023598820059
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.5899705014749262
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.41002949852508
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 31.858407079646017
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 68.14159292035397
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 74.33628318584071
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.4749262536873156
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 24.188790560471976
+                    }
+                ]
+            }
+        },
+        "kul": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.694642641189986
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.587132664167372
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.010521223848105
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.707703470794534
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 21.985729834320956
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 19.724271375015118
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.28999879066392
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 3.591728141250454
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 96.40827185874954
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 21.223848107389042
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 78.77615189261095
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 86.20147539001088
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.6386503809408635
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 12.159874229048253
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.840592292480586
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.190758693869676
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.167317802537017
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.80133121111272
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 21.83810479203642
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 19.797052241685314
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.36484296627826
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 3.690003086657921
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 96.30999691334208
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 22.781464619183577
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 77.21853538081642
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.00125395478047
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.1876688016050623
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 12.811077243614477
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.795031055900623
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.490683229813664
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.726708074534162
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.98757763975156
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 22.236024844720497
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 18.434782608695652
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 59.329192546583855
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 3.8012422360248443
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 96.19875776397515
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 22.26086956521739
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 77.73913043478261
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 84.96894409937889
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.7888198757763973
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 13.24223602484472
+                    }
+                ]
+            }
+        },
+        "mlk": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.454545454545453
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.766233766233767
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.480519480519483
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.2987012987013
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 15.064935064935064
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 21.09090909090909
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 63.84415584415585
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.2467532467532467
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.75324675324674
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 15.948051948051948
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 84.05194805194806
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 84.67532467532467
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.3506493506493507
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 13.974025974025976
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.92587533730886
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.9599560249192125
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.71819302395309
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.395975613818834
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 21.254622380650964
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 22.877036346070557
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 55.868341273278475
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.493053936102875
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.50694606389713
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 12.43628610454076
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 87.56371389545924
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 84.94186627577706
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.4286237798580803
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 12.62950994436486
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.31645569620253
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.012658227848101
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 30.69620253164557
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 37.9746835443038
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.088607594936708
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 20.253164556962027
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 62.65822784810127
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.89873417721519
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.10126582278481
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 19.303797468354432
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 80.69620253164557
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.75949367088607
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.5316455696202533
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 11.708860759493671
+                    }
+                ]
+            }
+        },
+        "mys": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.597232650434407
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.860774428831921
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.858307411777325
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.683685508956344
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.087457365338825
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 22.00913829718772
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.903404337473454
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.658193362936268
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.34180663706374
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 20.531136709783983
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 79.46886329021602
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.11058197653216
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.8769976617971984
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 13.012420361670635
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.676245177283914
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.614252544473735
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.074073427489044
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.63542885075331
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.7595821491666
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 21.894748235096955
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.34566961573644
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.7877717182579307
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.21222828174207
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 21.423583713314105
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 78.57641628668588
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.33227660272749
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.4265234726867724
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 12.241199924585745
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.116062896360003
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.368777690904352
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.24350621144992
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.27165320128572
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 18.860220658500566
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 19.94613847624012
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 61.19364086525931
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.7374685083832855
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.26253149161671
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 21.657544956997654
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 78.34245504300235
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.79619494396664
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.7365129007036746
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 11.467292155329686
+                    }
+                ]
+            }
+        },
+        "nsn": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.10979228486647
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.454005934718101
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 25.890207715133528
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.5459940652819
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 18.620178041543024
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 23.44213649851632
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.93768545994066
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 100.0
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 39.46587537091988
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 60.534124629080125
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 87.6112759643917
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.5934718100890208
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 11.795252225519288
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.92623555446275
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.929923776739612
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.647405950331944
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.4964347184657
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 19.369313990656504
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 22.860831079419718
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.76985492992378
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.012294074256208508
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.98770592574378
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 37.5706909269732
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 62.42930907302681
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 85.91099090238505
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.7273174329972953
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 12.361691664617654
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 27.469135802469136
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 2.4691358024691357
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.469135802469136
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.592592592592595
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 20.061728395061728
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 16.049382716049383
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 63.888888888888886
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 100.0
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 45.98765432098765
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 54.01234567901234
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 87.34567901234568
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.9259259259259258
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 11.728395061728394
+                    }
+                ]
+            }
+        },
+        "phg": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 26.106800547695112
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.7507987220447285
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.704244637151987
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.43815609310817
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 16.6514598540146
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 26.003649635036496
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.34489051094891
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.13686131386861314
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.86313868613139
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 18.886861313868614
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 81.11313868613139
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 81.11313868613139
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 7.481751824817519
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 11.405109489051094
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.8345611450221
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.986108187749947
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.526836455483057
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.652494211744894
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 13.92735384485879
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 26.07853865903447
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 59.99410749610674
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.39143061576665683
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.60856938423335
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 18.08156908960815
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 81.91843091039185
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 81.21974830590513
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 4.13737951934004
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 14.642872174754828
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.65217391304348
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.63768115942029
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.246376811594203
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.46376811594203
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.681159420289855
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 26.08695652173913
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 56.231884057971016
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.14492753623188406
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.85507246376811
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 11.594202898550725
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 88.40579710144928
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 75.07246376811594
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 18.695652173913043
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.231884057971015
+                    }
+                ]
+            }
+        },
+        "png": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.58321559762645
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.538287651879062
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.465385702175755
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.41311104831873
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 20.768578694546484
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 18.05594800791184
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 61.175473297541686
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.3280587736648772
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.67194122633512
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 29.273806159932185
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 70.72619384006782
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 93.07714043515118
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.42384854478666295
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.499011020062165
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.771004616941955
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.098313705157643
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.1189788410735
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.011702836826906
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 20.551564081672964
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 20.02073920450337
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 59.427696713823664
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.360393057304397
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.63960694269561
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 30.219983704910746
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 69.78001629508925
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 92.30921166333358
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.3332345752166508
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.357553761449769
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.8
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.9
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.999999999999996
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.3
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.7
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 16.8
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 65.5
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.0999999999999999
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.9
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 28.7
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 71.3
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 94.39999999999999
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.5
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 5.1
+                    }
+                ]
+            }
+        },
+        "prk": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.120772946859905
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.6615814899567765
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.646325959827106
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.571319603356216
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 14.59445715738622
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 28.07017543859649
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.33536740401729
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 1.932367149758454
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 98.06763285024155
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 14.0605136028477
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 85.9394863971523
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 67.2514619883041
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.5255530129672006
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 31.222984998728702
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.750368653886664
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.246050136928587
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.280387613229408
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.72319359595534
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.119565217391305
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 23.79086619480957
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 59.08956858779912
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 2.275025278058645
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 97.72497472194136
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 15.529154027637343
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 84.47084597236265
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 77.14863498483317
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 6.332153690596562
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 16.519211324570275
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.014336917562723
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.451612903225806
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 25.448028673835125
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 44.086021505376344
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 15.890083632019117
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 18.040621266427717
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 66.06929510155317
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 2.2700119474313025
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 97.7299880525687
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 16.129032258064516
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 83.87096774193549
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 80.76463560334528
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.5531660692951015
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 17.682198327359618
+                    }
+                ]
+            }
+        },
+        "sbh": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.932208887447292
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.092442426208239
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 23.38631203373338
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 48.58903665261109
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 17.093739863769056
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 22.348361985079467
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 60.55789815115148
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.1621796951021732
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.83782030489783
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 14.239377229970806
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 85.76062277002919
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.24229646448264
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.23807979240999
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.5196237431073625
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.598018095648428
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 4.9924601464885825
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 24.623007324429125
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 47.786514433433865
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 18.55831111829173
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 24.824299216414897
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 56.61738966529337
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.581630180143792
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.41836981985621
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 14.179928373320408
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 85.82007162667959
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 90.69660985001481
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 3.2205078493146995
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.082882300670491
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 21.990171990171987
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 3.8083538083538087
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 23.34152334152334
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 50.859950859950864
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 14.742014742014742
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 21.62162162162162
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 63.63636363636363
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 100.0
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 12.530712530712531
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 87.46928746928747
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 92.26044226044226
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.2285012285012284
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.511056511056511
+                    }
+                ]
+            }
+        },
+        "sgr": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 25.15751575157516
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.985598559855985
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.05760576057606
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.7992799279928
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 23.13231323132313
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 19.621962196219624
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.24572457245725
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 100.0
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 7.920792079207921
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 92.07920792079209
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.8091809180918
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.6300630063006301
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 7.560756075607561
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.660717292473482
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.546388280855362
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.772183869338274
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 43.02071055733288
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 25.558997844827587
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 20.925377155172413
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 53.515625
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.1279633620689655
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.87203663793103
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 7.465651939655173
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 92.53434806034483
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 91.17726293103449
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.5421605603448276
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 8.280576508620689
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 26.94394213381555
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.244122965641953
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 24.95479204339964
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 42.857142857142854
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 22.24231464737794
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 20.07233273056058
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 57.68535262206148
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 100.0
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 8.679927667269439
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 91.32007233273056
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 93.49005424954791
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.18083182640144665
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.329113924050633
+                    }
+                ]
+            }
+        },
+        "swk": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.76138532860649
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 7.226615762203437
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.73384237796564
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 40.27815653122443
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 13.553313335151348
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 17.42568857376602
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 69.02099809108263
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.0545404963185165
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.94545950368149
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 26.47941096263976
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 73.52058903736024
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 93.37332969730025
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.7362967002999727
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 5.890373602399782
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 23.974991281821353
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.301997708364469
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.421262392268222
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.30174861754596
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 12.501245392049418
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 16.496463086579656
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 71.00229152137094
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.21171664840091658
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.78828335159908
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 36.90096642423035
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 63.099033575769646
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 92.19886420245093
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.1183620603766065
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 6.682773737172462
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 23.920653442240372
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 8.401400233372229
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 28.93815635939323
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 38.739789964994166
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 13.652275379229872
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 16.102683780630105
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 70.24504084014002
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.2333722287047841
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.76662777129522
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 31.388564760793464
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 68.61143523920653
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 94.39906651108518
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 0.7001166861143524
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 4.900816802800467
+                    }
+                ]
+            }
+        },
+        "trg": {
+            "past_month": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 22.55813953488372
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.2015503875969
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.51162790697674
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 44.72868217054263
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 16.11154144074361
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 30.67389620449264
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 53.21456235476375
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.23237800154918667
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.76762199845082
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 12.161115414407437
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 87.83888458559257
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 64.13632842757552
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.6266460108443066
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 34.23702556158017
+                    }
+                ]
+            },
+            "past_year": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 24.294236710344094
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 6.919143496324705
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 27.772451262384145
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 41.01416853094705
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 16.750998668442076
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 28.862849533954726
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 54.3861517976032
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.7882822902796272
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.21171770972038
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 11.989347536617844
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 88.01065246338216
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 69.1185086551265
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 1.7576564580559253
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 29.12383488681758
+                    }
+                ]
+            },
+            "yesterday": {
+                "blood_group": [
+                    {
+                        "x": "blood_a_perc",
+                        "y": 21.894736842105264
+                    },
+                    {
+                        "x": "blood_ab_perc",
+                        "y": 5.473684210526316
+                    },
+                    {
+                        "x": "blood_b_perc",
+                        "y": 26.94736842105263
+                    },
+                    {
+                        "x": "blood_o_perc",
+                        "y": 45.68421052631579
+                    }
+                ],
+                "donation_regularity": [
+                    {
+                        "x": "donations_irregular_perc",
+                        "y": 13.894736842105262
+                    },
+                    {
+                        "x": "donations_new_perc",
+                        "y": 27.789473684210524
+                    },
+                    {
+                        "x": "donations_regular_perc",
+                        "y": 58.31578947368421
+                    }
+                ],
+                "donation_type": [
+                    {
+                        "x": "type_apheresis_perc",
+                        "y": 0.42105263157894735
+                    },
+                    {
+                        "x": "type_wholeblood_perc",
+                        "y": 99.57894736842105
+                    }
+                ],
+                "location": [
+                    {
+                        "x": "location_centre_perc",
+                        "y": 11.368421052631579
+                    },
+                    {
+                        "x": "location_mobile_perc",
+                        "y": 88.63157894736841
+                    }
+                ],
+                "social_group": [
+                    {
+                        "x": "social_civilian_perc",
+                        "y": 65.6842105263158
+                    },
+                    {
+                        "x": "social_policearmy_perc",
+                        "y": 2.526315789473684
+                    },
+                    {
+                        "x": "social_student_perc",
+                        "y": 31.789473684210527
+                    }
+                ]
+            }
+        }
+    }
+}

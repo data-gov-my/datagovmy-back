@@ -5,11 +5,15 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "admitted": "admitted",
-                "line": "admitted_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "admitted_7dma": "line"
+            },
+            "value_columns": [
+                "x",
+                "admitted",
+                "line"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

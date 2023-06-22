@@ -5,7 +5,7 @@
             "keys": [
                 "chart"
             ],
-            "columns": [
+            "value_columns": [
                 "callout1",
                 "callout2"
             ],

@@ -6,7 +6,7 @@
                 "state",
                 "chart_type"
             ],
-            "columns": [
+            "value_columns": [
                 "annot1",
                 "annot2"
             ],

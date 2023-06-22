@@ -5,31 +5,34 @@
             "keys": [
                 "chart_type"
             ],
-            "values": {
-                "x": "date",
-                "total": "total",
-                "note_1": "note_1",
-                "note_2": "note_2",
-                "note_5": "note_5",
-                "note_10": "note_10",
-                "note_20": "note_20",
-                "note_50": "note_50",
-                "note_100": "note_100",
-                "note_500": "note_500",
-                "note_1000": "note_1000",
-                "note_others": "note_others",
-                "coin_1": "coin_1",
-                "coin_5": "coin_5",
-                "coin_10": "coin_10",
-                "coin_20": "coin_20",
-                "coin_50": "coin_50",
-                "coin_rm1": "coin_rm1",
-                "coin_rm5": "coin_rm5",
-                "coin_others": "coin_others",
-                "recession": "recession",
-                "cny": "cny",
-                "eid": "eid"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "total",
+                "note_1",
+                "note_2",
+                "note_5",
+                "note_10",
+                "note_20",
+                "note_50",
+                "note_100",
+                "note_500",
+                "note_1000",
+                "note_others",
+                "coin_1",
+                "coin_5",
+                "coin_10",
+                "coin_20",
+                "coin_50",
+                "coin_rm1",
+                "coin_rm5",
+                "coin_others",
+                "recession",
+                "cny",
+                "eid"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

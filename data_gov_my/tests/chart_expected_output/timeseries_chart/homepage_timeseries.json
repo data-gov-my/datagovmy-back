@@ -3,15 +3,21 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/homepage_timeseries.parquet",
         "variables": {
             "keys": [],
-            "values": {
-                "x": "date",
-                "views": "views",
-                "line_views": "views_7dma",
-                "downloads": "downloads",
-                "line_downloads": "downloads_7dma",
-                "users": "users",
-                "line_users": "users_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "views_7dma": "line_views",
+                "downloads_7dma": "line_downloads",
+                "users_7dma": "line_users"
+            },
+            "value_columns": [
+                "x",
+                "views",
+                "line_views",
+                "downloads",
+                "line_downloads",
+                "users",
+                "line_users"
+            ]
         }
     },
     "chart_type": "timeseries_chart",
