@@ -539,14 +539,17 @@ def handle_request(param_list, isDashboard=True):
 
     params_req = []
 
+    data_last_updated = None
+
     if len(dbd_info) > 0:
         dbd_info = (
             dbd_info if isinstance(dbd_info, dict) else dbd_info[0]["dashboard_meta"]
         )
         params_req = dbd_info["required_params"]
         params_opt = dbd_info.get("optional_params", [])
+        data_last_updated = dbd_info.get("data_last_updated", None)
 
-    res = {}
+    res = {"data_last_updated": data_last_updated}
     if (
         all(p in param_list for p in params_req)
         or all(p in param_list for p in params_opt)
