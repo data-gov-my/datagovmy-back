@@ -18,6 +18,7 @@ from data_gov_my.models import (
     i18nJson,
 )
 from data_gov_my.utils import common, dashboard_builder, triggers
+from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 from data_gov_my.utils.cron_utils import (
     create_directory,
@@ -239,7 +240,6 @@ class GeneralMetaBuilder(ABC):
         1. Refresh github repository (delete and re-clone)
         2. Collect meta files (if no meta files provided in input, the whole folder will be taken)
         3. Calls `update_or_create_meta()` to save metadata into database as model instances.
-        // TODO: should we do `additional_handling(object: ModelObject)` instead of `additional_handling(objects: List[ModelObject])`?
         4. Calls `additional_handling()`, e.g. each dashboard metadata has multiple charts, these charts are individually updated through `additional_handling()`.
         5. Revalidates routes if the model instances have `route` field.
         """
@@ -365,7 +365,11 @@ class DashboardBuilder(GeneralMetaBuilder):
                 api_type = chart_list[k]["api_type"]
                 try:
                     res = {}
-                    res["data"] = dashboard_builder.build_chart(chart_type, c_data)
+                    builder = ChartBuilder.create(chart_type)
+                    chart_data = builder.build_chart(
+                        c_data["input"], c_data["variables"]
+                    )
+                    res["data"] = chart_data
                     if len(res["data"]) > 0:  # If the dict isnt empty
                         if "data_as_of" in chart_list[k]:
                             res["data_as_of"] = chart_list[k]["data_as_of"]
@@ -466,7 +470,7 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
     def update_or_create_meta(self, filename: str, metadata: dict):
         file_data = metadata["file"]
-        all_variable_data = metadata["file"]["variables"]  # TODO : change variable name
+        all_variable_data = metadata["file"]["variables"]
         full_meta = metadata
         file_src = filename.replace(".json", "")
 

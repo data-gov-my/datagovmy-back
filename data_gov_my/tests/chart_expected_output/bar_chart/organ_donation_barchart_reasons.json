@@ -6,9 +6,13 @@
                 "state",
                 "period"
             ],
-            "axis_values": [
-                "reason",
-                "pledgers"
+            "rename_cols": {
+                "reason": "x",
+                "pledgers": "y"
+            },
+            "x": "x",
+            "y": [
+                "y"
             ]
         }
     },

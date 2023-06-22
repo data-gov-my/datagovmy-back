@@ -5,13 +5,16 @@
             "keys": [
                 "period"
             ],
-            "values": {
-                "x": "date",
-                "passport": "passport",
-                "expatriate": "expatriate",
-                "visit": "visit",
-                "entry": "entry"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "passport",
+                "expatriate",
+                "visit",
+                "entry"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

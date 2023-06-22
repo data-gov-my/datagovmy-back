@@ -3,7 +3,7 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/covidepid_02_snapshot_graphic.parquet",
         "variables": {
             "null_vals": null,
-            "columns": [
+            "value_columns": [
                 "cases_active",
                 "cases_active_annot",
                 "pkrc",

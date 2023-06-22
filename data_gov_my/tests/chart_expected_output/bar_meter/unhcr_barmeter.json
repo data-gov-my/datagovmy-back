@@ -1,0 +1,132 @@
+{
+    "chart_param": {
+        "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/unhcr_barmeter.parquet",
+        "variables": {
+            "axis_values": [
+                {
+                    "variable": "value"
+                }
+            ],
+            "keys": [
+                "use_as",
+                "chart"
+            ],
+            "null_vals": null
+        }
+    },
+    "chart_type": "bar_meter",
+    "expected_results": {
+        "bar": {
+            "age": [
+                {
+                    "x": "infant",
+                    "y": 9.3
+                },
+                {
+                    "x": "child",
+                    "y": 11.8
+                },
+                {
+                    "x": "teen",
+                    "y": 5.1
+                },
+                {
+                    "x": "adult",
+                    "y": 72.4
+                },
+                {
+                    "x": "elderly",
+                    "y": 1.3999999999999915
+                }
+            ],
+            "country": [
+                {
+                    "x": "mmr",
+                    "y": 86.2
+                },
+                {
+                    "x": "pak",
+                    "y": 3.8
+                },
+                {
+                    "x": "yem",
+                    "y": 1.7
+                },
+                {
+                    "x": "iso",
+                    "y": 1.5
+                },
+                {
+                    "x": "oth",
+                    "y": 6.799999999999997
+                }
+            ],
+            "sex": [
+                {
+                    "x": "male",
+                    "y": 67.3
+                },
+                {
+                    "x": "female",
+                    "y": 32.7
+                }
+            ]
+        },
+        "tooltip": {
+            "age": [
+                {
+                    "x": "infant",
+                    "y": 17424.0
+                },
+                {
+                    "x": "child",
+                    "y": 22108.0
+                },
+                {
+                    "x": "teen",
+                    "y": 9555.0
+                },
+                {
+                    "x": "adult",
+                    "y": 135650.0
+                },
+                {
+                    "x": "elderly",
+                    "y": 2623.0
+                }
+            ],
+            "country": [
+                {
+                    "x": "mmr",
+                    "y": 161506.0
+                },
+                {
+                    "x": "pak",
+                    "y": 7119.0
+                },
+                {
+                    "x": "yem",
+                    "y": 3185.0
+                },
+                {
+                    "x": "iso",
+                    "y": 2810.0
+                },
+                {
+                    "x": "oth",
+                    "y": 12740.0
+                }
+            ],
+            "sex": [
+                {
+                    "x": "male",
+                    "y": 126094.0
+                },
+                {
+                    "x": "female",
+                    "y": 61267.0
+                }
+            ]
+        }
+    }
+}

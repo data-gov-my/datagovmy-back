@@ -6,9 +6,13 @@
                 "state",
                 "type"
             ],
-            "axis_values": [
-                "period",
-                "new_donors"
+            "rename_cols": {
+                "period": "x",
+                "new_donors": "y"
+            },
+            "x": "x",
+            "y": [
+                "y"
             ]
         }
     },

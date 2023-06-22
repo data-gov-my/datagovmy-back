@@ -5,23 +5,26 @@
             "keys": [
                 "chart_type"
             ],
-            "values": {
-                "x": "date",
-                "overall": "overall",
-                "supply_agri": "supply_agri",
-                "supply_mining": "supply_mining",
-                "supply_manufacturing": "supply_manufacturing",
-                "supply_construction": "supply_construction",
-                "supply_services": "supply_services",
-                "supply_import_duties": "supply_import_duties",
-                "demand_c": "demand_c",
-                "demand_g": "demand_g",
-                "demand_i": "demand_i",
-                "demand_x": "demand_x",
-                "demand_m": "demand_m",
-                "demand_nx": "demand_nx",
-                "demand_inventory": "demand_inventory"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "overall",
+                "supply_agri",
+                "supply_mining",
+                "supply_manufacturing",
+                "supply_construction",
+                "supply_services",
+                "supply_import_duties",
+                "demand_c",
+                "demand_g",
+                "demand_i",
+                "demand_x",
+                "demand_m",
+                "demand_nx",
+                "demand_inventory"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

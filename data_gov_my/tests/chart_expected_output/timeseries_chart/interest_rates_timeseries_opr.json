@@ -3,10 +3,13 @@
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/interestrates_timeseries_opr.parquet",
         "variables": {
             "keys": [],
-            "values": {
-                "x": "date",
-                "opr": "opr"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "opr"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

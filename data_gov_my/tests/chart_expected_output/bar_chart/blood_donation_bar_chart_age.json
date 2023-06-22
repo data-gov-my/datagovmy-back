@@ -6,9 +6,13 @@
                 "state",
                 "period"
             ],
-            "axis_values": [
-                "age_group",
-                "new_donors"
+            "rename_cols": {
+                "age_group": "x",
+                "new_donors": "y"
+            },
+            "x": "x",
+            "y": [
+                "y"
             ]
         }
     },

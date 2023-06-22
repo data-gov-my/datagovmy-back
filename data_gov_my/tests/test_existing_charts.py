@@ -1,9 +1,11 @@
-import os
-import pytest
 import json
-from data_gov_my.utils.dashboard_builder import *
-from data_gov_my.utils.variable_structures import *
+import os
 import pathlib
+
+import pytest
+
+from data_gov_my.utils.chart_builders import ChartBuilder
+from data_gov_my.utils.variable_structures import *
 
 
 # get list of chart builders
@@ -30,7 +32,10 @@ def test_all_chart_builders(chart_type):
             chart_type = data["chart_type"]
             chart_param = data["chart_param"]
             expected_results = data["expected_results"]
-            results = build_chart(chart_type, chart_param)
+            builder = ChartBuilder.create(chart_type)
+            results = builder.build_chart(
+                chart_param["input"], chart_param["variables"]
+            )
             assert expected_results == json.loads(
                 json.dumps(results)
             ), f"FAILED: {pathlib.PurePath(file).name}"

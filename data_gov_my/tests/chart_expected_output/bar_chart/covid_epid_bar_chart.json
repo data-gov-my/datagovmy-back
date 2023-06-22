@@ -6,13 +6,16 @@
                 "variable",
                 "metric"
             ],
-            "axis_values": {
-                "x": "age",
-                "unvax": "unvax",
-                "partialvax": "partialvax",
-                "fullyvax": "fullyvax",
-                "boosted": "boosted"
-            }
+            "rename_cols": {
+                "age": "x"
+            },
+            "x": "x",
+            "y": [
+                "unvax",
+                "partialvax",
+                "fullyvax",
+                "boosted"
+            ]
         }
     },
     "chart_type": "bar_chart",

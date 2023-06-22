@@ -5,11 +5,15 @@
             "keys": [
                 "state"
             ],
-            "values": {
-                "x": "date",
-                "icu": "icu",
-                "line": "icu_7dma"
-            }
+            "rename_cols": {
+                "date": "x",
+                "icu_7dma": "line"
+            },
+            "value_columns": [
+                "x",
+                "icu",
+                "line"
+            ]
         }
     },
     "chart_type": "timeseries_chart",

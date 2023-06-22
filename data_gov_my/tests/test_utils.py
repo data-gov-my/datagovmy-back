@@ -1,8 +1,8 @@
+import pandas as pd
 import pytest
 
-from data_gov_my.utils.chart_builder import *
+from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.variable_structures import *
-
 
 """
 Bar chart
@@ -28,7 +28,9 @@ def sample_barchart_data(tmp_path):
 def test_bar_chart(sample_barchart_data):
     variables = {
         "keys": ["state", "period"],
-        "axis_values": ["age_group", "new_donors"],
+        "rename_cols": {"age_group": "x", "new_donors": "y"},
+        "x": "x",
+        "y": ["y"],
     }
 
     expected_result = {
@@ -42,7 +44,8 @@ def test_bar_chart(sample_barchart_data):
         },
     }
 
-    result = bar_chart(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_chart")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -64,8 +67,8 @@ def test_barmeter_simple(sample_barchart_data):
         "California": [{"x": "18-24", "y": 100}, {"x": "25-34", "y": 200}],
         "New York": [{"x": "18-24", "y": 150}, {"x": "25-34", "y": 250}],
     }
-
-    result = bar_meter(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_meter")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -102,7 +105,8 @@ def test_barmeter_subkeys(sample_barchart_data):
         },
     }
 
-    result = bar_meter(sample_barchart_data, variables)
+    builder = ChartBuilder.create("bar_meter")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -143,7 +147,8 @@ def sample_timeseries_data(tmp_path):
 def test_timeseries_chart(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "values": {"x": "date", "daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "value_columns": ["x", "daily", "line_daily"],
     }
 
     expected_result = {
@@ -159,15 +164,17 @@ def test_timeseries_chart(sample_timeseries_data):
         },
     }
 
-    result = timeseries_chart(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_chart")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 
 def test_timeseries_shared_chart_simple(sample_timeseries_data):
     variables = {
         "keys": [],
-        "constant": {"x": "date"},
-        "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "constants": ["x"],
+        "value_columns": ["daily", "line_daily"],
     }
     expected_result = {
         "x": [1577836800000, 1577923200000, 1578009600000],
@@ -175,30 +182,26 @@ def test_timeseries_shared_chart_simple(sample_timeseries_data):
         "line_daily": [90, 190, 160, 130, 170, 150],
     }
 
-    result = timeseries_shared(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_chart")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 
 def test_timeseries_shared_chart_nested(sample_timeseries_data):
     variables = {
         "keys": ["state"],
-        "constant": {"x": "date"},
-        "attributes": {"daily": "daily", "line_daily": "daily_7dma"},
+        "rename_cols": {"date": "x", "daily_7dma": "line_daily"},
+        "constants": ["x"],
+        "value_columns": ["daily", "line_daily"],
     }
 
     expected_result = {
-        'x': [1577836800000, 1577923200000, 1578009600000], 
-        'California': {
-            'daily': [100, 200, 150], 
-            'line_daily': [90, 190, 160]
-        }, 
-        'New York': {
-            'daily': [120, 180, 140], 
-            'line_daily': [130, 170, 150]
-        }
+        "x": [1577836800000, 1577923200000, 1578009600000],
+        "California": {"daily": [100, 200, 150], "line_daily": [90, 190, 160]},
+        "New York": {"daily": [120, 180, 140], "line_daily": [130, 170, 150]},
     }
-
-    result = timeseries_shared(sample_timeseries_data, variables)
+    builder = ChartBuilder.create("timeseries_chart")
+    result = builder.build_chart(sample_timeseries_data, variables)
     assert result == expected_result
 
 
@@ -249,22 +252,19 @@ def sample_line_data(tmp_path):
 
 
 def test_line_chart_simple(sample_line_data):
-    variables = {"x": "x", "y": "y1"}
+    variables = {"rename_cols": {"y1": "y"}, "x": "x", "y": ["y"]}
 
     expected_result = {
         "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
         "y": [100, 200, 150, 170, 120, 180, 140, 160, 130, 110, 135, 155],
     }
-
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
 def test_line_chart_nested_single_layer(sample_line_data):
-    """
-    TODO: update test to fit after refactoring (assuming that variables structure will change)
-    """
-    variables = {"state": {"x": "x", "y": "y1"}}
+    variables = {"rename_cols": {"y1": "y"}, "keys": ["state"], "x": "x", "y": ["y"]}
 
     expected_result = {
         "California": {"x": [1, 2, 3, 4], "y": [100, 200, 150, 170]},
@@ -272,15 +272,18 @@ def test_line_chart_nested_single_layer(sample_line_data):
         "Texas": {"x": [9, 10, 11, 12], "y": [130, 110, 135, 155]},
     }
 
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
 def test_line_chart_nested_multi_layer(sample_line_data):
-    """
-    TODO: update test to fit after refactoring (assuming that variables structure will change)
-    """
-    variables = {"state": {"period": {"x": "x", "y": "y1"}}}
+    variables = {
+        "rename_cols": {"y1": "y"},
+        "keys": ["state", "period"],
+        "x": "x",
+        "y": ["y"],
+    }
 
     expected_result = {
         "California": {
@@ -297,7 +300,8 @@ def test_line_chart_nested_multi_layer(sample_line_data):
         },
     }
 
-    result = line_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("line_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
@@ -309,7 +313,7 @@ Custom Chart
 def test_custom_chart(sample_barchart_data):
     variables = {
         "keys": ["state", "period"],
-        "columns": ["age_group", "new_donors", "old_donors"],
+        "value_columns": ["age_group", "new_donors", "old_donors"],
     }
 
     expected_result = {
@@ -323,7 +327,8 @@ def test_custom_chart(sample_barchart_data):
         },
     }
 
-    result = custom_chart(sample_barchart_data, variables)
+    builder = ChartBuilder.create("custom_chart")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -425,8 +430,8 @@ def sample_waffle_data(tmp_path):
 
 def test_waffle_chart(sample_waffle_data):
     variables = {
-        "wanted": [],
-        "groups": ["state", "age_group", "dose"],
+        "filter": {"state": ["mys"]},
+        "keys": ["state", "age_group", "dose"],
         "dict_keys": ["metric", "value"],
         "data_arr": {"id": "dose", "label": "dose", "value": {"metric": "perc"}},
     }
@@ -478,7 +483,8 @@ def test_waffle_chart(sample_waffle_data):
         }
     }
 
-    result = waffle_chart(sample_waffle_data, variables)
+    builder = ChartBuilder.create("waffle_chart")
+    result = builder.build_chart(sample_waffle_data, variables)
     assert result == expected_result
 
 
@@ -614,7 +620,8 @@ def test_choropleth_chart(sample_choropleth_data):
         },
     }
 
-    result = choropleth_chart(sample_choropleth_data, variables)
+    builder = ChartBuilder.create("choropleth_chart")
+    result = builder.build_chart(sample_choropleth_data, variables)
     assert result == expected_result
 
 
@@ -638,12 +645,13 @@ def sample_metrics_table_data(tmp_path):
 
 
 def test_metrics_table(sample_metrics_table_data):
-    variables = {"keys": ["lang"], "obj_attr": {"fruit": "fruit"}}
+    variables = {"keys": ["lang"], "value_columns": ["fruit"]}
     expected_result = {
         "bm": [{"fruit": "nanas"}, {"fruit": "epal"}, {"fruit": "tembikai"}],
         "en": [{"fruit": "pineapple"}, {"fruit": "apple"}, {"fruit": "watermelon"}],
     }
-    result = metrics_table(sample_metrics_table_data, variables)
+    builder = ChartBuilder.create("metrics_table")
+    result = builder.build_chart(sample_metrics_table_data, variables)
     assert result == expected_result
 
 
@@ -655,7 +663,9 @@ Query values (Dropdown)
 def test_query_values_simple(sample_barchart_data):
     variables = {"columns": ["state"]}
     expected_result = ["California", "New York"]
-    result = query_values(sample_barchart_data, variables)
+
+    builder = ChartBuilder.create("query_values")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -667,14 +677,16 @@ def test_query_values_flat(sample_barchart_data):
         {"state": "New York", "period": "2020"},
         {"state": "New York", "period": "2021"},
     ]
-    result = query_values(sample_barchart_data, variables)
+    builder = ChartBuilder.create("query_values")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
 def test_query_values_nested_single_layer(sample_barchart_data):
     variables = {"columns": ["state", "period"], "flat": False}
     expected_result = {"California": ["2020", "2021"], "New York": ["2020", "2021"]}
-    result = query_values(sample_barchart_data, variables)
+    builder = ChartBuilder.create("query_values")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -684,7 +696,8 @@ def test_query_values_nested_multi_layer(sample_barchart_data):
         "California": {"2020": ["18-24"], "2021": ["25-34"]},
         "New York": {"2020": ["18-24"], "2021": ["25-34"]},
     }
-    result = query_values(sample_barchart_data, variables)
+    builder = ChartBuilder.create("query_values")
+    result = builder.build_chart(sample_barchart_data, variables)
     assert result == expected_result
 
 
@@ -695,94 +708,73 @@ Heatmap
 
 def test_heatmap_chart_simple(sample_line_data):
     variables = {
-        "cols": ["y1"],
-        "id": "state",
+        "rename_cols": {"y1": "Y1"},
+        "value_columns": ["Y1"],
         "keys": ["state"],
-        "null_values": None,
-        "replace_vals": {},
-        "dict_rename": {},
-        "row_format": "upper",
-        "operation": "SET",
     }
     expected_result = {
-        "California": {
-            "data": [
-                {"x": "Y1", "y": 100},
-                {"x": "Y1", "y": 200},
-                {"x": "Y1", "y": 150},
-                {"x": "Y1", "y": 170},
-            ],
-            "id": "California",
-        },
-        "New York": {
-            "data": [
-                {"x": "Y1", "y": 120},
-                {"x": "Y1", "y": 180},
-                {"x": "Y1", "y": 140},
-                {"x": "Y1", "y": 160},
-            ],
-            "id": "New York",
-        },
-        "Texas": {
-            "data": [
-                {"x": "Y1", "y": 130},
-                {"x": "Y1", "y": 110},
-                {"x": "Y1", "y": 135},
-                {"x": "Y1", "y": 155},
-            ],
-            "id": "Texas",
-        },
+        "California": [
+            {"x": "Y1", "y": 100},
+            {"x": "Y1", "y": 200},
+            {"x": "Y1", "y": 150},
+            {"x": "Y1", "y": 170},
+        ],
+        "New York": [
+            {"x": "Y1", "y": 120},
+            {"x": "Y1", "y": 180},
+            {"x": "Y1", "y": 140},
+            {"x": "Y1", "y": 160},
+        ],
+        "Texas": [
+            {"x": "Y1", "y": 130},
+            {"x": "Y1", "y": 110},
+            {"x": "Y1", "y": 135},
+            {"x": "Y1", "y": 155},
+        ],
     }
-    result = heatmap_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("heatmap_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
 def test_heatmap_chart_multi_cols(sample_line_data):
     variables = {
-        "cols": ["y1", "y2"],
-        "id": "state",
+        "rename_cols": {"y1": "Y1", "y2": "Y2"},
+        "value_columns": ["Y1", "Y2"],
         "keys": ["period"],
-        "null_values": None,
-        "replace_vals": {},
-        "dict_rename": {},
-        "row_format": "upper",
-        "operation": "SET",
     }
     expected_result = {
-        'daily': {
-            'id': 'California', 
-            'data': [
-                {'x': 'Y1', 'y': 100}, 
-                {'x': 'Y2', 'y': 50}, 
-                {'x': 'Y1', 'y': 200}, 
-                {'x': 'Y2', 'y': 80}, 
-                {'x': 'Y1', 'y': 120}, 
-                {'x': 'Y2', 'y': 90}, 
-                {'x': 'Y1', 'y': 180}, 
-                {'x': 'Y2', 'y': 160}, 
-                {'x': 'Y1', 'y': 130}, 
-                {'x': 'Y2', 'y': 100}, 
-                {'x': 'Y1', 'y': 110}, 
-                {'x': 'Y2', 'y': 70}]
-        }, 
-        'monthly': {
-            'id': 'California', 
-            'data': [
-                {'x': 'Y1', 'y': 150}, 
-                {'x': 'Y2', 'y': 120}, 
-                {'x': 'Y1', 'y': 170}, 
-                {'x': 'Y2', 'y': 140}, 
-                {'x': 'Y1', 'y': 140}, 
-                {'x': 'Y2', 'y': 110}, 
-                {'x': 'Y1', 'y': 160}, 
-                {'x': 'Y2', 'y': 130}, 
-                {'x': 'Y1', 'y': 135}, 
-                {'x': 'Y2', 'y': 90}, 
-                {'x': 'Y1', 'y': 155}, 
-                {'x': 'Y2', 'y': 110}]
-        }
+        "daily": [
+            {"x": "Y1", "y": 100},
+            {"x": "Y2", "y": 50},
+            {"x": "Y1", "y": 200},
+            {"x": "Y2", "y": 80},
+            {"x": "Y1", "y": 120},
+            {"x": "Y2", "y": 90},
+            {"x": "Y1", "y": 180},
+            {"x": "Y2", "y": 160},
+            {"x": "Y1", "y": 130},
+            {"x": "Y2", "y": 100},
+            {"x": "Y1", "y": 110},
+            {"x": "Y2", "y": 70},
+        ],
+        "monthly": [
+            {"x": "Y1", "y": 150},
+            {"x": "Y2", "y": 120},
+            {"x": "Y1", "y": 170},
+            {"x": "Y2", "y": 140},
+            {"x": "Y1", "y": 140},
+            {"x": "Y2", "y": 110},
+            {"x": "Y1", "y": 160},
+            {"x": "Y2", "y": 130},
+            {"x": "Y1", "y": 135},
+            {"x": "Y2", "y": 90},
+            {"x": "Y1", "y": 155},
+            {"x": "Y2", "y": 110},
+        ],
     }
-    result = heatmap_chart(sample_line_data, variables)
+    builder = ChartBuilder.create("heatmap_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
@@ -815,7 +807,9 @@ def test_snapshot_chart(sample_line_data):
         {"y": {"y1": 135, "y2": 90}, "index": 10, "state": "Texas"},
         {"y": {"y1": 155, "y2": 110}, "index": 11, "state": "Texas"},
     ]
-    result = snapshot_chart(sample_line_data, variables)
+
+    builder = ChartBuilder.create("snapshot_chart")
+    result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
 
 
@@ -848,7 +842,7 @@ def sample_map_lat_long_data(tmp_path):
 def test_map_lat_long_chart(sample_map_lat_long_data):
     variables = {
         "keys": ["state", "district"],
-        "values": ["lat", "long"],  # Updated column names
+        "value_columns": ["lat", "long"],  # Updated column names
         "null_vals": -1,
     }
     expected_result = {
@@ -862,65 +856,6 @@ def test_map_lat_long_chart(sample_map_lat_long_data):
         },
         "Texas": {"houston": [{"lat": 29.7604, "long": -95.3698}]},
     }
-    result = map_lat_lon(sample_map_lat_long_data, variables)
-    assert result == expected_result
-
-
-"""
-Helpers Custom 
-"""
-
-
-@pytest.fixture
-def sample_helpers_custom_data(tmp_path):
-    # Create a temporary test file with sample data
-    file_name = tmp_path / "test_file.parquet"
-    data = data = {
-        "state": [
-            "New York",
-            "New York",
-            "California",
-            "California",
-            "Texas",
-            "Texas",
-            "Florida",
-            "Florida",
-        ],
-        "district": [
-            "District 1",
-            "District 2",
-            "District 3",
-            "District 4",
-            "District 5",
-            "District 6",
-            "District 7",
-            "District 8",
-        ],
-        "type": [
-            "Type A",
-            "Type B",
-            "Type C",
-            "Type A",
-            "Type B",
-            "Type C",
-            "Type A",
-            "Type B",
-        ],
-    }
-    df = pd.DataFrame(data)
-    df.to_parquet(file_name)
-    return str(file_name)
-
-
-def test_helpers_custom(sample_helpers_custom_data):
-    expected_result = {
-        "facility_types": ["Type A", "Type B", "Type C"],
-        "state_district_mapping": {
-            "New York": ["District 1", "District 2"],
-            "California": ["District 3", "District 4"],
-            "Texas": ["District 5", "District 6"],
-            "Florida": ["District 7", "District 8"],
-        },
-    }
-    result = helpers_custom(sample_helpers_custom_data)
+    builder = ChartBuilder.create("map_lat_lon")
+    result = builder.build_chart(sample_map_lat_long_data, variables)
     assert result == expected_result

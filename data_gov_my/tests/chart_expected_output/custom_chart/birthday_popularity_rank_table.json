@@ -6,7 +6,7 @@
                 "state",
                 "year"
             ],
-            "columns": [
+            "value_columns": [
                 "year_popular",
                 "year_rare"
             ],

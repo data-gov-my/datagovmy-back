@@ -2,14 +2,15 @@
     "chart_param": {
         "input": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/sekolahku_bellcurve_curve.parquet",
         "variables": {
-            "state": {
-                "level": {
-                    "chart": {
-                        "x": "x",
-                        "y": "y"
-                    }
-                }
-            }
+            "keys": [
+                "state",
+                "level",
+                "chart"
+            ],
+            "x": "x",
+            "y": [
+                "y"
+            ]
         }
     },
     "chart_type": "line_chart",

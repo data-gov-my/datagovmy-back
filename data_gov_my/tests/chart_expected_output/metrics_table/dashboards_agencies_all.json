@@ -5,9 +5,9 @@
             "keys": [
                 "lang"
             ],
-            "obj_attr": {
-                "agency": "agency"
-            }
+            "value_columns": [
+                "agency"
+            ]
         }
     },
     "chart_type": "metrics_table",

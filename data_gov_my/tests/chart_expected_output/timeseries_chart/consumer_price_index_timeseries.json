@@ -6,23 +6,26 @@
                 "series_type",
                 "chart_type"
             ],
-            "values": {
-                "x": "date",
-                "overall": "overall",
-                "food_beverage": "food_beverage",
-                "alcohol_tobacco": "alcohol_tobacco",
-                "clothing_footwear": "clothing_footwear",
-                "housing_utilities": "housing_utilities",
-                "furnishings": "furnishings",
-                "health": "health",
-                "transport": "transport",
-                "communication": "communication",
-                "recreation_culture": "recreation_culture",
-                "education": "education",
-                "hospitality": "hospitality",
-                "misc": "misc",
-                "recession": "recession"
-            }
+            "rename_cols": {
+                "date": "x"
+            },
+            "value_columns": [
+                "x",
+                "overall",
+                "food_beverage",
+                "alcohol_tobacco",
+                "clothing_footwear",
+                "housing_utilities",
+                "furnishings",
+                "health",
+                "transport",
+                "communication",
+                "recreation_culture",
+                "education",
+                "hospitality",
+                "misc",
+                "recession"
+            ]
         }
     },
     "chart_type": "timeseries_chart",
