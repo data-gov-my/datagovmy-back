@@ -28,4 +28,5 @@ urlpatterns = [
     path("explorer/", views.EXPLORER.as_view(), name="EXPLORER"),
     path("i18n/", views.I18N.as_view(), name="I18N"),
     path("forms/<str:form_type>", views.FORMS.as_view(), name="FORMS"),
+    path("view-count/", views.VIEW_COUNT.as_view(), name="VIEW_COUNT")
 ]
