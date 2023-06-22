@@ -419,7 +419,14 @@ class VIEW_COUNT(APIView) :
         
         # Get the object and increment the relevant count
         metric = 'all_time_view' if metric == 'view_count' else metric # Change field name
-        ViewCount.objects.filter(id=id, type=type).update(**{metric : F(metric) + 1}) # Avoids race condition
+        
+        obj, created = ViewCount.objects.get_or_create(id=id, type=type, defaults={metric : 1})
+        
+        if not created : 
+            cur_val = getattr(obj, metric, 0) + 1
+            setattr(obj, metric, cur_val)
+            obj.save()
+
         res = ViewCount.objects.filter(id=id, type=type).values().first()
 
         if not res : 
