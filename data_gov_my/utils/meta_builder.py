@@ -16,7 +16,6 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     i18nJson,
-    ViewCount
 )
 from data_gov_my.utils import common, dashboard_builder, triggers
 from data_gov_my.utils.common import LANGUAGE_CHOICES
@@ -212,7 +211,6 @@ class GeneralMetaBuilder(ABC):
     def remove_deleted_files(self) : 
         """
         Removes the deleted files in the repo, from the db
-        TODO: Remove the entries from view_count as well
         """
         for i in ['dashboards', 'catalog'] : 
             _DIR = os.path.join(os.getcwd(),"DATAGOVMY_SRC",os.getenv("GITHUB_DIR", "-"),i)
@@ -226,10 +224,12 @@ class GeneralMetaBuilder(ABC):
             diff = list(set(distinct_db) - set(distinct_dir))
             if diff:
                 query = { f"{column}__in": diff}
-                model.objects.filter(**query).delete
                 if i == 'dashboards' : 
+                    DashboardJson.objects.filter(**query).delete()
                     MetaJson.objects.filter(**query).delete()
-                ViewCount.objects.filter(**{"id__in" : diff}).delete() # Deletes entry from view count
+                else : 
+                    CatalogJson.objects.filter(**query).delete()
+                
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[]):
         """
@@ -332,11 +332,6 @@ class DashboardBuilder(GeneralMetaBuilder):
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata["dashboard_name"],
             defaults=updated_values,
-        )
-
-        ViewCount.objects.get_or_create(
-            id=metadata['dashboard_name'], 
-            type='dashboard'
         )
 
         cache.set("META_" + metadata["dashboard_name"], metadata)
@@ -501,11 +496,6 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
                     db_obj, created = CatalogJson.objects.update_or_create(
                         id=unique_id, defaults=db_input
-                    )
-
-                    ViewCount.objects.get_or_create(
-                        id=unique_id, 
-                        type='data-catalogue'
                     )
 
                     created_objects.append(db_obj)
