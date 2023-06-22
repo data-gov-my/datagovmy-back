@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import json
 import logging
@@ -32,57 +34,79 @@ from data_gov_my.utils.cron_utils import (
 
 
 class GeneralMetaBuilder(ABC):
-    CATEGORY = ["DATA_CATALOG", "DASHBOARDS", "I18N", "FORMS"]
-    GITHUB_DIR = ["catalog", "dashboards", "i18n", "forms"]
-    MODEL = ""
+    subclasses_by_category = {}
+    subclasses_by_github_dir = {}
 
-    @staticmethod
-    def build_operation_by_category(
-        manual=True, category=None, rebuild=True, meta_files=[]
-    ):
+    def __init_subclass__(cls, **kwargs) -> None:
         """
-        Function used to find the concrete children class builder, e.g. DashboardBuilder, and peform building operations accordingly.
+        Keep a dictionary of concrete children builders based on the CATEGORY and GITHUB_DIR properties
         """
-        builder_classes = {
-            "DASHBOARDS": DashboardBuilder,
-            "I18N": i18nBuilder,
-            "FORMS": FormBuilder,
-            "DATA_CATALOG": DataCatalogBuilder,
-        }
-        Builder: GeneralMetaBuilder = builder_classes.get(category, None)
-        if Builder:
-            Builder().build_operation(
-                manual=manual, rebuild=rebuild, meta_files=meta_files
+        super().__init_subclass__(**kwargs)
+        cls.subclasses_by_category[cls.CATEGORY] = cls
+        cls.subclasses_by_github_dir[cls.GITHUB_DIR] = cls
+
+    @property
+    @abstractmethod
+    def CATEGORY(self) -> str:
+        """
+        Refers to what category the meta builder belongs to, e.g. "DASHBOARDS", "DATA_CATALOG"...
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def GITHUB_DIR(self) -> str:
+        """
+        Refers to what github directory the metajson files reside in within the meta repository.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def MODEL(self):
+        """
+        Refers to the Django model class that the meta builder builds.
+        """
+        pass
+
+    @classmethod
+    def create(cls, property: str, isCategory: bool = True) -> GeneralMetaBuilder:
+        """
+        Given the property, returns the corresponding meta builder. If isCategory is False, the property is assumed to be github_dir.
+        """
+        subclasses = (
+            cls.subclasses_by_category if isCategory else cls.subclasses_by_github_dir
+        )
+        if property not in subclasses:
+            raise ValueError(
+                f"'{property}' is not a valid {'category' if isCategory else 'github_dir'}."
             )
 
-    @staticmethod
-    def selective_update():
+        return subclasses[property]()
+
+    @classmethod
+    def selective_update(cls):
         """
         Selectively update database objects based on the latest commit in the github repository.
         """
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
-        filtered_changes = GeneralMetaBuilder.filter_changed_files(changed_files)
-        category_mapper = dict(
-            zip(GeneralMetaBuilder.GITHUB_DIR, GeneralMetaBuilder.CATEGORY)
-        )
+        filtered_changes = cls.filter_changed_files(changed_files)
 
-        for category, files in filtered_changes.items():
+        for dir, files in filtered_changes.items():
             if files:
-                GeneralMetaBuilder.build_operation_by_category(
-                    manual=False,
-                    category=category_mapper[category],
-                    rebuild=False,
-                    meta_files=files,
-                )
+                builder = GeneralMetaBuilder.create(dir, isCategory=False)
+                builder.build_operation(manual=False, rebuild=False, meta_files=files)
 
     @staticmethod
-    def filter_changed_files(file_list) -> dict:
+    def filter_changed_files(file_list) -> dict[str, list]:
         """
         Maps the files to respective categories and returns a dictionary where the keys are the categories and the values are the corresponding files.
         """
-        changed_files = {category: [] for category in GeneralMetaBuilder.GITHUB_DIR}
+        changed_files = {
+            category: [] for category in GeneralMetaBuilder.subclasses_by_github_dir
+        }
         meta_dir = os.path.join("DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"))
         # clone meta repo if needed
         if not os.path.exists(meta_dir):
@@ -209,28 +233,36 @@ class GeneralMetaBuilder(ABC):
 
             triggers.send_telegram(telegram_msg)
 
-    def remove_deleted_files(self) : 
+    def remove_deleted_files(self):
         """
         Removes the deleted files in the repo, from the db
+        TODO: add telegram messages? and also, should it be refactored to individial children builders?
         """
-        for i in ['dashboards', 'catalog'] : 
-            _DIR = os.path.join(os.getcwd(),"DATAGOVMY_SRC",os.getenv("GITHUB_DIR", "-"),i)
-            
-            column = 'dashboard_name' if i == 'dashboards' else 'file_src'
-            model_name = 'DashboardJson' if i == 'dashboards' else 'CatalogJson'
+        for i in ["dashboards", "catalog"]:
+            _DIR = os.path.join(
+                os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), i
+            )
+
+            column = "dashboard_name" if i == "dashboards" else "file_src"
+            model_name = "DashboardJson" if i == "dashboards" else "CatalogJson"
             model = apps.get_model("data_gov_my", model_name)
 
-            distinct_db = [ m[column] for m in model.objects.values(column).distinct() ] # Change model here
-            distinct_dir = [ f.replace(".json", "") for f in os.listdir(_DIR) if isfile(join(_DIR, f)) ]
+            distinct_db = [
+                m[column] for m in model.objects.values(column).distinct()
+            ]  # Change model here
+            distinct_dir = [
+                f.replace(".json", "")
+                for f in os.listdir(_DIR)
+                if isfile(join(_DIR, f))
+            ]
             diff = list(set(distinct_db) - set(distinct_dir))
             if diff:
-                query = { f"{column}__in": diff}
-                if i == 'dashboards' : 
+                query = {f"{column}__in": diff}
+                if i == "dashboards":
                     DashboardJson.objects.filter(**query).delete()
                     MetaJson.objects.filter(**query).delete()
-                else : 
+                else:
                     CatalogJson.objects.filter(**query).delete()
-                
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[]):
         """
@@ -336,7 +368,6 @@ class DashboardBuilder(GeneralMetaBuilder):
 
         cache.set("META_" + metadata["dashboard_name"], metadata)
         return obj
-
 
     def additional_handling(
         self, rebuild: bool, meta_files, created_objects: List[MetaJson]

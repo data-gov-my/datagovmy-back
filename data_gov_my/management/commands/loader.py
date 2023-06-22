@@ -49,6 +49,5 @@ class Command(BaseCommand):
             "UPDATE",
             "REBUILD",
         ]:
-            GeneralMetaBuilder.build_operation_by_category(
-                manual=True, category=category, rebuild=rebuild, meta_files=files
-            )
+            builder = GeneralMetaBuilder.create(property=category)
+            builder.build_operation(manual=True, rebuild=rebuild, meta_files=files)
