@@ -67,8 +67,8 @@ class CHART(APIView):
 
             #  TEMP FIX
             temp = {}
-            if chart_type == "timeseries_shared":
-                const_keys = list(chart_variables["constant"].keys())
+            if chart_type == "timeseries_chart" and "constants" in chart_variables:
+                const_keys = chart_variables["constants"]
                 for k in const_keys:
                     temp[k] = chart_data[k]
 
