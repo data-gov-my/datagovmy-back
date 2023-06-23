@@ -19,7 +19,7 @@ from data_gov_my.models import (
     MetaJson,
     i18nJson,
 )
-from data_gov_my.utils import common, dashboard_builder, triggers
+from data_gov_my.utils import common, triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 from data_gov_my.utils.cron_utils import (
@@ -236,7 +236,6 @@ class GeneralMetaBuilder(ABC):
     def remove_deleted_files(self):
         """
         Removes the deleted files in the repo, from the db
-        TODO: add telegram messages? and also, should it be refactored to individial children builders?
         """
         for i in ["dashboards", "catalog"]:
             _DIR = os.path.join(
