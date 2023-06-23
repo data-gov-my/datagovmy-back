@@ -26,7 +26,7 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     i18nJson,
-    ViewCount
+    ViewCount,
 )
 from data_gov_my.serializers import FormDataSerializer, i18nSerializer
 from data_gov_my.utils import cron_utils
@@ -61,6 +61,7 @@ class CHART(APIView):
                 dashboard_name=dbd_name, chart_name=chart_name
             ).values("chart_data")[0]["chart_data"]
 
+            data_last_updated = meta.get("data_last_updated", None)
             data_as_of = chart_data["data_as_of"]
             chart_data = chart_data["data"]
 
@@ -83,6 +84,7 @@ class CHART(APIView):
             overall_data = {}
             overall_data["data"] = chart_data
             overall_data["data_as_of"] = data_as_of
+            overall_data["data_last_updated"] = data_last_updated
 
         return JsonResponse(overall_data, safe=False)
 
@@ -395,7 +397,7 @@ class FORMS(generics.ListAPIView):
         )
 
 
-class VIEW_COUNT(APIView) :
+class VIEW_COUNT(APIView):
     def post(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
@@ -404,36 +406,60 @@ class VIEW_COUNT(APIView) :
         type = request.query_params.get("type", None)
         metric = request.query_params.get("metric", None)
 
-        default_values = {"type" : ['dashboard', 'data-catalogue'],  
-                          "metric" : ['view_count', 'download_png', 'download_csv', 'download_svg', 'download_parquet']}
+        default_values = {
+            "type": ["dashboard", "data-catalogue"],
+            "metric": [
+                "view_count",
+                "download_png",
+                "download_csv",
+                "download_svg",
+                "download_parquet",
+            ],
+        }
 
         # Checks if all parameters have values
-        if not all([id, type, metric]) :
-            return JsonResponse({"status": 400, "message": "Parameters id, type and metric must be supplied"}, status=400)
-        
+        if not all([id, type, metric]):
+            return JsonResponse(
+                {
+                    "status": 400,
+                    "message": "Parameters id, type and metric must be supplied",
+                },
+                status=400,
+            )
+
         # Checks if parameter 'type' and 'metric' has appropriate values
-        for k, v in default_values.items() : 
-            if request.query_params.get(k) not in v : 
+        for k, v in default_values.items():
+            if request.query_params.get(k) not in v:
                 pos_values = ", ".join(v)
-                return JsonResponse({"status" : 400, "message" : f"Parameter '{k}' has to hold either values : {pos_values}"}, status=400)
-        
+                return JsonResponse(
+                    {
+                        "status": 400,
+                        "message": f"Parameter '{k}' has to hold either values : {pos_values}",
+                    },
+                    status=400,
+                )
+
         # Get the object and increment the relevant count
-        metric = 'all_time_view' if metric == 'view_count' else metric # Change field name
-        
-        obj, created = ViewCount.objects.get_or_create(id=id, type=type, defaults={metric : 1})
-        
-        if not created : 
+        metric = (
+            "all_time_view" if metric == "view_count" else metric
+        )  # Change field name
+
+        obj, created = ViewCount.objects.get_or_create(
+            id=id, type=type, defaults={metric: 1}
+        )
+
+        if not created:
             cur_val = getattr(obj, metric, 0) + 1
             setattr(obj, metric, cur_val)
             obj.save()
 
         res = ViewCount.objects.filter(id=id, type=type).values().first()
 
-        if not res : 
-            return JsonResponse({"status" : 404, "message" : "ID not found"}, status=404)
+        if not res:
+            return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
 
-        if type == 'dashboard' : 
-            for i in ['csv', 'parquet', 'png', 'svg'] : 
+        if type == "dashboard":
+            for i in ["csv", "parquet", "png", "svg"]:
                 res.pop(f"download_{i}")
 
         return JsonResponse(res, safe=False)
