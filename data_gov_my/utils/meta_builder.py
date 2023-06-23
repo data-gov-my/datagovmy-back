@@ -210,9 +210,9 @@ class GeneralMetaBuilder(ABC):
             if not routes:  # current object does not have any routes
                 continue
             response = revalidate_frontend(routes=routes)
-            if response and response.status_code == 200:
+            if response.status_code == 200:
                 successful_routes.extend(response.json()["revalidated"])
-            elif response and response.status_code == 400:
+            elif response.status_code == 400:
                 failed_routes.extend(routes.split(","))
                 failed_info.append(response.json())
             else:
