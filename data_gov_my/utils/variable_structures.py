@@ -69,9 +69,9 @@ class MetricsTableVariables(GeneralChartVariables):
 
 
 class PyramidChartVariables(GeneralChartVariables):
-    col_range: dict[str, str]
-    suffix: dict[str, str]
-    keys: str
+    label_column: str = "age"
+    y1: str = "female"
+    y2: str = "male"
 
 
 class JitterChartVariables(GeneralChartVariables):
