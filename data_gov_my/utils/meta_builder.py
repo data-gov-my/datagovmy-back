@@ -572,13 +572,12 @@ class ExplorerBuilder(GeneralMetaBuilder) :
             exp_meta: dict = meta.dashboard_meta
             exp_name = meta.dashboard_name
             table_list = exp_meta["tables"]
-            obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta['explorer_name']]()
-
             for k in table_list.keys():
                 table_name = k
                 table_operation = exp_meta['tables'][k]['update']
                 last_update = exp_meta['tables'][k]['data_as_of']
                 try:
+                    obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta['explorer_name']]()
 
                     upd, create = ExplorersUpdate.objects.get_or_create(
                         explorer=exp_name,
@@ -600,7 +599,7 @@ class ExplorerBuilder(GeneralMetaBuilder) :
                         obj.update(table=table_name, unique_keys=unique_keys)
                     
                     successful_meta.add(meta)
-                    tables_updated.append()
+                    tables_updated.append(table_name)
                 except Exception as e:
                     failed_obj = {}
                     failed_obj["DASHBOARD"] = exp_name
