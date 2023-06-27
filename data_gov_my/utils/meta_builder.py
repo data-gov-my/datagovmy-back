@@ -11,6 +11,7 @@ from typing import List
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from django.apps import apps
+from data_gov_my.explorers import class_list as exp_class
 
 from data_gov_my.models import (
     CatalogJson,
@@ -18,6 +19,7 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     i18nJson,
+    ExplorersUpdate,
 )
 from data_gov_my.utils import common, triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -535,3 +537,93 @@ class DataCatalogBuilder(GeneralMetaBuilder):
                     created_objects.append(db_obj)
 
         return created_objects
+
+
+class ExplorerBuilder(GeneralMetaBuilder) : 
+    CATEGORY = "EXPLORERS"
+    MODEL = ExplorersUpdate
+    GITHUB_DIR = "explorers"
+
+    def update_or_create_meta(self, filename: str, metadata: dict):
+        route = metadata.get("route", "")
+        updated_values = {"dashboard_meta": metadata, "route": route}
+        obj, created = MetaJson.objects.update_or_create(
+            dashboard_name=metadata["explorer_name"],
+            defaults=updated_values,
+        )
+
+        cache.set("META_" + metadata["explorer_name"], metadata)
+        return obj
+
+    def additional_handling(
+        self, rebuild: bool, meta_files, created_objects: List[MetaJson]
+    ):
+        """
+        Update or create new ExplorersUpdate instances (Entire Table) based on each created MetaJson instance.
+        """
+        if rebuild:
+            ExplorersUpdate.objects.all().delete()
+
+        successful_meta = set()
+
+        for meta in created_objects:
+            failed = []
+            created_charts = []
+            exp_meta: dict = meta.dashboard_meta
+            exp_name = meta.dashboard_name
+            table_list = exp_meta["tables"]
+            obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta['explorer_name']]()
+
+            for k in table_list.keys():
+                table_name = k
+                table_operation = exp_meta['tables'][k]['update']
+                last_update = exp_meta['tables'][k]['data_as_of']
+                try:
+
+                    upd, create = ExplorersUpdate.objects.get_or_create(
+                        explorer=exp_name,
+                        file_name=k,
+                        defaults={"last_update" : last_update}
+                    )
+
+                    if not create : 
+                        if upd.last_update == last_update : 
+                            continue
+                        else : 
+                            upd.last_update = last_update
+                            upd.save()
+                    
+                    if table_operation == 'REBUILD' : 
+                        obj.populate_db(table=table_name, rebuild=True)
+                    elif table_operation == 'UPDATE' :
+                        unique_keys = exp_meta['tables'][k]['unique_keys']
+                        obj.update(table=table_name, unique_keys=unique_keys)
+
+                except Exception as e:
+                    failed_obj = {}
+                    failed_obj["DASHBOARD"] = exp_name
+                    failed_obj["CHART_NAME"] = table_name
+                    failed_obj["ERROR"] = str(e)
+                    failed.append(failed_obj)
+
+            # For a single dashboard, send status on all its charts
+            telegram_msg = [
+                triggers.format_header(
+                    f"<code>{exp_name.upper()}</code> Charts Built Status (DashboardJson)"
+                ),
+                triggers.format_files_with_status_emoji(created_charts, "✅︎") + "\n",
+                triggers.format_files_with_status_emoji(
+                    [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed],
+                    "❌",
+                ),
+            ]
+
+            if failed:
+                telegram_msg.append(
+                    "\n"
+                    + triggers.format_multi_line(failed, "Failed Meta - Error logs")
+                )
+
+            triggers.send_telegram("\n".join(telegram_msg))
+
+        return successful_meta

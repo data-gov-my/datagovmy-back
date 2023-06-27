@@ -51,9 +51,27 @@ class General_Explorer :
     Performs an update to the database.
     '''
 
-    def update() :
-        # Change once pipeline is changed too.
-        print("Update database")
+    def update(self, table_name='', unique_keys=[]) :
+        df = pd.read_parquet(self.data_populate[table_name])
+        df = df.replace({np.nan : None})
+        df = df.drop(columns=self.columns_exclude)
+
+        if "state" in df.columns:
+            df["state"].replace(STATE_ABBR, inplace=True)
+
+        if self.columns_rename : 
+            df.rename(columns=self.columns_rename, inplace=True)
+        
+        model_choice = apps.get_model("data_gov_my", table_name)
+        update_fields = list(set(df.columns.to_list()) - set(unique_keys))
+        queryset = [ model_choice(**x) for x in df.to_dict('records') ]
+
+        model_choice.objects.bulk_create(
+            queryset,
+            update_conflicts=True,
+            unique_fields=unique_keys,
+            update_fields=update_fields,
+        )
 
     '''
     Populates the table,

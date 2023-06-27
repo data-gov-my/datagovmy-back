@@ -254,3 +254,8 @@ class ViewCount(models.Model) :
     download_parquet = models.IntegerField(null=False, default=0)
     download_png = models.IntegerField(null=False, default=0)
     download_svg = models.IntegerField(null=False, default=0)
+
+class ExplorersUpdate(models.Model) : 
+    explorer = models.CharField(max_length=100, null=False)
+    file_name = models.CharField(max_length=100, null=False)
+    last_update = models.CharField(max_length=100, null=False)
