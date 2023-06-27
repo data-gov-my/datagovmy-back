@@ -568,7 +568,7 @@ class ExplorerBuilder(GeneralMetaBuilder) :
 
         for meta in created_objects:
             failed = []
-            created_charts = []
+            tables_updated = []
             exp_meta: dict = meta.dashboard_meta
             exp_name = meta.dashboard_name
             table_list = exp_meta["tables"]
@@ -598,7 +598,9 @@ class ExplorerBuilder(GeneralMetaBuilder) :
                     elif table_operation == 'UPDATE' :
                         unique_keys = exp_meta['tables'][k]['unique_keys']
                         obj.update(table=table_name, unique_keys=unique_keys)
-
+                    
+                    successful_meta.add(meta)
+                    tables_updated.append()
                 except Exception as e:
                     failed_obj = {}
                     failed_obj["DASHBOARD"] = exp_name
@@ -611,7 +613,7 @@ class ExplorerBuilder(GeneralMetaBuilder) :
                 triggers.format_header(
                     f"<code>{exp_name.upper()}</code> Charts Built Status (DashboardJson)"
                 ),
-                triggers.format_files_with_status_emoji(created_charts, "✅︎") + "\n",
+                triggers.format_files_with_status_emoji(tables_updated, "✅︎") + "\n",
                 triggers.format_files_with_status_emoji(
                     [f'{obj["DASHBOARD"]} ({obj["CHART_NAME"]})' for obj in failed],
                     "❌",
