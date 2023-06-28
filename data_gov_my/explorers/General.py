@@ -3,6 +3,8 @@ import numpy as np
 from django.apps import apps
 from django.http import JsonResponse
 from data_gov_my.utils.general_chart_helpers import STATE_ABBR
+from data_gov_my.models import ExplorersUpdate
+
 
 class General_Explorer :
     # General Data
@@ -51,9 +53,27 @@ class General_Explorer :
     Performs an update to the database.
     '''
 
-    def update() :
-        # Change once pipeline is changed too.
-        print("Update database")
+    def update(self, table_name='', unique_keys=[]) :
+        df = pd.read_parquet(self.data_populate[table_name])
+        df = df.replace({np.nan : None})
+        df = df.drop(columns=self.columns_exclude)
+
+        if "state" in df.columns:
+            df["state"].replace(STATE_ABBR, inplace=True)
+
+        if self.columns_rename : 
+            df.rename(columns=self.columns_rename, inplace=True)
+        
+        model_choice = apps.get_model("data_gov_my", table_name)
+        update_fields = list(set(df.columns.to_list()) - set(unique_keys))
+        queryset = [ model_choice(**x) for x in df.to_dict('records') ]
+
+        model_choice.objects.bulk_create(
+            queryset,
+            update_conflicts=True,
+            unique_fields=unique_keys,
+            update_fields=update_fields,
+        )
 
     '''
     Populates the table,
@@ -95,6 +115,12 @@ class General_Explorer :
         for k,v in groups :
             model_rows = [ model_choice(**i) for i in v.to_dict('records') ]
             model_choice.objects.bulk_create(model_rows)
+
+    def get_last_update(self, model_name="") : 
+        obj = ExplorersUpdate.objects.filter(explorer=self.explorer_name, file_name=model_name).first()
+        if obj : 
+            return obj.last_update
+        return None
 
     '''
     Validates a request,

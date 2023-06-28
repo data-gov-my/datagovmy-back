@@ -89,5 +89,6 @@ class NAME_POPULARITY(General_Explorer) :
             for name in s :
                 fin.append({"name" : name, "total" : 0, "max" : "-", "min" : "-"})
 
-
-        return JsonResponse(fin, safe=False, status=200)
+        last_update = self.get_last_update(model_name=model_name)
+        res = {"last_update" : last_update, "data" : fin}
+        return JsonResponse(res, safe=False, status=200)
