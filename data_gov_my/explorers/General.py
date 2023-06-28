@@ -3,6 +3,8 @@ import numpy as np
 from django.apps import apps
 from django.http import JsonResponse
 from data_gov_my.utils.general_chart_helpers import STATE_ABBR
+from data_gov_my.models import ExplorersUpdate
+
 
 class General_Explorer :
     # General Data
@@ -113,6 +115,12 @@ class General_Explorer :
         for k,v in groups :
             model_rows = [ model_choice(**i) for i in v.to_dict('records') ]
             model_choice.objects.bulk_create(model_rows)
+
+    def get_last_update(self, model_name="") : 
+        obj = ExplorersUpdate.objects.filter(explorer=self.explorer_name, file_name=model_name).first()
+        if obj : 
+            return obj.last_update
+        return None
 
     '''
     Validates a request,

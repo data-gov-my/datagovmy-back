@@ -579,20 +579,15 @@ class ExplorerBuilder(GeneralMetaBuilder) :
                 try:
                     obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta['explorer_name']]()
 
-                    upd, create = ExplorersUpdate.objects.get_or_create(
+                    upd, create = ExplorersUpdate.objects.update_or_create(
                         explorer=exp_name,
                         file_name=k,
                         defaults={"last_update" : last_update}
                     )
 
-                    if not create : 
-                        if upd.last_update == last_update : 
-                            continue
-                        else : 
-                            upd.last_update = last_update
-                            upd.save()
-                    
-                    if table_operation == 'REBUILD' : 
+                    if table_operation == 'SLEEP' :
+                        continue
+                    elif table_operation == 'REBUILD' : 
                         obj.populate_db(table=table_name, rebuild=True)
                     elif table_operation == 'UPDATE' :
                         unique_keys = exp_meta['tables'][k]['unique_keys']
@@ -610,7 +605,7 @@ class ExplorerBuilder(GeneralMetaBuilder) :
             # For a single dashboard, send status on all its charts
             telegram_msg = [
                 triggers.format_header(
-                    f"<code>{exp_name.upper()}</code> Charts Built Status (DashboardJson)"
+                    f"<code>{exp_name.upper()}</code> Explorer Table Built Status"
                 ),
                 triggers.format_files_with_status_emoji(tables_updated, "✅︎") + "\n",
                 triggers.format_files_with_status_emoji(
