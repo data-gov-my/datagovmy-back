@@ -174,7 +174,7 @@ class ELECTIONS(General_Explorer):
 
         last_update = self.get_last_update(model_name=chart_choice['model_name'])
 
-        r_data = {"last_update" : last_update, "data" : ser_data } 
+        r_data = {"data_last_update" : last_update, "data" : ser_data } 
         res["msg"] = r_data
         res["status"] = 200
         return res
@@ -219,7 +219,7 @@ class ELECTIONS(General_Explorer):
         serializer = ElectionOverallSeatSerializer(overall_res, many=True)
         last_update = self.get_last_update(model_name=model_name)
 
-        r_data = {"last_update" : last_update, "data" : serializer.data } 
+        r_data = {"data_last_update" : last_update, "data" : serializer.data } 
         res["msg"] = r_data
         res["status"] = 200
 
@@ -267,7 +267,7 @@ class ELECTIONS(General_Explorer):
 
         last_update = self.get_last_update(model_name=model_name)
 
-        r_data = {"last_update" : last_update, "data" : data } 
+        r_data = {"data_last_update" : last_update, "data" : data } 
         res["msg"] = r_data
         res["status"] = 200
 
