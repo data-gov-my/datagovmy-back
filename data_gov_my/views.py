@@ -225,21 +225,6 @@ class EXPLORER(APIView):
 
         return JsonResponse({"status": 400, "message": "Bad Request"}, status=400)
 
-    # TODO: Protect this, or remove once meta is created
-    def post(self, request, format=None):
-        params = dict(request.POST)
-
-        if (
-            "explorer" in params
-            and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
-        ):
-            obj = exp_class.EXPLORERS_CLASS_LIST[params["explorer"][0]]()
-            to_rebuild = "rebuild" in params
-            r_table = params["table"][0] if "table" in params else ""
-            obj.populate_db(table=r_table, rebuild=to_rebuild)
-
-        return JsonResponse({"status": 200, "message": "Table Populated."}, status=200)
-
 
 class DROPDOWN(APIView):
     def get(self, request, format=None):
