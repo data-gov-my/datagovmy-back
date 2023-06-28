@@ -5,7 +5,6 @@ from data_gov_my.explorers.General import General_Explorer
 from rest_framework import exceptions
 from django.http import JsonResponse
 from django.apps import apps
-from data_gov_my.models import DashboardJson
 from data_gov_my.serializers import ElectionCandidateSerializer, ElectionSeatSerializer, ElectionPartySerializer, ElectionOverallSeatSerializer
 from collections import defaultdict
 
@@ -109,16 +108,18 @@ class ELECTIONS(General_Explorer):
         # Handles Charts
         if "chart" in request_params and request_params["chart"][0] in self.charts:
             chart_type = request_params["chart"][0]
+            res = {}
+
             if chart_type == "full_result" :
                 res = self.full_result(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
             elif chart_type == "overall_seat" :
                 res = self.overall_seat(request_params=request_params)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
             else :
                 res = self.chart_handler(request_params=request_params, chart=chart_type)
-                return JsonResponse(res["msg"], status=res["status"], safe=False)
+
+            return JsonResponse(res["msg"], status=res["status"], safe=False)
             
+
         return JsonResponse({"400" : "Bad Request."}, status=400)
 
     '''
@@ -171,7 +172,10 @@ class ELECTIONS(General_Explorer):
         if chart_choice["segment_by"] :
             ser_data = self.group_by_type(type=chart_choice["segment_by"], data=ser_data)
 
-        res["msg"] = ser_data
+        last_update = self.get_last_update(model_name=chart_choice['model_name'])
+
+        r_data = {"data_last_update" : last_update, "data" : ser_data } 
+        res["msg"] = r_data
         res["status"] = 200
         return res
 
@@ -213,8 +217,10 @@ class ELECTIONS(General_Explorer):
         overall_res = model_choice.objects.filter(**args)
         
         serializer = ElectionOverallSeatSerializer(overall_res, many=True)
+        last_update = self.get_last_update(model_name=model_name)
 
-        res["msg"] = serializer.data
+        r_data = {"data_last_update" : last_update, "data" : serializer.data } 
+        res["msg"] = r_data
         res["status"] = 200
 
         return res
@@ -259,7 +265,10 @@ class ELECTIONS(General_Explorer):
             r["data"] = [{k: v for k, v in d.items() if k not in const_keys} for d in data]
             data = r
 
-        res["msg"] = data
+        last_update = self.get_last_update(model_name=model_name)
+
+        r_data = {"data_last_update" : last_update, "data" : data } 
+        res["msg"] = r_data
         res["status"] = 200
 
         return res

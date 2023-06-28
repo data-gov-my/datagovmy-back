@@ -45,6 +45,7 @@ class Command(BaseCommand):
             "DASHBOARDS",
             "I18N",
             "FORMS",
+            "EXPLORERS",
         ] and operation in [
             "UPDATE",
             "REBUILD",
