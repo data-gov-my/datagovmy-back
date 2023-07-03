@@ -94,12 +94,17 @@ class GeneralMetaBuilder(ABC):
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
         changed_files = [f["filename"] for f in data["files"]]
-        filtered_changes = cls.filter_changed_files(changed_files)
+        refreshed = GeneralMetaBuilder.refresh_meta_repo()
+        
+        if not refreshed:
+            logging.warning("Github repo has not been refreshed, abort building")
+        else : 
+            filtered_changes = cls.filter_changed_files(changed_files)
 
-        for dir, files in filtered_changes.items():
-            if files:
-                builder = GeneralMetaBuilder.create(dir, isCategory=False)
-                builder.build_operation(manual=False, rebuild=False, meta_files=files)
+            for dir, files in filtered_changes.items():
+                if files:
+                    builder = GeneralMetaBuilder.create(dir, isCategory=False)
+                    builder.build_operation(manual=False, rebuild=False, meta_files=files)
 
     @staticmethod
     def filter_changed_files(file_list) -> dict[str, list]:
@@ -276,11 +281,6 @@ class GeneralMetaBuilder(ABC):
         4. Calls `additional_handling()`, e.g. each dashboard metadata has multiple charts, these charts are individually updated through `additional_handling()`.
         5. Revalidates routes if the model instances have `route` field.
         """
-        refreshed = self.refresh_meta_repo()
-        if not refreshed:
-            logging.warning("Github repo has not been refreshed, abort building")
-            return False
-
         # Remove from db, deleted meta jsons
         self.remove_deleted_files()
 
