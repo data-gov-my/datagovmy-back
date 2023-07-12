@@ -10,7 +10,7 @@ class DashboardChartModel(BaseModel):
     name: str
     chart_type: str
     chart_source: str
-    data_as_of: datetime = datetime(2023, 7, 12, 11, 59)
+    data_as_of: datetime
     api_type: Literal["dynamic", "static", "individual_chart"]
     variables: dict  # will be validated individually for each chart
     api_params: list[str]
