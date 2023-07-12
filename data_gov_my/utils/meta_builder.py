@@ -539,7 +539,7 @@ class DataCatalogBuilder(GeneralMetaBuilder):
         return created_objects
 
 
-class ExplorerBuilder(GeneralMetaBuilder) : 
+class ExplorerBuilder(GeneralMetaBuilder):
     CATEGORY = "EXPLORERS"
     MODEL = ExplorersUpdate
     GITHUB_DIR = "explorers"
@@ -574,25 +574,25 @@ class ExplorerBuilder(GeneralMetaBuilder) :
             table_list = exp_meta["tables"]
             for k in table_list.keys():
                 table_name = k
-                table_operation = exp_meta['tables'][k]['update']
-                last_update = exp_meta['tables'][k]['data_as_of']
+                table_operation = exp_meta["tables"][k]["update"]
+                last_update = exp_meta["tables"][k]["data_as_of"]
                 try:
-                    obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta['explorer_name']]()
+                    obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta["explorer_name"]]()
 
                     upd, create = ExplorersUpdate.objects.update_or_create(
                         explorer=exp_name,
                         file_name=k,
-                        defaults={"last_update" : last_update}
+                        defaults={"last_update": last_update},
                     )
 
-                    if table_operation == 'SLEEP' :
+                    if table_operation == "SLEEP":
                         continue
-                    elif table_operation == 'REBUILD' : 
+                    elif table_operation == "REBUILD":
                         obj.populate_db(table=table_name, rebuild=True)
-                    elif table_operation == 'UPDATE' :
-                        unique_keys = exp_meta['tables'][k]['unique_keys']
+                    elif table_operation == "UPDATE":
+                        unique_keys = exp_meta["tables"][k]["unique_keys"]
                         obj.update(table=table_name, unique_keys=unique_keys)
-                    
+
                     successful_meta.add(meta)
                     tables_updated.append(table_name)
                 except Exception as e:
