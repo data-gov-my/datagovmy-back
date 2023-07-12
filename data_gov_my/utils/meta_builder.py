@@ -11,6 +11,7 @@ from typing import List
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from django.apps import apps
+from pydantic import BaseModel
 from data_gov_my.explorers import class_list as exp_class
 
 from data_gov_my.models import (
@@ -33,6 +34,13 @@ from data_gov_my.utils.cron_utils import (
     revalidate_frontend,
     write_as_binary,
 )
+from data_gov_my.utils.metajson_structures import (
+    DashboardValidateModel,
+    DataCatalogValidateModel,
+    ExplorerValidateModel,
+    FormValidateModel,
+    i18nValidateModel,
+)
 
 
 class GeneralMetaBuilder(ABC):
@@ -46,6 +54,14 @@ class GeneralMetaBuilder(ABC):
         super().__init_subclass__(**kwargs)
         cls.subclasses_by_category[cls.CATEGORY] = cls
         cls.subclasses_by_github_dir[cls.GITHUB_DIR] = cls
+
+    @property
+    @abstractmethod
+    def VALIDATOR(self) -> BaseModel:
+        """
+        Refers to the pydantic model for metajson structure validation.
+        """
+        pass
 
     @property
     @abstractmethod
@@ -315,7 +331,8 @@ class GeneralMetaBuilder(ABC):
                 f_meta = os.path.join(self.get_github_directory(), meta)
                 f = open(f_meta)
                 data = json.load(f)
-                created_object = self.update_or_create_meta(meta, data)
+                validated_metadata = self.VALIDATOR(**data)
+                created_object = self.update_or_create_meta(meta, validated_metadata)
                 if isinstance(created_object, list):
                     for object in created_object:
                         object.save()
@@ -362,16 +379,20 @@ class DashboardBuilder(GeneralMetaBuilder):
     CATEGORY = "DASHBOARDS"
     MODEL = MetaJson
     GITHUB_DIR = "dashboards"
+    VALIDATOR = DashboardValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        route = metadata.get("route", "")
-        updated_values = {"dashboard_meta": metadata, "route": route}
+    def update_or_create_meta(self, filename: str, metadata: DashboardValidateModel):
+        dashboard_meta = metadata.model_dump()
+        updated_values = {
+            "dashboard_meta": dashboard_meta,
+            "route": metadata.route,
+        }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata["dashboard_name"],
+            dashboard_name=metadata.dashboard_name,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata["dashboard_name"], metadata)
+        cache.set("META_" + metadata.dashboard_name, dashboard_meta)
         return obj
 
     def additional_handling(
@@ -461,6 +482,7 @@ class i18nBuilder(GeneralMetaBuilder):
     CATEGORY = "I18N"
     MODEL = i18nJson
     GITHUB_DIR = "i18n"
+    VALIDATOR = i18nValidateModel
 
     def get_meta_files(self):
         """
@@ -479,12 +501,12 @@ class i18nBuilder(GeneralMetaBuilder):
             )
         return files
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
+    def update_or_create_meta(self, filename: str, metadata: i18nValidateModel):
         language, filename = os.path.split(filename)
         filename = filename.replace(".json", "")
 
         obj, created = i18nJson.objects.update_or_create(
-            filename=filename, language=language, defaults=metadata
+            filename=filename, language=language, defaults=metadata.model_dump()
         )
         return obj
 
@@ -493,20 +515,22 @@ class FormBuilder(GeneralMetaBuilder):
     CATEGORY = "FORMS"
     MODEL = FormTemplate
     GITHUB_DIR = "forms"
+    VALIDATOR = FormValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
+    def update_or_create_meta(self, filename: str, metadata: FormValidateModel):
         form_type = filename.replace(".json", "")
-        return FormTemplate.create(form_type=form_type, form_meta=metadata)
+        return FormTemplate.create(form_type=form_type, form_meta=metadata.model_dump())
 
 
 class DataCatalogBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOG"
     MODEL = CatalogJson
     GITHUB_DIR = "catalog"
+    VALIDATOR = DataCatalogValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        file_data = metadata["file"]
-        all_variable_data = metadata["file"]["variables"]
+    def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
+        file_data = metadata.file
+        all_variable_data = metadata.file.variables
         full_meta = metadata
         file_src = filename.replace(".json", "")
 
@@ -547,16 +571,19 @@ class ExplorerBuilder(GeneralMetaBuilder):
     CATEGORY = "EXPLORERS"
     MODEL = ExplorersUpdate
     GITHUB_DIR = "explorers"
+    VALIDATOR = ExplorerValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        route = metadata.get("route", "")
-        updated_values = {"dashboard_meta": metadata, "route": route}
+    def update_or_create_meta(self, filename: str, metadata: ExplorerValidateModel):
+        updated_values = {
+            "dashboard_meta": metadata.model_dump(),
+            "route": metadata.route,
+        }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata["explorer_name"],
+            dashboard_name=metadata.explorer_name,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata["explorer_name"], metadata)
+        cache.set("META_" + metadata.explorer_name, metadata)
         return obj
 
     def additional_handling(
