@@ -3,6 +3,7 @@ from typing import Literal
 from datetime import datetime
 from data_gov_my.utils.chart_builders import ChartBuilder
 from pydantic_core.core_schema import FieldValidationInfo
+from typing import Optional
 
 
 class DashboardChartModel(BaseModel):
@@ -81,9 +82,6 @@ class ExplorerValidateModel(BaseModel):
         return data_last_updated.strftime("%Y-%m-%d %H:%M")
 
 
-# TODO: data catalog metajson not that thoroughly handled,
-# for proper refactor on this involves updating catalog_variable_classes as well (in future)
-
 # class CatalogData(BaseModel):
 #     catalog_filters: dict
 #     metadata_neutral: dict
@@ -101,6 +99,8 @@ class ExplorerValidateModel(BaseModel):
 #     catalog_data: Optional[dict]
 
 
+# TODO: data catalog metajson not that thoroughly handled,
+# for proper refactor on this involves updating catalog_variable_classes as well (in future)
 class _DataCatalogFileValidateModel(BaseModel):
     manual_trigger: str = "0"
     bucket: str
@@ -112,8 +112,9 @@ class _DataCatalogFileValidateModel(BaseModel):
     subcategory_en: str
     subcategory_bm: str
     description: dict[Literal["en", "bm"], str]
-    link_parquet: str
-    link_csv: str
+    link_parquet: Optional[str] = None
+    link_csv: Optional[str] = None
+    link_geojson: Optional[str] = None
     variables: list[dict]
 
 

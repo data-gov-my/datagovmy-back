@@ -543,8 +543,8 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
                 if chart_type in common.CHART_TYPES:
                     args = {
-                        "full_meta": full_meta,
-                        "file_data": file_data,
+                        "full_meta": full_meta.model_dump(),
+                        "file_data": file_data.model_dump(),
                         "cur_data": cur_data,
                         "all_variable_data": all_variable_data,
                         "file_src": file_src,
