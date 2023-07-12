@@ -52,7 +52,7 @@ class DashboardValidateModel(BaseModel):
 
 
 class i18nValidateModel(BaseModel):
-    route: str
+    route: str | None
     translation: dict
 
 
