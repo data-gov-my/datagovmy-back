@@ -14,7 +14,7 @@ class GeneralChartVariables(BaseModel):
     """
 
     keys: list[str] = []
-    value_columns: list[str] = None
+    value_columns: list[str] = []
     rename_cols: dict[str, str] = {}
     null_vals: str | int | None = None
     replace_vals: dict[str, str | int] = {}
