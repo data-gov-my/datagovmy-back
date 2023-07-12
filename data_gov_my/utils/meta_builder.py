@@ -105,7 +105,7 @@ class GeneralMetaBuilder(ABC):
                 if files:
                     builder = GeneralMetaBuilder.create(dir, isCategory=False)
                     builder.build_operation(
-                        manual=False, rebuild=False, meta_files=files
+                        manual=False, rebuild=False, meta_files=files, refresh=False
                     )
 
     @staticmethod
@@ -272,7 +272,7 @@ class GeneralMetaBuilder(ABC):
                 else:
                     CatalogJson.objects.filter(**query).delete()
 
-    def build_operation(self, manual=True, rebuild=True, meta_files=[]):
+    def build_operation(self, manual=True, rebuild=True, meta_files=[], refresh=True):
         """
         General build operation for all data builder classes.
         Inherited classes should override `update_or_create_meta()` to control how each meta file is used to update or create model objects.
@@ -283,6 +283,8 @@ class GeneralMetaBuilder(ABC):
         4. Calls `additional_handling()`, e.g. each dashboard metadata has multiple charts, these charts are individually updated through `additional_handling()`.
         5. Revalidates routes if the model instances have `route` field.
         """
+        if refresh:
+            self.refresh_meta_repo()
         # Remove from db, deleted meta jsons
         self.remove_deleted_files()
 
