@@ -231,14 +231,13 @@ class EXPLORER(APIView):
 
 
 class DROPDOWN(APIView):
-    def get(self, request, format=None):
+    def get(self, request: request.Request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        param_list = dict(request.GET)
-        params_req = ["dashboard"]
+        param_list = request.query_params
 
-        if all(p in param_list for p in params_req):
+        if "dashboard" in param_list:
             res = handle_request(param_list, False)
             dropdown_lst = res["query_values"]["data"]["data"]
             info = {"total": len(dropdown_lst)}
