@@ -4,12 +4,11 @@ from threading import Thread
 import environ
 from django.core.cache import cache
 from django.db.models import Q
-from django.db.models import F
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from post_office import mail
 from post_office.models import Email
-from rest_framework import generics, status
+from rest_framework import generics, status, request
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -102,18 +101,23 @@ class UPDATE(APIView):
 
 
 class DASHBOARD(APIView):
-    def get(self, request, format=None):
+    def get(self, request: request.Request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-        param_list = dict(request.GET)
-        params_req = ["dashboard"]
+        param_list = request.query_params
 
-        if all(p in param_list for p in params_req):
+        if "dashboard" in param_list:
             res = handle_request(param_list)
             res = handle.dashboard_additional_handling(param_list, res)
-            return JsonResponse(res, safe=False)
+            return JsonResponse(res, safe=False, status=200)
         else:
-            return JsonResponse({}, safe=False)
+            return JsonResponse(
+                {
+                    status: status.HTTP_400_BAD_REQUEST,
+                    "message": "Missing 'dashboard' query parameter.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class DATA_VARIABLE(APIView):
@@ -548,8 +552,8 @@ Handles request for dashboards
 """
 
 
-def handle_request(param_list, isDashboard=True):
-    dbd_name = str(param_list["dashboard"][0])
+def handle_request(param_list: QueryDict, isDashboard=True):
+    dbd_name = param_list["dashboard"]
     dbd_info = cache.get("META_" + dbd_name)
 
     if not dbd_info:
@@ -558,7 +562,6 @@ def handle_request(param_list, isDashboard=True):
         )
 
     params_req = []
-
     data_last_updated = None
 
     if len(dbd_info) > 0:
@@ -595,11 +598,7 @@ def handle_request(param_list, isDashboard=True):
                     ).values("chart_data")[0]["chart_data"]
                     cache.set(dbd_name + "_" + k, cur_chart_data)
 
-                data_as_of = (
-                    None
-                    if "data_as_of" not in cur_chart_data
-                    else cur_chart_data["data_as_of"]
-                )
+                data_as_of = cur_chart_data.get("data_as_of", None)
 
                 if api_type == "static":
                     res[k] = {}
@@ -627,13 +626,16 @@ based on keys within dictionary
 """
 
 
-def get_nested_data(dbd_info, api_params, param_list, data):
+def get_nested_data(
+    dbd_info: dict,
+    api_params: list[str],
+    param_list: QueryDict,
+    data: dict,
+):
     for a in api_params:
         optional = a in dbd_info.get("optional_params", [])
         if a in param_list:
-            key = (
-                param_list[a][0] if "__FIXED__" not in a else a.replace("__FIXED__", "")
-            )
+            key = param_list[a] if "__FIXED__" not in a else a.replace("__FIXED__", "")
             if key in data:
                 data = data[key]
             elif optional:
