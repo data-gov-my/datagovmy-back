@@ -81,7 +81,9 @@ class JitterChartVariables(GeneralChartVariables):
 
 
 class HeatmapChartVariables(GeneralChartVariables):
-    pass
+    x: str
+    y: str
+    z: str
 
 
 class WaffleChartVariables(GeneralChartVariables):
