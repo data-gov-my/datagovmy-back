@@ -85,6 +85,7 @@ class GeneralChartsUtil:
         # Sets precision attribute for API
         self.set_precision()
         self.get_translations()
+        self.get_queries()
 
     """
     Gets a nested dictionary key
@@ -118,6 +119,10 @@ class GeneralChartsUtil:
     def get_translations(self):
         if "translations" in self.cur_catalog_data:
             self.translations = self.cur_catalog_data["translations"]
+
+    def get_queries(self):
+        if "queries" in self.cur_catalog_data:
+            self.queries = self.cur_catalog_data["queries"]
 
     """
     Builds the variables table for each catalog variable
@@ -276,6 +281,7 @@ class GeneralChartsUtil:
         res["downloads"] = self.downloads
         res["chart_details"] = self.chart_details
         res["translations"] = self.translations
+        res["queries"] = self.queries
 
         return res
 
