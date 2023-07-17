@@ -707,31 +707,21 @@ Heatmap
 
 
 def test_heatmap_chart_simple(sample_line_data):
-    variables = {
-        "rename_cols": {"y1": "Y1"},
-        "value_columns": ["Y1"],
-        "keys": ["state"],
-    }
-    expected_result = {
-        "California": [
-            {"x": "Y1", "y": 100},
-            {"x": "Y1", "y": 200},
-            {"x": "Y1", "y": 150},
-            {"x": "Y1", "y": 170},
-        ],
-        "New York": [
-            {"x": "Y1", "y": 120},
-            {"x": "Y1", "y": 180},
-            {"x": "Y1", "y": 140},
-            {"x": "Y1", "y": 160},
-        ],
-        "Texas": [
-            {"x": "Y1", "y": 130},
-            {"x": "Y1", "y": 110},
-            {"x": "Y1", "y": 135},
-            {"x": "Y1", "y": 155},
-        ],
-    }
+    variables = {"rename_cols": {"y1": "Y1"}, "x": "state", "y": "period", "z": "Y1"}
+    expected_result = [
+        {"x": "California", "y": "daily", "z": 100},
+        {"x": "California", "y": "daily", "z": 200},
+        {"x": "California", "y": "monthly", "z": 150},
+        {"x": "California", "y": "monthly", "z": 170},
+        {"x": "New York", "y": "daily", "z": 120},
+        {"x": "New York", "y": "daily", "z": 180},
+        {"x": "New York", "y": "monthly", "z": 140},
+        {"x": "New York", "y": "monthly", "z": 160},
+        {"x": "Texas", "y": "daily", "z": 130},
+        {"x": "Texas", "y": "daily", "z": 110},
+        {"x": "Texas", "y": "monthly", "z": 135},
+        {"x": "Texas", "y": "monthly", "z": 155},
+    ]
     builder = ChartBuilder.create("heatmap_chart")
     result = builder.build_chart(sample_line_data, variables)
     assert result == expected_result
@@ -740,37 +730,27 @@ def test_heatmap_chart_simple(sample_line_data):
 def test_heatmap_chart_multi_cols(sample_line_data):
     variables = {
         "rename_cols": {"y1": "Y1", "y2": "Y2"},
-        "value_columns": ["Y1", "Y2"],
+        "x": "state",
+        "y": "Y1",
+        "z": "Y2",
         "keys": ["period"],
     }
     expected_result = {
         "daily": [
-            {"x": "Y1", "y": 100},
-            {"x": "Y2", "y": 50},
-            {"x": "Y1", "y": 200},
-            {"x": "Y2", "y": 80},
-            {"x": "Y1", "y": 120},
-            {"x": "Y2", "y": 90},
-            {"x": "Y1", "y": 180},
-            {"x": "Y2", "y": 160},
-            {"x": "Y1", "y": 130},
-            {"x": "Y2", "y": 100},
-            {"x": "Y1", "y": 110},
-            {"x": "Y2", "y": 70},
+            {"x": "California", "y": 100, "z": 50},
+            {"x": "California", "y": 200, "z": 80},
+            {"x": "New York", "y": 120, "z": 90},
+            {"x": "New York", "y": 180, "z": 160},
+            {"x": "Texas", "y": 130, "z": 100},
+            {"x": "Texas", "y": 110, "z": 70},
         ],
         "monthly": [
-            {"x": "Y1", "y": 150},
-            {"x": "Y2", "y": 120},
-            {"x": "Y1", "y": 170},
-            {"x": "Y2", "y": 140},
-            {"x": "Y1", "y": 140},
-            {"x": "Y2", "y": 110},
-            {"x": "Y1", "y": 160},
-            {"x": "Y2", "y": 130},
-            {"x": "Y1", "y": 135},
-            {"x": "Y2", "y": 90},
-            {"x": "Y1", "y": 155},
-            {"x": "Y2", "y": 110},
+            {"x": "California", "y": 150, "z": 120},
+            {"x": "California", "y": 170, "z": 140},
+            {"x": "New York", "y": 140, "z": 110},
+            {"x": "New York", "y": 160, "z": 130},
+            {"x": "Texas", "y": 135, "z": 90},
+            {"x": "Texas", "y": 155, "z": 110},
         ],
     }
     builder = ChartBuilder.create("heatmap_chart")
