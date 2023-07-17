@@ -205,11 +205,10 @@ class HeatMapBuilder(ChartBuilder):
     VARIABLE_MODEL = HeatmapChartVariables
 
     def group_to_data(self, variables: HeatmapChartVariables, group: pd.DataFrame):
-        data = group[variables.value_columns].transform(
-            lambda x: [{"x": x.name, "y": y} for y in x]
+        group.rename(
+            columns={variables.x: "x", variables.y: "y", variables.z: "z"}, inplace=True
         )
-        data = data.to_numpy().flatten().tolist()
-        return data
+        return group[["x", "y", "z"]].to_dict("records")
 
 
 class TimeseriesBuilder(ChartBuilder):
