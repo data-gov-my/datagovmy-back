@@ -4,23 +4,24 @@ import importlib
 import json
 import logging
 import os
+import traceback
 from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
 
+from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
-from django.apps import apps
 from pydantic import BaseModel
-from data_gov_my.explorers import class_list as exp_class
 
+from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     CatalogJson,
     DashboardJson,
+    ExplorersUpdate,
     FormTemplate,
     MetaJson,
     i18nJson,
-    ExplorersUpdate,
 )
 from data_gov_my.utils import common, triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -41,6 +42,8 @@ from data_gov_my.utils.metajson_structures import (
     FormValidateModel,
     i18nValidateModel,
 )
+
+logger = logging.getLogger("django")
 
 
 class GeneralMetaBuilder(ABC):
@@ -342,6 +345,7 @@ class GeneralMetaBuilder(ABC):
                     meta_objects.append(created_object)
                 f.close()
             except Exception as e:
+                logger.error(traceback.format_exc())
                 failed.append({"FILE": meta, "ERROR": e})
 
         telegram_msg = [
@@ -371,7 +375,7 @@ class GeneralMetaBuilder(ABC):
         try:
             field = self.MODEL._meta.get_field(field)
             return True
-        except FieldDoesNotExist as e:
+        except FieldDoesNotExist:
             return False
 
 
@@ -447,12 +451,11 @@ class DashboardBuilder(GeneralMetaBuilder):
                         cache.set(dbd_name + "_" + k, res)
 
                 except Exception as e:
-                    # failed_notify.append(meta)
                     failed_obj = {}
                     failed_obj["DASHBOARD"] = dbd_name
                     failed_obj["CHART_NAME"] = chart_name
                     failed_obj["ERROR"] = str(e)
-                    # failed_builds.append(failed_obj)
+                    logger.error(traceback.format_exc())
                     failed.append(failed_obj)
 
             # For a single dashboard, send status on all its charts
@@ -631,6 +634,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                     failed_obj["DASHBOARD"] = exp_name
                     failed_obj["CHART_NAME"] = table_name
                     failed_obj["ERROR"] = str(e)
+                    logger.error(traceback.format_exc())
                     failed.append(failed_obj)
 
             # For a single dashboard, send status on all its charts
