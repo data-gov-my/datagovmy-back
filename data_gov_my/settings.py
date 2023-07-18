@@ -218,7 +218,7 @@ LOGGING = {
         "file": {
             "level": "WARNING",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "data_gov_my/_logs/warning.log",
+            "filename": os.path.join(BASE_DIR, "_logs", "warning.log"),
             "maxBytes": 1000000,  # 1MB
             "backupCount": 10,
             "formatter": "verbose",
