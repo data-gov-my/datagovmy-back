@@ -68,7 +68,7 @@ class Table(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         all_columns = df.columns.to_list()
-        group_keys = list(set(all_columns) - set(self.exclude))
+        group_keys = [col for col in all_columns if col not in self.exclude]
 
         # table_columns = self.set_table_columns(group_keys)
         table_data = df[group_keys].to_dict(orient="records")
@@ -86,7 +86,7 @@ class Table(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         all_columns = df.columns.to_list()
-        group_keys = list(set(all_columns) - set(self.exclude))
+        group_keys = [col for col in all_columns if col not in self.exclude]
 
         for key in self.t_keys:
             if df[key].dtype == "object":
