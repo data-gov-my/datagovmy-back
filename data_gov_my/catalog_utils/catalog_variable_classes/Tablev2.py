@@ -1,10 +1,10 @@
-from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import GeneralChartsUtil
-
-import pandas as pd
 import numpy as np
-import json
-from dateutil.relativedelta import relativedelta
+import pandas as pd
 from mergedeep import merge
+
+from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import (
+    GeneralChartsUtil,
+)
 
 
 class Table(GeneralChartsUtil):
@@ -22,7 +22,9 @@ class Table(GeneralChartsUtil):
     """
 
     def __init__(self, full_meta, file_data, cur_data, all_variable_data, file_src):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, cur_data, all_variable_data, file_src)
+        GeneralChartsUtil.__init__(
+            self, full_meta, file_data, cur_data, all_variable_data, file_src
+        )
 
         self.chart_name = {}
         self.chart_name["en"] = self.cur_data["title_en"]
@@ -42,17 +44,18 @@ class Table(GeneralChartsUtil):
     """
     Chart version 2
     """
-    def chartv2(self) :
+
+    def chartv2(self):
         result = {}
 
         df = pd.read_parquet(self.read_from)
 
-        if 'date' in df.columns : 
-            self.t_keys.insert(0, 'date')
+        if "date" in df.columns:
+            self.t_keys.insert(0, "date")
 
-        if len(self.t_keys) > 0 : 
+        if len(self.t_keys) > 0:
             result = self.build_chart_parents()
-        else : 
+        else:
             result = self.build_chart_self()
 
         return result
@@ -60,39 +63,41 @@ class Table(GeneralChartsUtil):
     """
     Build chart self
     """
-    def build_chart_self(self) :
+
+    def build_chart_self(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         all_columns = df.columns.to_list()
         group_keys = list(set(all_columns) - set(self.exclude))
-        
+
         # table_columns = self.set_table_columns(group_keys)
         table_data = df[group_keys].to_dict(orient="records")
-        
+
         overall = table_data
         # overall["columns"] = table_columns
-        
+
         return overall
 
     """
     Builds chart parents
     """
-    def build_chart_parents(self) :
+
+    def build_chart_parents(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
         all_columns = df.columns.to_list()
         group_keys = list(set(all_columns) - set(self.exclude))
 
         for key in self.t_keys:
-            if df[key].dtype == "object" :
-                df[key] = df[key].astype(str)            
+            if df[key].dtype == "object":
+                df[key] = df[key].astype(str)
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
         # table_columns = self.set_table_columns(group_keys)
 
         df["u_groups"] = list(df[self.t_keys].itertuples(index=False, name=None))
         u_groups_list = df["u_groups"].unique().tolist()
-        
+
         res = {}
 
         for group in u_groups_list:
@@ -101,10 +106,14 @@ class Table(GeneralChartsUtil):
                 result = {b: result}
             group_l = list(group)
 
-            if len(group) == 1 : 
-                group = group[0]            
-            
-            final_d = df.groupby(self.t_keys)[group_keys].get_group(group).to_dict(orient="records")
+            if len(group) == 1:
+                group = group[0]
+
+            final_d = (
+                df.groupby(self.t_keys)[group_keys]
+                .get_group(group)
+                .to_dict(orient="records")
+            )
 
             self.set_dict(result, group_l, final_d)
             merge(res, result)
@@ -113,23 +122,22 @@ class Table(GeneralChartsUtil):
 
         return overall
 
-    def set_table_columns(self, columns) :
+    def set_table_columns(self, columns):
         res = {}
 
         res["en"] = {}
         res["bm"] = {}
 
         if self.table_translation:
-            for lang in ["en", "bm"] :
-                for k, v in self.table_translation[lang] :
-                    res[lang][k] = v            
+            for lang in ["en", "bm"]:
+                for k, v in self.table_translation[lang]:
+                    res[lang][k] = v
         else:
-            for lang in ["en", "bm"] :
-                for i in columns : 
+            for lang in ["en", "bm"]:
+                for i in columns:
                     res[lang][i] = i
 
-        return res 
-
+        return res
 
     """
     Build the Table chart
@@ -161,6 +169,7 @@ class Table(GeneralChartsUtil):
     """
     Rebuilds the metadata
     """
+
     def rebuild_metadata(self):
         self.metadata.pop("in_dataset", None)
 
@@ -184,7 +193,7 @@ class Table(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         api_filters_inc = []
 
-        if 'date' in df.columns :
+        if "date" in df.columns:
             slider_obj = self.build_date_slider(df)
             api_filters_inc.append(slider_obj)
 
