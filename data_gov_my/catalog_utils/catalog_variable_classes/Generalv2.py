@@ -250,9 +250,9 @@ class GeneralChartsUtil:
         # Sets the frequency of the catalog
         res["time_range"] = self.catalog_filters["frequency"]
 
-        # Sets the geography, demographic and datasource ( multiple )
+        # Sets the geography, demography and datasource ( multiple )
         res["geography"] = " | ".join(self.catalog_filters["geography"])
-        res["demographic"] = " | ".join(self.catalog_filters["demographic"])
+        res["demography"] = " | ".join(self.catalog_filters["demography"])
         res["data_source"] = " | ".join(self.catalog_filters["data_source"])
 
         # Sets the range of start and end of dataset

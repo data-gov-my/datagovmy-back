@@ -39,7 +39,7 @@ class CatalogJson(models.Model):
     catalog_subcategory_name = models.CharField(max_length=600, default="")
     time_range = models.CharField(max_length=100)
     geography = models.CharField(max_length=300)
-    demographic = models.CharField(max_length=300)
+    demography = models.CharField(max_length=300)
     dataset_begin = models.IntegerField(default=0)
     dataset_end = models.IntegerField(default=0)
     data_source = models.CharField(max_length=100)
