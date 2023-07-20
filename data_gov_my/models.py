@@ -38,7 +38,7 @@ class CatalogJson(models.Model):
     catalog_subcategory = models.CharField(max_length=300, default="")
     catalog_subcategory_name = models.CharField(max_length=600, default="")
     time_range = models.CharField(max_length=100)
-    geographic = models.CharField(max_length=300)
+    geography = models.CharField(max_length=300)
     demographic = models.CharField(max_length=300)
     dataset_begin = models.IntegerField(default=0)
     dataset_end = models.IntegerField(default=0)
@@ -116,7 +116,7 @@ class ElectionDashboard_Candidates(models.Model):
     votes_rejected_perc = models.FloatField(null=True, default=None)
     majority = models.IntegerField(default=0)
     majority_perc = models.FloatField(null=True, default=None)
-    slug = models.CharField(max_length=100, default='')
+    slug = models.CharField(max_length=100, default="")
 
 
 class ElectionDashboard_Seats(models.Model):
@@ -130,12 +130,11 @@ class ElectionDashboard_Seats(models.Model):
     majority_perc = models.FloatField(null=True)
     seat_name = models.CharField(max_length=100)
     state = models.CharField(max_length=50, null=True)
-    slug = models.CharField(max_length=100, default='')
+    slug = models.CharField(max_length=100, default="")
     voter_turnout = models.IntegerField(null=True)
     voter_turnout_perc = models.FloatField(null=True, default=None)
     votes_rejected = models.IntegerField(null=True)
     votes_rejected_perc = models.FloatField(null=True, default=None)
-
 
 
 class ElectionDashboard_Party(models.Model):
@@ -150,9 +149,10 @@ class ElectionDashboard_Party(models.Model):
     votes = models.IntegerField()
     votes_perc = models.FloatField(null=True)
 
-class ElectionDashboard_Dropdown(models.Model) : 
-    state = models.CharField(max_length=100, default='')
-    election = models.CharField(max_length=50, default='')
+
+class ElectionDashboard_Dropdown(models.Model):
+    state = models.CharField(max_length=100, default="")
+    election = models.CharField(max_length=50, default="")
     date = models.IntegerField(default=0)
 
 
@@ -246,7 +246,8 @@ class FormData(models.Model):
     def get_recipient(self) -> str:
         return self.form_data.get("email", None)
 
-class ViewCount(models.Model) :
+
+class ViewCount(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
     type = models.CharField(max_length=100, null=False)
     all_time_view = models.IntegerField(null=False, default=0)
@@ -255,7 +256,8 @@ class ViewCount(models.Model) :
     download_png = models.IntegerField(null=False, default=0)
     download_svg = models.IntegerField(null=False, default=0)
 
-class ExplorersUpdate(models.Model) : 
+
+class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
     file_name = models.CharField(max_length=100, null=False)
     last_update = models.CharField(max_length=100, null=False)

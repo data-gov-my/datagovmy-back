@@ -8,7 +8,7 @@ from data_gov_my.models import CatalogJson
 def filter_options(param_list):
     default_params = {
         "period": "",
-        "geographic": [],
+        "geography": [],
         "begin": "",
         "end": "",
         "source": [],
@@ -36,7 +36,7 @@ def set_filter_cache():
         "catalog_category_name",
         "catalog_subcategory_name",
         "time_range",
-        "geographic",
+        "geography",
         "data_source",
         "dataset_begin",
         "dataset_end",
@@ -61,9 +61,9 @@ def filter_cache(filter_list, full_list):
             begin = 1 if int(filter_list["begin"]) >= int(obj["dataset_begin"]) else 0
         if "end" in filter_list:
             end = 1 if int(filter_list["end"]) <= int(obj["dataset_end"]) else 0
-        if "geographic" in filter_list:
-            for g in filter_list["geographic"]:
-                if obj["geographic"].find(g) != -1:
+        if "geography" in filter_list:
+            for g in filter_list["geography"]:
+                if obj["geography"].find(g) != -1:
                     geo = 1
                     break
         else:
@@ -89,7 +89,7 @@ def filter_cache(filter_list, full_list):
 
     for obj in final_list:
         obj.pop("time_range", None)
-        obj.pop("geographic", None)
+        obj.pop("geography", None)
         obj.pop("data_source", None)
         obj.pop("dataset_begin", None)
         obj.pop("dataset_end", None)
