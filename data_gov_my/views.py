@@ -467,8 +467,8 @@ Checks which filters have been applied for the data-catalog
 def get_filters_applied(param_list):
     default_params = {
         "period": "",
-        "geographic": [],
-        "demographic": [],
+        "geography": [],
+        "demography": [],
         "begin": "",
         "end": "",
         "source": [],
@@ -490,12 +490,12 @@ def get_filters_applied(param_list):
     for k, v in default_params.items():
         if k == "period":
             query &= Q(time_range=v)
-        elif k == "geographic":
+        elif k == "geography":
             for i in v:
-                query |= Q(geographic__contains=i)
-        elif k == "demographic":
+                query |= Q(geography__contains=i)
+        elif k == "demography":
             for i in v:
-                query |= Q(demographic__contains=i)
+                query |= Q(demography__contains=i)
         elif k == "source":
             for i in v:
                 query |= Q(data_source__contains=i)
