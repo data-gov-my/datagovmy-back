@@ -33,7 +33,7 @@ class CatalogSerializer(serializers.ModelSerializer):
             "catalog_name",
             "catalog_category",
             "time_range",
-            "geographic",
+            "geography",
             "dataset_range",
             "data_source",
             "catalog_data",
@@ -59,7 +59,7 @@ class ElectionCandidateSerializer(serializers.ModelSerializer):
             "votes_rejected",
             "votes_rejected_perc",
             "majority",
-            "majority_perc"
+            "majority_perc",
         ]
 
     def get_votes(self, obj):
@@ -99,7 +99,15 @@ class ElectionOverallSeatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElectionDashboard_Seats
-        fields = ["seat", "date", "party", "name", "majority", "voter_turnout", "votes_rejected"]
+        fields = [
+            "seat",
+            "date",
+            "party",
+            "name",
+            "majority",
+            "voter_turnout",
+            "votes_rejected",
+        ]
 
     def get_majority(self, obj):
         return {"abs": obj.majority, "perc": obj.majority_perc}
