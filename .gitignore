@@ -21,3 +21,6 @@ KKMNOW_SRC
 AKSARA_SRC
 DATAGOVMY_SRC
 repo.zip
+
+# Logs
+_logs/*
