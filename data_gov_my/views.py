@@ -492,13 +492,13 @@ def get_filters_applied(param_list):
             query &= Q(time_range=v)
         elif k == "geography":
             for i in v:
-                query |= Q(geography__contains=i)
+                query &= Q(geography__contains=i)
         elif k == "demography":
             for i in v:
-                query |= Q(demography__contains=i)
+                query &= Q(demography__contains=i)
         elif k == "source":
             for i in v:
-                query |= Q(data_source__contains=i)
+                query &= Q(data_source__contains=i)
         elif k == "search":
             query &= Q(catalog_name__icontains=v)
         if k == "begin":
