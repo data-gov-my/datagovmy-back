@@ -4,22 +4,24 @@ import importlib
 import json
 import logging
 import os
+import traceback
 from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
 
+from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
-from django.apps import apps
-from data_gov_my.explorers import class_list as exp_class
+from pydantic import BaseModel
 
+from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     CatalogJson,
     DashboardJson,
+    ExplorersUpdate,
     FormTemplate,
     MetaJson,
     i18nJson,
-    ExplorersUpdate,
 )
 from data_gov_my.utils import common, triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -33,6 +35,15 @@ from data_gov_my.utils.cron_utils import (
     revalidate_frontend,
     write_as_binary,
 )
+from data_gov_my.utils.metajson_structures import (
+    DashboardValidateModel,
+    DataCatalogValidateModel,
+    ExplorerValidateModel,
+    FormValidateModel,
+    i18nValidateModel,
+)
+
+logger = logging.getLogger("django")
 
 
 class GeneralMetaBuilder(ABC):
@@ -46,6 +57,14 @@ class GeneralMetaBuilder(ABC):
         super().__init_subclass__(**kwargs)
         cls.subclasses_by_category[cls.CATEGORY] = cls
         cls.subclasses_by_github_dir[cls.GITHUB_DIR] = cls
+
+    @property
+    @abstractmethod
+    def VALIDATOR(self) -> BaseModel:
+        """
+        Refers to the pydantic model for metajson structure validation.
+        """
+        pass
 
     @property
     @abstractmethod
@@ -315,7 +334,8 @@ class GeneralMetaBuilder(ABC):
                 f_meta = os.path.join(self.get_github_directory(), meta)
                 f = open(f_meta)
                 data = json.load(f)
-                created_object = self.update_or_create_meta(meta, data)
+                validated_metadata = self.VALIDATOR(**data)
+                created_object = self.update_or_create_meta(meta, validated_metadata)
                 if isinstance(created_object, list):
                     for object in created_object:
                         object.save()
@@ -325,6 +345,7 @@ class GeneralMetaBuilder(ABC):
                     meta_objects.append(created_object)
                 f.close()
             except Exception as e:
+                logger.error(traceback.format_exc())
                 failed.append({"FILE": meta, "ERROR": e})
 
         telegram_msg = [
@@ -354,7 +375,7 @@ class GeneralMetaBuilder(ABC):
         try:
             field = self.MODEL._meta.get_field(field)
             return True
-        except FieldDoesNotExist as e:
+        except FieldDoesNotExist:
             return False
 
 
@@ -362,16 +383,20 @@ class DashboardBuilder(GeneralMetaBuilder):
     CATEGORY = "DASHBOARDS"
     MODEL = MetaJson
     GITHUB_DIR = "dashboards"
+    VALIDATOR = DashboardValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        route = metadata.get("route", "")
-        updated_values = {"dashboard_meta": metadata, "route": route}
+    def update_or_create_meta(self, filename: str, metadata: DashboardValidateModel):
+        dashboard_meta = metadata.model_dump()
+        updated_values = {
+            "dashboard_meta": dashboard_meta,
+            "route": metadata.route,
+        }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata["dashboard_name"],
+            dashboard_name=metadata.dashboard_name,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata["dashboard_name"], metadata)
+        cache.set("META_" + metadata.dashboard_name, dashboard_meta)
         return obj
 
     def additional_handling(
@@ -426,12 +451,11 @@ class DashboardBuilder(GeneralMetaBuilder):
                         cache.set(dbd_name + "_" + k, res)
 
                 except Exception as e:
-                    # failed_notify.append(meta)
                     failed_obj = {}
                     failed_obj["DASHBOARD"] = dbd_name
                     failed_obj["CHART_NAME"] = chart_name
                     failed_obj["ERROR"] = str(e)
-                    # failed_builds.append(failed_obj)
+                    logger.error(traceback.format_exc())
                     failed.append(failed_obj)
 
             # For a single dashboard, send status on all its charts
@@ -461,6 +485,7 @@ class i18nBuilder(GeneralMetaBuilder):
     CATEGORY = "I18N"
     MODEL = i18nJson
     GITHUB_DIR = "i18n"
+    VALIDATOR = i18nValidateModel
 
     def get_meta_files(self):
         """
@@ -479,12 +504,12 @@ class i18nBuilder(GeneralMetaBuilder):
             )
         return files
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
+    def update_or_create_meta(self, filename: str, metadata: i18nValidateModel):
         language, filename = os.path.split(filename)
         filename = filename.replace(".json", "")
 
         obj, created = i18nJson.objects.update_or_create(
-            filename=filename, language=language, defaults=metadata
+            filename=filename, language=language, defaults=metadata.model_dump()
         )
         return obj
 
@@ -493,20 +518,22 @@ class FormBuilder(GeneralMetaBuilder):
     CATEGORY = "FORMS"
     MODEL = FormTemplate
     GITHUB_DIR = "forms"
+    VALIDATOR = FormValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
+    def update_or_create_meta(self, filename: str, metadata: FormValidateModel):
         form_type = filename.replace(".json", "")
-        return FormTemplate.create(form_type=form_type, form_meta=metadata)
+        return FormTemplate.create(form_type=form_type, form_meta=metadata.model_dump())
 
 
 class DataCatalogBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOG"
     MODEL = CatalogJson
     GITHUB_DIR = "catalog"
+    VALIDATOR = DataCatalogValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        file_data = metadata["file"]
-        all_variable_data = metadata["file"]["variables"]
+    def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
+        file_data = metadata.file
+        all_variable_data = metadata.file.variables
         full_meta = metadata
         file_src = filename.replace(".json", "")
 
@@ -519,8 +546,8 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
                 if chart_type in common.CHART_TYPES:
                     args = {
-                        "full_meta": full_meta,
-                        "file_data": file_data,
+                        "full_meta": full_meta.model_dump(),
+                        "file_data": file_data.model_dump(),
                         "cur_data": cur_data,
                         "all_variable_data": all_variable_data,
                         "file_src": file_src,
@@ -547,16 +574,19 @@ class ExplorerBuilder(GeneralMetaBuilder):
     CATEGORY = "EXPLORERS"
     MODEL = ExplorersUpdate
     GITHUB_DIR = "explorers"
+    VALIDATOR = ExplorerValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: dict):
-        route = metadata.get("route", "")
-        updated_values = {"dashboard_meta": metadata, "route": route}
+    def update_or_create_meta(self, filename: str, metadata: ExplorerValidateModel):
+        updated_values = {
+            "dashboard_meta": metadata.model_dump(),
+            "route": metadata.route,
+        }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata["explorer_name"],
+            dashboard_name=metadata.explorer_name,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata["explorer_name"], metadata)
+        cache.set("META_" + metadata.explorer_name, metadata)
         return obj
 
     def additional_handling(
@@ -604,6 +634,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                     failed_obj["DASHBOARD"] = exp_name
                     failed_obj["CHART_NAME"] = table_name
                     failed_obj["ERROR"] = str(e)
+                    logger.error(traceback.format_exc())
                     failed.append(failed_obj)
 
             # For a single dashboard, send status on all its charts
