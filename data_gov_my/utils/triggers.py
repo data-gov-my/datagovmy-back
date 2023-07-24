@@ -27,14 +27,21 @@ def format_files_with_status_emoji(files: List[str], emoji: str):
 def send_telegram(message: str):
     location = format_header(os.getenv("ENV_LOCATION")) + "\n"
     message = location + message
-
-    params = {
-        "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
-        "text": message,
-        "parse_mode": "HTML",
-    }
-    tf_url = f'https://api.telegram.org/bot{os.getenv("TELEGRAM_TOKEN")}/sendMessage'
-    r = requests.get(url=tf_url, data=params)
+    limit = 4096
+    if len(message) > limit:
+        chunks = [message[i : i + limit] for i in range(0, len(message), limit)]
+    else:
+        chunks = [message]
+    for chunk in chunks:
+        params = {
+            "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
+            "text": chunk,
+            "parse_mode": "HTML",
+        }
+        tf_url = (
+            f'https://api.telegram.org/bot{os.getenv("TELEGRAM_TOKEN")}/sendMessage'
+        )
+        r = requests.get(url=tf_url, data=params)
 
 
 """
