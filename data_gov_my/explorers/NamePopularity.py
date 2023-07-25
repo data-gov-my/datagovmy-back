@@ -91,29 +91,28 @@ class NAME_POPULARITY(General_Explorer):
                     ][-1]
 
                     if temp.get("total", 0) < 10:
-                        temp["max"] = False
+                        temp["max"] = None
 
                     fin.append(temp)
                     s.remove(temp["name"])
                 else:
                     temp["decade"] = [d.replace("d_", "") for d in list(i.keys())]
                     temp["count"] = list(i.values())
+                    temp["total"] = sum(temp["count"])
                     if (sum(val > 0 for val in temp["count"]) <= 1) or sum(
                         temp["count"]
-                    ) < 10:  # avoid returning real number
-                        hidden = True
+                    ) < 10:  # avoid returning real number by years
+                        temp["count"] = None
+                        temp["decade"] = None
                     fin = temp  # Convert back into Dictionary
                     break
 
         if len(s) > 0 and compare:
             for name in s:
-                fin.append({"name": name, "total": 0, "max": "-"})
+                fin.append({"name": name, "total": 0, "max": None})
 
         last_update = self.get_last_update(model_name=model_name)
 
-        res = dict()
-        res["data_last_updated"] = last_update
-        if not hidden:
-            res["data"] = fin
+        res = {"data_last_updated": last_update, "data": fin}
 
         return JsonResponse(res, safe=False, status=200)
