@@ -98,9 +98,9 @@ class NAME_POPULARITY(General_Explorer):
                 else:
                     temp["decade"] = [d.replace("d_", "") for d in list(i.keys())]
                     temp["count"] = list(i.values())
-                    if (
-                        sum(val > 0 for val in temp["count"]) <= 1
-                    ):  # avoid returning real number
+                    if (sum(val > 0 for val in temp["count"]) <= 1) or sum(
+                        temp["count"]
+                    ) < 10:  # avoid returning real number
                         hidden = True
                     fin = temp  # Convert back into Dictionary
                     break
