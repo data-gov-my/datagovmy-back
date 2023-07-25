@@ -73,7 +73,7 @@ class NAME_POPULARITY(General_Explorer):
         res = model_choice.objects.all().filter(name__in=s).values()
 
         fin = []  # Default is as a list
-
+        hidden = False
         if len(res) > 0:
             for i in res:
                 temp = {}
@@ -97,11 +97,11 @@ class NAME_POPULARITY(General_Explorer):
                     s.remove(temp["name"])
                 else:
                     temp["decade"] = [d.replace("d_", "") for d in list(i.keys())]
-                    count = list(i.values())
-                    if sum(val > 0 for val in count) > 1:  # avoid returning real number
-                        temp["count"] = count
-                    else:
-                        temp = None
+                    temp["count"] = list(i.values())
+                    if (
+                        sum(val > 0 for val in temp["count"]) <= 1
+                    ):  # avoid returning real number
+                        hidden = True
                     fin = temp  # Convert back into Dictionary
                     break
 
@@ -113,7 +113,7 @@ class NAME_POPULARITY(General_Explorer):
 
         res = dict()
         res["data_last_updated"] = last_update
-        if fin is not None:
+        if not hidden:
             res["data"] = fin
 
         return JsonResponse(res, safe=False, status=200)
