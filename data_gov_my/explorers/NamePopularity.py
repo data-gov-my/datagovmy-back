@@ -101,7 +101,7 @@ class NAME_POPULARITY(General_Explorer):
                     if sum(val > 0 for val in count) > 1:  # avoid returning real number
                         temp["count"] = count
                     else:
-                        temp = False
+                        temp = None
                     fin = temp  # Convert back into Dictionary
                     break
 
@@ -111,6 +111,9 @@ class NAME_POPULARITY(General_Explorer):
 
         last_update = self.get_last_update(model_name=model_name)
 
-        res = {"data_last_updated": last_update, "data": fin}
+        res = dict()
+        res["data_last_updated"] = last_update
+        if fin is not None:
+            res["data"] = fin
 
         return JsonResponse(res, safe=False, status=200)
