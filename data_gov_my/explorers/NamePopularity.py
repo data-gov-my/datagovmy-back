@@ -73,7 +73,7 @@ class NAME_POPULARITY(General_Explorer):
         res = model_choice.objects.all().filter(name__in=s).values()
 
         fin = []  # Default is as a list
-        hidden = False
+
         if len(res) > 0:
             for i in res:
                 temp = {}
