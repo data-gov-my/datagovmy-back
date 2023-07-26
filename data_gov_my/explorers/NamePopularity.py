@@ -81,6 +81,7 @@ class NAME_POPULARITY(General_Explorer):
                 temp["total"] = i["total"]
                 i.pop("name")
                 i.pop("total")
+                temp["count"] = list(i.values())
 
                 if compare:
                     temp["max"] = [
@@ -90,18 +91,20 @@ class NAME_POPULARITY(General_Explorer):
                         if val == m
                     ][-1]
 
-                    if temp.get("total", 0) < 10:
+                    if (sum(val > 0 for val in temp["count"]) <= 1) or sum(
+                        temp["count"]
+                    ) < 10:  # privacy handling
                         temp["max"] = None
 
+                    del temp["count"]
                     fin.append(temp)
                     s.remove(temp["name"])
                 else:
                     temp["decade"] = [d.replace("d_", "") for d in list(i.keys())]
-                    temp["count"] = list(i.values())
                     temp["total"] = sum(temp["count"])
                     if (sum(val > 0 for val in temp["count"]) <= 1) or sum(
                         temp["count"]
-                    ) < 10:  # avoid returning real number by years
+                    ) < 10:  # privacy handling
                         temp["count"] = None
                         temp["decade"] = None
                     fin = temp  # Convert back into Dictionary
