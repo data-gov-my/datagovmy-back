@@ -322,14 +322,27 @@ class Timeseries(GeneralChartsUtil):
         api_filters_inc = []
 
         if self.api_filter:
-            for api in self.api_filter:
-                be_vals = (
-                    df[api]
-                    .apply(lambda x: x.lower().replace(" ", "-"))
-                    .unique()
-                    .tolist()
-                )
-                filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
+            for idx, api in enumerate(self.api_filter):
+                filter_obj = None
+                default_key = []
+                df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
+                if idx == 0 :                
+                    be_vals = (
+                        df[api]
+                        .unique()
+                        .tolist()
+                    )
+                    default_key.append(be_vals[0])
+                    filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
+                else : 
+                    dropdown = self.dropdown_options(df, groupby_cols=self.api_filter[0:idx], column=api)
+                    cur_level = dropdown
+                    for dk in default_key : 
+                        cur_level = dropdown[dk]
+                    def_key = cur_level[0]
+                    filter_obj = self.build_api_object_filter(key=api, def_val=def_key, options=dropdown)
+                    default_key.append(def_key)
+
                 api_filters_inc.append(filter_obj)
 
         range_options = [r for r in self.applicable_frequency]
