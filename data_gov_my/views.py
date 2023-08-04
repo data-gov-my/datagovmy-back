@@ -398,7 +398,7 @@ class FORMS(generics.ListAPIView):
 
 class VIEW_COUNT(APIView):
     VIEWCOUNT_CACHE_KEY = "viewcount"
-    MAX_CACHE_SIZE = 10
+    MAX_CACHE_SIZE = 5
 
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
@@ -484,7 +484,7 @@ class VIEW_COUNT(APIView):
             # increment count if found in cache
             setattr(viewcount_object, metric, getattr(viewcount_object, metric) + 1)
 
-        cache.set(self.VIEWCOUNT_CACHE_KEY, cached_viewcount_lst)
+        cache.set(self.VIEWCOUNT_CACHE_KEY, cached_viewcount_lst, timeout=None)
         res = ViewCountSerializer(viewcount_object).data
 
         if not res:
