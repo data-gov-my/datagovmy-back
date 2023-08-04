@@ -397,6 +397,9 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
+    VIEWCOUNT_CACHE_KEY = "viewcount"
+    MAX_CACHE_SIZE = 10
+
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
@@ -446,58 +449,43 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        # Get the object and increment the relevant count
         metric = (
             "all_time_view" if metric == "view_count" else metric
         )  # Change field name
 
-        cached_viewcount_lst = cache.get("viewcount_lst") or []
-        # Get or create ViewCount object, increment views without saving.
-        try:
-            obj = ViewCount.objects.get(id=id, type=type)
-        except ViewCount.DoesNotExist:
-            # check if cache has it
-            obj = next(
-                (
-                    object
-                    for object in cached_viewcount_lst
-                    if object.id == id and object.type == type
-                ),
-                None,
+        # Get the object and increment the relevant count
+        cached_viewcount_lst = cache.get(self.VIEWCOUNT_CACHE_KEY) or []
+        viewcount_object = next(
+            (object for object in cached_viewcount_lst if object.id == id),
+            None,
+        )
+        if not viewcount_object:
+            viewcount_object, created = ViewCount.objects.get_or_create(
+                id=id,
+                type=type,
             )
-            if not obj:
-                obj = ViewCount(id=id, type=type)
-                created = True
-
-        # process which to increment (based on diff type?)
-        obj.all_time_view += 1
-
-        if created:
-            cached_viewcount_lst.append(obj)
-
-        if len(cached_viewcount_lst) >= 10:
-            update_or_create_obejcts = ViewCount.objects.bulk_create(
-                cached_viewcount_lst,
-                update_conflicts=True,
-                unique_fields=["id"],
-                update_fields=[
-                    "type",
-                    "all_time_view",
-                    "download_csv",
-                    "download_parquet",
-                    "download_png",
-                    "download_svg",
-                ],
-            )
-            logging.info(
-                f"Created {len(update_or_create_obejcts)} ViewCount objects from cache."
-            )
-            cache.set("viewcount_lst", [])
-
+            # increment from viewcount_object found in DB
+            setattr(viewcount_object, metric, getattr(viewcount_object, metric) + 1)
+            cached_viewcount_lst.append(viewcount_object)
+            if len(cached_viewcount_lst) > self.MAX_CACHE_SIZE:
+                items = ViewCount.objects.bulk_update(
+                    objs=cached_viewcount_lst,
+                    fields=[
+                        "all_time_view",
+                        "download_csv",
+                        "download_parquet",
+                        "download_png",
+                        "download_svg",
+                    ],
+                )
+                cached_viewcount_lst = []
+                logging.info(f"Created {items} ViewCount objects from cache.")
         else:
-            cache.set("viewcount_lst", cached_viewcount_lst)
+            # increment count if found in cache
+            setattr(viewcount_object, metric, getattr(viewcount_object, metric) + 1)
 
-        res = ViewCountSerializer(obj).data
+        cache.set(self.VIEWCOUNT_CACHE_KEY, cached_viewcount_lst)
+        res = ViewCountSerializer(viewcount_object).data
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
