@@ -196,18 +196,29 @@ class Pyramid(GeneralChartsUtil):
             slider_obj = self.build_date_slider(df)
             api_filters_inc.append(slider_obj)
 
-
         if self.api_filter:
-            for api in self.api_filter:
-                df[api] = df[api].astype(str)
-                be_vals = (
-                    df[api]
-                    .apply(lambda x: x.lower().replace(" ", "-"))
-                    .unique()
-                    .tolist()
-                )
-                api_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
-                api_filters_inc.append(api_obj)
+            default_key = []
+            for idx, api in enumerate(self.api_filter):
+                filter_obj = None
+                df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
+                if idx == 0 :                
+                    be_vals = (
+                        df[api]
+                        .unique()
+                        .tolist()
+                    )
+                    default_key.append(be_vals[0])
+                    filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
+                else : 
+                    dropdown = self.dropdown_options(df, groupby_cols=self.api_filter[0:idx], column=api)
+                    cur_level = dropdown
+                    for dk in default_key : 
+                        cur_level = dropdown[dk]
+                    def_key = cur_level[0]
+                    filter_obj = self.build_api_object_filter(key=api, def_val=def_key, options=dropdown)
+                    default_key.append(def_key)
+
+                api_filters_inc.append(filter_obj)
 
         res["API"] = {}
         res["API"]["filters"] = api_filters_inc
