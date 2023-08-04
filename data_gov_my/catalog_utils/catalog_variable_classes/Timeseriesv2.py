@@ -322,9 +322,9 @@ class Timeseries(GeneralChartsUtil):
         api_filters_inc = []
 
         if self.api_filter:
+            default_key = []
             for idx, api in enumerate(self.api_filter):
                 filter_obj = None
-                default_key = []
                 df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
                 if idx == 0 :                
                     be_vals = (
