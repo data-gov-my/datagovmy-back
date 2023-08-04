@@ -1,4 +1,6 @@
+import logging
 import os
+import pprint
 from threading import Thread
 
 import environ
@@ -27,7 +29,11 @@ from data_gov_my.models import (
     i18nJson,
     ViewCount,
 )
-from data_gov_my.serializers import FormDataSerializer, i18nSerializer
+from data_gov_my.serializers import (
+    FormDataSerializer,
+    ViewCountSerializer,
+    i18nSerializer,
+)
 from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 
@@ -37,6 +43,8 @@ environ.Env.read_env()
 """
 Endpoint for all single charts
 """
+
+logging.basicConfig(level=logging.INFO)
 
 
 class CHART(APIView):
@@ -393,7 +401,9 @@ class VIEW_COUNT(APIView):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        return JsonResponse(list(ViewCount.objects.all().values()), safe=False)
+        return JsonResponse(
+            ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
+        )
 
     def post(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
@@ -441,16 +451,53 @@ class VIEW_COUNT(APIView):
             "all_time_view" if metric == "view_count" else metric
         )  # Change field name
 
-        obj, created = ViewCount.objects.get_or_create(
-            id=id, type=type, defaults={metric: 1}
-        )
+        cached_viewcount_lst = cache.get("viewcount_lst") or []
+        # Get or create ViewCount object, increment views without saving.
+        try:
+            obj = ViewCount.objects.get(id=id, type=type)
+        except ViewCount.DoesNotExist:
+            # check if cache has it
+            obj = next(
+                (
+                    object
+                    for object in cached_viewcount_lst
+                    if object.id == id and object.type == type
+                ),
+                None,
+            )
+            if not obj:
+                obj = ViewCount(id=id, type=type)
+                created = True
 
-        if not created:
-            cur_val = getattr(obj, metric, 0) + 1
-            setattr(obj, metric, cur_val)
-            obj.save()
+        # process which to increment (based on diff type?)
+        obj.all_time_view += 1
 
-        res = ViewCount.objects.filter(id=id, type=type).values().first()
+        if created:
+            cached_viewcount_lst.append(obj)
+
+        if len(cached_viewcount_lst) >= 10:
+            update_or_create_obejcts = ViewCount.objects.bulk_create(
+                cached_viewcount_lst,
+                update_conflicts=True,
+                unique_fields=["id"],
+                update_fields=[
+                    "type",
+                    "all_time_view",
+                    "download_csv",
+                    "download_parquet",
+                    "download_png",
+                    "download_svg",
+                ],
+            )
+            logging.info(
+                f"Created {len(update_or_create_obejcts)} ViewCount objects from cache."
+            )
+            cache.set("viewcount_lst", [])
+
+        else:
+            cache.set("viewcount_lst", cached_viewcount_lst)
+
+        res = ViewCountSerializer(obj).data
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
