@@ -256,6 +256,9 @@ class ViewCount(models.Model):
     download_png = models.IntegerField(null=False, default=0)
     download_svg = models.IntegerField(null=False, default=0)
 
+    def __str__(self) -> str:
+        return f"{self.id} ({self.all_time_view})"
+
 
 class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
