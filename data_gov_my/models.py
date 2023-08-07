@@ -298,10 +298,20 @@ class Publication(models.Model):
 
 
 class PublicationResource(models.Model):
+    resource_id = models.IntegerField()
     resource_type = models.CharField(max_length=50)
     resource_name = models.CharField(max_length=100)
     resource_link = models.URLField(max_length=150)
     publication = models.ForeignKey(Publication, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["resource_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resource_id", "publication"],
+                name="unique publication resource by publication and id",
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.publication} - {self.resource_name}"
