@@ -8,6 +8,8 @@ from data_gov_my.models import (
     ElectionDashboard_Seats,
     FormData,
     MetaJson,
+    Publication,
+    PublicationResource,
     i18nJson,
 )
 
@@ -135,3 +137,21 @@ class FormDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormData
         fields = ["language", "form_data"]
+
+
+class PublicationResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationResource
+        exclude = ["id", "publication"]
+
+
+class PublicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publication
+        fields = [
+            "publication_id",
+            "publication_type",
+            "title",
+            "description",
+            "release_date",
+        ]
