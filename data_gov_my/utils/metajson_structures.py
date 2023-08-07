@@ -1,9 +1,10 @@
-from pydantic import BaseModel, validator, field_serializer, field_validator
-from typing import Literal
-from datetime import datetime
-from data_gov_my.utils.chart_builders import ChartBuilder
+from datetime import date, datetime
+from typing import Literal, Optional
+
+from pydantic import BaseModel, field_serializer, field_validator, validator
 from pydantic_core.core_schema import FieldValidationInfo
-from typing import Optional
+
+from data_gov_my.utils.chart_builders import ChartBuilder
 
 
 class DashboardChartModel(BaseModel):
@@ -120,3 +121,27 @@ class _DataCatalogFileValidateModel(BaseModel):
 
 class DataCatalogValidateModel(BaseModel):
     file: _DataCatalogFileValidateModel
+
+
+class _PublicationResourceValidateModel(BaseModel):
+    resource_id: int
+    resource_type: str
+    resource_name: str
+    resource_link: str
+
+
+class _PublicationLangValidateModel(BaseModel):
+    title: str
+    publication_type: str
+    description: str
+    resources: list[_PublicationResourceValidateModel]
+
+
+class PublicationValidateModel(BaseModel):
+    publication: str
+    release_date: date
+    frequency: str
+    geography: list
+    demography: list
+    en: _PublicationLangValidateModel
+    bm: _PublicationLangValidateModel
