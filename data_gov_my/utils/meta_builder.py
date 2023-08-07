@@ -21,6 +21,8 @@ from data_gov_my.models import (
     ExplorersUpdate,
     FormTemplate,
     MetaJson,
+    Publication,
+    PublicationResource,
     i18nJson,
 )
 from data_gov_my.utils import common, triggers
@@ -40,6 +42,7 @@ from data_gov_my.utils.metajson_structures import (
     DataCatalogValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
+    PublicationValidateModel,
     i18nValidateModel,
 )
 
@@ -305,7 +308,7 @@ class GeneralMetaBuilder(ABC):
         if refresh:
             self.refresh_meta_repo()
         # Remove from db, deleted meta jsons
-        self.remove_deleted_files()
+        self.remove_deleted_files()  # FIXME: refactor to delete from *all* categories?
 
         # get meta files (prioritise input files)
         meta_files = (
@@ -334,7 +337,7 @@ class GeneralMetaBuilder(ABC):
                 f_meta = os.path.join(self.get_github_directory(), meta)
                 f = open(f_meta)
                 data = json.load(f)
-                validated_metadata = self.VALIDATOR(**data)
+                validated_metadata = self.VALIDATOR.model_validate(data)
                 created_object = self.update_or_create_meta(meta, validated_metadata)
                 if isinstance(created_object, list):
                     for object in created_object:
@@ -658,3 +661,71 @@ class ExplorerBuilder(GeneralMetaBuilder):
             triggers.send_telegram("\n".join(telegram_msg))
 
         return successful_meta
+
+
+class PublicationBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION"
+    MODEL = Publication
+    GITHUB_DIR = "pub-dosm"
+    VALIDATOR = PublicationValidateModel
+
+    def update_or_create_meta(self, filename: str, metadata: PublicationValidateModel):
+        # english publication
+        pub_object_en, _ = Publication.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="en-GB",
+            defaults={
+                "publication_type": metadata.en.publication_type,
+                "title": metadata.en.title,
+                "description": metadata.en.description,
+                "release_date": metadata.release_date,
+                "frequency": metadata.frequency,
+                "geography": metadata.geography,
+                "demography": metadata.demography,
+            },
+        )
+
+        PublicationResource.objects.filter(publication=pub_object_en).delete()
+        resources_en = PublicationResource.objects.bulk_create(
+            [
+                PublicationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_en,
+                )
+                for resource in metadata.en.resources
+            ]
+        )
+
+        # bm publications
+        pub_object_bm, _ = Publication.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="ms-MY",
+            defaults={
+                "publication_type": metadata.bm.publication_type,
+                "title": metadata.bm.title,
+                "description": metadata.bm.description,
+                "release_date": metadata.release_date,
+                "frequency": metadata.frequency,
+                "geography": metadata.geography,
+                "demography": metadata.demography,
+            },
+        )
+
+        PublicationResource.objects.filter(publication=pub_object_bm).delete()
+        resources_bm = PublicationResource.objects.bulk_create(
+            [
+                PublicationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_bm,
+                )
+                for resource in metadata.bm.resources
+            ]
+        )
+
+        return [pub_object_en, pub_object_bm]
