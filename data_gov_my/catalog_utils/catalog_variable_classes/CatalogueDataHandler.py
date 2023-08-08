@@ -48,6 +48,7 @@ class CatalogueDataHandler:
             "GEOCHOROPLETH",
             "GEOPOINT",
             "SCATTER",
+            "INTRADAY",
         ]:
             return self.array_value_handler()
         elif self._chart_type in ["HEATTABLE", "TABLE"]:
