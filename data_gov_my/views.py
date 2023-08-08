@@ -537,6 +537,7 @@ class PUBLICATION_DROPDOWN(APIView):
         return JsonResponse(
             list(
                 Publication.objects.filter(language=language)
+                .order_by()
                 .values_list("publication_type", flat=True)
                 .distinct()
             ),
