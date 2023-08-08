@@ -181,6 +181,7 @@ class ELECTIONS(General_Explorer):
         last_update = self.get_last_update(model_name=chart_choice["model_name"])
 
         r_data = {"data_last_updated": last_update, "data": ser_data}
+
         res["msg"] = r_data
         res["status"] = 200
         return res
