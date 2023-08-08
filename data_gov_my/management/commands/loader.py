@@ -46,6 +46,7 @@ class Command(BaseCommand):
             "I18N",
             "FORMS",
             "EXPLORERS",
+            "PUBLICATION",
         ] and operation in [
             "UPDATE",
             "REBUILD",

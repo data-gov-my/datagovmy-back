@@ -9,6 +9,8 @@ from data_gov_my.models import (
     FormData,
     MetaJson,
     ViewCount,
+    Publication,
+    PublicationResource,
     i18nJson,
 )
 
@@ -142,3 +144,21 @@ class ViewCountSerializer(serializers.ModelSerializer):
     class Meta:
         model = ViewCount
         fields = "__all__"
+
+
+class PublicationResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationResource
+        exclude = ["id", "publication"]
+
+
+class PublicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Publication
+        fields = [
+            "publication_id",
+            "publication_type",
+            "title",
+            "description",
+            "release_date",
+        ]

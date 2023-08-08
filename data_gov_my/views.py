@@ -10,8 +10,9 @@ from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from post_office import mail
 from post_office.models import Email
-from rest_framework import generics, status, request
+from rest_framework import generics, request, status
 from rest_framework.exceptions import ParseError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -26,8 +27,15 @@ from data_gov_my.models import (
     FormData,
     FormTemplate,
     MetaJson,
-    i18nJson,
+    Publication,
     ViewCount,
+    i18nJson,
+)
+from data_gov_my.serializers import (
+    FormDataSerializer,
+    PublicationResourceSerializer,
+    PublicationSerializer,
+    i18nSerializer,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -495,6 +503,83 @@ class VIEW_COUNT(APIView):
                 res.pop(f"download_{i}")
 
         return JsonResponse(res, safe=False)
+
+
+## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
+
+
+class PublicationPagination(PageNumberPagination):
+    page_size = 15
+    page_size_query_param = "page_size"
+    max_page_size = 1000
+
+
+class PUBLICATION(generics.ListAPIView):
+    serializer_class = PublicationSerializer
+    pagination_class = PublicationPagination
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return Publication.objects.filter(language=language)
+
+    def filter_queryset(self, queryset):
+        # apply filters
+        pub_type = self.request.query_params.get("pub_type")
+        if pub_type:
+            queryset = queryset.filter(publication_type__iexact=pub_type)
+
+        frequency = self.request.query_params.get("frequency")
+        if frequency:
+            queryset = queryset.filter(frequency__iexact=frequency)
+
+        geography = self.request.query_params.get("geography")
+        if geography:
+            geography = geography.split(",")
+            queryset = queryset.filter(geography__contains=geography)
+
+        demography = self.request.query_params.get("demography")
+        if demography:
+            demography = demography.split(",")
+            queryset = queryset.filter(demography__contains=demography)
+        return queryset
+
+
+class PUBLICATION_RESOURCE(generics.ListAPIView):
+    serializer_class = PublicationResourceSerializer
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        pub_object = get_object_or_404(
+            Publication, publication_id=self.kwargs["id"], language=language
+        )
+        return pub_object.publicationresource_set.all()
+
+
+class PUBLICATION_DROPDOWN(APIView):
+    def get(self, request: request.Request, format=None):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return JsonResponse(
+            list(
+                Publication.objects.filter(language=language)
+                .order_by()
+                .values_list("publication_type", flat=True)
+                .distinct()
+            ),
+            safe=False,
+            status=200,
+        )
 
 
 """

@@ -1,3 +1,5 @@
+import pandas as pd
+
 class GeneralChartsUtil:
     # Data from file
     full_meta = {}
@@ -185,6 +187,16 @@ class GeneralChartsUtil:
         res["downloads"]["parquet"] = self.metadata["url"]["parquet"]
 
         return res["downloads"]
+
+    """
+    Helper to return nested dropdowns
+    """
+    def dropdown_options(self, df, groupby_cols, column):
+        if len(groupby_cols) == 1:
+            return df.groupby(groupby_cols[0])[column].unique().apply(list).to_dict()
+        else:
+            return {key: self.dropdown_options(sub_df, groupby_cols[1:], column) for key, sub_df in df.groupby(groupby_cols[0])}
+
 
     """
     Helper to build the filters within an API

@@ -5,6 +5,7 @@ from django.db import models
 from jsonfield import JSONField
 from post_office.models import Email, EmailTemplate
 from rest_framework.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 
@@ -264,3 +265,57 @@ class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
     file_name = models.CharField(max_length=100, null=False)
     last_update = models.CharField(max_length=100, null=False)
+
+
+class Publication(models.Model):
+    publication_id = models.CharField(max_length=30)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=50)
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=300)
+    release_date = models.DateField()
+    frequency = models.CharField(max_length=50)
+    geography = ArrayField(
+        models.CharField(max_length=10, blank=True),
+    )
+    demography = ArrayField(
+        models.CharField(max_length=10, blank=True),
+    )
+
+    class Meta:
+        ordering = ["-release_date", "publication_id"]
+        indexes = [
+            models.Index(
+                fields=["publication_id", "language"],
+                name="publication_id_language_idx",
+            )
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["publication_id", "language"],
+                name="unique publication by language",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
+
+
+class PublicationResource(models.Model):
+    resource_id = models.IntegerField()
+    resource_type = models.CharField(max_length=50)
+    resource_name = models.CharField(max_length=100)
+    resource_link = models.URLField(max_length=150)
+    publication = models.ForeignKey(Publication, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ["resource_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resource_id", "publication"],
+                name="unique publication resource by publication and id",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication} - {self.resource_name}"

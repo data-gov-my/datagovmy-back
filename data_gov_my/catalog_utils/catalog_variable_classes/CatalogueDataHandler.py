@@ -104,6 +104,8 @@ class CatalogueDataHandler:
 
         self.extract_lang(lang)
         self.set_translations(lang, translations, self._data["API"]["filters"])
+        self.toggle_api_filters()
+
 
         res = {}
 
@@ -140,7 +142,12 @@ class CatalogueDataHandler:
             defaults_api[d["key"]] = d["default"]
 
         for k, v in defaults_api.items():
-            key = self._params[k][0] if k in self._params else v
+            key = v # Uses the default
+            
+            if k in self._params : # Uses the API
+                key = self._params[k][0] 
+
+            # key = self._params[k][0] if k in self._params else v
             if (key in table_data) and (key in chart_data):
                 table_data = table_data[key]
                 chart_data = chart_data[key]
@@ -148,9 +155,10 @@ class CatalogueDataHandler:
                 table_data = {}
                 chart_data = {}
                 break
-
+            
         self.extract_lang(lang)
         self.set_translations(lang, translations, self._data["API"]["filters"])
+        self.toggle_api_filters()
 
         res = {}
         res["chart_data"] = chart_data
@@ -160,6 +168,32 @@ class CatalogueDataHandler:
         self._data["chart_details"] = res
 
         return self._data
+
+
+    """
+    Handles the toggle for API filters
+    """
+    def toggle_api_filters(self) :
+        start_idx = 0
+
+        # Checks to see if the first filter is a date_slider
+        if len(self._data["API"]["filters"]) > 0 : 
+            first_filter = self._data["API"]["filters"][0]["key"]
+            start_idx = 1 if first_filter == 'date_slider' else 0
+
+        for idx, d in enumerate(self._data["API"]["filters"]):
+            if (idx > start_idx) and (d['key'] != 'range') :
+                prev_param = self._data["API"]["filters"][ idx - 1 ] # Take from previous selection
+                if prev_param['key'] in self._params : 
+                    choice = self._params[ prev_param['key'] ][0]
+                    if choice in d['options'] : 
+                        d["options"] = d["options"][choice]
+                        d["default"] = d["options"][0]
+                    else : 
+                        self._data["API"]["filters"].remove(d)
+                else : 
+                    d["options"] = d["options"][prev_param["default"]]
+
 
     """
     Check if a chart has a date range element
