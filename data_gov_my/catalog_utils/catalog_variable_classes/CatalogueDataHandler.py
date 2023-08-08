@@ -90,15 +90,23 @@ class CatalogueDataHandler:
         if self._chart_type == "TABLE":
             chart_data = chart_data
 
-        defaults_api = {}
+        defaults_api = {}  # Creates a default API
+        prev_key = ''
 
         for d in self._data["API"]["filters"]:  # Gets all the default API values
-            defaults_api[d["key"]] = d["default"]
+            key = d["key"]
+            val = ''
+            if (key not in ["date_slider", "range"]) : 
+                if prev_key == '' : # The first key 
+                    val = self._params[key][0] if key in self._params else d["default"]
+                else : 
+                    val = d['options'][ defaults_api[prev_key] ][0]
+                prev_key = key
+            defaults_api[key] = val
 
         for k, v in defaults_api.items():
-            key = self._params[k][0] if k in self._params else v
-            if key in chart_data:
-                chart_data = chart_data[key]
+            if v in chart_data:
+                chart_data = chart_data[v]
             else:
                 chart_data = {}
                 break
@@ -138,20 +146,23 @@ class CatalogueDataHandler:
         ]  # Get chart data
 
         defaults_api = {}  # Creates a default API
+        prev_key = ''
 
         for d in self._data["API"]["filters"]:  # Gets all the default API values
-            defaults_api[d["key"]] = d["default"]
-
+            key = d["key"]
+            val = ''
+            if (key not in ["date_slider", "range"]) : 
+                if prev_key == '' : # The first key 
+                    val = self._params[key][0] if key in self._params else d["default"]
+                else : 
+                    val = d['options'][ defaults_api[prev_key] ][0]
+                prev_key = key
+            defaults_api[key] = val
+        
         for k, v in defaults_api.items():
-            key = v # Uses the default
-            
-            if k in self._params : # Uses the API
-                key = self._params[k][0] 
-
-            # key = self._params[k][0] if k in self._params else v
-            if (key in table_data) and (key in chart_data):
-                table_data = table_data[key]
-                chart_data = chart_data[key]
+            if (v in table_data) and (v in chart_data):
+                table_data = table_data[v]
+                chart_data = chart_data[v]
             else:
                 table_data = {}
                 chart_data = {}
