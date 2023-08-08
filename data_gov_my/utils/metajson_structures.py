@@ -139,13 +139,14 @@ class _PublicationResourceValidateModel(BaseModel):
 
 class _PublicationLangValidateModel(BaseModel):
     title: str
-    publication_type: str
     description: str
+    publication_type_title: str
     resources: list[_PublicationResourceValidateModel]
 
 
 class PublicationValidateModel(BaseModel):
     publication: str
+    publication_type: str
     release_date: date
     frequency: str
     geography: list
