@@ -1,9 +1,17 @@
-from pydantic import BaseModel, validator, field_serializer, field_validator
-from typing import Literal
-from datetime import datetime
-from data_gov_my.utils.chart_builders import ChartBuilder
+from __future__ import annotations
+from datetime import date, datetime
+from typing import Literal, Optional
+
+from pydantic import (
+    BaseModel,
+    field_serializer,
+    field_validator,
+    model_validator,
+    validator,
+)
 from pydantic_core.core_schema import FieldValidationInfo
-from typing import Optional
+
+from data_gov_my.utils.chart_builders import ChartBuilder
 
 
 class DashboardChartModel(BaseModel):
@@ -120,3 +128,37 @@ class _DataCatalogFileValidateModel(BaseModel):
 
 class DataCatalogValidateModel(BaseModel):
     file: _DataCatalogFileValidateModel
+
+
+class _PublicationResourceValidateModel(BaseModel):
+    resource_id: int
+    resource_type: str
+    resource_name: str
+    resource_link: str
+
+
+class _PublicationLangValidateModel(BaseModel):
+    title: str
+    publication_type: str
+    description: str
+    resources: list[_PublicationResourceValidateModel]
+
+
+class PublicationValidateModel(BaseModel):
+    publication: str
+    release_date: date
+    frequency: str
+    geography: list
+    demography: list
+    en: _PublicationLangValidateModel
+    bm: _PublicationLangValidateModel
+
+    @model_validator(mode="after")
+    def validate_api_params_against_keys(cls, v: PublicationValidateModel):
+        resource_en = v.en.resources
+        resource_bm = v.bm.resources
+
+        if len(resource_bm) != len(resource_en):
+            raise ValueError(f"Resources of different language must be same length!")
+
+        return v
