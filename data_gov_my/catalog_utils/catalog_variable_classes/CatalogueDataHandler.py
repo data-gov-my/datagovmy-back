@@ -102,6 +102,8 @@ class CatalogueDataHandler:
                 else : 
                     val = d['options'][ defaults_api[prev_key] ][0]
                 prev_key = key
+            else : 
+                val = self._params[key][0] if key in self._params else d["default"]
             defaults_api[key] = val
 
         for k, v in defaults_api.items():
@@ -157,6 +159,8 @@ class CatalogueDataHandler:
                 else : 
                     val = d['options'][ defaults_api[prev_key] ][0]
                 prev_key = key
+            else : 
+                val = self._params[key][0] if key in self._params else d["default"]
             defaults_api[key] = val
         
         for k, v in defaults_api.items():
