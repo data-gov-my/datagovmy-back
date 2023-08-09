@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "post_office",
+    "django_rq",
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,8 @@ CACHES = {
         },
     }
 }
+
+RQ_QUEUES = {"high": {"USE_REDIS_CACHE": "default"}}
 
 # TODO: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#using-cached-sessions
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"

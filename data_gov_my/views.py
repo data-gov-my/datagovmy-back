@@ -1,6 +1,5 @@
 import logging
 import os
-import pprint
 from threading import Thread
 
 import environ
@@ -42,8 +41,11 @@ from data_gov_my.serializers import (
     ViewCountSerializer,
     i18nSerializer,
 )
+from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+
+import django_rq
 
 env = environ.Env()
 environ.Env.read_env()
@@ -461,48 +463,14 @@ class VIEW_COUNT(APIView):
             "all_time_view" if metric == "view_count" else metric
         )  # Change field name
 
-        # Get the object and increment the relevant count
-        cached_viewcount_lst = cache.get(self.VIEWCOUNT_CACHE_KEY) or []
-        viewcount_object = next(
-            (object for object in cached_viewcount_lst if object.id == id),
-            None,
-        )
-        if not viewcount_object:
-            viewcount_object, created = ViewCount.objects.get_or_create(
-                id=id,
-                type=type,
-            )
-            # increment from viewcount_object found in DB
-            setattr(viewcount_object, metric, getattr(viewcount_object, metric) + 1)
-            cached_viewcount_lst.append(viewcount_object)
-            if len(cached_viewcount_lst) > self.MAX_CACHE_SIZE:
-                items = ViewCount.objects.bulk_update(
-                    objs=cached_viewcount_lst,
-                    fields=[
-                        "all_time_view",
-                        "download_csv",
-                        "download_parquet",
-                        "download_png",
-                        "download_svg",
-                    ],
-                )
-                cached_viewcount_lst = []
-                logging.info(f"Created {items} ViewCount objects from cache.")
-        else:
-            # increment count if found in cache
-            setattr(viewcount_object, metric, getattr(viewcount_object, metric) + 1)
-
-        cache.set(self.VIEWCOUNT_CACHE_KEY, cached_viewcount_lst, timeout=None)
-        res = ViewCountSerializer(viewcount_object).data
+        queue = django_rq.get_queue("high")
+        res = queue.enqueue(increment_view_count, id, type, metric)
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
 
-        if type == "dashboard":
-            for i in ["csv", "parquet", "png", "svg"]:
-                res.pop(f"download_{i}")
-
-        return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({"status": "In Queue."}, status=200)
 
 
 ## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
