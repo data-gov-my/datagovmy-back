@@ -574,7 +574,7 @@ class PUBLICATION_DROPDOWN(APIView):
             list(
                 Publication.objects.filter(language=language)
                 .order_by()
-                .values_list("publication_type", flat=True)
+                .values("publication_type", "publication_type_title")
                 .distinct()
             ),
             safe=False,

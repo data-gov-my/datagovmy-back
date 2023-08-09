@@ -675,7 +675,8 @@ class PublicationBuilder(GeneralMetaBuilder):
             publication_id=metadata.publication,
             language="en-GB",
             defaults={
-                "publication_type": metadata.en.publication_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.en.publication_type_title,
                 "title": metadata.en.title,
                 "description": metadata.en.description,
                 "release_date": metadata.release_date,
@@ -704,7 +705,8 @@ class PublicationBuilder(GeneralMetaBuilder):
             publication_id=metadata.publication,
             language="ms-MY",
             defaults={
-                "publication_type": metadata.bm.publication_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.bm.publication_type_title,
                 "title": metadata.bm.title,
                 "description": metadata.bm.description,
                 "release_date": metadata.release_date,
