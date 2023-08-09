@@ -268,6 +268,7 @@ class Publication(models.Model):
     publication_id = models.CharField(max_length=30)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     publication_type = models.CharField(max_length=50)
+    publication_type_title = models.CharField(max_length=100)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300)
     release_date = models.DateField()
