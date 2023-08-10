@@ -8,6 +8,7 @@ from data_gov_my.models import (
     ElectionDashboard_Seats,
     FormData,
     MetaJson,
+    ViewCount,
     Publication,
     PublicationResource,
     i18nJson,
@@ -137,6 +138,12 @@ class FormDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormData
         fields = ["language", "form_data"]
+
+
+class ViewCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ViewCount
+        fields = "__all__"
 
 
 class PublicationResourceSerializer(serializers.ModelSerializer):

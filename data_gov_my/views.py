@@ -1,3 +1,4 @@
+import logging
 import os
 from threading import Thread
 
@@ -35,8 +36,16 @@ from data_gov_my.serializers import (
     PublicationSerializer,
     i18nSerializer,
 )
+from data_gov_my.serializers import (
+    FormDataSerializer,
+    ViewCountSerializer,
+    i18nSerializer,
+)
+from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+
+import django_rq
 
 env = environ.Env()
 environ.Env.read_env()
@@ -44,6 +53,8 @@ environ.Env.read_env()
 """
 Endpoint for all single charts
 """
+
+logging.basicConfig(level=logging.INFO)
 
 
 class CHART(APIView):
@@ -396,11 +407,16 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
+    VIEWCOUNT_CACHE_KEY = "viewcount"
+    MAX_CACHE_SIZE = 5
+
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
-        return JsonResponse(list(ViewCount.objects.all().values()), safe=False)
+        return JsonResponse(
+            ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
+        )
 
     def post(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
@@ -443,30 +459,18 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        # Get the object and increment the relevant count
         metric = (
             "all_time_view" if metric == "view_count" else metric
         )  # Change field name
 
-        obj, created = ViewCount.objects.get_or_create(
-            id=id, type=type, defaults={metric: 1}
-        )
-
-        if not created:
-            cur_val = getattr(obj, metric, 0) + 1
-            setattr(obj, metric, cur_val)
-            obj.save()
-
-        res = ViewCount.objects.filter(id=id, type=type).values().first()
+        queue = django_rq.get_queue("high")
+        res = queue.enqueue(increment_view_count, id, type, metric)
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
 
-        if type == "dashboard":
-            for i in ["csv", "parquet", "png", "svg"]:
-                res.pop(f"download_{i}")
-
-        return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({"status": "In Queue."}, status=200)
 
 
 ## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)

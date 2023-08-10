@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "post_office",
+    "django_rq",
 ]
 
 MIDDLEWARE = [
@@ -86,20 +87,21 @@ WSGI_APPLICATION = "data_gov_my.wsgi.application"
 # Cache
 # https://docs.djangoproject.com/en/4.1/topics/cache/#filesystem-caching
 
-if platform.system() == "Windows":
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-            "LOCATION": "c:/var/tmp/django_cache",
-        }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.getenv("REDIS_CONNECTION_STR"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-            "LOCATION": "/var/tmp/django_cache",
-        }
-    }
+}
+
+RQ_QUEUES = {"high": {"USE_REDIS_CACHE": "default"}}
+
+# TODO: https://docs.djangoproject.com/en/4.2/topics/http/sessions/#using-cached-sessions
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
