@@ -173,12 +173,13 @@ class Timeseries(GeneralChartsUtil):
     Intraday Chart builder
     """
     def build_intraday(self, df, cur_group) : 
+        df = df.copy()
         res = {}
         res["chart_data"] = {}
         res["table_data"] = {}
 
         df["timestamp"] = df["timestamp"].values.astype(np.int64) // 10**6
-        
+
         if self.t_keys:
             res["chart_data"]["x"] = (
                 df.groupby(self.t_keys)["timestamp"]
