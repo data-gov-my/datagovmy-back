@@ -1,6 +1,7 @@
 import logging
 import os
 from threading import Thread
+import json
 
 import environ
 from django.core.cache import cache
@@ -56,6 +57,21 @@ Endpoint for all single charts
 
 logging.basicConfig(level=logging.INFO)
 
+class AUTH_TOKEN(APIView) : 
+    def post(self, request, format=None):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
+            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        
+        try :
+            # TODO: Insert into DB, and set in cache
+            b_unicode = request.body.decode('utf-8')
+            auth_token = json.loads(b_unicode).get("AUTH_TOKEN", None)
+            if (not auth_token) or (not isinstance(auth_token, str)) : 
+                raise ParseError("AUTH_TOKEN must be a valid str.")
+        except Exception as e : 
+            return JsonResponse({"status": 400, "message" : str(e)}, status=400)
+        
+        return JsonResponse({"status" : 200, "message" : "Auth token received."}, status=200)
 
 class CHART(APIView):
     def get(self, request, format=None):
