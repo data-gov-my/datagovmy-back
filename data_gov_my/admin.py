@@ -1,5 +1,12 @@
 from django.contrib import admin
-from data_gov_my.models import FormData, FormTemplate, ViewCount, i18nJson
+from data_gov_my.models import (
+    FormData,
+    FormTemplate,
+    PublicationDocumentation,
+    PublicationDocumentationResource,
+    ViewCount,
+    i18nJson,
+)
 from data_gov_my.models import (
     FormData,
     FormTemplate,
@@ -14,3 +21,5 @@ admin.site.register(FormData)
 admin.site.register(ViewCount)
 admin.site.register(Publication)
 admin.site.register(PublicationResource)
+admin.site.register(PublicationDocumentation)
+admin.site.register(PublicationDocumentationResource)

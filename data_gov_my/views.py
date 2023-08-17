@@ -27,12 +27,14 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     Publication,
+    PublicationDocumentation,
     ViewCount,
     i18nJson,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
     PublicationDetailSerializer,
+    PublicationDocumentationSerializer,
     PublicationSerializer,
     i18nSerializer,
 )
@@ -548,6 +550,39 @@ class PUBLICATION_DROPDOWN(APIView):
             safe=False,
             status=200,
         )
+
+
+class PUBLICATION_DOCS(generics.ListAPIView):
+    serializer_class = PublicationDocumentationSerializer
+    pagination_class = PublicationPagination
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        doc_type = self.kwargs["doc_type"]
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return PublicationDocumentation.objects.filter(
+            language=language, documentation_type=doc_type
+        )
+
+
+class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
+    serializer_class = PublicationDetailSerializer
+
+    def get_object(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        pub_object = get_object_or_404(
+            PublicationDocumentation,
+            publication_id=self.kwargs["id"],
+            language=language,
+        )
+        return pub_object
 
 
 """
