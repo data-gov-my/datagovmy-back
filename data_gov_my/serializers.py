@@ -182,6 +182,7 @@ class PublicationDocumentationSerializer(serializers.ModelSerializer):
             "publication_id",
             "publication_type",
             "publication_type_title",
+            "title",
             "description",
             "release_date",
         ]
