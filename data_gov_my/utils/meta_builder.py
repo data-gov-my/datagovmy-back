@@ -22,7 +22,10 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     Publication,
+    PublicationDocumentation,
+    PublicationDocumentationResource,
     PublicationResource,
+    PublicationUpcoming,
     i18nJson,
 )
 from data_gov_my.utils import common, triggers
@@ -42,6 +45,8 @@ from data_gov_my.utils.metajson_structures import (
     DataCatalogValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
+    PublicationDocumentationValidateModel,
+    PublicationUpcomingModel,
     PublicationValidateModel,
     i18nValidateModel,
 )
@@ -666,7 +671,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
 class PublicationBuilder(GeneralMetaBuilder):
     CATEGORY = "PUBLICATION"
     MODEL = Publication
-    GITHUB_DIR = "pub-dosm"
+    GITHUB_DIR = "pub-dosm/publications"
     VALIDATOR = PublicationValidateModel
 
     def update_or_create_meta(self, filename: str, metadata: PublicationValidateModel):
@@ -728,6 +733,111 @@ class PublicationBuilder(GeneralMetaBuilder):
                 )
                 for resource in metadata.bm.resources
             ]
+        )
+
+        return [pub_object_en, pub_object_bm]
+
+
+class PublicationDocumentationBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_DOCS"
+    MODEL = PublicationDocumentation
+    GITHUB_DIR = "pub-dosm/documentation"
+    VALIDATOR = PublicationDocumentationValidateModel
+
+    def update_or_create_meta(
+        self, filename: str, metadata: PublicationDocumentationValidateModel
+    ):
+        # english publications
+        pub_object_en, _ = PublicationDocumentation.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="en-GB",
+            defaults={
+                "documentation_type": metadata.documentation_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.en.publication_type_title,
+                "title": metadata.en.title,
+                "description": metadata.en.description,
+                "release_date": metadata.release_date,
+            },
+        )
+
+        PublicationDocumentationResource.objects.filter(
+            publication=pub_object_en
+        ).delete()
+        resources_en = PublicationDocumentationResource.objects.bulk_create(
+            [
+                PublicationDocumentationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_en,
+                )
+                for resource in metadata.en.resources
+            ]
+        )
+
+        # bm publications
+        pub_object_bm, _ = PublicationDocumentation.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="ms-MY",
+            defaults={
+                "documentation_type": metadata.documentation_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.bm.publication_type_title,
+                "title": metadata.bm.title,
+                "description": metadata.bm.description,
+                "release_date": metadata.release_date,
+            },
+        )
+
+        PublicationDocumentationResource.objects.filter(
+            publication=pub_object_bm
+        ).delete()
+        resources_bm = PublicationDocumentationResource.objects.bulk_create(
+            [
+                PublicationDocumentationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_bm,
+                )
+                for resource in metadata.bm.resources
+            ]
+        )
+
+        return [pub_object_en, pub_object_bm]
+
+
+class PublicationUpcomingBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_UPCOMING"
+    MODEL = PublicationUpcoming
+    GITHUB_DIR = "pub-dosm/upcoming"
+    VALIDATOR = PublicationUpcomingModel
+
+    def update_or_create_meta(self, filename: str, metadata: PublicationUpcomingModel):
+        # english publications
+        pub_object_en, _ = PublicationUpcoming.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="en-GB",
+            defaults={
+                "release_date": metadata.release_date,
+                "publication_title": metadata.en.title,
+                "product_type": metadata.en.product_type,
+                "release_series": metadata.en.release_series,
+            },
+        )
+        # bm publications
+        pub_object_bm, _ = PublicationUpcoming.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="ms-MY",
+            defaults={
+                "release_date": metadata.release_date,
+                "publication_title": metadata.bm.title,
+                "product_type": metadata.bm.product_type,
+                "release_series": metadata.bm.release_series,
+            },
         )
 
         return [pub_object_en, pub_object_bm]
