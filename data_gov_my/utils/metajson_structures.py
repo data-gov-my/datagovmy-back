@@ -182,3 +182,16 @@ class PublicationDocumentationValidateModel(BaseModel):
             raise ValueError(f"Resources of different language must be same length!")
 
         return v
+
+
+class _PublicationUpcomingLangModel(BaseModel):
+    title: str
+    product_type: str
+    release_series: str
+
+
+class PublicationUpcomingModel(BaseModel):
+    publication: str
+    release_date: date
+    en: _PublicationUpcomingLangModel
+    bm: _PublicationUpcomingLangModel

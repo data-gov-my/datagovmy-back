@@ -10,6 +10,7 @@ from data_gov_my.models import (
     MetaJson,
     PublicationDocumentation,
     PublicationDocumentationResource,
+    PublicationUpcoming,
     ViewCount,
     Publication,
     PublicationResource,
@@ -198,3 +199,9 @@ class PublicationDocumentationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publication
         fields = ["title", "description", "release_date", "resources"]
+
+
+class PublicationUpcomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationUpcoming
+        exclude = ["id"]

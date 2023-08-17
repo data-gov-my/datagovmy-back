@@ -28,6 +28,7 @@ from data_gov_my.models import (
     MetaJson,
     Publication,
     PublicationDocumentation,
+    PublicationUpcoming,
     ViewCount,
     i18nJson,
 )
@@ -36,6 +37,7 @@ from data_gov_my.serializers import (
     PublicationDetailSerializer,
     PublicationDocumentationSerializer,
     PublicationSerializer,
+    PublicationUpcomingSerializer,
     i18nSerializer,
 )
 from data_gov_my.serializers import (
@@ -583,6 +585,27 @@ class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
             language=language,
         )
         return pub_object
+
+
+class PUBLICATION_UPCOMING(generics.ListAPIView):
+    serializer_class = PublicationUpcomingSerializer
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return PublicationUpcoming.objects.filter(language=language)
+
+    def filter_queryset(self, queryset):
+        start = self.request.query_params.get("start")
+        end = self.request.query_params.get("end")
+        if start:
+            queryset = queryset.filter(release_date__gte=start)
+        if end:
+            queryset = queryset.filter(release_date__lte=end)
+        return queryset
 
 
 """

@@ -50,6 +50,11 @@ urlpatterns = [
         views.PUBLICATION_DOCS_RESOURCE.as_view(),
         name="PUBLICATION_DOCS_RESOURCE",
     ),
+    path(
+        "pub-upcoming/",
+        views.PUBLICATION_UPCOMING.as_view(),
+        name="PUB_UPCOMING",
+    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]

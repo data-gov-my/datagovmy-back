@@ -48,6 +48,7 @@ class Command(BaseCommand):
             "EXPLORERS",
             "PUBLICATION",
             "PUBLICATION_DOCS",
+            "PUBLICATION_UPCOMING",
         ] and operation in [
             "UPDATE",
             "REBUILD",

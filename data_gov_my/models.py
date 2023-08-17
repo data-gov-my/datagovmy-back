@@ -377,3 +377,27 @@ class PublicationDocumentationResource(models.Model):
 
     def __str__(self) -> str:
         return f"{self.publication} - {self.resource_name}"
+
+
+class PublicationUpcoming(models.Model):
+    publication_id = models.CharField(max_length=30)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    release_date = models.DateField()
+    publication_title = models.CharField(max_length=100)
+    product_type = models.CharField(max_length=100)
+    release_series = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["release_date"]
+        indexes = [
+            models.Index(
+                fields=["language"],
+                name="upcoming_pub_language_idx",
+            )
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["publication_id", "language"],
+                name="unique upcoming publication by id and language",
+            )
+        ]
