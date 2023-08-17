@@ -282,7 +282,7 @@ class DROPDOWN(APIView):
                 ]
 
             if limit := param_list.get("limit"):
-                limit = int(limit[0])
+                limit = int(limit)
                 filtered_res = filtered_res[:limit]
                 info["limit"] = limit
 
