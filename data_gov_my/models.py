@@ -322,3 +322,58 @@ class PublicationResource(models.Model):
 
     def __str__(self) -> str:
         return f"{self.publication} - {self.resource_name}"
+
+
+class PublicationDocumentation(models.Model):
+    publication_id = models.CharField(max_length=30)
+    documentation_type = models.CharField(max_length=30)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=50)
+    publication_type_title = models.CharField(max_length=100)
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=300)
+    release_date = models.DateField()
+
+    class Meta:
+        ordering = ["-release_date", "publication_id"]
+        indexes = [
+            models.Index(
+                fields=["publication_id", "language"],
+                name="pub_docs_id_language_idx",
+            ),
+            models.Index(
+                fields=["documentation_type", "language"],
+                name="pub_docs_type_language_idx",
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["publication_id", "language"],
+                name="unique publication documentation by language",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
+
+
+class PublicationDocumentationResource(models.Model):
+    resource_id = models.IntegerField()
+    resource_type = models.CharField(max_length=50)
+    resource_name = models.CharField(max_length=100)
+    resource_link = models.URLField(max_length=150)
+    publication = models.ForeignKey(
+        PublicationDocumentation, related_name="resources", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ["resource_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resource_id", "publication"],
+                name="unique publication documentation resource by publication and id",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication} - {self.resource_name}"

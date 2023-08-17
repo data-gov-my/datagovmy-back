@@ -47,6 +47,7 @@ class Command(BaseCommand):
             "FORMS",
             "EXPLORERS",
             "PUBLICATION",
+            "PUBLICATION_DOCS",
         ] and operation in [
             "UPDATE",
             "REBUILD",
