@@ -152,6 +152,14 @@ class PublicationResourceSerializer(serializers.ModelSerializer):
         exclude = ["id", "publication"]
 
 
+class PublicationDetailSerializer(serializers.ModelSerializer):
+    resources = PublicationResourceSerializer(many=True)
+
+    class Meta:
+        model = Publication
+        fields = ["title", "description", "release_date", "resources"]
+
+
 class PublicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Publication

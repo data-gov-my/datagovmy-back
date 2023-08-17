@@ -32,7 +32,7 @@ from data_gov_my.models import (
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
-    PublicationResourceSerializer,
+    PublicationDetailSerializer,
     PublicationSerializer,
     i18nSerializer,
 )
@@ -516,10 +516,10 @@ class PUBLICATION(generics.ListAPIView):
         return queryset
 
 
-class PUBLICATION_RESOURCE(generics.ListAPIView):
-    serializer_class = PublicationResourceSerializer
+class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
+    serializer_class = PublicationDetailSerializer
 
-    def get_queryset(self):
+    def get_object(self):
         language = self.request.query_params.get("language")
         if language not in ["en-GB", "ms-MY"]:
             raise ParseError(
@@ -528,7 +528,7 @@ class PUBLICATION_RESOURCE(generics.ListAPIView):
         pub_object = get_object_or_404(
             Publication, publication_id=self.kwargs["id"], language=language
         )
-        return pub_object.publicationresource_set.all()
+        return pub_object
 
 
 class PUBLICATION_DROPDOWN(APIView):
