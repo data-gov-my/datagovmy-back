@@ -738,7 +738,7 @@ class PublicationBuilder(GeneralMetaBuilder):
 
 class PublicationDocumentationBuilder(GeneralMetaBuilder):
     CATEGORY = "PUBLICATION_DOCS"
-    MODEL = Publication
+    MODEL = PublicationDocumentation
     GITHUB_DIR = "pub-dosm/documentation"
     VALIDATOR = PublicationDocumentationValidateModel
 
