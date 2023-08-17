@@ -32,13 +32,28 @@ urlpatterns = [
     path(
         "publication-dropdown/",
         views.PUBLICATION_DROPDOWN.as_view(),
-        name="PUBLICATION-DROPDOWN",
+        name="PUBLICATION_DROPDOWN",
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
     path(
         "publication-resource/<str:id>",
         views.PUBLICATION_RESOURCE.as_view(),
         name="PUBLICATION",
+    ),
+    path(
+        "pub-docs/<str:doc_type>",
+        views.PUBLICATION_DOCS.as_view(),
+        name="PUBLICATION_DOCS",
+    ),
+    path(
+        "pub-docs-resource/<str:id>",
+        views.PUBLICATION_DOCS_RESOURCE.as_view(),
+        name="PUBLICATION_DOCS_RESOURCE",
+    ),
+    path(
+        "pub-upcoming/",
+        views.PUBLICATION_UPCOMING.as_view(),
+        name="PUB_UPCOMING",
     ),
 ]
 

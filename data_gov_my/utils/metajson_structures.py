@@ -163,3 +163,35 @@ class PublicationValidateModel(BaseModel):
             raise ValueError(f"Resources of different language must be same length!")
 
         return v
+
+
+class PublicationDocumentationValidateModel(BaseModel):
+    publication: str
+    documentation_type: str
+    publication_type: str
+    release_date: date
+    en: _PublicationLangValidateModel
+    bm: _PublicationLangValidateModel
+
+    @model_validator(mode="after")
+    def validate_api_params_against_keys(cls, v: PublicationValidateModel):
+        resource_en = v.en.resources
+        resource_bm = v.bm.resources
+
+        if len(resource_bm) != len(resource_en):
+            raise ValueError(f"Resources of different language must be same length!")
+
+        return v
+
+
+class _PublicationUpcomingLangModel(BaseModel):
+    title: str
+    product_type: str
+    release_series: str
+
+
+class PublicationUpcomingModel(BaseModel):
+    publication: str
+    release_date: date
+    en: _PublicationUpcomingLangModel
+    bm: _PublicationUpcomingLangModel
