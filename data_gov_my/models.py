@@ -10,6 +10,12 @@ from django.contrib.postgres.fields import ArrayField
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 
+class AuthTable(models.Model) : 
+    key = models.CharField(max_length=200, primary_key=True)
+    value = models.CharField(max_length=200)
+    timestamp = models.DateTimeField()
+
+
 class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200, primary_key=True)
     dashboard_meta = models.JSONField()

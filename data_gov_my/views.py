@@ -2,10 +2,14 @@ import logging
 import os
 from threading import Thread
 import json
+from datetime import datetime
 
 import environ
 from django.core.cache import cache
 from django.db.models import Q
+from django.utils import timezone
+from django.utils.timezone import make_aware
+from django.utils.timezone import get_current_timezone
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from post_office import mail
@@ -32,6 +36,7 @@ from data_gov_my.models import (
     PublicationUpcoming,
     ViewCount,
     i18nJson,
+    AuthTable,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -72,6 +77,10 @@ class AUTH_TOKEN(APIView) :
             auth_token = json.loads(b_unicode).get("AUTH_TOKEN", None)
             if (not auth_token) or (not isinstance(auth_token, str)) : 
                 raise ParseError("AUTH_TOKEN must be a valid str.")
+
+            cur_time = datetime.now(tz=get_current_timezone())
+            defaults = {"value" : auth_token, "timestamp" : cur_time}
+            AuthTable.objects.update_or_create(key="AUTH_TOKEN", defaults=defaults)
         except Exception as e : 
             return JsonResponse({"status": 400, "message" : str(e)}, status=400)
         
