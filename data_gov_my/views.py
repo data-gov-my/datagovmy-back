@@ -84,6 +84,7 @@ class AUTH_TOKEN(APIView) :
         
         return JsonResponse({"status" : 200, "message" : "Auth token received."}, status=200)
 
+
 class CHART(APIView):
     def get(self, request, format=None):
         if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
@@ -420,7 +421,7 @@ class FORMS(generics.ListAPIView):
         return FormData.objects.filter(form_type=form_type)
 
     def delete(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("MODS_TOKEN")):
+        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
 
         queryset = Email.objects.filter(
