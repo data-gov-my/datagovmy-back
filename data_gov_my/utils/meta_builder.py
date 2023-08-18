@@ -823,6 +823,8 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
             language="en-GB",
             defaults={
                 "release_date": metadata.release_date,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.en.publication_type_title,
                 "publication_title": metadata.en.title,
                 "product_type": metadata.en.product_type,
                 "release_series": metadata.en.release_series,
@@ -834,6 +836,8 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
             language="ms-MY",
             defaults={
                 "release_date": metadata.release_date,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.bm.publication_type_title,
                 "publication_title": metadata.bm.title,
                 "product_type": metadata.bm.product_type,
                 "release_series": metadata.bm.release_series,

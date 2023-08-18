@@ -186,12 +186,14 @@ class PublicationDocumentationValidateModel(BaseModel):
 
 class _PublicationUpcomingLangModel(BaseModel):
     title: str
+    publication_type_title: str
     product_type: str
     release_series: str
 
 
 class PublicationUpcomingModel(BaseModel):
     publication: str
+    publication_type: str
     release_date: date
     en: _PublicationUpcomingLangModel
     bm: _PublicationUpcomingLangModel

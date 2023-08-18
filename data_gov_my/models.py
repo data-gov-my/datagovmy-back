@@ -382,6 +382,8 @@ class PublicationDocumentationResource(models.Model):
 class PublicationUpcoming(models.Model):
     publication_id = models.CharField(max_length=30)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=50)
+    publication_type_title = models.CharField(max_length=100)
     release_date = models.DateField()
     publication_title = models.CharField(max_length=100)
     product_type = models.CharField(max_length=100)
@@ -401,3 +403,6 @@ class PublicationUpcoming(models.Model):
                 name="unique upcoming publication by id and language",
             )
         ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
