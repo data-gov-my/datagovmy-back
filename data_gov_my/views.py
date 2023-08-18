@@ -7,8 +7,6 @@ from datetime import datetime
 import environ
 from django.core.cache import cache
 from django.db.models import Q
-from django.utils import timezone
-from django.utils.timezone import make_aware
 from django.utils.timezone import get_current_timezone
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
@@ -72,7 +70,6 @@ class AUTH_TOKEN(APIView) :
             return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         
         try :
-            # TODO: Insert into DB, and set in cache
             b_unicode = request.body.decode('utf-8')
             auth_token = json.loads(b_unicode).get("AUTH_TOKEN", None)
             if (not auth_token) or (not isinstance(auth_token, str)) : 
@@ -81,6 +78,7 @@ class AUTH_TOKEN(APIView) :
             cur_time = datetime.now(tz=get_current_timezone())
             defaults = {"value" : auth_token, "timestamp" : cur_time}
             AuthTable.objects.update_or_create(key="AUTH_TOKEN", defaults=defaults)
+            cache.set("AUTH_KEY", auth_token)
         except Exception as e : 
             return JsonResponse({"status": 400, "message" : str(e)}, status=400)
         
