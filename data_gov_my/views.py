@@ -608,6 +608,25 @@ class PUBLICATION_UPCOMING(generics.ListAPIView):
         return queryset
 
 
+class PUBLICATION_UPCOMING_DROPDOWN(APIView):
+    def get(self, request: request.Request, format=None):
+        language = request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return JsonResponse(
+            list(
+                PublicationUpcoming.objects.filter(language=language)
+                .order_by()
+                .values("publication_type", "publication_type_title")
+                .distinct()
+            ),
+            safe=False,
+            status=200,
+        )
+
+
 """
 Checks which filters have been applied for the data-catalog
 """
