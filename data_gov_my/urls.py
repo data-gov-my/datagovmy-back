@@ -56,6 +56,11 @@ urlpatterns = [
         name="PUB_UPCOMING_CALENDAR",
     ),
     path(
+        "pub-upcoming/list/",
+        views.PUBLICATION_UPCOMING_LIST.as_view(),
+        name="PUB_UPCOMING_LIST",
+    ),
+    path(
         "pub-upcoming-dropdown/",
         views.PUBLICATION_UPCOMING_DROPDOWN.as_view(),
         name="PUB_UPCOMING_DROPDOWN",

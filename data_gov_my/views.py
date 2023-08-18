@@ -609,9 +609,29 @@ class PUBLICATION_UPCOMING_CALENDAR(APIView):
         queryset = queryset.order_by("release_date")
         res = {}
         for date, group in groupby(queryset, lambda x: x.release_date):
-            res[str(date)] = PublicationUpcomingSerializer(group, many=True).data
+            res[str(date)] = [pub.publication_title for pub in group]
 
         return JsonResponse(data=res, status=200)
+
+
+class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
+    serializer_class = PublicationUpcomingSerializer
+    pagination_class = PublicationPagination
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return PublicationUpcoming.objects.filter(language=language)
+
+    def filter_queryset(self, queryset):
+        # apply filters
+        pub_type = self.request.query_params.get("pub_type")
+        if pub_type:
+            queryset = queryset.filter(publication_type__iexact=pub_type)
+        return queryset
 
 
 class PUBLICATION_UPCOMING_DROPDOWN(APIView):
