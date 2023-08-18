@@ -1,6 +1,7 @@
 import logging
 import os
 from threading import Thread
+from itertools import groupby
 
 import environ
 from django.core.cache import cache
@@ -587,25 +588,30 @@ class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
         return pub_object
 
 
-class PUBLICATION_UPCOMING(generics.ListAPIView):
-    serializer_class = PublicationUpcomingSerializer
-
-    def get_queryset(self):
+class PUBLICATION_UPCOMING_CALENDAR(APIView):
+    def get(self, request: request.Request, format=None):
         language = self.request.query_params.get("language")
         if language not in ["en-GB", "ms-MY"]:
             raise ParseError(
                 detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
             )
-        return PublicationUpcoming.objects.filter(language=language)
+        queryset = PublicationUpcoming.objects.filter(language=language)
 
-    def filter_queryset(self, queryset):
+        # filter start and end date
         start = self.request.query_params.get("start")
         end = self.request.query_params.get("end")
         if start:
             queryset = queryset.filter(release_date__gte=start)
         if end:
             queryset = queryset.filter(release_date__lte=end)
-        return queryset
+
+        # process into dict response
+        queryset = queryset.order_by("release_date")
+        res = {}
+        for date, group in groupby(queryset, lambda x: x.release_date):
+            res[str(date)] = PublicationUpcomingSerializer(group, many=True).data
+
+        return JsonResponse(data=res, status=200)
 
 
 class PUBLICATION_UPCOMING_DROPDOWN(APIView):

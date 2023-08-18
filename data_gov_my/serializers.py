@@ -205,4 +205,4 @@ class PublicationDocumentationDetailSerializer(serializers.ModelSerializer):
 class PublicationUpcomingSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationUpcoming
-        exclude = ["id"]
+        fields = ["publication_title"]
