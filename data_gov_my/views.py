@@ -71,7 +71,7 @@ class AUTH_TOKEN(APIView) :
         
         try :
             b_unicode = request.body.decode('utf-8')
-            auth_token = json.loads(b_unicode).get("AUTH_TOKEN", None)
+            auth_token = json.loads(b_unicode).get("ROLLING_TOKEN", None)
             if (not auth_token) or (not isinstance(auth_token, str)) : 
                 raise ParseError("AUTH_TOKEN must be a valid str.")
 
