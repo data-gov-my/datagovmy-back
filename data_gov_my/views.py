@@ -547,7 +547,7 @@ class PUBLICATION_DROPDOWN(APIView):
         return JsonResponse(
             list(
                 Publication.objects.filter(language=language)
-                .order_by()
+                .order_by("publication_type")
                 .values("publication_type", "publication_type_title")
                 .distinct()
             ),
@@ -612,7 +612,7 @@ class PUBLICATION_UPCOMING_CALENDAR(APIView):
         queryset = queryset.order_by("release_date")
         res = {}
         for date, group in groupby(queryset, lambda x: x.release_date):
-            res[str(date)] = [pub.publication_title for pub in group]
+            res[str(date)] = PublicationUpcomingSerializer(group, many=True).data
 
         return JsonResponse(data=res, status=200)
 
@@ -647,7 +647,7 @@ class PUBLICATION_UPCOMING_DROPDOWN(APIView):
         return JsonResponse(
             list(
                 PublicationUpcoming.objects.filter(language=language)
-                .order_by()
+                .order_by("publication_type")
                 .values("publication_type", "publication_type_title")
                 .distinct()
             ),
