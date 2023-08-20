@@ -191,9 +191,6 @@ class _PublicationUpcomingLangModel(BaseModel):
     release_series: str
 
 
-class PublicationUpcomingModel(BaseModel):
-    publication: str
-    publication_type: str
-    release_date: date
-    en: _PublicationUpcomingLangModel
-    bm: _PublicationUpcomingLangModel
+class PublicationUpcomingValidateModel(BaseModel):
+    manual_trigger: str | int | bool
+    parquet_link: str
