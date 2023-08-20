@@ -152,15 +152,13 @@ class GeneralMetaBuilder(ABC):
         for f in file_list:
             f_path = os.path.join(meta_dir, f)
             f_info = f.split("/")
-            if (
-                len(f_info) > 1
-                and f_info[0] in changed_files
-                and os.path.exists(f_path)
-            ):
-                changed_files[f_info[0]].append(
-                    os.path.join(*f_info[1:]).replace(".json", "")
-                )
-
+            for github_dir in changed_files:
+                github_dir_info = github_dir.split("/")
+                if f_info[: len(github_dir_info)] == github_dir_info:
+                    dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
+                        ".json", ""
+                    )
+                    changed_files[github_dir].append(dir)
         return changed_files
 
     @staticmethod
