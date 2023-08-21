@@ -54,6 +54,8 @@ from data_gov_my.utils.metajson_structures import (
 
 logger = logging.getLogger("django")
 
+MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH = 15
+
 
 class GeneralMetaBuilder(ABC):
     subclasses_by_category = {}
@@ -359,9 +361,15 @@ class GeneralMetaBuilder(ABC):
                 logger.error(traceback.format_exc())
                 failed.append({"FILE": meta, "ERROR": e})
 
+        if len(meta_objects) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+            successful_log = (
+                f"✅︎ <b>{len(meta_objects)}</b> objects have been successfully built!\n"
+            )
+        else:
+            successful_log = triggers.format_files_with_status_emoji(meta_objects, "✅︎")
         telegram_msg = [
             triggers.format_header(f"Meta Built Status ({self.MODEL.__name__})"),
-            triggers.format_files_with_status_emoji(meta_objects, "✅︎") + "\n",
+            successful_log + "\n",
             triggers.format_files_with_status_emoji(
                 [obj["FILE"] for obj in failed], "❌"
             ),
