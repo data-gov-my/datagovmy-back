@@ -15,6 +15,12 @@ REFRESH_VARIABLES = {
 
 LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]
 
+SITE_CHOICES = [
+    ("datagovmy", "https://data.gov.my"),
+    ("kkmnow", "https://data.moh.gov.my/"),
+    ("opendosm", "https://open.dosm.gov.my/"),
+]
+
 CHART_TYPES = {
     "HBAR": {"parent": "Barv2", "constructor": "Bar"},
     "BAR": {"parent": "Barv2", "constructor": "Bar"},
@@ -23,7 +29,7 @@ CHART_TYPES = {
     "AREA": {"parent": "Timeseriesv2", "constructor": "Timeseries"},
     "TIMESERIES": {"parent": "Timeseriesv2", "constructor": "Timeseries"},
     "STACKED_AREA": {"parent": "Timeseriesv2", "constructor": "Timeseries"},
-    "INTRADAY" : {"parent" : "Timeseriesv2", "constructor" : "Timeseries"},
+    "INTRADAY": {"parent": "Timeseriesv2", "constructor": "Timeseries"},
     "PYRAMID": {"parent": "Pyramidv2", "constructor": "Pyramid"},
     "HEATTABLE": {"parent": "Heattablev2", "constructor": "Heattable"},
     "CHOROPLETH": {"parent": "Choroplethv2", "constructor": "Choropleth"},

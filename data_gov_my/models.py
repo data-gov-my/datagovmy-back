@@ -7,10 +7,10 @@ from post_office.models import Email, EmailTemplate
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 
-from data_gov_my.utils.common import LANGUAGE_CHOICES
+from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES
 
 
-class AuthTable(models.Model) : 
+class AuthTable(models.Model):
     key = models.CharField(max_length=200, primary_key=True)
     value = models.CharField(max_length=200)
     timestamp = models.DateTimeField()
@@ -20,6 +20,10 @@ class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200, primary_key=True)
     dashboard_meta = models.JSONField()
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
+    sites = ArrayField(
+        models.CharField(max_length=50, choices=SITE_CHOICES),
+        default=list,
+    )
 
     def __str__(self) -> str:
         return f"{self.dashboard_name}"
@@ -91,6 +95,10 @@ class i18nJson(models.Model):
     filename = models.CharField(max_length=50)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
+    sites = ArrayField(
+        models.CharField(max_length=50, choices=SITE_CHOICES),
+        default=list,
+    )
     translation = models.JSONField()
 
     def __str__(self) -> str:
