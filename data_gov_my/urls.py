@@ -19,6 +19,7 @@ from data_gov_my import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
     path("dashboard/", views.DASHBOARD.as_view(), name="DASHBOARD"),
     path("data-variable/", views.DATA_VARIABLE.as_view(), name="DATA_VARIABLE"),
     path("data-catalog/", views.DATA_CATALOG.as_view(), name="DATA_CATALOG"),
