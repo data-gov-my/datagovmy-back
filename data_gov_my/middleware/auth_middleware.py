@@ -19,15 +19,15 @@ class AuthMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs) : 
         view_name = view_func.view_class.__name__
         req_auth_key = request.headers.get("Authorization")
+        master_token = os.getenv("WORKFLOW_TOKEN")
 
         if view_name not in self._exclude : 
             auth_key = cache.get("AUTH_KEY")
             if not auth_key : 
                 auth_key = AuthTable.objects.filter(key="AUTH_TOKEN").values('value').first()['value']
                 cache.set("AUTH_KEY", auth_key)
-            if req_auth_key != auth_key : 
+            if (req_auth_key != auth_key) and (req_auth_key != master_token) : 
                 return JsonResponse({"status" : 401, "message" : "Unauthorized"}, status=400)
         else : 
-            auth_key = os.getenv("WORKFLOW_TOKEN")
-            if auth_key != req_auth_key : 
+            if master_token != req_auth_key : 
                 return JsonResponse({"status" : 401, "message" : "Unauthorized"}, status=400)
