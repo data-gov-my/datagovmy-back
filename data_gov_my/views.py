@@ -619,6 +619,14 @@ class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
         pub_type = self.request.query_params.get("pub_type")
         if pub_type:
             queryset = queryset.filter(publication_type__iexact=pub_type)
+
+        # filter start and end date
+        start = self.request.query_params.get("start")
+        end = self.request.query_params.get("end")
+        if start:
+            queryset = queryset.filter(release_date__gte=start)
+        if end:
+            queryset = queryset.filter(release_date__lte=end)
         return queryset
 
 
