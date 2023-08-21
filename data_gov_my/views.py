@@ -65,10 +65,7 @@ Endpoint for all single charts
 logging.basicConfig(level=logging.INFO)
 
 class AUTH_TOKEN(APIView) : 
-    def post(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-        
+    def post(self, request, format=None):        
         try :
             b_unicode = request.body.decode('utf-8')
             auth_token = json.loads(b_unicode).get("ROLLING_TOKEN", None)
@@ -87,9 +84,6 @@ class AUTH_TOKEN(APIView) :
 
 class CHART(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         params_req = ["dashboard", "chart_name"]
 
@@ -139,17 +133,13 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
-        if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            thread = Thread(target=GeneralMetaBuilder.selective_update)
-            thread.start()
-            return Response(status=status.HTTP_200_OK)
-        return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        thread = Thread(target=GeneralMetaBuilder.selective_update)
+        thread.start()
+        return Response(status=status.HTTP_200_OK)
 
 
 class DASHBOARD(APIView):
     def get(self, request: request.Request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         param_list = request.query_params
 
         if "dashboard" in param_list:
@@ -168,9 +158,6 @@ class DASHBOARD(APIView):
 
 class DATA_VARIABLE(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         params_req = ["id"]
 
@@ -187,9 +174,6 @@ class DATA_VARIABLE(APIView):
 
 class DATA_CATALOG(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
@@ -278,9 +262,6 @@ class EXPLORER(APIView):
 
 class DROPDOWN(APIView):
     def get(self, request: request.Request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = request.query_params
 
         if "dashboard" in param_list:
@@ -320,9 +301,6 @@ class DROPDOWN(APIView):
 
 class I18N(APIView):
     def get(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         if {"filename", "lang"} <= request.query_params.keys():  # return all
             queryset = get_object_or_404(
                 i18nJson,
@@ -341,8 +319,6 @@ class I18N(APIView):
         return JsonResponse(res, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         serializer = i18nSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -350,9 +326,6 @@ class I18N(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         if {"filename", "lang"} <= request.query_params.keys():  # return all
             i18n_object = get_object_or_404(
                 i18nJson,
@@ -381,9 +354,6 @@ class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
 
     def post(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         # get FormTemplate instance by request query param, then validate & store new form data
         form_type = kwargs.get("form_type")
         template = FormTemplate.objects.get(form_type=form_type)
@@ -421,9 +391,6 @@ class FORMS(generics.ListAPIView):
         return FormData.objects.filter(form_type=form_type)
 
     def delete(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         queryset = Email.objects.filter(
             formdata__form_type=kwargs["form_type"]
         )  # query email for cascading deletes
@@ -439,17 +406,11 @@ class VIEW_COUNT(APIView):
     MAX_CACHE_SIZE = 5
 
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         return JsonResponse(
             ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
         )
 
     def post(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         id = request.query_params.get("id", None)
         type = request.query_params.get("type", None)
         metric = request.query_params.get("metric", None)
