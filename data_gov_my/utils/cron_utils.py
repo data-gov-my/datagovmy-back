@@ -122,7 +122,29 @@ def remove_deleted_files():
     cache.set("catalog_list", catalog_list)
 
 
-def revalidate_frontend(routes=[]):
+def get_fe_url_by_site(site):
+    """
+    Returns the URL and authorization header for frontend revalidation.
+    """
+    if site == "datagovmy":
+        return os.getenv("DATAGOVMY_FRONTEND_URL"), os.getenv(
+            "DATAGOVMY_FRONTEND_REBUILD_AUTH"
+        )
+    elif site == "opendosm":
+        return os.getenv("OPENDOSM_FRONTEND_URL"), os.getenv(
+            "OPENDOSM_FRONTEND_REBUILD_AUTH"
+        )
+    elif site == "kkmnow":
+        return os.getenv("KKMNOW_FRONTEND_URL"), os.getenv(
+            "KKMNOW_FRONTEND_REBUILD_AUTH"
+        )
+    else:
+        raise ValueError(
+            f"{site} is not a valid site for revalidation! (Currently supports datagovmy, opendosm, kkmnow only.)"
+        )
+
+
+def revalidate_frontend(routes=[], site="datagovmy"):
     """
     Revalidate frontend pages based on input routes.
     """
@@ -133,8 +155,7 @@ def revalidate_frontend(routes=[]):
         routes = routes.split(",")
     endpoint = ",".join(route for route in routes if isinstance(route, str))
 
-    url = os.getenv("FRONTEND_URL", "-")
-    fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
+    url, fe_auth = get_fe_url_by_site(site)
 
     headers = {
         "Authorization": fe_auth,

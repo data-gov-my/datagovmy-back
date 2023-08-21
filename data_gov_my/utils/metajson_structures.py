@@ -49,6 +49,7 @@ class DashboardValidateModel(BaseModel):
     dashboard_name: str
     data_last_updated: datetime
     route: str
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     manual_trigger: str
     required_params: list[str] = []
     optional_params: list[str] = []
@@ -61,6 +62,7 @@ class DashboardValidateModel(BaseModel):
 
 class i18nValidateModel(BaseModel):
     route: str | None
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     translation: dict
 
 
@@ -83,6 +85,7 @@ class ExplorerValidateModel(BaseModel):
     manual_trigger: str = "0"
     explorer_name: str
     route: str
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     tables: dict[str, dict]
 
     @field_serializer("data_last_updated")
