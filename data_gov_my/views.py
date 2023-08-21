@@ -1,6 +1,7 @@
 import logging
 import os
 from threading import Thread
+from itertools import groupby
 import json
 from datetime import datetime
 
@@ -17,6 +18,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.filters import SearchFilter
 
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
@@ -530,7 +532,7 @@ class PUBLICATION_DROPDOWN(APIView):
         return JsonResponse(
             list(
                 Publication.objects.filter(language=language)
-                .order_by()
+                .order_by("publication_type")
                 .values("publication_type", "publication_type_title")
                 .distinct()
             ),
@@ -542,6 +544,8 @@ class PUBLICATION_DROPDOWN(APIView):
 class PUBLICATION_DOCS(generics.ListAPIView):
     serializer_class = PublicationDocumentationSerializer
     pagination_class = PublicationPagination
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "description"]
 
     def get_queryset(self):
         language = self.request.query_params.get("language")
@@ -572,8 +576,35 @@ class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
         return pub_object
 
 
-class PUBLICATION_UPCOMING(generics.ListAPIView):
+class PUBLICATION_UPCOMING_CALENDAR(APIView):
+    def get(self, request: request.Request, format=None):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        queryset = PublicationUpcoming.objects.filter(language=language)
+
+        # filter start and end date
+        start = self.request.query_params.get("start")
+        end = self.request.query_params.get("end")
+        if start:
+            queryset = queryset.filter(release_date__gte=start)
+        if end:
+            queryset = queryset.filter(release_date__lte=end)
+
+        # process into dict response
+        queryset = queryset.order_by("release_date")
+        res = {}
+        for date, group in groupby(queryset, lambda x: x.release_date):
+            res[str(date)] = PublicationUpcomingSerializer(group, many=True).data
+
+        return JsonResponse(data=res, status=200)
+
+
+class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
     serializer_class = PublicationUpcomingSerializer
+    pagination_class = PublicationPagination
 
     def get_queryset(self):
         language = self.request.query_params.get("language")
@@ -584,13 +615,30 @@ class PUBLICATION_UPCOMING(generics.ListAPIView):
         return PublicationUpcoming.objects.filter(language=language)
 
     def filter_queryset(self, queryset):
-        start = self.request.query_params.get("start")
-        end = self.request.query_params.get("end")
-        if start:
-            queryset = queryset.filter(release_date__gte=start)
-        if end:
-            queryset = queryset.filter(release_date__lte=end)
+        # apply filters
+        pub_type = self.request.query_params.get("pub_type")
+        if pub_type:
+            queryset = queryset.filter(publication_type__iexact=pub_type)
         return queryset
+
+
+class PUBLICATION_UPCOMING_DROPDOWN(APIView):
+    def get(self, request: request.Request, format=None):
+        language = request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return JsonResponse(
+            list(
+                PublicationUpcoming.objects.filter(language=language)
+                .order_by("publication_type")
+                .values("publication_type", "publication_type_title")
+                .distinct()
+            ),
+            safe=False,
+            status=200,
+        )
 
 
 """

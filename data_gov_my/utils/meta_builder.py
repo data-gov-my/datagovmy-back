@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
 
+import pandas as pd
 from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
@@ -46,7 +47,7 @@ from data_gov_my.utils.metajson_structures import (
     ExplorerValidateModel,
     FormValidateModel,
     PublicationDocumentationValidateModel,
-    PublicationUpcomingModel,
+    PublicationUpcomingValidateModel,
     PublicationValidateModel,
     i18nValidateModel,
 )
@@ -151,15 +152,13 @@ class GeneralMetaBuilder(ABC):
         for f in file_list:
             f_path = os.path.join(meta_dir, f)
             f_info = f.split("/")
-            if (
-                len(f_info) > 1
-                and f_info[0] in changed_files
-                and os.path.exists(f_path)
-            ):
-                changed_files[f_info[0]].append(
-                    os.path.join(*f_info[1:]).replace(".json", "")
-                )
-
+            for github_dir in changed_files:
+                github_dir_info = github_dir.split("/")
+                if f_info[: len(github_dir_info)] == github_dir_info:
+                    dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
+                        ".json", ""
+                    )
+                    changed_files[github_dir].append(dir)
         return changed_files
 
     @staticmethod
@@ -814,30 +813,81 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
     CATEGORY = "PUBLICATION_UPCOMING"
     MODEL = PublicationUpcoming
     GITHUB_DIR = "pub-dosm/upcoming"
-    VALIDATOR = PublicationUpcomingModel
+    VALIDATOR = PublicationUpcomingValidateModel
 
-    def update_or_create_meta(self, filename: str, metadata: PublicationUpcomingModel):
+    def update_or_create_meta(
+        self, filename: str, metadata: PublicationUpcomingValidateModel
+    ):
+        df = pd.read_parquet(metadata.parquet_link)
+
+        PublicationUpcoming.objects.all().delete()
+
         # english publications
-        pub_object_en, _ = PublicationUpcoming.objects.update_or_create(
-            publication_id=metadata.publication,
-            language="en-GB",
-            defaults={
-                "release_date": metadata.release_date,
-                "publication_title": metadata.en.title,
-                "product_type": metadata.en.product_type,
-                "release_series": metadata.en.release_series,
-            },
-        )
-        # bm publications
-        pub_object_bm, _ = PublicationUpcoming.objects.update_or_create(
-            publication_id=metadata.publication,
-            language="ms-MY",
-            defaults={
-                "release_date": metadata.release_date,
-                "publication_title": metadata.bm.title,
-                "product_type": metadata.bm.product_type,
-                "release_series": metadata.bm.release_series,
-            },
+        df_en = (
+            df[
+                [
+                    "publication_id",
+                    "publication_type",
+                    "release_date",
+                    "title_en",
+                    "publication_type_en",
+                    "product_type_en",
+                    "release_series_en",
+                ]
+            ]
+            .copy()
+            .rename(
+                columns={
+                    "title_en": "publication_title",
+                    "publication_type_en": "publication_type_title",
+                    "product_type_en": "product_type",
+                    "release_series_en": "release_series",
+                },
+                errors="raise",
+            )
         )
 
-        return [pub_object_en, pub_object_bm]
+        publications_en = [
+            PublicationUpcoming(**kwargs, language="en-GB")
+            for kwargs in df_en.to_dict(orient="records")
+        ]
+
+        publications_en_created = PublicationUpcoming.objects.bulk_create(
+            publications_en, batch_size=1000
+        )
+
+        # bm publications
+        df_bm = (
+            df[
+                [
+                    "publication_id",
+                    "publication_type",
+                    "release_date",
+                    "title_bm",
+                    "publication_type_bm",
+                    "product_type_bm",
+                    "release_series_bm",
+                ]
+            ]
+            .copy()
+            .rename(
+                columns={
+                    "title_bm": "publication_title",
+                    "publication_type_bm": "publication_type_title",
+                    "product_type_bm": "product_type",
+                    "release_series_bm": "release_series",
+                },
+                errors="raise",
+            )
+        )
+
+        publications_bm = [
+            PublicationUpcoming(**kwargs, language="ms-MY")
+            for kwargs in df_bm.to_dict(orient="records")
+        ]
+
+        publications_bm_created = PublicationUpcoming.objects.bulk_create(
+            publications_bm, batch_size=1000
+        )
+
+        return publications_en_created + publications_bm_created

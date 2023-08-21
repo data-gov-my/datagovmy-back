@@ -277,8 +277,8 @@ class Publication(models.Model):
     publication_id = models.CharField(max_length=30)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     publication_type = models.CharField(max_length=50)
-    publication_type_title = models.CharField(max_length=100)
-    title = models.CharField(max_length=50)
+    publication_type_title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150)
     description = models.CharField(max_length=300)
     release_date = models.DateField()
     frequency = models.CharField(max_length=50)
@@ -334,9 +334,9 @@ class PublicationDocumentation(models.Model):
     publication_id = models.CharField(max_length=30)
     documentation_type = models.CharField(max_length=30)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
-    publication_type = models.CharField(max_length=50)
-    publication_type_title = models.CharField(max_length=100)
-    title = models.CharField(max_length=50)
+    publication_type = models.CharField(max_length=100)
+    publication_type_title = models.CharField(max_length=150)
+    title = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
     release_date = models.DateField()
 
@@ -365,8 +365,8 @@ class PublicationDocumentation(models.Model):
 
 class PublicationDocumentationResource(models.Model):
     resource_id = models.IntegerField()
-    resource_type = models.CharField(max_length=50)
-    resource_name = models.CharField(max_length=100)
+    resource_type = models.CharField(max_length=100)
+    resource_name = models.CharField(max_length=150)
     resource_link = models.URLField(max_length=150)
     publication = models.ForeignKey(
         PublicationDocumentation, related_name="resources", on_delete=models.CASCADE
@@ -386,15 +386,17 @@ class PublicationDocumentationResource(models.Model):
 
 
 class PublicationUpcoming(models.Model):
-    publication_id = models.CharField(max_length=30)
+    publication_id = models.CharField(max_length=100)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=100)
+    publication_type_title = models.CharField(max_length=150)
     release_date = models.DateField()
-    publication_title = models.CharField(max_length=100)
-    product_type = models.CharField(max_length=100)
-    release_series = models.CharField(max_length=100)
+    publication_title = models.CharField(max_length=150)
+    product_type = models.CharField(max_length=150)
+    release_series = models.CharField(max_length=150)
 
     class Meta:
-        ordering = ["release_date"]
+        ordering = ["release_date", "publication_id"]
         indexes = [
             models.Index(
                 fields=["language"],
@@ -407,3 +409,6 @@ class PublicationUpcoming(models.Model):
                 name="unique upcoming publication by id and language",
             )
         ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
