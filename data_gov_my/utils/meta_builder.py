@@ -258,9 +258,13 @@ class GeneralMetaBuilder(ABC):
                         {"DB OBJECT": str(model_obj), "ERROR": "Unknown :("}
                     )
 
-                telegram_msg += triggers.format_files_with_status_emoji(
-                    successful_routes, "✅︎"
-                )
+                if len(successful_routes) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+                    successful_log = f"✅︎ <b>{len(successful_routes)}</b> routes have been successfully revalidated!\n"
+                else:
+                    successful_log = triggers.format_files_with_status_emoji(
+                        successful_routes, "✅︎"
+                    )
+                telegram_msg += successful_log
                 telegram_msg += "\n\n"
                 telegram_msg += triggers.format_files_with_status_emoji(
                     failed_routes, "❌"
