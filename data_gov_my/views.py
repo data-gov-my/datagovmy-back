@@ -73,7 +73,8 @@ class AUTH_TOKEN(APIView) :
             auth_token = json.loads(b_unicode).get("ROLLING_TOKEN", None)
             if (not auth_token) or (not isinstance(auth_token, str)) : 
                 raise ParseError("AUTH_TOKEN must be a valid str.")
-
+            
+            auth_token = f"Bearer {auth_token}"
             cur_time = datetime.now(tz=get_current_timezone())
             defaults = {"value" : auth_token, "timestamp" : cur_time}
             AuthTable.objects.update_or_create(key="AUTH_TOKEN", defaults=defaults)
