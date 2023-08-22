@@ -54,6 +54,8 @@ from data_gov_my.utils.metajson_structures import (
 
 logger = logging.getLogger("django")
 
+MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH = 15
+
 
 class GeneralMetaBuilder(ABC):
     subclasses_by_category = {}
@@ -150,7 +152,6 @@ class GeneralMetaBuilder(ABC):
             GeneralMetaBuilder.refresh_meta_repo()
 
         for f in file_list:
-            f_path = os.path.join(meta_dir, f)
             f_info = f.split("/")
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
@@ -218,8 +219,6 @@ class GeneralMetaBuilder(ABC):
         if len(objects) < 1:
             return
 
-        routes = []
-
         triggers.send_telegram(
             "\n".join(
                 [
@@ -232,41 +231,52 @@ class GeneralMetaBuilder(ABC):
         )
 
         for model_obj in objects:
-            successful_routes = []
-            failed_routes = []
-            failed_info = []
-            telegram_msg = (
-                triggers.format_header(
-                    f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS"
-                )
-                + "\n"
-            )
             routes = model_obj.route
-            if not routes:  # current object does not have any routes
+            sites = model_obj.sites
+            if not routes and not sites:  # current object does not have any routes
                 continue
-            response = revalidate_frontend(routes=routes)
-            if response.status_code == 200:
-                successful_routes.extend(response.json()["revalidated"])
-            elif response.status_code == 400:
-                failed_routes.extend(routes.split(","))
-                failed_info.append(response.json())
-            else:
-                failed_routes.extend(routes.split(","))
-                failed_info.append({"DB OBJECT": str(model_obj), "ERROR": "Unknown :("})
 
-            telegram_msg += triggers.format_files_with_status_emoji(
-                successful_routes, "✅︎"
-            )
-            telegram_msg += "\n\n"
-            telegram_msg += triggers.format_files_with_status_emoji(failed_routes, "❌")
+            for site in sites:
+                successful_routes = []
+                failed_routes = []
+                failed_info = []
+                telegram_msg = (
+                    triggers.format_header(
+                        f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
+                    )
+                    + "\n"
+                )
+                response = revalidate_frontend(routes=routes, site=site)
+                if response.status_code == 200:
+                    successful_routes.extend(response.json()["revalidated"])
+                elif response.status_code == 400:
+                    failed_routes.extend(routes.split(","))
+                    failed_info.append(response.json())
+                else:
+                    failed_routes.extend(routes.split(","))
+                    failed_info.append(
+                        {"DB OBJECT": str(model_obj), "ERROR": "Unknown :("}
+                    )
 
-            if len(failed_info) > 0:
+                if len(successful_routes) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+                    successful_log = f"✅︎ <b>{len(successful_routes)}</b> routes have been successfully revalidated!\n"
+                else:
+                    successful_log = triggers.format_files_with_status_emoji(
+                        successful_routes, "✅︎"
+                    )
+                telegram_msg += successful_log
                 telegram_msg += "\n\n"
-                telegram_msg += triggers.format_multi_line(
-                    failed_info, "FAILED REVALIDATION INFO"
+                telegram_msg += triggers.format_files_with_status_emoji(
+                    failed_routes, "❌"
                 )
 
-            triggers.send_telegram(telegram_msg)
+                if len(failed_info) > 0:
+                    telegram_msg += "\n\n"
+                    telegram_msg += triggers.format_multi_line(
+                        failed_info, "FAILED REVALIDATION INFO"
+                    )
+
+                triggers.send_telegram(telegram_msg)
 
     def remove_deleted_files(self):
         """
@@ -355,9 +365,15 @@ class GeneralMetaBuilder(ABC):
                 logger.error(traceback.format_exc())
                 failed.append({"FILE": meta, "ERROR": e})
 
+        if len(meta_objects) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+            successful_log = (
+                f"✅︎ <b>{len(meta_objects)}</b> objects have been successfully built!\n"
+            )
+        else:
+            successful_log = triggers.format_files_with_status_emoji(meta_objects, "✅︎")
         telegram_msg = [
             triggers.format_header(f"Meta Built Status ({self.MODEL.__name__})"),
-            triggers.format_files_with_status_emoji(meta_objects, "✅︎") + "\n",
+            successful_log + "\n",
             triggers.format_files_with_status_emoji(
                 [obj["FILE"] for obj in failed], "❌"
             ),
@@ -397,6 +413,7 @@ class DashboardBuilder(GeneralMetaBuilder):
         updated_values = {
             "dashboard_meta": dashboard_meta,
             "route": metadata.route,
+            "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata.dashboard_name,
@@ -587,6 +604,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
         updated_values = {
             "dashboard_meta": metadata.model_dump(),
             "route": metadata.route,
+            "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata.explorer_name,
