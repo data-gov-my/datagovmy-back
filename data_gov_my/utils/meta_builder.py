@@ -246,17 +246,18 @@ class GeneralMetaBuilder(ABC):
                     )
                     + "\n"
                 )
-                response = revalidate_frontend(routes=routes, site=site)
-                if response.status_code == 200:
-                    successful_routes.extend(response.json()["revalidated"])
-                elif response.status_code == 400:
-                    failed_routes.extend(routes.split(","))
-                    failed_info.append(response.json())
-                else:
-                    failed_routes.extend(routes.split(","))
-                    failed_info.append(
-                        {"DB OBJECT": str(model_obj), "ERROR": "Unknown :("}
-                    )
+                if routes:
+                    response = revalidate_frontend(routes=routes, site=site)
+                    if response.status_code == 200:
+                        successful_routes.extend(response.json()["revalidated"])
+                    elif response.status_code == 400:
+                        failed_routes.extend(routes.split(","))
+                        failed_info.append(response.json())
+                    else:
+                        failed_routes.extend(routes.split(","))
+                        failed_info.append(
+                            {"DB OBJECT": str(model_obj), "ERROR": "Unknown :("}
+                        )
 
                 if len(successful_routes) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
                     successful_log = f"✅︎ <b>{len(successful_routes)}</b> routes have been successfully revalidated!\n"

@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import zipfile
@@ -106,7 +107,8 @@ def remove_deleted_files():
         if diff:
             # Remove the deleted datasets
             query = {v["column_name"] + "__in": diff}
-            model_name.objects.filter(**query).delete()
+            del_int, deleted = model_name.objects.filter(**query).delete()
+            logging.warning(f"Deleted removed files: {deleted}")
 
     # Update the cache
     source_filters_cache()
@@ -148,9 +150,6 @@ def revalidate_frontend(routes=[], site="datagovmy"):
     """
     Revalidate frontend pages based on input routes.
     """
-    if routes is None:
-        return False
-
     if isinstance(routes, str):
         routes = routes.split(",")
     endpoint = ",".join(route for route in routes if isinstance(route, str))
