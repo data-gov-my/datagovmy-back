@@ -4,82 +4,83 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0004_alter_namedashboard_firstname_first_name_and_more'),
+        ("data_gov_my", "0004_alter_namedashboard_firstname_first_name_and_more"),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='namedashboard_firstname',
-            name='first_name_idx',
+            model_name="namedashboard_firstname",
+            name="first_name_idx",
         ),
         migrations.RemoveField(
-            model_name='namedashboard_firstname',
-            name='decade',
+            model_name="namedashboard_firstname",
+            name="decade",
         ),
         migrations.RemoveField(
-            model_name='namedashboard_firstname',
-            name='first_name',
+            model_name="namedashboard_firstname",
+            name="first_name",
         ),
         migrations.RemoveField(
-            model_name='namedashboard_firstname',
-            name='id',
+            model_name="namedashboard_firstname",
+            name="id",
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_10',
+            model_name="namedashboard_firstname",
+            name="decade_10",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_20',
+            model_name="namedashboard_firstname",
+            name="decade_20",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_30',
+            model_name="namedashboard_firstname",
+            name="decade_30",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_40',
+            model_name="namedashboard_firstname",
+            name="decade_40",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_50',
+            model_name="namedashboard_firstname",
+            name="decade_50",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_60',
+            model_name="namedashboard_firstname",
+            name="decade_60",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_70',
+            model_name="namedashboard_firstname",
+            name="decade_70",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_80',
+            model_name="namedashboard_firstname",
+            name="decade_80",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='decade_90',
+            model_name="namedashboard_firstname",
+            name="decade_90",
             field=models.IntegerField(default=0, null=True),
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='name',
-            field=models.CharField(default=0, max_length=300, primary_key=True, serialize=False),
+            model_name="namedashboard_firstname",
+            name="name",
+            field=models.CharField(
+                default=0, max_length=300, primary_key=True, serialize=False
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='namedashboard_firstname',
-            name='total',
+            model_name="namedashboard_firstname",
+            name="total",
             field=models.IntegerField(default=0, null=True),
         ),
     ]

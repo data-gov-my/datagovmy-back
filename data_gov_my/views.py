@@ -66,23 +66,26 @@ Endpoint for all single charts
 
 logging.basicConfig(level=logging.INFO)
 
-class AUTH_TOKEN(APIView) : 
-    def post(self, request, format=None):        
-        try :
-            b_unicode = request.body.decode('utf-8')
+
+class AUTH_TOKEN(APIView):
+    def post(self, request, format=None):
+        try:
+            b_unicode = request.body.decode("utf-8")
             auth_token = json.loads(b_unicode).get("ROLLING_TOKEN", None)
-            if (not auth_token) or (not isinstance(auth_token, str)) : 
+            if (not auth_token) or (not isinstance(auth_token, str)):
                 raise ParseError("AUTH_TOKEN must be a valid str.")
-            
+
             auth_token = f"Bearer {auth_token}"
             cur_time = datetime.now(tz=get_current_timezone())
-            defaults = {"value" : auth_token, "timestamp" : cur_time}
+            defaults = {"value": auth_token, "timestamp": cur_time}
             AuthTable.objects.update_or_create(key="AUTH_TOKEN", defaults=defaults)
             cache.set("AUTH_KEY", auth_token)
-        except Exception as e : 
-            return JsonResponse({"status": 400, "message" : str(e)}, status=400)
-        
-        return JsonResponse({"status" : 200, "message" : "Auth token received."}, status=200)
+        except Exception as e:
+            return JsonResponse({"status": 400, "message": str(e)}, status=400)
+
+        return JsonResponse(
+            {"status": 200, "message": "Auth token received."}, status=200
+        )
 
 
 class CHART(APIView):

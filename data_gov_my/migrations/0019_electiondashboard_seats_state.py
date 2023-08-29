@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0018_rename_translation_json_i18njson_translation_and_more'),
+        ("data_gov_my", "0018_rename_translation_json_i18njson_translation_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='state',
+            model_name="electiondashboard_seats",
+            name="state",
             field=models.CharField(max_length=50, null=True),
         ),
     ]

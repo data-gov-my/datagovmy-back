@@ -4,18 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0047_publicationupcoming_and_more'),
+        ("data_gov_my", "0047_publicationupcoming_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AuthTable',
+            name="AuthTable",
             fields=[
-                ('key', models.CharField(max_length=200, primary_key=True, serialize=False)),
-                ('value', models.CharField(max_length=200)),
-                ('timestamp', models.DateTimeField()),
+                (
+                    "key",
+                    models.CharField(max_length=200, primary_key=True, serialize=False),
+                ),
+                ("value", models.CharField(max_length=200)),
+                ("timestamp", models.DateTimeField()),
             ],
         ),
     ]

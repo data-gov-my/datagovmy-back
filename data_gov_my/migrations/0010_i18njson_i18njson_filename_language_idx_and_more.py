@@ -4,28 +4,46 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0009_namedashboard_lastname'),
+        ("data_gov_my", "0009_namedashboard_lastname"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='i18nJson',
+            name="i18nJson",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filename', models.CharField(max_length=50)),
-                ('language', models.CharField(choices=[('en', 'English'), ('bm', 'Bahasa Melayu')], default='en', max_length=2)),
-                ('route', models.CharField(max_length=50)),
-                ('translation_json', models.JSONField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("filename", models.CharField(max_length=50)),
+                (
+                    "language",
+                    models.CharField(
+                        choices=[("en", "English"), ("bm", "Bahasa Melayu")],
+                        default="en",
+                        max_length=2,
+                    ),
+                ),
+                ("route", models.CharField(max_length=50)),
+                ("translation_json", models.JSONField()),
             ],
         ),
         migrations.AddIndex(
-            model_name='i18njson',
-            index=models.Index(fields=['filename', 'language'], name='filename_language_idx'),
+            model_name="i18njson",
+            index=models.Index(
+                fields=["filename", "language"], name="filename_language_idx"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='i18njson',
-            constraint=models.UniqueConstraint(fields=('filename', 'language'), name='unique json file by language'),
+            model_name="i18njson",
+            constraint=models.UniqueConstraint(
+                fields=("filename", "language"), name="unique json file by language"
+            ),
         ),
     ]

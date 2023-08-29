@@ -4,25 +4,32 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0010_i18njson_i18njson_filename_language_idx_and_more'),
+        ("data_gov_my", "0010_i18njson_i18njson_filename_language_idx_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ElectionDashboard_Candidates',
+            name="ElectionDashboard_Candidates",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('type', models.CharField(max_length=20)),
-                ('date', models.CharField(max_length=100)),
-                ('election_name', models.CharField(max_length=100)),
-                ('seat', models.CharField(max_length=100)),
-                ('party', models.CharField(max_length=100)),
-                ('votes', models.IntegerField(null=True)),
-                ('votes_perc', models.IntegerField(null=True)),
-                ('result', models.CharField(max_length=100, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("type", models.CharField(max_length=20)),
+                ("date", models.CharField(max_length=100)),
+                ("election_name", models.CharField(max_length=100)),
+                ("seat", models.CharField(max_length=100)),
+                ("party", models.CharField(max_length=100)),
+                ("votes", models.IntegerField(null=True)),
+                ("votes_perc", models.IntegerField(null=True)),
+                ("result", models.CharField(max_length=100, null=True)),
             ],
         ),
     ]
