@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "post_office",
     "django_rq",
+    "drf_api_logger",
 ]
 
 MIDDLEWARE = [
@@ -62,10 +63,13 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
     "data_gov_my.middleware.auth_middleware.AuthMiddleware",
 ]
 
 ROOT_URLCONF = "data_gov_my.urls"
+
+DRF_API_LOGGER_DATABASE = True  # Default to False
 
 TEMPLATES = [
     {
