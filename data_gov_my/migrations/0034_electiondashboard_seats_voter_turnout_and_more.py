@@ -4,30 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0033_merge_20230614_0444'),
+        ("data_gov_my", "0033_merge_20230614_0444"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='voter_turnout',
+            model_name="electiondashboard_seats",
+            name="voter_turnout",
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='voter_turnout_perc',
+            model_name="electiondashboard_seats",
+            name="voter_turnout_perc",
             field=models.FloatField(default=None, null=True),
         ),
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='votes_rejected',
+            model_name="electiondashboard_seats",
+            name="votes_rejected",
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='votes_rejected_perc',
+            model_name="electiondashboard_seats",
+            name="votes_rejected_perc",
             field=models.FloatField(default=None, null=True),
         ),
     ]

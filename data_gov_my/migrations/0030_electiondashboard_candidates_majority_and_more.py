@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0029_metajson_route'),
+        ("data_gov_my", "0029_metajson_route"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='electiondashboard_candidates',
-            name='majority',
+            model_name="electiondashboard_candidates",
+            name="majority",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='electiondashboard_candidates',
-            name='majority_perc',
+            model_name="electiondashboard_candidates",
+            name="majority_perc",
             field=models.FloatField(default=None, null=True),
         ),
     ]

@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0010_i18njson_i18njson_filename_language_idx_and_more'),
+        ("data_gov_my", "0010_i18njson_i18njson_filename_language_idx_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='i18njson',
-            name='language',
-            field=models.CharField(choices=[('en-GB', 'English'), ('ms-MY', 'Bahasa Melayu')], default='en-GB', max_length=5),
+            model_name="i18njson",
+            name="language",
+            field=models.CharField(
+                choices=[("en-GB", "English"), ("ms-MY", "Bahasa Melayu")],
+                default="en-GB",
+                max_length=5,
+            ),
         ),
     ]

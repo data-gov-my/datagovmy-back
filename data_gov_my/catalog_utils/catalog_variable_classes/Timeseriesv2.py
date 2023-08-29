@@ -124,12 +124,12 @@ class Timeseries(GeneralChartsUtil):
         for key in self.t_keys:
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
-        if 'date' in df.columns : # INTRADAY DOESN'T HAVE DATE
+        if "date" in df.columns:  # INTRADAY DOESN'T HAVE DATE
             df["date"] = pd.to_datetime(df["date"])
-        
+
         isIntraday = self.chart_type == "INTRADAY"
 
-        if ('timestamp' in df.columns) and (isIntraday) : 
+        if ("timestamp" in df.columns) and (isIntraday):
             df["timestamp"] = pd.to_datetime(df["timestamp"])
 
         if "STACKED" in self.chart_type:
@@ -152,7 +152,11 @@ class Timeseries(GeneralChartsUtil):
                     result = {b: result}
                     tbl = {b: tbl}
                 cur_group = group[0] if len(group) == 1 else group
-                cur_data = self.build_intraday(df, cur_group) if isIntraday else self.slice_timeline(df, cur_group)
+                cur_data = (
+                    self.build_intraday(df, cur_group)
+                    if isIntraday
+                    else self.slice_timeline(df, cur_group)
+                )
                 chart_vals = cur_data["chart_data"]
                 table_vals = cur_data["table_data"]
                 self.set_dict(result, list(group), chart_vals)
@@ -162,7 +166,11 @@ class Timeseries(GeneralChartsUtil):
 
             return res
         else:
-            data_res = self.build_intraday(df, "") if isIntraday else self.slice_timeline(df, "")
+            data_res = (
+                self.build_intraday(df, "")
+                if isIntraday
+                else self.slice_timeline(df, "")
+            )
 
             res["chart_data"] = data_res["chart_data"]
             res["table_data"] = data_res["table_data"]
@@ -172,7 +180,8 @@ class Timeseries(GeneralChartsUtil):
     """
     Intraday Chart builder
     """
-    def build_intraday(self, df, cur_group) : 
+
+    def build_intraday(self, df, cur_group):
         df = df.copy()
         res = {}
         res["chart_data"] = {}
@@ -194,21 +203,15 @@ class Timeseries(GeneralChartsUtil):
                     .replace({np.nan: None})
                     .to_list()
                 )
-            res["table_data"] = self.build_variable_table(
-                res["chart_data"]
-            )
+            res["table_data"] = self.build_variable_table(res["chart_data"])
         else:
-            res["chart_data"]["x"] = (
-                df["timestamp"].replace({np.nan: None}).to_list()
-            )
+            res["chart_data"]["x"] = df["timestamp"].replace({np.nan: None}).to_list()
             for index, y in enumerate(self.t_y):
                 res["chart_data"][f"y{index + 1}"] = (
                     df[y].replace({np.nan: None}).to_list()
                 )
-            res["table_data"] = self.build_variable_table(
-                res["chart_data"]
-            )
-        
+            res["table_data"] = self.build_variable_table(res["chart_data"])
+
         return res
 
     """
@@ -258,7 +261,7 @@ class Timeseries(GeneralChartsUtil):
 
             range_df = self.is_in_timeline(range, range_df)
 
-            if range in self.group_time :  # If requires time grouping
+            if range in self.group_time:  # If requires time grouping
                 key_list_mod = self.t_keys[:] if self.t_keys else []
                 key_list_mod.append("interval")
 
@@ -310,7 +313,7 @@ class Timeseries(GeneralChartsUtil):
                 )
             else:
                 range_df["date"] = range_df["date"].values.astype(np.int64) // 10**6
-                
+
                 if self.t_keys:
                     res["chart_data"][range]["x"] = (
                         range_df.groupby(self.t_keys)["date"]
@@ -370,28 +373,30 @@ class Timeseries(GeneralChartsUtil):
             for idx, api in enumerate(self.api_filter):
                 filter_obj = None
                 df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
-                if idx == 0 :                
-                    be_vals = (
-                        df[api]
-                        .unique()
-                        .tolist()
-                    )
+                if idx == 0:
+                    be_vals = df[api].unique().tolist()
                     default_key.append(be_vals[0])
                     filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
-                else : 
-                    dropdown = self.dropdown_options(df, groupby_cols=self.api_filter[0:idx], column=api)
+                else:
+                    dropdown = self.dropdown_options(
+                        df, groupby_cols=self.api_filter[0:idx], column=api
+                    )
                     cur_level = dropdown
-                    for dk in default_key : 
+                    for dk in default_key:
                         cur_level = dropdown[dk]
                     def_key = cur_level[0]
-                    filter_obj = self.build_api_object_filter(key=api, def_val=def_key, options=dropdown)
+                    filter_obj = self.build_api_object_filter(
+                        key=api, def_val=def_key, options=dropdown
+                    )
                     default_key.append(def_key)
 
                 api_filters_inc.append(filter_obj)
 
-        if self.chart_type != "INTRADAY" :
+        if self.chart_type != "INTRADAY":
             range_options = [r for r in self.applicable_frequency]
-            range_obj = self.build_api_object_filter("range", self.frequency, range_options)
+            range_obj = self.build_api_object_filter(
+                "range", self.frequency, range_options
+            )
             api_filters_inc.append(range_obj)
 
         res["API"] = {}

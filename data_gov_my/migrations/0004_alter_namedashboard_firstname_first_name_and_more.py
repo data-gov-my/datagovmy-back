@@ -6,20 +6,21 @@ from django.contrib.postgres.operations import BtreeGinExtension
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0003_alter_namedashboard_firstname_first_name'),
+        ("data_gov_my", "0003_alter_namedashboard_firstname_first_name"),
     ]
 
     operations = [
         BtreeGinExtension(),
         migrations.AlterField(
-            model_name='namedashboard_firstname',
-            name='first_name',
+            model_name="namedashboard_firstname",
+            name="first_name",
             field=models.CharField(max_length=300),
         ),
         migrations.AddIndex(
-            model_name='namedashboard_firstname',
-            index=django.contrib.postgres.indexes.GinIndex(fastupdate=True, fields=['first_name'], name='first_name_idx'),
+            model_name="namedashboard_firstname",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fastupdate=True, fields=["first_name"], name="first_name_idx"
+            ),
         ),
     ]
