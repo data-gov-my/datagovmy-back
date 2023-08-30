@@ -23,17 +23,6 @@ class DashboardChartModel(BaseModel):
     variables: dict  # will be validated individually for each chart
     api_params: list[str]
 
-    @field_validator("api_params")
-    def validate_api_params_against_keys(cls, v, info: FieldValidationInfo):
-        keys = info.data["variables"].get("keys", [])
-
-        if len(keys) < len(v) or keys[: len(v)] != v:
-            raise ValueError(
-                f"api_params {v} must be a subset of keys {keys} starting at index 0!"
-            )
-
-        return v
-
     @field_serializer("data_as_of")
     def serialize_date(self, data_as_of: datetime):
         return data_as_of.strftime("%Y-%m-%d %H:%M")
