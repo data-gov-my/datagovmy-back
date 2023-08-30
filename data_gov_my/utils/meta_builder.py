@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
 
+import pandas as pd
 from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
@@ -22,7 +23,10 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     Publication,
+    PublicationDocumentation,
+    PublicationDocumentationResource,
     PublicationResource,
+    PublicationUpcoming,
     i18nJson,
 )
 from data_gov_my.utils import common, triggers
@@ -42,11 +46,15 @@ from data_gov_my.utils.metajson_structures import (
     DataCatalogValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
+    PublicationDocumentationValidateModel,
+    PublicationUpcomingValidateModel,
     PublicationValidateModel,
     i18nValidateModel,
 )
 
 logger = logging.getLogger("django")
+
+MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH = 15
 
 
 class GeneralMetaBuilder(ABC):
@@ -144,17 +152,14 @@ class GeneralMetaBuilder(ABC):
             GeneralMetaBuilder.refresh_meta_repo()
 
         for f in file_list:
-            f_path = os.path.join(meta_dir, f)
             f_info = f.split("/")
-            if (
-                len(f_info) > 1
-                and f_info[0] in changed_files
-                and os.path.exists(f_path)
-            ):
-                changed_files[f_info[0]].append(
-                    os.path.join(*f_info[1:]).replace(".json", "")
-                )
-
+            for github_dir in changed_files:
+                github_dir_info = github_dir.split("/")
+                if f_info[: len(github_dir_info)] == github_dir_info:
+                    dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
+                        ".json", ""
+                    )
+                    changed_files[github_dir].append(dir)
         return changed_files
 
     @staticmethod
@@ -214,8 +219,6 @@ class GeneralMetaBuilder(ABC):
         if len(objects) < 1:
             return
 
-        routes = []
-
         triggers.send_telegram(
             "\n".join(
                 [
@@ -228,41 +231,53 @@ class GeneralMetaBuilder(ABC):
         )
 
         for model_obj in objects:
-            successful_routes = []
-            failed_routes = []
-            failed_info = []
-            telegram_msg = (
-                triggers.format_header(
-                    f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS"
-                )
-                + "\n"
-            )
             routes = model_obj.route
-            if not routes:  # current object does not have any routes
+            sites = model_obj.sites
+            if not routes and not sites:  # current object does not have any routes
                 continue
-            response = revalidate_frontend(routes=routes)
-            if response.status_code == 200:
-                successful_routes.extend(response.json()["revalidated"])
-            elif response.status_code == 400:
-                failed_routes.extend(routes.split(","))
-                failed_info.append(response.json())
-            else:
-                failed_routes.extend(routes.split(","))
-                failed_info.append({"DB OBJECT": str(model_obj), "ERROR": "Unknown :("})
 
-            telegram_msg += triggers.format_files_with_status_emoji(
-                successful_routes, "✅︎"
-            )
-            telegram_msg += "\n\n"
-            telegram_msg += triggers.format_files_with_status_emoji(failed_routes, "❌")
+            for site in sites:
+                successful_routes = []
+                failed_routes = []
+                failed_info = []
+                telegram_msg = (
+                    triggers.format_header(
+                        f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
+                    )
+                    + "\n"
+                )
+                if routes:
+                    response = revalidate_frontend(routes=routes, site=site)
+                    if response.status_code == 200:
+                        successful_routes.extend(response.json()["revalidated"])
+                    elif response.status_code == 400:
+                        failed_routes.extend(routes.split(","))
+                        failed_info.append(response.json())
+                    else:
+                        failed_routes.extend(routes.split(","))
+                        failed_info.append(
+                            {"DB OBJECT": str(model_obj), "ERROR": "Unknown :("}
+                        )
 
-            if len(failed_info) > 0:
+                if len(successful_routes) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+                    successful_log = f"✅︎ <b>{len(successful_routes)}</b> routes have been successfully revalidated!\n"
+                else:
+                    successful_log = triggers.format_files_with_status_emoji(
+                        successful_routes, "✅︎"
+                    )
+                telegram_msg += successful_log
                 telegram_msg += "\n\n"
-                telegram_msg += triggers.format_multi_line(
-                    failed_info, "FAILED REVALIDATION INFO"
+                telegram_msg += triggers.format_files_with_status_emoji(
+                    failed_routes, "❌"
                 )
 
-            triggers.send_telegram(telegram_msg)
+                if len(failed_info) > 0:
+                    telegram_msg += "\n\n"
+                    telegram_msg += triggers.format_multi_line(
+                        failed_info, "FAILED REVALIDATION INFO"
+                    )
+
+                triggers.send_telegram(telegram_msg)
 
     def remove_deleted_files(self):
         """
@@ -351,9 +366,15 @@ class GeneralMetaBuilder(ABC):
                 logger.error(traceback.format_exc())
                 failed.append({"FILE": meta, "ERROR": e})
 
+        if len(meta_objects) >= MAX_SUCCESSFUL_BUILD_LOGS_OBJECT_LENGTH:
+            successful_log = (
+                f"✅︎ <b>{len(meta_objects)}</b> objects have been successfully built!\n"
+            )
+        else:
+            successful_log = triggers.format_files_with_status_emoji(meta_objects, "✅︎")
         telegram_msg = [
             triggers.format_header(f"Meta Built Status ({self.MODEL.__name__})"),
-            triggers.format_files_with_status_emoji(meta_objects, "✅︎") + "\n",
+            successful_log + "\n",
             triggers.format_files_with_status_emoji(
                 [obj["FILE"] for obj in failed], "❌"
             ),
@@ -393,6 +414,7 @@ class DashboardBuilder(GeneralMetaBuilder):
         updated_values = {
             "dashboard_meta": dashboard_meta,
             "route": metadata.route,
+            "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata.dashboard_name,
@@ -583,6 +605,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
         updated_values = {
             "dashboard_meta": metadata.model_dump(),
             "route": metadata.route,
+            "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
             dashboard_name=metadata.explorer_name,
@@ -666,7 +689,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
 class PublicationBuilder(GeneralMetaBuilder):
     CATEGORY = "PUBLICATION"
     MODEL = Publication
-    GITHUB_DIR = "pub-dosm"
+    GITHUB_DIR = "pub-dosm/publications"
     VALIDATOR = PublicationValidateModel
 
     def update_or_create_meta(self, filename: str, metadata: PublicationValidateModel):
@@ -731,3 +754,159 @@ class PublicationBuilder(GeneralMetaBuilder):
         )
 
         return [pub_object_en, pub_object_bm]
+
+
+class PublicationDocumentationBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_DOCS"
+    MODEL = PublicationDocumentation
+    GITHUB_DIR = "pub-dosm/documentation"
+    VALIDATOR = PublicationDocumentationValidateModel
+
+    def update_or_create_meta(
+        self, filename: str, metadata: PublicationDocumentationValidateModel
+    ):
+        # english publications
+        pub_object_en, _ = PublicationDocumentation.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="en-GB",
+            defaults={
+                "documentation_type": metadata.documentation_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.en.publication_type_title,
+                "title": metadata.en.title,
+                "description": metadata.en.description,
+                "release_date": metadata.release_date,
+            },
+        )
+
+        PublicationDocumentationResource.objects.filter(
+            publication=pub_object_en
+        ).delete()
+        resources_en = PublicationDocumentationResource.objects.bulk_create(
+            [
+                PublicationDocumentationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_en,
+                )
+                for resource in metadata.en.resources
+            ]
+        )
+
+        # bm publications
+        pub_object_bm, _ = PublicationDocumentation.objects.update_or_create(
+            publication_id=metadata.publication,
+            language="ms-MY",
+            defaults={
+                "documentation_type": metadata.documentation_type,
+                "publication_type": metadata.publication_type,
+                "publication_type_title": metadata.bm.publication_type_title,
+                "title": metadata.bm.title,
+                "description": metadata.bm.description,
+                "release_date": metadata.release_date,
+            },
+        )
+
+        PublicationDocumentationResource.objects.filter(
+            publication=pub_object_bm
+        ).delete()
+        resources_bm = PublicationDocumentationResource.objects.bulk_create(
+            [
+                PublicationDocumentationResource(
+                    resource_id=resource.resource_id,
+                    resource_type=resource.resource_type,
+                    resource_name=resource.resource_name,
+                    resource_link=resource.resource_link,
+                    publication=pub_object_bm,
+                )
+                for resource in metadata.bm.resources
+            ]
+        )
+
+        return [pub_object_en, pub_object_bm]
+
+
+class PublicationUpcomingBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_UPCOMING"
+    MODEL = PublicationUpcoming
+    GITHUB_DIR = "pub-dosm/upcoming"
+    VALIDATOR = PublicationUpcomingValidateModel
+
+    def update_or_create_meta(
+        self, filename: str, metadata: PublicationUpcomingValidateModel
+    ):
+        df = pd.read_parquet(metadata.parquet_link)
+
+        PublicationUpcoming.objects.all().delete()
+
+        # english publications
+        df_en = (
+            df[
+                [
+                    "publication_id",
+                    "publication_type",
+                    "release_date",
+                    "title_en",
+                    "publication_type_en",
+                    "product_type_en",
+                    "release_series_en",
+                ]
+            ]
+            .copy()
+            .rename(
+                columns={
+                    "title_en": "publication_title",
+                    "publication_type_en": "publication_type_title",
+                    "product_type_en": "product_type",
+                    "release_series_en": "release_series",
+                },
+                errors="raise",
+            )
+        )
+
+        publications_en = [
+            PublicationUpcoming(**kwargs, language="en-GB")
+            for kwargs in df_en.to_dict(orient="records")
+        ]
+
+        publications_en_created = PublicationUpcoming.objects.bulk_create(
+            publications_en, batch_size=1000
+        )
+
+        # bm publications
+        df_bm = (
+            df[
+                [
+                    "publication_id",
+                    "publication_type",
+                    "release_date",
+                    "title_bm",
+                    "publication_type_bm",
+                    "product_type_bm",
+                    "release_series_bm",
+                ]
+            ]
+            .copy()
+            .rename(
+                columns={
+                    "title_bm": "publication_title",
+                    "publication_type_bm": "publication_type_title",
+                    "product_type_bm": "product_type",
+                    "release_series_bm": "release_series",
+                },
+                errors="raise",
+            )
+        )
+
+        publications_bm = [
+            PublicationUpcoming(**kwargs, language="ms-MY")
+            for kwargs in df_bm.to_dict(orient="records")
+        ]
+
+        publications_bm_created = PublicationUpcoming.objects.bulk_create(
+            publications_bm, batch_size=1000
+        )
+
+        return publications_en_created + publications_bm_created

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0007_rename_decade_0_namedashboard_firstname_d_1920_and_more'),
+        ("data_gov_my", "0007_rename_decade_0_namedashboard_firstname_d_1920_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='namedashboard_firstname',
-            name='name',
+            model_name="namedashboard_firstname",
+            name="name",
             field=models.CharField(max_length=30, primary_key=True, serialize=False),
         ),
     ]

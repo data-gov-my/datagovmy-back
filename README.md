@@ -8,6 +8,7 @@
 # activate and install dependencies
 source env/bin/activate
 pip install -r requirements.txt
+pre-commit install
 ```
 
 ## Setup DB

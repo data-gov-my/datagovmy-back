@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0030_electiondashboard_candidates_majority_and_more'),
+        ("data_gov_my", "0030_electiondashboard_candidates_majority_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='electiondashboard_candidates',
-            name='slug',
-            field=models.CharField(default='', max_length=100),
+            model_name="electiondashboard_candidates",
+            name="slug",
+            field=models.CharField(default="", max_length=100),
         ),
         migrations.AddField(
-            model_name='electiondashboard_seats',
-            name='slug',
-            field=models.CharField(default='', max_length=100),
+            model_name="electiondashboard_seats",
+            name="slug",
+            field=models.CharField(default="", max_length=100),
         ),
     ]

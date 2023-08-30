@@ -23,17 +23,6 @@ class DashboardChartModel(BaseModel):
     variables: dict  # will be validated individually for each chart
     api_params: list[str]
 
-    @field_validator("api_params")
-    def validate_api_params_against_keys(cls, v, info: FieldValidationInfo):
-        keys = info.data["variables"].get("keys", [])
-
-        if len(keys) < len(v) or keys[: len(v)] != v:
-            raise ValueError(
-                f"api_params {v} must be a subset of keys {keys} starting at index 0!"
-            )
-
-        return v
-
     @field_serializer("data_as_of")
     def serialize_date(self, data_as_of: datetime):
         return data_as_of.strftime("%Y-%m-%d %H:%M")
@@ -49,6 +38,7 @@ class DashboardValidateModel(BaseModel):
     dashboard_name: str
     data_last_updated: datetime
     route: str
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     manual_trigger: str
     required_params: list[str] = []
     optional_params: list[str] = []
@@ -61,6 +51,7 @@ class DashboardValidateModel(BaseModel):
 
 class i18nValidateModel(BaseModel):
     route: str | None
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     translation: dict
 
 
@@ -83,6 +74,7 @@ class ExplorerValidateModel(BaseModel):
     manual_trigger: str = "0"
     explorer_name: str
     route: str
+    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     tables: dict[str, dict]
 
     @field_serializer("data_last_updated")
@@ -163,3 +155,34 @@ class PublicationValidateModel(BaseModel):
             raise ValueError(f"Resources of different language must be same length!")
 
         return v
+
+
+class PublicationDocumentationValidateModel(BaseModel):
+    publication: str
+    documentation_type: str
+    publication_type: str
+    release_date: date
+    en: _PublicationLangValidateModel
+    bm: _PublicationLangValidateModel
+
+    @model_validator(mode="after")
+    def validate_api_params_against_keys(cls, v: PublicationValidateModel):
+        resource_en = v.en.resources
+        resource_bm = v.bm.resources
+
+        if len(resource_bm) != len(resource_en):
+            raise ValueError(f"Resources of different language must be same length!")
+
+        return v
+
+
+class _PublicationUpcomingLangModel(BaseModel):
+    title: str
+    publication_type_title: str
+    product_type: str
+    release_series: str
+
+
+class PublicationUpcomingValidateModel(BaseModel):
+    manual_trigger: str | int | bool
+    parquet_link: str

@@ -8,6 +8,10 @@ from data_gov_my.models import (
     ElectionDashboard_Seats,
     FormData,
     MetaJson,
+    PublicationDocumentation,
+    PublicationDocumentationResource,
+    PublicationUpcoming,
+    ViewCount,
     Publication,
     PublicationResource,
     i18nJson,
@@ -139,10 +143,24 @@ class FormDataSerializer(serializers.ModelSerializer):
         fields = ["language", "form_data"]
 
 
+class ViewCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ViewCount
+        fields = "__all__"
+
+
 class PublicationResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicationResource
         exclude = ["id", "publication"]
+
+
+class PublicationDetailSerializer(serializers.ModelSerializer):
+    resources = PublicationResourceSerializer(many=True)
+
+    class Meta:
+        model = Publication
+        fields = ["title", "description", "release_date", "resources"]
 
 
 class PublicationSerializer(serializers.ModelSerializer):
@@ -155,3 +173,36 @@ class PublicationSerializer(serializers.ModelSerializer):
             "description",
             "release_date",
         ]
+
+
+class PublicationDocumentationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationDocumentation
+        fields = [
+            "publication_id",
+            "publication_type",
+            "publication_type_title",
+            "title",
+            "description",
+            "release_date",
+        ]
+
+
+class PublicationDocumentationResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationDocumentationResource
+        fields = "__all__"
+
+
+class PublicationDocumentationDetailSerializer(serializers.ModelSerializer):
+    resources = PublicationDocumentationResourceSerializer(many=True)
+
+    class Meta:
+        model = Publication
+        fields = ["title", "description", "release_date", "resources"]
+
+
+class PublicationUpcomingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PublicationUpcoming
+        exclude = ["id", "language"]

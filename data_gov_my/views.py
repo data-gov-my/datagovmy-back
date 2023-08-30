@@ -1,9 +1,14 @@
+import logging
 import os
 from threading import Thread
+from itertools import groupby
+import json
+from datetime import datetime
 
 import environ
 from django.core.cache import cache
 from django.db.models import Q
+from django.utils.timezone import get_current_timezone
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from post_office import mail
@@ -13,6 +18,7 @@ from rest_framework.exceptions import ParseError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.filters import SearchFilter
 
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
@@ -26,17 +32,30 @@ from data_gov_my.models import (
     FormTemplate,
     MetaJson,
     Publication,
+    PublicationDocumentation,
+    PublicationUpcoming,
     ViewCount,
     i18nJson,
+    AuthTable,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
-    PublicationResourceSerializer,
+    PublicationDetailSerializer,
+    PublicationDocumentationSerializer,
     PublicationSerializer,
+    PublicationUpcomingSerializer,
     i18nSerializer,
 )
+from data_gov_my.serializers import (
+    FormDataSerializer,
+    ViewCountSerializer,
+    i18nSerializer,
+)
+from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+
+import django_rq
 
 env = environ.Env()
 environ.Env.read_env()
@@ -45,12 +64,32 @@ environ.Env.read_env()
 Endpoint for all single charts
 """
 
+logging.basicConfig(level=logging.INFO)
+
+
+class AUTH_TOKEN(APIView):
+    def post(self, request, format=None):
+        try:
+            b_unicode = request.body.decode("utf-8")
+            auth_token = json.loads(b_unicode).get("ROLLING_TOKEN", None)
+            if (not auth_token) or (not isinstance(auth_token, str)):
+                raise ParseError("AUTH_TOKEN must be a valid str.")
+
+            auth_token = f"Bearer {auth_token}"
+            cur_time = datetime.now(tz=get_current_timezone())
+            defaults = {"value": auth_token, "timestamp": cur_time}
+            AuthTable.objects.update_or_create(key="AUTH_TOKEN", defaults=defaults)
+            cache.set("AUTH_KEY", auth_token)
+        except Exception as e:
+            return JsonResponse({"status": 400, "message": str(e)}, status=400)
+
+        return JsonResponse(
+            {"status": 200, "message": "Auth token received."}, status=200
+        )
+
 
 class CHART(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         params_req = ["dashboard", "chart_name"]
 
@@ -100,17 +139,13 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
-        if is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            thread = Thread(target=GeneralMetaBuilder.selective_update)
-            thread.start()
-            return Response(status=status.HTTP_200_OK)
-        return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+        thread = Thread(target=GeneralMetaBuilder.selective_update)
+        thread.start()
+        return Response(status=status.HTTP_200_OK)
 
 
 class DASHBOARD(APIView):
     def get(self, request: request.Request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         param_list = request.query_params
 
         if "dashboard" in param_list:
@@ -129,9 +164,6 @@ class DASHBOARD(APIView):
 
 class DATA_VARIABLE(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         params_req = ["id"]
 
@@ -148,9 +180,6 @@ class DATA_VARIABLE(APIView):
 
 class DATA_CATALOG(APIView):
     def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
@@ -239,9 +268,6 @@ class EXPLORER(APIView):
 
 class DROPDOWN(APIView):
     def get(self, request: request.Request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         param_list = request.query_params
 
         if "dashboard" in param_list:
@@ -269,7 +295,7 @@ class DROPDOWN(APIView):
                 ]
 
             if limit := param_list.get("limit"):
-                limit = int(limit[0])
+                limit = int(limit)
                 filtered_res = filtered_res[:limit]
                 info["limit"] = limit
 
@@ -281,9 +307,6 @@ class DROPDOWN(APIView):
 
 class I18N(APIView):
     def get(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         if {"filename", "lang"} <= request.query_params.keys():  # return all
             queryset = get_object_or_404(
                 i18nJson,
@@ -302,8 +325,6 @@ class I18N(APIView):
         return JsonResponse(res, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
         serializer = i18nSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -311,9 +332,6 @@ class I18N(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         if {"filename", "lang"} <= request.query_params.keys():  # return all
             i18n_object = get_object_or_404(
                 i18nJson,
@@ -342,9 +360,6 @@ class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
 
     def post(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         # get FormTemplate instance by request query param, then validate & store new form data
         form_type = kwargs.get("form_type")
         template = FormTemplate.objects.get(form_type=form_type)
@@ -382,9 +397,6 @@ class FORMS(generics.ListAPIView):
         return FormData.objects.filter(form_type=form_type)
 
     def delete(self, request, *args, **kwargs):
-        if not is_valid_request(request, os.getenv("MODS_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         queryset = Email.objects.filter(
             formdata__form_type=kwargs["form_type"]
         )  # query email for cascading deletes
@@ -396,16 +408,15 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    def get(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
+    VIEWCOUNT_CACHE_KEY = "viewcount"
+    MAX_CACHE_SIZE = 5
 
-        return JsonResponse(list(ViewCount.objects.all().values()), safe=False)
+    def get(self, request, format=None):
+        return JsonResponse(
+            ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
+        )
 
     def post(self, request, format=None):
-        if not is_valid_request(request, os.getenv("WORKFLOW_TOKEN")):
-            return JsonResponse({"status": 401, "message": "unauthorized"}, status=401)
-
         id = request.query_params.get("id", None)
         type = request.query_params.get("type", None)
         metric = request.query_params.get("metric", None)
@@ -443,30 +454,18 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        # Get the object and increment the relevant count
         metric = (
             "all_time_view" if metric == "view_count" else metric
         )  # Change field name
 
-        obj, created = ViewCount.objects.get_or_create(
-            id=id, type=type, defaults={metric: 1}
-        )
-
-        if not created:
-            cur_val = getattr(obj, metric, 0) + 1
-            setattr(obj, metric, cur_val)
-            obj.save()
-
-        res = ViewCount.objects.filter(id=id, type=type).values().first()
+        queue = django_rq.get_queue("high")
+        res = queue.enqueue(increment_view_count, id, type, metric)
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
 
-        if type == "dashboard":
-            for i in ["csv", "parquet", "png", "svg"]:
-                res.pop(f"download_{i}")
-
-        return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({"status": "In Queue."}, status=200)
 
 
 ## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
@@ -512,10 +511,10 @@ class PUBLICATION(generics.ListAPIView):
         return queryset
 
 
-class PUBLICATION_RESOURCE(generics.ListAPIView):
-    serializer_class = PublicationResourceSerializer
+class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
+    serializer_class = PublicationDetailSerializer
 
-    def get_queryset(self):
+    def get_object(self):
         language = self.request.query_params.get("language")
         if language not in ["en-GB", "ms-MY"]:
             raise ParseError(
@@ -524,7 +523,7 @@ class PUBLICATION_RESOURCE(generics.ListAPIView):
         pub_object = get_object_or_404(
             Publication, publication_id=self.kwargs["id"], language=language
         )
-        return pub_object.publicationresource_set.all()
+        return pub_object
 
 
 class PUBLICATION_DROPDOWN(APIView):
@@ -537,7 +536,115 @@ class PUBLICATION_DROPDOWN(APIView):
         return JsonResponse(
             list(
                 Publication.objects.filter(language=language)
-                .order_by()
+                .order_by("publication_type")
+                .values("publication_type", "publication_type_title")
+                .distinct()
+            ),
+            safe=False,
+            status=200,
+        )
+
+
+class PUBLICATION_DOCS(generics.ListAPIView):
+    serializer_class = PublicationDocumentationSerializer
+    pagination_class = PublicationPagination
+    filter_backends = [SearchFilter]
+    search_fields = ["title", "description"]
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        doc_type = self.kwargs["doc_type"]
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return PublicationDocumentation.objects.filter(
+            language=language, documentation_type=doc_type
+        )
+
+
+class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
+    serializer_class = PublicationDetailSerializer
+
+    def get_object(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        pub_object = get_object_or_404(
+            PublicationDocumentation,
+            publication_id=self.kwargs["id"],
+            language=language,
+        )
+        return pub_object
+
+
+class PUBLICATION_UPCOMING_CALENDAR(APIView):
+    def get(self, request: request.Request, format=None):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        queryset = PublicationUpcoming.objects.filter(language=language)
+
+        # filter start and end date
+        start = self.request.query_params.get("start")
+        end = self.request.query_params.get("end")
+        if start:
+            queryset = queryset.filter(release_date__gte=start)
+        if end:
+            queryset = queryset.filter(release_date__lte=end)
+
+        # process into dict response
+        queryset = queryset.order_by("release_date")
+        res = {}
+        for date, group in groupby(queryset, lambda x: x.release_date):
+            res[str(date)] = PublicationUpcomingSerializer(group, many=True).data
+
+        return JsonResponse(data=res, status=200)
+
+
+class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
+    serializer_class = PublicationUpcomingSerializer
+    pagination_class = PublicationPagination
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return PublicationUpcoming.objects.filter(language=language)
+
+    def filter_queryset(self, queryset):
+        # apply filters
+        pub_type = self.request.query_params.get("pub_type")
+        if pub_type:
+            queryset = queryset.filter(publication_type__iexact=pub_type)
+
+        # filter start and end date
+        start = self.request.query_params.get("start")
+        end = self.request.query_params.get("end")
+        if start:
+            queryset = queryset.filter(release_date__gte=start)
+        if end:
+            queryset = queryset.filter(release_date__lte=end)
+        return queryset
+
+
+class PUBLICATION_UPCOMING_DROPDOWN(APIView):
+    def get(self, request: request.Request, format=None):
+        language = request.query_params.get("language")
+        if language not in ["en-GB", "ms-MY"]:
+            raise ParseError(
+                detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
+            )
+        return JsonResponse(
+            list(
+                PublicationUpcoming.objects.filter(language=language)
+                .order_by("publication_type")
                 .values("publication_type", "publication_type_title")
                 .distinct()
             ),

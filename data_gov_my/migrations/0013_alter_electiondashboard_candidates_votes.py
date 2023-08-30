@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0012_merge_20230420_0740'),
+        ("data_gov_my", "0012_merge_20230420_0740"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='electiondashboard_candidates',
-            name='votes',
+            model_name="electiondashboard_candidates",
+            name="votes",
             field=models.IntegerField(),
         ),
     ]

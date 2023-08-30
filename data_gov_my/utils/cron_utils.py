@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import zipfile
@@ -106,7 +107,8 @@ def remove_deleted_files():
         if diff:
             # Remove the deleted datasets
             query = {v["column_name"] + "__in": diff}
-            model_name.objects.filter(**query).delete()
+            del_int, deleted = model_name.objects.filter(**query).delete()
+            logging.warning(f"Deleted removed files: {deleted}")
 
     # Update the cache
     source_filters_cache()
@@ -122,19 +124,37 @@ def remove_deleted_files():
     cache.set("catalog_list", catalog_list)
 
 
-def revalidate_frontend(routes=[]):
+def get_fe_url_by_site(site):
+    """
+    Returns the URL and authorization header for frontend revalidation.
+    """
+    if site == "datagovmy":
+        return os.getenv("DATAGOVMY_FRONTEND_URL"), os.getenv(
+            "DATAGOVMY_FRONTEND_REBUILD_AUTH"
+        )
+    elif site == "opendosm":
+        return os.getenv("OPENDOSM_FRONTEND_URL"), os.getenv(
+            "OPENDOSM_FRONTEND_REBUILD_AUTH"
+        )
+    elif site == "kkmnow":
+        return os.getenv("KKMNOW_FRONTEND_URL"), os.getenv(
+            "KKMNOW_FRONTEND_REBUILD_AUTH"
+        )
+    else:
+        raise ValueError(
+            f"{site} is not a valid site for revalidation! (Currently supports datagovmy, opendosm, kkmnow only.)"
+        )
+
+
+def revalidate_frontend(routes=[], site="datagovmy"):
     """
     Revalidate frontend pages based on input routes.
     """
-    if routes is None:
-        return False
-
     if isinstance(routes, str):
         routes = routes.split(",")
     endpoint = ",".join(route for route in routes if isinstance(route, str))
 
-    url = os.getenv("FRONTEND_URL", "-")
-    fe_auth = os.getenv("FRONTEND_REBUILD_AUTH", "-")
+    url, fe_auth = get_fe_url_by_site(site)
 
     headers = {
         "Authorization": fe_auth,

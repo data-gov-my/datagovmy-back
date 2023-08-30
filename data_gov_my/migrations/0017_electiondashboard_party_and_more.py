@@ -4,31 +4,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0016_electiondashboard_seats'),
+        ("data_gov_my", "0016_electiondashboard_seats"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ElectionDashboard_Party',
+            name="ElectionDashboard_Party",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('party', models.CharField(max_length=100)),
-                ('type', models.CharField(max_length=20)),
-                ('state', models.CharField(max_length=100)),
-                ('election_name', models.CharField(max_length=100)),
-                ('date', models.CharField(max_length=100)),
-                ('seats', models.IntegerField()),
-                ('seats_total', models.IntegerField()),
-                ('seats_perc', models.FloatField(null=True)),
-                ('votes', models.IntegerField()),
-                ('votes_perc', models.FloatField(null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("party", models.CharField(max_length=100)),
+                ("type", models.CharField(max_length=20)),
+                ("state", models.CharField(max_length=100)),
+                ("election_name", models.CharField(max_length=100)),
+                ("date", models.CharField(max_length=100)),
+                ("seats", models.IntegerField()),
+                ("seats_total", models.IntegerField()),
+                ("seats_perc", models.FloatField(null=True)),
+                ("votes", models.IntegerField()),
+                ("votes_perc", models.FloatField(null=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='electiondashboard_seats',
-            name='type',
-            field=models.CharField(default='', max_length=20),
+            model_name="electiondashboard_seats",
+            name="type",
+            field=models.CharField(default="", max_length=20),
         ),
     ]

@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from data_gov_my import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
     path("dashboard/", views.DASHBOARD.as_view(), name="DASHBOARD"),
     path("data-variable/", views.DATA_VARIABLE.as_view(), name="DATA_VARIABLE"),
     path("data-catalog/", views.DATA_CATALOG.as_view(), name="DATA_CATALOG"),
@@ -32,7 +33,7 @@ urlpatterns = [
     path(
         "publication-dropdown/",
         views.PUBLICATION_DROPDOWN.as_view(),
-        name="PUBLICATION-DROPDOWN",
+        name="PUBLICATION_DROPDOWN",
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
     path(
@@ -40,4 +41,31 @@ urlpatterns = [
         views.PUBLICATION_RESOURCE.as_view(),
         name="PUBLICATION",
     ),
+    path(
+        "pub-docs/<str:doc_type>",
+        views.PUBLICATION_DOCS.as_view(),
+        name="PUBLICATION_DOCS",
+    ),
+    path(
+        "pub-docs-resource/<str:id>",
+        views.PUBLICATION_DOCS_RESOURCE.as_view(),
+        name="PUBLICATION_DOCS_RESOURCE",
+    ),
+    path(
+        "pub-upcoming/calendar/",
+        views.PUBLICATION_UPCOMING_CALENDAR.as_view(),
+        name="PUB_UPCOMING_CALENDAR",
+    ),
+    path(
+        "pub-upcoming/list/",
+        views.PUBLICATION_UPCOMING_LIST.as_view(),
+        name="PUB_UPCOMING_LIST",
+    ),
+    path(
+        "pub-upcoming-dropdown/",
+        views.PUBLICATION_UPCOMING_DROPDOWN.as_view(),
+        name="PUB_UPCOMING_DROPDOWN",
+    ),
 ]
+
+urlpatterns += [path("django-rq/", include("django_rq.urls"))]

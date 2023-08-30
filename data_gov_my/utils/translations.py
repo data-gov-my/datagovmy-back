@@ -2,12 +2,12 @@ RANGE_TRANSLATIONS = {
     "DAILY": "Daily",
     "WEEKLY": "Weekly",
     "MONTHLY": "Monthly",
-    "QUARTERLY" : "Quarterly",
-    "YEARLY" : "Yearly"
+    "QUARTERLY": "Quarterly",
+    "YEARLY": "Yearly",
 }
 
 STATE_TRANSLATIONS = {
-    "malaysia" : "Malaysia",
+    "malaysia": "Malaysia",
     "johor": "Johor",
     "kedah": "Kedah",
     "kelantan": "Kelantan",
@@ -23,7 +23,7 @@ STATE_TRANSLATIONS = {
     "sarawak": "Sarawak",
     "w.p.-kuala-lumpur": "W.P. Kuala Lumpur",
     "w.p.-labuan": "W.P. Labuan",
-    "w.p.-putrajaya": "W.P. Putrajaya"
+    "w.p.-putrajaya": "W.P. Putrajaya",
 }
 
 DISTRICT_TRANSLATIONS = {
@@ -186,7 +186,7 @@ DISTRICT_TRANSLATIONS = {
     "telang-usan": "Telang Usan",
     "w.p.-kuala-lumpur": "W.P. Kuala Lumpur",
     "w.p.-labuan": "W.P. Labuan",
-    "w.p.-putrajaya": "W.P. Putrajaya" 
+    "w.p.-putrajaya": "W.P. Putrajaya",
 }
 
 PARLIMEN_TRANSLATIONS = {
@@ -411,7 +411,7 @@ PARLIMEN_TRANSLATIONS = {
     "p.219-miri": "P.219 Miri",
     "p.220-baram": "P.220 Baram",
     "p.221-limbang": "P.221 Limbang",
-    "p.222-lawas": "P.222 Lawas"
+    "p.222-lawas": "P.222 Lawas",
 }
 
 DUN_TRANSLATIONS = {
@@ -1014,5 +1014,5 @@ DUN_TRANSLATIONS = {
     "n.79-bukit-kota": "N.79 Bukit Kota",
     "n.80-batu-danau": "N.80 Batu Danau",
     "n.81-ba`kelalan": "N.81 Ba`Kelalan",
-    "n.82-bukit-sari": "N.82 Bukit Sari"
+    "n.82-bukit-sari": "N.82 Bukit Sari",
 }

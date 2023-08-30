@@ -1,4 +1,6 @@
-from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import GeneralChartsUtil
+from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import (
+    GeneralChartsUtil,
+)
 
 import pandas as pd
 import numpy as np
@@ -20,7 +22,9 @@ class Geojson(GeneralChartsUtil):
     """
 
     def __init__(self, full_meta, file_data, cur_data, all_variable_data, file_src):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, cur_data, all_variable_data, file_src)
+        GeneralChartsUtil.__init__(
+            self, full_meta, file_data, cur_data, all_variable_data, file_src
+        )
 
         # self.validate_meta_json()
 
@@ -42,12 +46,14 @@ class Geojson(GeneralChartsUtil):
     """
     Replace link for downloads
     """
+
     def rebuild_downloads(self):
         self.downloads = {"link_geojson": self.file_data["link_geojson"]}
-    
+
     """
     Rebuild metadata accordingly
     """
+
     def rebuild_metadata(self):
         self.metadata.pop("url", None)
         self.metadata["url"] = {"link_geojson": self.file_data["link_geojson"]}
@@ -67,6 +73,7 @@ class Geojson(GeneralChartsUtil):
     """
     Builds the API details
     """
+
     def build_api(self):
         res = {}
         res["API"] = {}

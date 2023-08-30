@@ -4,19 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0031_electiondashboard_candidates_slug_and_more'),
+        ("data_gov_my", "0031_electiondashboard_candidates_slug_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ElectionDashboard_Dropdown',
+            name="ElectionDashboard_Dropdown",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('state', models.CharField(default='', max_length=100)),
-                ('election', models.CharField(default='', max_length=50)),
-                ('date', models.IntegerField(default=0)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("state", models.CharField(default="", max_length=100)),
+                ("election", models.CharField(default="", max_length=50)),
+                ("date", models.IntegerField(default=0)),
             ],
         ),
     ]

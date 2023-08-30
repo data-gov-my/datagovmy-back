@@ -4,49 +4,69 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='CatalogJson',
+            name="CatalogJson",
             fields=[
-                ('id', models.CharField(max_length=400, primary_key=True, serialize=False)),
-                ('catalog_meta', models.JSONField()),
-                ('catalog_name', models.CharField(max_length=400)),
-                ('catalog_category', models.CharField(max_length=300)),
-                ('catalog_category_name', models.CharField(default='', max_length=600)),
-                ('catalog_subcategory', models.CharField(default='', max_length=300)),
-                ('catalog_subcategory_name', models.CharField(default='', max_length=600)),
-                ('time_range', models.CharField(max_length=100)),
-                ('geographic', models.CharField(max_length=300)),
-                ('dataset_begin', models.IntegerField(default=0)),
-                ('dataset_end', models.IntegerField(default=0)),
-                ('data_source', models.CharField(max_length=100)),
-                ('catalog_data', models.JSONField()),
-                ('file_src', models.CharField(default='', max_length=400)),
+                (
+                    "id",
+                    models.CharField(max_length=400, primary_key=True, serialize=False),
+                ),
+                ("catalog_meta", models.JSONField()),
+                ("catalog_name", models.CharField(max_length=400)),
+                ("catalog_category", models.CharField(max_length=300)),
+                ("catalog_category_name", models.CharField(default="", max_length=600)),
+                ("catalog_subcategory", models.CharField(default="", max_length=300)),
+                (
+                    "catalog_subcategory_name",
+                    models.CharField(default="", max_length=600),
+                ),
+                ("time_range", models.CharField(max_length=100)),
+                ("geographic", models.CharField(max_length=300)),
+                ("dataset_begin", models.IntegerField(default=0)),
+                ("dataset_end", models.IntegerField(default=0)),
+                ("data_source", models.CharField(max_length=100)),
+                ("catalog_data", models.JSONField()),
+                ("file_src", models.CharField(default="", max_length=400)),
             ],
         ),
         migrations.CreateModel(
-            name='DashboardJson',
+            name="DashboardJson",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dashboard_name', models.CharField(max_length=200)),
-                ('chart_name', models.CharField(max_length=200, null=True)),
-                ('chart_type', models.CharField(max_length=200, null=True)),
-                ('api_type', models.CharField(max_length=200, null=True)),
-                ('chart_data', models.JSONField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("dashboard_name", models.CharField(max_length=200)),
+                ("chart_name", models.CharField(max_length=200, null=True)),
+                ("chart_type", models.CharField(max_length=200, null=True)),
+                ("api_type", models.CharField(max_length=200, null=True)),
+                ("chart_data", models.JSONField()),
             ],
         ),
         migrations.CreateModel(
-            name='MetaJson',
+            name="MetaJson",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dashboard_name', models.CharField(max_length=200)),
-                ('dashboard_meta', models.JSONField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("dashboard_name", models.CharField(max_length=200)),
+                ("dashboard_meta", models.JSONField()),
             ],
         ),
     ]

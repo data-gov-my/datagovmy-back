@@ -7,13 +7,23 @@ from post_office.models import Email, EmailTemplate
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 
-from data_gov_my.utils.common import LANGUAGE_CHOICES
+from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES
+
+
+class AuthTable(models.Model):
+    key = models.CharField(max_length=200, primary_key=True)
+    value = models.CharField(max_length=200)
+    timestamp = models.DateTimeField()
 
 
 class MetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200, primary_key=True)
     dashboard_meta = models.JSONField()
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
+    sites = ArrayField(
+        models.CharField(max_length=50, choices=SITE_CHOICES),
+        default=list,
+    )
 
     def __str__(self) -> str:
         return f"{self.dashboard_name}"
@@ -85,6 +95,10 @@ class i18nJson(models.Model):
     filename = models.CharField(max_length=50)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
+    sites = ArrayField(
+        models.CharField(max_length=50, choices=SITE_CHOICES),
+        default=list,
+    )
     translation = models.JSONField()
 
     def __str__(self) -> str:
@@ -257,6 +271,9 @@ class ViewCount(models.Model):
     download_png = models.IntegerField(null=False, default=0)
     download_svg = models.IntegerField(null=False, default=0)
 
+    def __str__(self) -> str:
+        return f"{self.id} ({self.all_time_view})"
+
 
 class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
@@ -268,8 +285,8 @@ class Publication(models.Model):
     publication_id = models.CharField(max_length=30)
     language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
     publication_type = models.CharField(max_length=50)
-    publication_type_title = models.CharField(max_length=100)
-    title = models.CharField(max_length=50)
+    publication_type_title = models.CharField(max_length=150)
+    title = models.CharField(max_length=150)
     description = models.CharField(max_length=300)
     release_date = models.DateField()
     frequency = models.CharField(max_length=50)
@@ -304,7 +321,9 @@ class PublicationResource(models.Model):
     resource_type = models.CharField(max_length=50)
     resource_name = models.CharField(max_length=100)
     resource_link = models.URLField(max_length=150)
-    publication = models.ForeignKey(Publication, on_delete=models.CASCADE)
+    publication = models.ForeignKey(
+        Publication, related_name="resources", on_delete=models.CASCADE
+    )
 
     class Meta:
         ordering = ["resource_id"]
@@ -317,3 +336,87 @@ class PublicationResource(models.Model):
 
     def __str__(self) -> str:
         return f"{self.publication} - {self.resource_name}"
+
+
+class PublicationDocumentation(models.Model):
+    publication_id = models.CharField(max_length=30)
+    documentation_type = models.CharField(max_length=30)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=100)
+    publication_type_title = models.CharField(max_length=150)
+    title = models.CharField(max_length=100)
+    description = models.CharField(max_length=300)
+    release_date = models.DateField()
+
+    class Meta:
+        ordering = ["-release_date", "publication_id"]
+        indexes = [
+            models.Index(
+                fields=["publication_id", "language"],
+                name="pub_docs_id_language_idx",
+            ),
+            models.Index(
+                fields=["documentation_type", "language"],
+                name="pub_docs_type_language_idx",
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["publication_id", "language"],
+                name="unique publication documentation by language",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
+
+
+class PublicationDocumentationResource(models.Model):
+    resource_id = models.IntegerField()
+    resource_type = models.CharField(max_length=100)
+    resource_name = models.CharField(max_length=150)
+    resource_link = models.URLField(max_length=150)
+    publication = models.ForeignKey(
+        PublicationDocumentation, related_name="resources", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        ordering = ["resource_id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["resource_id", "publication"],
+                name="unique publication documentation resource by publication and id",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication} - {self.resource_name}"
+
+
+class PublicationUpcoming(models.Model):
+    publication_id = models.CharField(max_length=100)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    publication_type = models.CharField(max_length=100)
+    publication_type_title = models.CharField(max_length=150)
+    release_date = models.DateField()
+    publication_title = models.CharField(max_length=150)
+    product_type = models.CharField(max_length=150)
+    release_series = models.CharField(max_length=150)
+
+    class Meta:
+        ordering = ["release_date", "publication_id"]
+        indexes = [
+            models.Index(
+                fields=["language"],
+                name="upcoming_pub_language_idx",
+            )
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["publication_id", "language"],
+                name="unique upcoming publication by id and language",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.publication_id} ({self.language})"
