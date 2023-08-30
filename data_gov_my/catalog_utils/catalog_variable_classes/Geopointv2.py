@@ -1,4 +1,6 @@
-from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import GeneralChartsUtil
+from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import (
+    GeneralChartsUtil,
+)
 
 import pandas as pd
 import numpy as np
@@ -24,7 +26,9 @@ class Geopoint(GeneralChartsUtil):
     """
 
     def __init__(self, full_meta, file_data, cur_data, all_variable_data, file_src):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, cur_data, all_variable_data, file_src)
+        GeneralChartsUtil.__init__(
+            self, full_meta, file_data, cur_data, all_variable_data, file_src
+        )
 
         self.chart_type = self.chart["chart_type"]
 
@@ -44,17 +48,18 @@ class Geopoint(GeneralChartsUtil):
     """
     Chart builder version 2
     """
-    def chart_v2(self) :
+
+    def chart_v2(self):
         result = {}
 
         df = pd.read_parquet(self.read_from)
 
-        if 'date' in df.columns : 
-            self.g_keys.insert(0, 'date')
+        if "date" in df.columns:
+            self.g_keys.insert(0, "date")
 
-        if len(self.g_keys) > 0 : 
+        if len(self.g_keys) > 0:
             result = self.build_chart_parents()
-        else : 
+        else:
             result = self.build_chart_self()
 
         return result
@@ -62,24 +67,25 @@ class Geopoint(GeneralChartsUtil):
     """
     Builds chart data with 0 nested keys
     """
-    def build_chart_self(self) :
+
+    def build_chart_self(self):
         df = pd.read_parquet(self.read_from)
-        df = df.replace({np.nan: None})        
+        df = df.replace({np.nan: None})
 
         include = list(self.g_include)
 
-        df["position"] = df[["lat", "lon"]].values.tolist() # Lat, Lon, must be present
-        include.append("position") # Add position into the array
+        df["position"] = df[["lat", "lon"]].values.tolist()  # Lat, Lon, must be present
+        include.append("position")  # Add position into the array
         c_vals = df[include].to_dict(orient="records")
 
         # t_columns = self.set_table_columns()
-        
+
         # Remove position, & add lat, lon instead
         include.remove("position")
         include.append("lat")
         include.append("lon")
 
-        t_vals = df[include].to_dict("records")      
+        t_vals = df[include].to_dict("records")
 
         overall = {}
         overall["chart_data"] = c_vals
@@ -94,7 +100,7 @@ class Geopoint(GeneralChartsUtil):
     def build_chart_parents(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
-        df["position"] = df[["lat", "lon"]].values.tolist() # Lat, Lon, must be present
+        df["position"] = df[["lat", "lon"]].values.tolist()  # Lat, Lon, must be present
 
         chart_include = list(self.g_include)
         chart_include.append("position")
@@ -103,13 +109,13 @@ class Geopoint(GeneralChartsUtil):
         table_include.append("lat")
         table_include.append("lon")
 
-        # Converts all values to : 
+        # Converts all values to :
         # - A str if its an object
         # - A str with lowercase, and spaces as hyphen
 
         for key in self.g_keys:
-            if df[key].dtype == "object" :
-                df[key] = df[key].astype(str)            
+            if df[key].dtype == "object":
+                df[key] = df[key].astype(str)
             df[key] = df[key].apply(lambda x: x.lower().replace(" ", "-"))
 
         # Gets all unique groups
@@ -129,11 +135,19 @@ class Geopoint(GeneralChartsUtil):
                 tbl = {b: tbl}
             group_l = list(group)
 
-            if len(group) == 1 : 
+            if len(group) == 1:
                 group = group[0]
-            
-            chart_vals = df.groupby(self.g_keys)[chart_include].get_group(group).to_dict(orient="records")
-            table_vals = df.groupby(self.g_keys)[table_include].get_group(group).to_dict(orient="records")
+
+            chart_vals = (
+                df.groupby(self.g_keys)[chart_include]
+                .get_group(group)
+                .to_dict(orient="records")
+            )
+            table_vals = (
+                df.groupby(self.g_keys)[table_include]
+                .get_group(group)
+                .to_dict(orient="records")
+            )
 
             final_d = chart_vals
             self.set_dict(result, group_l, final_d)
@@ -150,26 +164,26 @@ class Geopoint(GeneralChartsUtil):
     """
     Set table columns
     """
-    def set_table_columns(self) :
+
+    def set_table_columns(self):
         res = {}
 
         res["en"] = {}
         res["bm"] = {}
 
-        if self.table_translation: 
-            
-            for l in ["en", "bm"] :
-                if l in self.table_translation : 
-                    for k, v in self.table_translation[l].items() :
+        if self.table_translation:
+            for l in ["en", "bm"]:
+                if l in self.table_translation:
+                    for k, v in self.table_translation[l].items():
                         res[l][k] = v
 
-        else: # Sets the default
+        else:  # Sets the default
             include = list(self.g_include)
             include.append("lat")
             include.append("lon")
-            
-            for l in ["en", "bm"] :
-                for i in include : 
+
+            for l in ["en", "bm"]:
+                for i in include:
                     res[l][i] = i
         return res
 
@@ -184,7 +198,7 @@ class Geopoint(GeneralChartsUtil):
 
         api_filters_inc = []
 
-        if 'date' in df.columns :
+        if "date" in df.columns:
             slider_obj = self.build_date_slider(df)
             api_filters_inc.append(slider_obj)
 
@@ -193,21 +207,21 @@ class Geopoint(GeneralChartsUtil):
             for idx, api in enumerate(self.api_filter):
                 filter_obj = None
                 df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
-                if idx == 0 :                
-                    be_vals = (
-                        df[api]
-                        .unique()
-                        .tolist()
-                    )
+                if idx == 0:
+                    be_vals = df[api].unique().tolist()
                     default_key.append(be_vals[0])
                     filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
-                else : 
-                    dropdown = self.dropdown_options(df, groupby_cols=self.api_filter[0:idx], column=api)
+                else:
+                    dropdown = self.dropdown_options(
+                        df, groupby_cols=self.api_filter[0:idx], column=api
+                    )
                     cur_level = dropdown
-                    for dk in default_key : 
+                    for dk in default_key:
                         cur_level = dropdown[dk]
                     def_key = cur_level[0]
-                    filter_obj = self.build_api_object_filter(key=api, def_val=def_key, options=dropdown)
+                    filter_obj = self.build_api_object_filter(
+                        key=api, def_val=def_key, options=dropdown
+                    )
                     default_key.append(def_key)
 
                 api_filters_inc.append(filter_obj)
@@ -223,14 +237,14 @@ class Geopoint(GeneralChartsUtil):
     Builds date slider object
     """
 
-    def build_date_slider(self, df) :
+    def build_date_slider(self, df):
         df["date"] = df["date"].astype(str)
         options_list = df["date"].unique().tolist()
-        
+
         obj = {}
-        obj['key'] = "date_slider"
+        obj["key"] = "date_slider"
         obj["default"] = options_list[0]
-        obj["options"] = options_list 
+        obj["options"] = options_list
         obj["interval"] = self.data_frequency
 
         return obj

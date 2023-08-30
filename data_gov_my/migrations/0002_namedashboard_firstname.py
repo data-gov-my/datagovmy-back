@@ -4,18 +4,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0001_initial'),
+        ("data_gov_my", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='NameDashboard_FirstName',
+            name="NameDashboard_FirstName",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('first_name', models.CharField(max_length=300)),
-                ('decade', models.IntegerField(null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("first_name", models.CharField(max_length=300)),
+                ("decade", models.IntegerField(null=True)),
             ],
         ),
     ]

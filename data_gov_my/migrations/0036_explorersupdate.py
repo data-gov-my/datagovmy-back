@@ -4,19 +4,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0035_viewcount'),
+        ("data_gov_my", "0035_viewcount"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ExplorersUpdate',
+            name="ExplorersUpdate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('explorer', models.CharField(max_length=100)),
-                ('file_name', models.CharField(max_length=100)),
-                ('last_update', models.CharField(max_length=100)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("explorer", models.CharField(max_length=100)),
+                ("file_name", models.CharField(max_length=100)),
+                ("last_update", models.CharField(max_length=100)),
             ],
         ),
     ]

@@ -1,4 +1,6 @@
-from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import GeneralChartsUtil
+from data_gov_my.catalog_utils.catalog_variable_classes.Generalv2 import (
+    GeneralChartsUtil,
+)
 
 import pandas as pd
 import numpy as np
@@ -27,7 +29,9 @@ class Pyramid(GeneralChartsUtil):
     """
 
     def __init__(self, full_meta, file_data, cur_data, all_variable_data, file_src):
-        GeneralChartsUtil.__init__(self, full_meta, file_data, cur_data, all_variable_data, file_src)
+        GeneralChartsUtil.__init__(
+            self, full_meta, file_data, cur_data, all_variable_data, file_src
+        )
 
         self.chart_type = self.chart["chart_type"]
         self.api_filter = self.chart["chart_filters"]["SLICE_BY"]
@@ -49,19 +53,20 @@ class Pyramid(GeneralChartsUtil):
     """
     Chart builder version 2
     """
-    def chart_v2(self) :
+
+    def chart_v2(self):
         result = {}
         has_date = False
 
         df = pd.read_parquet(self.read_from)
 
-        if 'date' in df.columns : 
-            self.p_keys.insert(0, 'date')
+        if "date" in df.columns:
+            self.p_keys.insert(0, "date")
             has_date = True
 
-        if len(self.p_keys) > 0 : 
+        if len(self.p_keys) > 0:
             result = self.build_chart_parents(has_date)
-        else : 
+        else:
             result = self.build_chart_self()
 
         return result
@@ -69,7 +74,8 @@ class Pyramid(GeneralChartsUtil):
     """
     Populates table columns
     """
-    def set_table_columns(self) : 
+
+    def set_table_columns(self):
         tbl_res = {}
         tbl_res["en"] = {}
         tbl_res["bm"] = {}
@@ -77,7 +83,7 @@ class Pyramid(GeneralChartsUtil):
         if self.table_translation:
             tbl_res["en"]["x"] = self.table_translation["en"]["x"]
             tbl_res["bm"]["x"] = self.table_translation["bm"]["x"]
-            
+
             for y_lang in ["en", "bm"]:
                 for index, c_y in enumerate(self.table_translation[y_lang]["y"]):
                     y_val = f"y{ index + 1 }"
@@ -96,7 +102,8 @@ class Pyramid(GeneralChartsUtil):
     """
     Build chart self
     """
-    def build_chart_self(self) :
+
+    def build_chart_self(self):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
 
@@ -115,7 +122,9 @@ class Pyramid(GeneralChartsUtil):
         y1_list = [x * -1 for x in df[self.p_y[0]].to_list()]
         y2_list = df[self.p_y[1]].to_list()
         res = {"x": x_list, "y1": y1_list, "y2": y2_list}
-        tbl_res = df.rename(columns=rename_columns)[list(rename_columns.values())].to_dict("records")
+        tbl_res = df.rename(columns=rename_columns)[
+            list(rename_columns.values())
+        ].to_dict("records")
 
         overall = {}
         overall["chart_data"] = res
@@ -125,7 +134,8 @@ class Pyramid(GeneralChartsUtil):
     """
     Build chart parents
     """
-    def build_chart_parents(self, has_date) : 
+
+    def build_chart_parents(self, has_date):
         df = pd.read_parquet(self.read_from)
         df = df.replace({np.nan: None})
 
@@ -156,13 +166,9 @@ class Pyramid(GeneralChartsUtil):
 
             y1_list = [
                 x * -1
-                for x in df.groupby(self.p_keys)[self.p_y[0]]
-                .get_group(group)
-                .to_list()
+                for x in df.groupby(self.p_keys)[self.p_y[0]].get_group(group).to_list()
             ]
-            y2_list = (
-                df.groupby(self.p_keys)[self.p_y[1]].get_group(group).to_list()
-            )
+            y2_list = df.groupby(self.p_keys)[self.p_y[1]].get_group(group).to_list()
 
             table_vals = (
                 df.rename(columns=rename_columns)
@@ -192,7 +198,7 @@ class Pyramid(GeneralChartsUtil):
         df = pd.read_parquet(self.read_from)
         api_filters_inc = []
 
-        if 'date' in df.columns :
+        if "date" in df.columns:
             slider_obj = self.build_date_slider(df)
             api_filters_inc.append(slider_obj)
 
@@ -201,21 +207,21 @@ class Pyramid(GeneralChartsUtil):
             for idx, api in enumerate(self.api_filter):
                 filter_obj = None
                 df[api] = df[api].apply(lambda x: x.lower().replace(" ", "-"))
-                if idx == 0 :                
-                    be_vals = (
-                        df[api]
-                        .unique()
-                        .tolist()
-                    )
+                if idx == 0:
+                    be_vals = df[api].unique().tolist()
                     default_key.append(be_vals[0])
                     filter_obj = self.build_api_object_filter(api, be_vals[0], be_vals)
-                else : 
-                    dropdown = self.dropdown_options(df, groupby_cols=self.api_filter[0:idx], column=api)
+                else:
+                    dropdown = self.dropdown_options(
+                        df, groupby_cols=self.api_filter[0:idx], column=api
+                    )
                     cur_level = dropdown
-                    for dk in default_key : 
+                    for dk in default_key:
                         cur_level = dropdown[dk]
                     def_key = cur_level[0]
-                    filter_obj = self.build_api_object_filter(key=api, def_val=def_key, options=dropdown)
+                    filter_obj = self.build_api_object_filter(
+                        key=api, def_val=def_key, options=dropdown
+                    )
                     default_key.append(def_key)
 
                 api_filters_inc.append(filter_obj)
@@ -231,18 +237,17 @@ class Pyramid(GeneralChartsUtil):
     Builds the date slider
     """
 
-    def build_date_slider(self, df) :
+    def build_date_slider(self, df):
         df["date"] = df["date"].astype(str)
         options_list = df["date"].unique().tolist()
-        
+
         obj = {}
-        obj['key'] = "date_slider"
+        obj["key"] = "date_slider"
         obj["default"] = options_list[0]
-        obj["options"] = options_list 
+        obj["options"] = options_list
         obj["interval"] = self.data_frequency
 
-        return obj      
-
+        return obj
 
     """
     REBUILDS THE METADATA

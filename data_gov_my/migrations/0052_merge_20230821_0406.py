@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data_gov_my', '0048_authtable'),
-        ('data_gov_my', '0051_alter_publicationupcoming_options'),
+        ("data_gov_my", "0048_authtable"),
+        ("data_gov_my", "0051_alter_publicationupcoming_options"),
     ]
 
-    operations = [
-    ]
+    operations = []
