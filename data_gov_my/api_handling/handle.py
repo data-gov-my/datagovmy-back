@@ -26,5 +26,6 @@ def dashboard_additional_handling(params: QueryDict, res: dict):
             temp = jitter_data["chart_data"]["data"]["state"]
             res.setdefault("jitter_chart", {"data": None})
             res["jitter_chart"]["data"] = temp
+            res["jitter_chart"]["data_as_of"] = jitter_data["chart_data"]["data_as_of"]
             return res
     return res
