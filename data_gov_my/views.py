@@ -463,9 +463,50 @@ class VIEW_COUNT(APIView):
 
         if not res:
             return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
-
         else:
             return JsonResponse({"status": "In Queue."}, status=200)
+
+
+class VIEW_COUNT_V2(APIView):
+    def post(self, request, format=None):
+        id = request.query_params.get("id", None)
+        type = request.query_params.get("type", None)
+        metric = request.query_params.get("metric", None)
+
+        default_values = {
+            "type": ["dashboard", "data-catalogue"],
+            "metric": [
+                "view_count",
+                "download_png",
+                "download_csv",
+                "download_svg",
+                "download_parquet",
+            ],
+        }
+
+        # Checks if all parameters have values
+        if not all([id, type, metric]):
+            return JsonResponse(
+                {
+                    "status": 400,
+                    "message": "Parameters id, type and metric must be supplied",
+                },
+                status=400,
+            )
+
+        # Checks if parameter 'type' and 'metric' has appropriate values
+        for k, v in default_values.items():
+            if request.query_params.get(k) not in v:
+                pos_values = ", ".join(v)
+                return JsonResponse(
+                    {
+                        "status": 400,
+                        "message": f"Parameter '{k}' has to hold either values : {pos_values}",
+                    },
+                    status=400,
+                )
+
+        return JsonResponse({}, status=200, safe=False)
 
 
 ## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)

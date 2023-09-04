@@ -66,6 +66,7 @@ urlpatterns = [
         views.PUBLICATION_UPCOMING_DROPDOWN.as_view(),
         name="PUB_UPCOMING_DROPDOWN",
     ),
+    path("view-count-v2/", views.VIEW_COUNT_V2.as_view(), name="VIEW_COUNT_V2"),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
