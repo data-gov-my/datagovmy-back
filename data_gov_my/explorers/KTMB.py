@@ -1,17 +1,11 @@
-from datetime import datetime, date
-from typing import List
-from data_gov_my.explorers.General import General_Explorer
-from rest_framework import response, serializers
-from django.http import JsonResponse
-from data_gov_my.models import (
-    ExplorersUpdate,
-    KTMBTimeseries,
-    KTMBTimeseriesCallout,
-)
-from data_gov_my.utils.chart_builders import ChartBuilder
-from django.contrib.postgres.aggregates import ArrayAgg
+from datetime import date, datetime
 from itertools import groupby
 
+from django.http import JsonResponse
+from rest_framework import response
+
+from data_gov_my.explorers.General import General_Explorer
+from data_gov_my.models import ExplorersUpdate, KTMBTimeseries, KTMBTimeseriesCallout
 
 EPOCH = datetime(1970, 1, 1)
 
