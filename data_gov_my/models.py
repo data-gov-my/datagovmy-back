@@ -437,3 +437,20 @@ class KTMBTimeseriesCallout(models.Model):
     destination = models.CharField(max_length=100)
     passengers = models.IntegerField(null=True)
     frequency = models.CharField(max_length=50)
+
+
+class PrasaranaTimeseries(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    date = models.DateField()
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
+
+
+class PrasaranaTimeseriesCallout(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
