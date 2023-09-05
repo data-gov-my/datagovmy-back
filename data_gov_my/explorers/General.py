@@ -8,7 +8,7 @@ from django.apps import apps
 from django.http import JsonResponse
 from rest_framework import response
 
-from data_gov_my.models import ExplorersUpdate
+from data_gov_my.models import ExplorersUpdate, MetaJson
 from data_gov_my.utils.general_chart_helpers import STATE_ABBR
 
 
@@ -204,7 +204,15 @@ class GeneralTransportExplorer(General_Explorer):
 
         timeseries = self.get_timeseries(service, origin, destination)
         callout = self.get_timeseries_callout(service, origin, destination)
-        res = dict(timeseries=timeseries, timeseries_callout=callout)
+
+        data_last_updated = MetaJson.objects.get(
+            dashboard_name=self.explorer_name
+        ).dashboard_meta.get("data_last_updated", None)
+        res = dict(
+            data_last_updated=data_last_updated,
+            timeseries=timeseries,
+            timeseries_callout=callout,
+        )
         return response.Response(res)
 
     def get_dropdown(self):
