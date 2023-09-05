@@ -10,8 +10,8 @@ class Prasarana(GeneralTransportExplorer):
 
     # Data Populate (FIXME: update after data creates correct parquet files)
     data_populate = {
-        "PrasaranaTimeseries": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ktmb_timeseries.parquet",
-        "PrasaranaTimeseriesCallout": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ktmb_timeseries_callout.parquet",
+        "PrasaranaTimeseries": "https://storage.data.gov.my/dashboards/ktmb_timeseries.parquet",
+        "PrasaranaTimeseriesCallout": "https://storage.data.gov.my/dashboards/ktmb_timeseries_callout.parquet",
     }
 
     TIMESERIES_MODEL = PrasaranaTimeseries

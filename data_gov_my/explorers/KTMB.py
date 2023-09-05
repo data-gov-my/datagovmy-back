@@ -8,8 +8,8 @@ class KTMB(GeneralTransportExplorer):
 
     # Data Populate
     data_populate = {
-        "KTMBTimeseries": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ktmb_timeseries.parquet",
-        "KTMBTimeseriesCallout": "https://dgmy-public-dashboards.s3.ap-southeast-1.amazonaws.com/ktmb_timeseries_callout.parquet",
+        "KTMBTimeseries": "https://storage.data.gov.my/dashboards/ktmb_timeseries.parquet",
+        "KTMBTimeseriesCallout": "https://storage.data.gov.my/dashboards/ktmb_timeseries_callout.parquet",
     }
 
     TIMESERIES_MODEL = KTMBTimeseries
