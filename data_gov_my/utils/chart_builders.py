@@ -355,8 +355,9 @@ class JitterBuilder(ChartBuilder):
 
     def build_chart(self, file_name: str, variables: JitterChartVariables) -> str:
         df: pd.DataFrame = pd.read_parquet(file_name)
-        res = {}
         variables = self.VARIABLE_MODEL(**variables)
+        df = df.fillna(np.nan).replace({np.nan: variables.null_vals})
+        res = {}
 
         df[variables.keys] = df[variables.keys].apply(
             lambda x: x.lower().replace(" ", "_")
