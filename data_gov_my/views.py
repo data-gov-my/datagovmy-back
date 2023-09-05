@@ -49,6 +49,7 @@ from data_gov_my.serializers import (
 from data_gov_my.serializers import (
     FormDataSerializer,
     ViewCountSerializer,
+    ViewCountSerializerV2,
     i18nSerializer,
 )
 from data_gov_my.tasks.increment_count import increment_view_count
@@ -506,7 +507,73 @@ class VIEW_COUNT_V2(APIView):
                     status=400,
                 )
 
-        return JsonResponse({}, status=200, safe=False)
+        c_viewcount = cache.get("viewcount")
+
+        # If the cache viewcount isn't present
+        if not c_viewcount:
+            data = ViewCountSerializerV2(ViewCount.objects.all(), many=True).data
+            c_viewcount = {d.pop("id"): d for d in data}
+            c_viewcount["_hit_count"] = 0
+
+        # If the viewcount data isn't in the cache
+        if id not in c_viewcount:
+            default_view_vals = {
+                "type": "",
+                "view_count": 0,
+                "download_csv": 0,
+                "download_parquet": 0,
+                "download_png": 0,
+                "download_svg": 0,
+            }
+            c_viewcount[id] = default_view_vals
+            c_viewcount[id]["type"] = type
+
+        # Increment the viewcount
+        c_viewcount[id][metric] += 1
+        c_viewcount["_hit_count"] += 1
+        cache.set("viewcount", c_viewcount)
+
+        res = c_viewcount[id]
+        res["id"] = id
+
+        if c_viewcount["_hit_count"] >= 30:
+            c_viewcount.pop("_hit_count")
+            viewcounts = []
+            for k, v in c_viewcount.items():
+                v["id"] = k
+                viewcounts.append(ViewCount(**v))
+
+            try:
+                """
+                If this fails its likely bcs of deadlock
+                Suggestions :
+                - Increment the _hit_count
+                - Try restarting the resource again
+                - Both
+                """
+
+                ViewCount.objects.bulk_create(
+                    viewcounts,
+                    update_conflicts=True,
+                    unique_fields=["id"],
+                    update_fields=[
+                        "view_count",
+                        "download_csv",
+                        "download_parquet",
+                        "download_png",
+                        "download_svg",
+                    ],
+                )
+            except Exception as e:
+                print(e)
+
+            cache.set("viewcount", {})
+
+        if type == "dashboard":
+            for i in ["csv", "parquet", "png", "svg"]:
+                res.pop(f"download_{i}")
+
+        return JsonResponse(res, status=200, safe=False)
 
 
 ## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
