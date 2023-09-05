@@ -430,6 +430,14 @@ class KTMBTimeseries(models.Model):
     passengers = models.IntegerField(null=True)
     frequency = models.CharField(max_length=50)
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="ktmb_timeseries_idx",
+            )
+        ]
+
 
 class KTMBTimeseriesCallout(models.Model):
     service = models.CharField(max_length=100)
@@ -437,6 +445,14 @@ class KTMBTimeseriesCallout(models.Model):
     destination = models.CharField(max_length=100)
     passengers = models.IntegerField(null=True)
     frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="ktmb_callout_idx",
+            )
+        ]
 
 
 class PrasaranaTimeseries(models.Model):
@@ -447,6 +463,14 @@ class PrasaranaTimeseries(models.Model):
     passengers = models.IntegerField(null=True)
     frequency = models.CharField(max_length=50)
 
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="prasarana_timeseries_idx",
+            )
+        ]
+
 
 class PrasaranaTimeseriesCallout(models.Model):
     service = models.CharField(max_length=100)
@@ -454,3 +478,11 @@ class PrasaranaTimeseriesCallout(models.Model):
     destination = models.CharField(max_length=100)
     passengers = models.IntegerField(null=True)
     frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="prasarana_callout_idx",
+            )
+        ]
