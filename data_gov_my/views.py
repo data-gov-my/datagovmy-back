@@ -54,6 +54,7 @@ from data_gov_my.serializers import (
 )
 from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
+from data_gov_my.utils import common
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 
 import django_rq
@@ -536,37 +537,25 @@ class VIEW_COUNT_V2(APIView):
         res = c_viewcount[id]
         res["id"] = id
 
-        if c_viewcount["_hit_count"] >= 30:
+        if c_viewcount["_hit_count"] >= 50:
             c_viewcount.pop("_hit_count")
             viewcounts = []
             for k, v in c_viewcount.items():
                 v["id"] = k
                 viewcounts.append(ViewCount(**v))
 
-            try:
-                """
-                If this fails its likely bcs of deadlock
-                Suggestions :
-                - Increment the _hit_count
-                - Try restarting the resource again
-                - Both
-                """
-
-                ViewCount.objects.bulk_create(
-                    viewcounts,
-                    update_conflicts=True,
-                    unique_fields=["id"],
-                    update_fields=[
-                        "view_count",
-                        "download_csv",
-                        "download_parquet",
-                        "download_png",
-                        "download_svg",
-                    ],
-                )
-            except Exception as e:
-                print(e)
-
+            ViewCount.objects.bulk_create(
+                objs=viewcounts,
+                update_conflicts=True,
+                unique_fields=["id"],
+                update_fields=[
+                    "view_count",
+                    "download_csv",
+                    "download_parquet",
+                    "download_png",
+                    "download_svg",
+                ],
+            )
             cache.set("viewcount", {})
 
         if type == "dashboard":
