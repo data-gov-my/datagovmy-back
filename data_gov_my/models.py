@@ -420,3 +420,69 @@ class PublicationUpcoming(models.Model):
 
     def __str__(self) -> str:
         return f"{self.publication_id} ({self.language})"
+
+
+class KTMBTimeseries(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    date = models.DateField()
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="ktmb_timeseries_idx",
+            )
+        ]
+
+
+class KTMBTimeseriesCallout(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="ktmb_callout_idx",
+            )
+        ]
+
+
+class PrasaranaTimeseries(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    date = models.DateField()
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="prasarana_timeseries_idx",
+            )
+        ]
+
+
+class PrasaranaTimeseriesCallout(models.Model):
+    service = models.CharField(max_length=100)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    passengers = models.IntegerField(null=True)
+    frequency = models.CharField(max_length=50)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["service", "origin", "destination"],
+                name="prasarana_callout_idx",
+            )
+        ]

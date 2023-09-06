@@ -39,6 +39,7 @@ class NAME_POPULARITY(General_Explorer):
         "last": "NameDashboard_LastName",
     }
     required_params = ["name", "explorer", "type"]
+    FORBIDDEN_SEARCH = []  # TODO: update stop words when data arrives
 
     """
     Constructor.
@@ -70,6 +71,24 @@ class NAME_POPULARITY(General_Explorer):
         compare = "compare_name" in params and self.str2bool(params["compare_name"][0])
 
         s = list(set(s.split(","))) if compare else [s]
+
+        forbidden_searches = list(set(s) & set(self.FORBIDDEN_SEARCH))
+        for i, name in enumerate(forbidden_searches):
+            # censor the last two characters when returning
+            forbidden_searches[i] = (
+                "*" * len(name) if len(name) <= 2 else name[:-2] + "**"
+            )
+
+        if forbidden_searches:
+            return JsonResponse(
+                {
+                    "status": 400,
+                    "error": "censored_toast",
+                    "censored_names": forbidden_searches,
+                },
+                status=400,
+            )
+
         res = model_choice.objects.all().filter(name__in=s).values()
 
         fin = []  # Default is as a list
