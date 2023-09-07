@@ -42,6 +42,7 @@ class DashboardJson(models.Model):
 
 class CatalogJson(models.Model):
     id = models.CharField(max_length=400, primary_key=True)
+    exclude_openapi = models.BooleanField(default=False)
     catalog_meta = models.JSONField()
     catalog_name = models.CharField(max_length=400)
     catalog_category = models.CharField(max_length=300)
