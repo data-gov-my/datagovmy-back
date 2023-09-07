@@ -1,34 +1,33 @@
-import logging
-import os
-from threading import Thread
-from itertools import groupby
 import json
+import logging
 from datetime import datetime
+from itertools import groupby
+from threading import Thread
 
 import environ
 from django.core.cache import cache
-from django.core.cache import caches
-from django_lock import lock
-from django.db.models import Q
-from django.utils.timezone import get_current_timezone
+from django.db.models import F, Q
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.utils.timezone import get_current_timezone
 from post_office import mail
 from post_office.models import Email
 from rest_framework import generics, request, status
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.filters import SearchFilter
-import data_gov_my.utils.viewcount_cache as vcc
 
+import data_gov_my.utils.viewcount_cache as vcc
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
     CatalogueDataHandler as cdh,
 )
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
+    AuthTable,
     CatalogJson,
     DashboardJson,
     FormData,
@@ -36,10 +35,10 @@ from data_gov_my.models import (
     MetaJson,
     Publication,
     PublicationDocumentation,
+    PublicationResource,
     PublicationUpcoming,
     ViewCount,
     i18nJson,
-    AuthTable,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -47,20 +46,11 @@ from data_gov_my.serializers import (
     PublicationDocumentationSerializer,
     PublicationSerializer,
     PublicationUpcomingSerializer,
-    i18nSerializer,
-)
-from data_gov_my.serializers import (
-    FormDataSerializer,
     ViewCountSerializer,
-    ViewCountSerializerV2,
     i18nSerializer,
 )
-from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
-from data_gov_my.utils import common
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-
-import django_rq
 
 env = environ.Env()
 environ.Env.read_env()
@@ -528,6 +518,32 @@ class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
             Publication, publication_id=self.kwargs["id"], language=language
         )
         return pub_object
+
+
+@api_view(["POST"])
+def publication_resource_download(request: request.Request):
+    pub_id = request.data.get("publication_id")
+    resource_id = request.data.get("resource_id")
+    resources = PublicationResource.objects.filter(
+        publication__publication_id=pub_id, resource_id=resource_id
+    )
+    updated = resources.update(downloads=F("downloads") + 1)
+    downloads = resources.values_list("downloads", flat=True)
+
+    if len(set(downloads)) > 1:
+        return Response(
+            data={
+                "error": f"Inconsistent download count between en and bm resources. ({downloads})"
+            },
+            status=status.HTTP_409_CONFLICT,
+        )
+
+    new_download_count = downloads.first()
+
+    return Response(
+        data={"download": new_download_count},
+        status=status.HTTP_200_OK,
+    )
 
 
 class PUBLICATION_DROPDOWN(APIView):

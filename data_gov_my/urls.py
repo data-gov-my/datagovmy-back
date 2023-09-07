@@ -71,6 +71,11 @@ urlpatterns = [
         views.PUBLICATION_UPCOMING_DROPDOWN.as_view(),
         name="PUB_UPCOMING_DROPDOWN",
     ),
+    path(
+        "publication-resource/download/",
+        views.publication_resource_download,
+        name="PUB_RESOURCE_DL",
+    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
