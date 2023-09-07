@@ -29,7 +29,7 @@ def increment_view_count(id, type, metric):
             items = ViewCount.objects.bulk_update(
                 objs=cached_viewcount_lst,
                 fields=[
-                    "all_time_view",
+                    "view_count",
                     "download_csv",
                     "download_parquet",
                     "download_png",

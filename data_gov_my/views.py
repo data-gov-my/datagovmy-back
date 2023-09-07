@@ -7,6 +7,8 @@ from datetime import datetime
 
 import environ
 from django.core.cache import cache
+from django.core.cache import caches
+from django_lock import lock
 from django.db.models import Q
 from django.utils.timezone import get_current_timezone
 from django.http import JsonResponse, QueryDict
@@ -19,6 +21,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
+import data_gov_my.utils.viewcount_cache as vcc
 
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
@@ -49,10 +52,12 @@ from data_gov_my.serializers import (
 from data_gov_my.serializers import (
     FormDataSerializer,
     ViewCountSerializer,
+    ViewCountSerializerV2,
     i18nSerializer,
 )
 from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
+from data_gov_my.utils import common
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 
 import django_rq
@@ -408,9 +413,6 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    VIEWCOUNT_CACHE_KEY = "viewcount"
-    MAX_CACHE_SIZE = 5
-
     def get(self, request, format=None):
         return JsonResponse(
             ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
@@ -454,21 +456,23 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        metric = (
-            "all_time_view" if metric == "view_count" else metric
-        )  # Change field name
+        res = vcc.ViewCountCache().handle_viewcount(id=id, type=type, metric=metric)
 
-        queue = django_rq.get_queue("high")
-        res = queue.enqueue(increment_view_count, id, type, metric)
+        if type == "dashboard":
+            for i in ["csv", "parquet", "png", "svg"]:
+                res.pop(f"download_{i}")
 
-        if not res:
-            return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
-
-        else:
-            return JsonResponse({"status": "In Queue."}, status=200)
+        return JsonResponse(res, status=200, safe=False)
 
 
-## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
+class UPDATE_VIEW_COUNT(APIView):
+    def post(self, request, format=None):
+        res = vcc.ViewCountCache.update_cache()
+
+        if res:
+            return JsonResponse({"update": "successful"}, status=200, safe=False)
+
+        return JsonResponse({"update": "failed"}, status=500, safe=False)
 
 
 class PublicationPagination(PageNumberPagination):

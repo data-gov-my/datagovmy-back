@@ -31,6 +31,11 @@ urlpatterns = [
     path("forms/<str:form_type>", views.FORMS.as_view(), name="FORMS"),
     path("view-count/", views.VIEW_COUNT.as_view(), name="VIEW_COUNT"),
     path(
+        "update-view-count/",
+        views.UPDATE_VIEW_COUNT.as_view(),
+        name="UPDATE_VIEW_COUNT",
+    ),
+    path(
         "publication-dropdown/",
         views.PUBLICATION_DROPDOWN.as_view(),
         name="PUBLICATION_DROPDOWN",
