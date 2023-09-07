@@ -1,8 +1,9 @@
+import os
+
 import pandas as pd
-import numpy as np
-import operator
 from django.apps import apps
 from django.http import JsonResponse
+
 from data_gov_my.explorers.General import General_Explorer
 
 
@@ -47,6 +48,10 @@ class NAME_POPULARITY(General_Explorer):
 
     def __init__(self):
         General_Explorer.__init__(self)
+        url = os.getenv("FORBIDDEN_SEARCH_PARQUET_URL")
+        if url:
+            df = pd.read_parquet(url)
+            self.FORBIDDEN_SEARCH = df.iloc[:, 0].tolist()
 
     """
     Handles the API requests,
