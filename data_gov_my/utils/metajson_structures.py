@@ -103,6 +103,7 @@ class ExplorerValidateModel(BaseModel):
 # for proper refactor on this involves updating catalog_variable_classes as well (in future)
 class _DataCatalogFileValidateModel(BaseModel):
     manual_trigger: str = "0"
+    exclude_openapi: bool = False
     bucket: str
     file_name: str
     category: str
