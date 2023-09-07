@@ -5,7 +5,7 @@ from data_gov_my.models import AuthTable
 
 
 class AuthMiddleware:
-    _exclude = ["UPDATE", "AUTH_TOKEN", "FORMS"]
+    _exclude = ["UPDATE", "AUTH_TOKEN", "FORMS", "UPDATE_VIEW_COUNT"]
 
     def __init__(self, get_response):
         self.get_response = get_response
