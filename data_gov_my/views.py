@@ -7,6 +7,8 @@ from datetime import datetime
 
 import environ
 from django.core.cache import cache
+from django.core.cache import caches
+from django_lock import lock
 from django.db.models import Q
 from django.utils.timezone import get_current_timezone
 from django.http import JsonResponse, QueryDict
@@ -19,6 +21,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
+import data_gov_my.utils.viewcount_cache as vcc
 
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
@@ -410,9 +413,6 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    VIEWCOUNT_CACHE_KEY = "viewcount"
-    MAX_CACHE_SIZE = 5
-
     def get(self, request, format=None):
         return JsonResponse(
             ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
@@ -456,107 +456,7 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        metric = (
-            "all_time_view" if metric == "view_count" else metric
-        )  # Change field name
-
-        queue = django_rq.get_queue("high")
-        res = queue.enqueue(increment_view_count, id, type, metric)
-
-        if not res:
-            return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
-        else:
-            return JsonResponse({"status": "In Queue."}, status=200)
-
-
-class VIEW_COUNT_V2(APIView):
-    def post(self, request, format=None):
-        id = request.query_params.get("id", None)
-        type = request.query_params.get("type", None)
-        metric = request.query_params.get("metric", None)
-
-        default_values = {
-            "type": ["dashboard", "data-catalogue"],
-            "metric": [
-                "view_count",
-                "download_png",
-                "download_csv",
-                "download_svg",
-                "download_parquet",
-            ],
-        }
-
-        # Checks if all parameters have values
-        if not all([id, type, metric]):
-            return JsonResponse(
-                {
-                    "status": 400,
-                    "message": "Parameters id, type and metric must be supplied",
-                },
-                status=400,
-            )
-
-        # Checks if parameter 'type' and 'metric' has appropriate values
-        for k, v in default_values.items():
-            if request.query_params.get(k) not in v:
-                pos_values = ", ".join(v)
-                return JsonResponse(
-                    {
-                        "status": 400,
-                        "message": f"Parameter '{k}' has to hold either values : {pos_values}",
-                    },
-                    status=400,
-                )
-
-        c_viewcount = cache.get("viewcount")
-
-        # If the cache viewcount isn't present
-        if not c_viewcount:
-            data = ViewCountSerializerV2(ViewCount.objects.all(), many=True).data
-            c_viewcount = {d.pop("id"): d for d in data}
-            c_viewcount["_hit_count"] = 0
-
-        # If the viewcount data isn't in the cache
-        if id not in c_viewcount:
-            default_view_vals = {
-                "type": "",
-                "view_count": 0,
-                "download_csv": 0,
-                "download_parquet": 0,
-                "download_png": 0,
-                "download_svg": 0,
-            }
-            c_viewcount[id] = default_view_vals
-            c_viewcount[id]["type"] = type
-
-        # Increment the viewcount
-        c_viewcount[id][metric] += 1
-        c_viewcount["_hit_count"] += 1
-        cache.set("viewcount", c_viewcount)
-
-        res = c_viewcount[id]
-        res["id"] = id
-
-        if c_viewcount["_hit_count"] >= 50:
-            c_viewcount.pop("_hit_count")
-            viewcounts = []
-            for k, v in c_viewcount.items():
-                v["id"] = k
-                viewcounts.append(ViewCount(**v))
-
-            ViewCount.objects.bulk_create(
-                objs=viewcounts,
-                update_conflicts=True,
-                unique_fields=["id"],
-                update_fields=[
-                    "view_count",
-                    "download_csv",
-                    "download_parquet",
-                    "download_png",
-                    "download_svg",
-                ],
-            )
-            cache.set("viewcount", {})
+        res = vcc.ViewCountCache().handle_viewcount(id=id, type=type, metric=metric)
 
         if type == "dashboard":
             for i in ["csv", "parquet", "png", "svg"]:
@@ -565,7 +465,14 @@ class VIEW_COUNT_V2(APIView):
         return JsonResponse(res, status=200, safe=False)
 
 
-## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
+class UPDATE_VIEW_COUNT(APIView):
+    def post(self, request, format=None):
+        res = vcc.ViewCountCache.update_cache()
+
+        if res:
+            return JsonResponse({"update": "successful"}, status=200, safe=False)
+
+        return JsonResponse({"update": "failed"}, status=500, safe=False)
 
 
 class PublicationPagination(PageNumberPagination):
