@@ -724,21 +724,23 @@ General handler for data-variables
 
 def data_variable_handler(param_list):
     var_id = param_list["id"][0]
-    info = cache.get(var_id)
+    catalog_data = cache.get(var_id)
+    exclude_openapi = cache.get(f"{var_id}_openapi")
 
-    if not info:
-        info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
-        if len(info) == 0:  # If catalogue doesn't exist
-            return {}
-        info = info[0]["catalog_data"]
-        cache.set(var_id, info)
+    if not catalog_data or not exclude_openapi:
+        info = get_object_or_404(CatalogJson, id=var_id)
+        catalog_data = info.catalog_data
+        exclude_openapi = info.exclude_openapi
+        cache.set(var_id, catalog_data)
+        cache.set(f"{var_id}_openapi", exclude_openapi)
 
-    chart_type = info["API"]["chart_type"]
-    info = data_variable_chart_handler(info, chart_type, param_list)
+    chart_type = catalog_data["API"]["chart_type"]
+    res = data_variable_chart_handler(catalog_data, chart_type, param_list)
+    res["exclude_openapi"] = exclude_openapi
 
-    if len(info) == 0:  # If catalogues with the filter isn't found
+    if len(res) == 0:  # If catalogues with the filter isn't found
         return {}
-    return info
+    return res
 
 
 """
