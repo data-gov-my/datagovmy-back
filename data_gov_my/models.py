@@ -382,6 +382,7 @@ class PublicationDocumentationResource(models.Model):
     resource_type = models.CharField(max_length=100)
     resource_name = models.CharField(max_length=150)
     resource_link = models.URLField(max_length=150)
+    downloads = models.PositiveIntegerField(default=0)
     publication = models.ForeignKey(
         PublicationDocumentation, related_name="resources", on_delete=models.CASCADE
     )

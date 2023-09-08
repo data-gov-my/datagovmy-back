@@ -35,6 +35,7 @@ from data_gov_my.models import (
     MetaJson,
     Publication,
     PublicationDocumentation,
+    PublicationDocumentationResource,
     PublicationResource,
     PublicationUpcoming,
     ViewCount,
@@ -533,9 +534,13 @@ class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
 
 @api_view(["POST"])
 def publication_resource_download(request: request.Request):
+    if request.query_params.get("documentation_type", "").lower() == "true":
+        model = PublicationDocumentationResource
+    else:
+        model = PublicationResource
     pub_id = request.data.get("publication_id")
     resource_id = request.data.get("resource_id")
-    resources = PublicationResource.objects.filter(
+    resources = model.objects.filter(
         publication__publication_id=pub_id, resource_id=resource_id
     )
     updated = resources.update(downloads=F("downloads") + 1)
@@ -547,6 +552,11 @@ def publication_resource_download(request: request.Request):
                 "error": f"Inconsistent download count between en and bm resources. ({downloads})"
             },
             status=status.HTTP_409_CONFLICT,
+        )
+    elif not downloads:
+        return Response(
+            data={"details": "No relevant publication resource found."},
+            status=status.HTTP_404_NOT_FOUND,
         )
 
     new_download_count = downloads.first()
