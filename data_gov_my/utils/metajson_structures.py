@@ -103,6 +103,7 @@ class ExplorerValidateModel(BaseModel):
 # for proper refactor on this involves updating catalog_variable_classes as well (in future)
 class _DataCatalogFileValidateModel(BaseModel):
     manual_trigger: str = "0"
+    exclude_openapi: bool = False
     bucket: str
     file_name: str
     category: str
@@ -111,6 +112,12 @@ class _DataCatalogFileValidateModel(BaseModel):
     subcategory: str
     subcategory_en: str
     subcategory_bm: str
+    category_opendosm: str = ""
+    category_opendosm_en: str = ""
+    category_opendosm_bm: str = ""
+    subcategory_opendosm: str = ""
+    subcategory_opendosm_en: str = ""
+    subcategory_opendosm_bm: str = ""
     description: dict[Literal["en", "bm"], str]
     link_parquet: Optional[str] = None
     link_csv: Optional[str] = None

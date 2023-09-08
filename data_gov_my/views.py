@@ -1,31 +1,33 @@
-import logging
-import os
-from threading import Thread
-from itertools import groupby
 import json
+import logging
 from datetime import datetime
+from itertools import groupby
+from threading import Thread
 
 import environ
 from django.core.cache import cache
-from django.db.models import Q
-from django.utils.timezone import get_current_timezone
+from django.db.models import F, Q
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.utils.timezone import get_current_timezone
 from post_office import mail
 from post_office.models import Email
 from rest_framework import generics, request, status
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import ParseError
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.filters import SearchFilter
 
+import data_gov_my.utils.viewcount_cache as vcc
 from data_gov_my.api_handling import handle
 from data_gov_my.catalog_utils.catalog_variable_classes import (
     CatalogueDataHandler as cdh,
 )
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
+    AuthTable,
     CatalogJson,
     DashboardJson,
     FormData,
@@ -33,10 +35,11 @@ from data_gov_my.models import (
     MetaJson,
     Publication,
     PublicationDocumentation,
+    PublicationDocumentationResource,
+    PublicationResource,
     PublicationUpcoming,
     ViewCount,
     i18nJson,
-    AuthTable,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -44,18 +47,11 @@ from data_gov_my.serializers import (
     PublicationDocumentationSerializer,
     PublicationSerializer,
     PublicationUpcomingSerializer,
-    i18nSerializer,
-)
-from data_gov_my.serializers import (
-    FormDataSerializer,
     ViewCountSerializer,
     i18nSerializer,
 )
-from data_gov_my.tasks.increment_count import increment_view_count
 from data_gov_my.utils import cron_utils
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-
-import django_rq
 
 env = environ.Env()
 environ.Env.read_env()
@@ -179,7 +175,13 @@ class DATA_VARIABLE(APIView):
 
 
 class DATA_CATALOG(APIView):
-    def get(self, request, format=None):
+    def get(self, request: request.Request, format=None):
+        catalog_category_name = "catalog_category_name"
+        catalog_subcategory_name = "catalog_subcategory_name"
+        if request.query_params.get("opendosm", "").lower() == "true":
+            catalog_category_name = "catalog_category_opendosm_name"
+            catalog_subcategory_name = "catalog_subcategory_opendosm_name"
+
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
@@ -192,9 +194,10 @@ class DATA_CATALOG(APIView):
             info = CatalogJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
-                "catalog_category",
                 "catalog_category_name",
                 "catalog_subcategory_name",
+                "catalog_category_opendosm_name",
+                "catalog_subcategory_opendosm_name",
             )
         else:
             catalog_list = cache.get("catalog_list")
@@ -206,9 +209,10 @@ class DATA_CATALOG(APIView):
                     CatalogJson.objects.all().values(
                         "id",
                         "catalog_name",
-                        "catalog_category",
                         "catalog_category_name",
                         "catalog_subcategory_name",
+                        "catalog_category_opendosm_name",
+                        "catalog_subcategory_opendosm_name",
                     )
                 )
                 cache.set("catalog_list", info)
@@ -232,10 +236,13 @@ class DATA_CATALOG(APIView):
             lang = "en"
 
         for item in info:
-            category = item["catalog_category_name"].split(" | ")[lang_mapping[lang]]
-            sub_category = item["catalog_subcategory_name"].split(" | ")[
-                lang_mapping[lang]
-            ]
+            category = item.get(catalog_category_name)
+            sub_category = item.get(catalog_subcategory_name)
+            if not category or not sub_category:
+                res["total_all"] -= 1
+                continue
+            category = category.split(" | ")[lang_mapping[lang]]
+            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
 
             obj = {}
             obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
@@ -408,9 +415,6 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    VIEWCOUNT_CACHE_KEY = "viewcount"
-    MAX_CACHE_SIZE = 5
-
     def get(self, request, format=None):
         return JsonResponse(
             ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
@@ -454,21 +458,23 @@ class VIEW_COUNT(APIView):
                     status=400,
                 )
 
-        metric = (
-            "all_time_view" if metric == "view_count" else metric
-        )  # Change field name
+        res = vcc.ViewCountCache().handle_viewcount(id=id, type=type, metric=metric)
 
-        queue = django_rq.get_queue("high")
-        res = queue.enqueue(increment_view_count, id, type, metric)
+        if type == "dashboard":
+            for i in ["csv", "parquet", "png", "svg"]:
+                res.pop(f"download_{i}")
 
-        if not res:
-            return JsonResponse({"status": 404, "message": "ID not found"}, status=404)
-
-        else:
-            return JsonResponse({"status": "In Queue."}, status=200)
+        return JsonResponse(res, status=200, safe=False)
 
 
-## TODO: make sure all views have authorisation check (classes that use more abstract than apiview base)
+class UPDATE_VIEW_COUNT(APIView):
+    def post(self, request, format=None):
+        res = vcc.ViewCountCache.update_cache()
+
+        if res:
+            return JsonResponse({"update": "successful"}, status=200, safe=False)
+
+        return JsonResponse({"update": "failed"}, status=500, safe=False)
 
 
 class PublicationPagination(PageNumberPagination):
@@ -524,6 +530,41 @@ class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
             Publication, publication_id=self.kwargs["id"], language=language
         )
         return pub_object
+
+
+@api_view(["POST"])
+def publication_resource_download(request: request.Request):
+    if request.query_params.get("documentation_type", "").lower() == "true":
+        model = PublicationDocumentationResource
+    else:
+        model = PublicationResource
+    pub_id = request.data.get("publication_id")
+    resource_id = request.data.get("resource_id")
+    resources = model.objects.filter(
+        publication__publication_id=pub_id, resource_id=resource_id
+    )
+    updated = resources.update(downloads=F("downloads") + 1)
+    downloads = resources.values_list("downloads", flat=True)
+
+    if len(set(downloads)) > 1:
+        return Response(
+            data={
+                "error": f"Inconsistent download count between en and bm resources. ({downloads})"
+            },
+            status=status.HTTP_409_CONFLICT,
+        )
+    elif not downloads:
+        return Response(
+            data={"details": "No relevant publication resource found."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    new_download_count = downloads.first()
+
+    return Response(
+        data={"download": new_download_count},
+        status=status.HTTP_200_OK,
+    )
 
 
 class PUBLICATION_DROPDOWN(APIView):
@@ -720,21 +761,23 @@ General handler for data-variables
 
 def data_variable_handler(param_list):
     var_id = param_list["id"][0]
-    info = cache.get(var_id)
+    catalog_data = cache.get(var_id)
+    exclude_openapi = cache.get(f"{var_id}_openapi")
 
-    if not info:
-        info = CatalogJson.objects.filter(id=var_id).values("catalog_data")
-        if len(info) == 0:  # If catalogue doesn't exist
-            return {}
-        info = info[0]["catalog_data"]
-        cache.set(var_id, info)
+    if not catalog_data or not exclude_openapi:
+        info = get_object_or_404(CatalogJson, id=var_id)
+        catalog_data = info.catalog_data
+        exclude_openapi = info.exclude_openapi
+        cache.set(var_id, catalog_data)
+        cache.set(f"{var_id}_openapi", exclude_openapi)
 
-    chart_type = info["API"]["chart_type"]
-    info = data_variable_chart_handler(info, chart_type, param_list)
+    chart_type = catalog_data["API"]["chart_type"]
+    res = data_variable_chart_handler(catalog_data, chart_type, param_list)
+    res["exclude_openapi"] = exclude_openapi
 
-    if len(info) == 0:  # If catalogues with the filter isn't found
+    if len(res) == 0:  # If catalogues with the filter isn't found
         return {}
-    return info
+    return res
 
 
 """

@@ -585,7 +585,7 @@ class DataCatalogBuilder(GeneralMetaBuilder):
 
                     unique_id = obj.unique_id
                     db_input = obj.db_input
-
+                    db_input["exclude_openapi"] = file_data.exclude_openapi
                     db_obj, created = CatalogJson.objects.update_or_create(
                         id=unique_id, defaults=db_input
                     )

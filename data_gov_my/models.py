@@ -42,12 +42,17 @@ class DashboardJson(models.Model):
 
 class CatalogJson(models.Model):
     id = models.CharField(max_length=400, primary_key=True)
+    exclude_openapi = models.BooleanField(default=False)
     catalog_meta = models.JSONField()
     catalog_name = models.CharField(max_length=400)
     catalog_category = models.CharField(max_length=300)
     catalog_category_name = models.CharField(max_length=600, default="")
     catalog_subcategory = models.CharField(max_length=300, default="")
     catalog_subcategory_name = models.CharField(max_length=600, default="")
+    catalog_category_opendosm = models.CharField(max_length=300, null=True)
+    catalog_category_opendosm_name = models.CharField(max_length=600, null=True)
+    catalog_subcategory_opendosm = models.CharField(max_length=300, null=True)
+    catalog_subcategory_opendosm_name = models.CharField(max_length=600, null=True)
     time_range = models.CharField(max_length=100)
     geography = models.CharField(max_length=300)
     demography = models.CharField(max_length=300)
@@ -265,14 +270,14 @@ class FormData(models.Model):
 class ViewCount(models.Model):
     id = models.CharField(max_length=100, primary_key=True)
     type = models.CharField(max_length=100, null=False)
-    all_time_view = models.IntegerField(null=False, default=0)
+    view_count = models.IntegerField(null=False, default=0)
     download_csv = models.IntegerField(null=False, default=0)
     download_parquet = models.IntegerField(null=False, default=0)
     download_png = models.IntegerField(null=False, default=0)
     download_svg = models.IntegerField(null=False, default=0)
 
     def __str__(self) -> str:
-        return f"{self.id} ({self.all_time_view})"
+        return f"{self.id} ({self.view_count})"
 
 
 class ExplorersUpdate(models.Model):
@@ -321,6 +326,7 @@ class PublicationResource(models.Model):
     resource_type = models.CharField(max_length=50)
     resource_name = models.CharField(max_length=100)
     resource_link = models.URLField(max_length=150)
+    downloads = models.PositiveIntegerField(default=0)
     publication = models.ForeignKey(
         Publication, related_name="resources", on_delete=models.CASCADE
     )
@@ -376,6 +382,7 @@ class PublicationDocumentationResource(models.Model):
     resource_type = models.CharField(max_length=100)
     resource_name = models.CharField(max_length=150)
     resource_link = models.URLField(max_length=150)
+    downloads = models.PositiveIntegerField(default=0)
     publication = models.ForeignKey(
         PublicationDocumentation, related_name="resources", on_delete=models.CASCADE
     )
