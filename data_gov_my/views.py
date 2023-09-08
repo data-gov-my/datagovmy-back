@@ -174,7 +174,13 @@ class DATA_VARIABLE(APIView):
 
 
 class DATA_CATALOG(APIView):
-    def get(self, request, format=None):
+    def get(self, request: request.Request, format=None):
+        catalog_category_name = "catalog_category_name"
+        catalog_subcategory_name = "catalog_subcategory_name"
+        if request.query_params.get("opendosm", "").lower() == "true":
+            catalog_category_name = "catalog_category_opendosm_name"
+            catalog_subcategory_name = "catalog_subcategory_opendosm_name"
+
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
         info = ""
@@ -187,9 +193,10 @@ class DATA_CATALOG(APIView):
             info = CatalogJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
-                "catalog_category",
                 "catalog_category_name",
                 "catalog_subcategory_name",
+                "catalog_category_opendosm_name",
+                "catalog_subcategory_opendosm_name",
             )
         else:
             catalog_list = cache.get("catalog_list")
@@ -201,9 +208,10 @@ class DATA_CATALOG(APIView):
                     CatalogJson.objects.all().values(
                         "id",
                         "catalog_name",
-                        "catalog_category",
                         "catalog_category_name",
                         "catalog_subcategory_name",
+                        "catalog_category_opendosm_name",
+                        "catalog_subcategory_opendosm_name",
                     )
                 )
                 cache.set("catalog_list", info)
@@ -227,10 +235,13 @@ class DATA_CATALOG(APIView):
             lang = "en"
 
         for item in info:
-            category = item["catalog_category_name"].split(" | ")[lang_mapping[lang]]
-            sub_category = item["catalog_subcategory_name"].split(" | ")[
-                lang_mapping[lang]
-            ]
+            category = item.get(catalog_category_name)
+            sub_category = item.get(catalog_subcategory_name)
+            if not category or not sub_category:
+                res["total_all"] -= 1
+                continue
+            category = category.split(" | ")[lang_mapping[lang]]
+            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
 
             obj = {}
             obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
