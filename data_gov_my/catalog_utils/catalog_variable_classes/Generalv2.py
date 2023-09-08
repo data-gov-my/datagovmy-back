@@ -263,6 +263,22 @@ class GeneralChartsUtil:
             "catalog_subcategory_name"
         ] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
 
+        # Sets catalog category (opendosm)
+        res["catalog_category_opendosm"] = self.file_data["category_opendosm"]
+        catalog_category_en = self.file_data["category_opendosm_en"]
+        catalog_category_bm = self.file_data["category_opendosm_bm"]
+        res[
+            "catalog_category_opendosm_name"
+        ] = f"{catalog_category_en} | {catalog_category_bm}"
+
+        # Sets catalog subcategory (opendosm)
+        res["catalog_subcategory_opendosm"] = self.file_data["subcategory_opendosm"]
+        catalog_subcategory_en = self.file_data["subcategory_opendosm_en"]
+        catalog_subcategory_bm = self.file_data["subcategory_opendosm_bm"]
+        res[
+            "catalog_subcategory_opendosm_name"
+        ] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
+
         # Sets the frequency of the catalog
         res["time_range"] = self.catalog_filters["frequency"]
 
