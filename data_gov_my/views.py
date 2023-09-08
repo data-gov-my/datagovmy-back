@@ -92,18 +92,26 @@ class CHART(APIView):
         if all(p in param_list for p in params_req):
             dbd_name = param_list["dashboard"][0]
             chart_name = param_list["chart_name"][0]
+            meta = cache.get(f"META_{dbd_name}")
 
-            meta = MetaJson.objects.filter(dashboard_name=dbd_name).values(
-                "dashboard_meta"
-            )[0]["dashboard_meta"]
+            if not meta:
+                meta = MetaJson.objects.filter(dashboard_name=dbd_name).values(
+                    "dashboard_meta"
+                )[0]["dashboard_meta"]
+                cache.set(f"META_{dbd_name}", meta)
+
             api_params = meta["charts"][chart_name]["api_params"]
             chart_type = meta["charts"][chart_name]["chart_type"]
             api_type = meta["charts"][chart_name]["api_type"]
             chart_variables = meta["charts"][chart_name]["variables"]
 
-            chart_data = DashboardJson.objects.filter(
-                dashboard_name=dbd_name, chart_name=chart_name
-            ).values("chart_data")[0]["chart_data"]
+            chart_data = cache.get(f"{dbd_name}_{chart_name}")
+
+            if not chart_data:
+                chart_data = DashboardJson.objects.filter(
+                    dashboard_name=dbd_name, chart_name=chart_name
+                ).values("chart_data")[0]["chart_data"]
+                cache.set(f"{dbd_name}_{chart_name}", chart_data)
 
             data_last_updated = meta.get("data_last_updated", None)
             data_as_of = chart_data["data_as_of"]
@@ -187,10 +195,6 @@ class DATA_CATALOG(APIView):
         info = ""
 
         if len(filters) > 0:
-            # search_cache = cache.get("search_cache")
-            # filter_list = cache_search.filter_options(param_list)
-            # info = cache_search.filter_cache(filter_list, search_cache)
-
             info = CatalogJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
@@ -225,7 +229,6 @@ class DATA_CATALOG(APIView):
             source_filters = cron_utils.source_filters_cache()
             res["source_filters"] = source_filters
             cache.set("source_filters", source_filters)
-        # res["source_filters"] = cache.get('source_filters') if cache.get('source_filters') else cron_utils.source_filters_cache()
 
         res["dataset"] = {}
 
@@ -801,6 +804,7 @@ def handle_request(param_list: QueryDict, isDashboard=True):
         dbd_info = (
             dbd_info if isinstance(dbd_info, dict) else dbd_info[0]["dashboard_meta"]
         )
+        cache.set(f"META_{dbd_name}", dbd_info)
         params_req = dbd_info["required_params"]
         params_opt = dbd_info.get("optional_params", [])
         data_last_updated = dbd_info.get("data_last_updated", None)
