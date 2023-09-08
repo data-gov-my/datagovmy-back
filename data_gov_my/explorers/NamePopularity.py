@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 from django.apps import apps
+from django.core.cache import cache
 from django.http import JsonResponse
 
 from data_gov_my.explorers.General import General_Explorer
@@ -40,7 +41,7 @@ class NAME_POPULARITY(General_Explorer):
         "last": "NameDashboard_LastName",
     }
     required_params = ["name", "explorer", "type"]
-    FORBIDDEN_SEARCH = []  # TODO: update stop words when data arrives
+    FORBIDDEN_SEARCH = []
 
     """
     Constructor.
@@ -48,10 +49,13 @@ class NAME_POPULARITY(General_Explorer):
 
     def __init__(self):
         General_Explorer.__init__(self)
+        self.FORBIDDEN_SEARCH = cache.get("NAME_POPULARITY_FORBIDDEN_SEARCH")
         url = os.getenv("FORBIDDEN_SEARCH_PARQUET_URL")
-        if url:
+
+        if not self.FORBIDDEN_SEARCH:
             df = pd.read_parquet(url)
             self.FORBIDDEN_SEARCH = df.iloc[:, 0].tolist()
+            cache.set("NAME_POPULARITY_FORBIDDEN_SEARCH", self.FORBIDDEN_SEARCH)
 
     """
     Handles the API requests,
