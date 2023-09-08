@@ -112,6 +112,12 @@ class _DataCatalogFileValidateModel(BaseModel):
     subcategory: str
     subcategory_en: str
     subcategory_bm: str
+    category_opendosm: str = ""
+    category_opendosm_en: str = ""
+    category_opendosm_bm: str = ""
+    subcategory_opendosm: str = ""
+    subcategory_opendosm_en: str = ""
+    subcategory_opendosm_bm: str = ""
     description: dict[Literal["en", "bm"], str]
     link_parquet: Optional[str] = None
     link_csv: Optional[str] = None
