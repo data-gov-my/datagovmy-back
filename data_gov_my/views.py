@@ -187,10 +187,6 @@ class DATA_CATALOG(APIView):
         info = ""
 
         if len(filters) > 0:
-            # search_cache = cache.get("search_cache")
-            # filter_list = cache_search.filter_options(param_list)
-            # info = cache_search.filter_cache(filter_list, search_cache)
-
             info = CatalogJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
@@ -225,7 +221,6 @@ class DATA_CATALOG(APIView):
             source_filters = cron_utils.source_filters_cache()
             res["source_filters"] = source_filters
             cache.set("source_filters", source_filters)
-        # res["source_filters"] = cache.get('source_filters') if cache.get('source_filters') else cron_utils.source_filters_cache()
 
         res["dataset"] = {}
 
