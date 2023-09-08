@@ -1,10 +1,11 @@
 from django.core.cache import cache
 from django.core.cache import caches
-from django_lock import lock
 from data_gov_my.models import ViewCount
 
 
 class ViewCountCache:
+
+    cache_choice = caches["viewcount"]
 
     # Cache key naming convention
     cache_key_prepend = "viewcount_"
@@ -32,7 +33,7 @@ class ViewCountCache:
 
     def handle_viewcount(self, id, type, metric):
         cache_key = f"{self.cache_key_prepend}{id}"
-        cur_val = cache.get(cache_key)
+        cur_val = self.cache_choice.get(cache_key)
 
         # If the cur_val isn't present in cache
         if not cur_val:
@@ -40,18 +41,18 @@ class ViewCountCache:
             if cur_val.exists():
                 cur_val = cur_val[0]
                 cur_val[metric] += 1
-                cache.set(cache_key, cur_val)
+                self.cache_choice.set(cache_key, cur_val)
             # If the key has never existed
             else:
                 cur_val = dict(self.default_view_value)
                 cur_val["id"] = id
                 cur_val["type"] = type
                 cur_val[metric] = 1
-                cache.set(cache_key, cur_val)
+                self.cache_choice.set(cache_key, cur_val)
         else:
-            with lock(cache_key):
+            with self.cache_choice.lock(cache_key):
                 cur_val[metric] += 1
-                cache.set(cache_key, cur_val)
+                self.cache_choice.set(cache_key, cur_val)
 
         return cur_val
 
@@ -62,13 +63,13 @@ class ViewCountCache:
     @classmethod
     def update_cache(self):
         try:
-            all_keys = cache.keys("*")
+            all_keys = self.cache_choice.keys("*")
             objs = []
 
             for c in all_keys:
                 if self.cache_key_prepend in c:
-                    with lock(c):
-                        val = cache.get(c)
+                    with self.cache_choice.lock(c):
+                        val = self.cache_choice.get(c)
                         objs.append(ViewCount(**val))
 
             ViewCount.objects.bulk_create(
@@ -88,7 +89,7 @@ class ViewCountCache:
 
             # Sets all cache to updated values from db
             for x in all_view_counts:
-                cache.set(f"{self.cache_key_prepend}{x['id']}", x)
+                self.cache_choice.set(f"{self.cache_key_prepend}{x['id']}", x)
 
             return True
 
