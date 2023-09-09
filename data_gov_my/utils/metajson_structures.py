@@ -120,6 +120,7 @@ class _DataCatalogFileValidateModel(BaseModel):
     subcategory_opendosm_bm: str = ""
     description: dict[Literal["en", "bm"], str]
     link_parquet: Optional[str] = None
+    link_preview: Optional[str] = None
     link_csv: Optional[str] = None
     link_geojson: Optional[str] = None
     variables: list[dict]
