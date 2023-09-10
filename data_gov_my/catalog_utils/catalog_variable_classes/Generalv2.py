@@ -302,6 +302,7 @@ class GeneralChartsUtil:
 
     def build_catalog_data_info(self):
         res = {}
+        res["openapi_id"] = self.file_src
         res["API"] = self.api
         res["explanation"] = self.explanation
         res["metadata"] = self.metadata
