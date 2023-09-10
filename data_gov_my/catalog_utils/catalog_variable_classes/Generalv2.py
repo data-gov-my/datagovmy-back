@@ -59,9 +59,9 @@ class GeneralChartsUtil:
         self.file_src = file_src
 
         # Decides which link to read from
-        if "link_preview" in file_data:
+        if file_data.get("link_preview"):
             self.read_from = file_data["link_preview"]
-        elif "link_parquet" in file_data:
+        elif file_data.get("link_parquet"):
             self.read_from = file_data["link_parquet"]
 
         # Sets current (int) id of object
