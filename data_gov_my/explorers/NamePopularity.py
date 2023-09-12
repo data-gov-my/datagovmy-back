@@ -98,7 +98,14 @@ class NAME_POPULARITY(General_Explorer):
                 status=400,
             )
 
-        res = model_choice.objects.all().filter(name__in=s).values()
+        cache_key_names = ",".join(sorted(s))
+        cache_key = f"NAME_POPULARITY_{cache_key_names}-{type}"
+
+        res = cache.get(cache_key)
+
+        if not res:
+            res = list(model_choice.objects.all().filter(name__in=s).values())
+            cache.set(cache_key, res, 60)  # Cache the names for a minute
 
         fin = []  # Default is as a list
 

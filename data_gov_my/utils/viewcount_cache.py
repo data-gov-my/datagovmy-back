@@ -72,18 +72,19 @@ class ViewCountCache:
                         val = self.cache_choice.get(c)
                         objs.append(ViewCount(**val))
 
-            ViewCount.objects.bulk_create(
-                objs=objs,
-                update_conflicts=True,
-                unique_fields=["id"],
-                update_fields=[
-                    "view_count",
-                    "download_csv",
-                    "download_parquet",
-                    "download_png",
-                    "download_svg",
-                ],
-            )
+            if objs:
+                ViewCount.objects.bulk_create(
+                    objs=objs,
+                    update_conflicts=True,
+                    unique_fields=["id"],
+                    update_fields=[
+                        "view_count",
+                        "download_csv",
+                        "download_parquet",
+                        "download_png",
+                        "download_svg",
+                    ],
+                )
 
             all_view_counts = list(ViewCount.objects.all().values())
 
