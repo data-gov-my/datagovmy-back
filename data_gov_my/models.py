@@ -120,62 +120,6 @@ class i18nJson(models.Model):
         ]
 
 
-class ElectionDashboard_Candidates(models.Model):
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=20)
-    date = models.CharField(max_length=100)
-    election_name = models.CharField(max_length=100)
-    seat = models.CharField(max_length=100)
-    party = models.CharField(max_length=100)
-    votes = models.IntegerField()
-    votes_perc = models.FloatField(null=True)
-    result = models.CharField(max_length=100)
-    voter_turnout = models.IntegerField(null=True)
-    voter_turnout_perc = models.FloatField(null=True, default=None)
-    votes_rejected = models.IntegerField(null=True)
-    votes_rejected_perc = models.FloatField(null=True, default=None)
-    majority = models.IntegerField(default=0)
-    majority_perc = models.FloatField(null=True, default=None)
-    slug = models.CharField(max_length=100, default="")
-
-
-class ElectionDashboard_Seats(models.Model):
-    seat = models.CharField(max_length=100)
-    election_name = models.CharField(max_length=100)
-    date = models.CharField(max_length=100)
-    party = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    type = models.CharField(max_length=20, default="")
-    majority = models.IntegerField()
-    majority_perc = models.FloatField(null=True)
-    seat_name = models.CharField(max_length=100)
-    state = models.CharField(max_length=50, null=True)
-    slug = models.CharField(max_length=100, default="")
-    voter_turnout = models.IntegerField(null=True)
-    voter_turnout_perc = models.FloatField(null=True, default=None)
-    votes_rejected = models.IntegerField(null=True)
-    votes_rejected_perc = models.FloatField(null=True, default=None)
-
-
-class ElectionDashboard_Party(models.Model):
-    party = models.CharField(max_length=100)
-    type = models.CharField(max_length=20)
-    state = models.CharField(max_length=100)
-    election_name = models.CharField(max_length=100)
-    date = models.CharField(max_length=100)
-    seats = models.IntegerField()
-    seats_total = models.IntegerField()
-    seats_perc = models.FloatField(null=True)
-    votes = models.IntegerField()
-    votes_perc = models.FloatField(null=True)
-
-
-class ElectionDashboard_Dropdown(models.Model):
-    state = models.CharField(max_length=100, default="")
-    election = models.CharField(max_length=50, default="")
-    date = models.IntegerField(default=0)
-
-
 class FormTemplate(models.Model):
     form_type = models.CharField(max_length=50, primary_key=True)
     email_template = models.ForeignKey(EmailTemplate, on_delete=models.CASCADE)
