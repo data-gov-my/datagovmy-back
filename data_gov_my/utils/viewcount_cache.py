@@ -86,11 +86,11 @@ class ViewCountCache:
                     ],
                 )
 
-                all_view_counts = list(ViewCount.objects.all().values())
+            all_view_counts = list(ViewCount.objects.all().values())
 
-                # Sets all cache to updated values from db
-                for x in all_view_counts:
-                    self.cache_choice.set(f"{self.cache_key_prepend}{x['id']}", x)
+            # Sets all cache to updated values from db
+            for x in all_view_counts:
+                self.cache_choice.set(f"{self.cache_key_prepend}{x['id']}", x)
 
             return True
 
