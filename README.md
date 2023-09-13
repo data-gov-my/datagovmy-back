@@ -50,14 +50,14 @@ Despite Datagovmy having multiple dashboards and data variables, there is only 1
 - `dashboard/`
     - Every GET request to this endpoint, will have to be associated with a query parameter, `'dashboard'`.
     - This `dashboard` parameter indicates which dashboard API should be returned.
-    - There can be multiple parameters as long as they are defined in the META Json and individual charts' parameter - this enables the `handle_request` method to execute them accordingly.
+    - There can be multiple parameters as long as they are defined in the META JSON and individual charts' parameter - this enables the `handle_request` method to execute them accordingly.
 - `data-variable/`
     - Every get request to this endpoint, will have to be associated with a query parameter, `'id'`.
     - The `'id'` represents the unique identifier for each variable, within the data catalog.
     - The response from this endpoint, are information, such as chart data, variable explanations, download links, and more.
 - `chart/`
     - Every get request to this endpoint, will have to be associated with 2 query parameters, `'dashboard'` and `'chart'`.
-    - There can be multiple parameters as long as they are defined in the META Json and individual charts' parameter.
+    - There can be multiple parameters as long as they are defined in the META JSON and individual charts' parameter.
     - This endpoint allows for the ability to request data for individual charts from within a dashboard.
 - `update/`
     - Every POST request to this endpoint, will trigger an update, to perform a selective update, based on the files changed in the git repository.
@@ -85,19 +85,19 @@ Before explaining the logic of Datagovmy's backend operations, here is a brief d
 
 Therefore, to minimise complexity, it was vital that we used an architecture that could keep the number of endpoints minimal, while simultaneously ensuring that chart data could be served in as versatile a manner as possible. Here are the key ingredients we used to do this:
 
-## META Jsons
-    Meta Json version 2.0
-A META Json contains all information required to build a dashboard. These files can be found within the `dashboard` folder of the `datagovmy-meta` repo. Each one is responsible for either a dashboard, or a dedicated chart.
-- Each META Json contains information regarding the required and optional parameters for the API, and the list of charts needed.
-- Each Meta Json contains the route mapped to Front-end for revalidation.
+## META JSONs
+    Meta JSON version 2.0
+A META JSON contains all information required to build a dashboard. These files can be found within the `dashboard` folder of the `datagovmy-meta` repo. Each one is responsible for either a dashboard, or a dedicated chart.
+- Each META JSON contains information regarding the required and optional parameters for the API, and the list of charts needed.
+- Each Meta JSON contains the route mapped to Front-end for revalidation.
 - Each chart key contains multiple sub-keys representing chart names.
 - Each sub-key contains all information required to fully specify a chart, such as parameters, chart types, API types, and variables.
 - The variables and `chart_source` keys contain data which is fed to the chart builders, which serves the final data.
 
-## Catalog Jsons
-    Catalog Json version 1.0
-A Catalog Json contains all information required to build a data variable, or a set of data-variables. These files can be found within the `catalog` forlder of the `aksara-data` repo. Each one is responsible for 1 or more data variables.
-- Each Catalog Json contains information regarding the chart type of the variable, the explanations of the variables, as well as the file source of the data.
+## Catalog JSONs
+    Catalog JSON version 1.0
+A Catalog JSON contains all information required to build a data variable, or a set of data-variables. These files can be found within the `catalog` forlder of the `aksara-data` repo. Each one is responsible for 1 or more data variables.
+- Each Catalog JSON contains information regarding the chart type of the variable, the explanations of the variables, as well as the file source of the data.
 - The Catalog JSON can be divided into 2 essential parts :
     - File
         - The `file` key contains the description of the dataset, as well as the source of the data set.
@@ -113,7 +113,7 @@ A Catalog Json contains all information required to build a data variable, or a 
     Chart Builders version 1.0
 Critical design principle: All charts of the same type should be built using only 1 method. For instance, all time series charts on the site should (as far as possible) be handled by the same code unit.
 - Within the `utils` folder in the project, the `chart_builder` file contains several methods for various charts, such as heatmaps, bar charts, choropleths, etc.
-- As long as sufficient information is supplied (by the META Json), the chart builder can dynamically format a chart's api, thus requiring minimal to no 'hard-coding'. This increases versatility.
+- As long as sufficient information is supplied (by the META JSON), the chart builder can dynamically format a chart's api, thus requiring minimal to no 'hard-coding'. This increases versatility.
 - Variable structures and data-types, of each chart type can be viewed in the `variable_structures.py` file, within the `utils` folder.
 
 ## Contributing
