@@ -1,8 +1,9 @@
 # datagovmy-back
 
-The backend API for Datagovmy that serves data available via [`datagovmy/datagovmy-meta`](https://github.com/data-gov-my/datagovmy-meta) to the frontend at [`datagovmy/datagovmy-front`](https://github.com/data-gov-my/datagovmy-meta).
+The backend API for Datagovmy that serves data available via [`datagovmy/datagovmy-meta`](https://github.com/data-gov-my/datagovmy-meta) to the frontend at [`datagovmy/datagovmy-front`](https://github.com/data-gov-my/datagovmy-front).
 - Django app name: `data_gov_my`
 - Database: `postgresql`
+- Cache: `redis`
 
 ## Table of Contents
 
