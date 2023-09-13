@@ -69,7 +69,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "data_gov_my.urls"
 
-DRF_API_LOGGER_DATABASE = True  # Default to False
+DRF_API_LOGGER_DATABASE = False  # Default to False
 
 TEMPLATES = [
     {
