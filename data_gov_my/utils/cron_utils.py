@@ -2,6 +2,8 @@ import logging
 import os
 import shutil
 import zipfile
+import boto3
+import json
 from os import listdir
 from os.path import isfile, join
 
@@ -194,3 +196,19 @@ def remove_src_folders():
         shutil.rmtree("DATAGOVMY_SRC")
     if os.path.exists("repo.zip"):
         os.remove("repo.zip")
+
+
+def upload_s3(data, bucket, key):
+    try:
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=os.getenv("S3_KEY_ID"),
+            aws_secret_access_key=os.getenv("S3_KEY_SECRET"),
+        )
+
+        json_str = json.dumps(data)
+
+        s3.put_object(Body=json_str, Bucket=bucket, Key=key)
+        return True
+    except Exception as e:
+        return False
