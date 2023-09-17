@@ -40,6 +40,7 @@ from data_gov_my.utils.cron_utils import (
     remove_src_folders,
     revalidate_frontend,
     write_as_binary,
+    upload_s3,
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
