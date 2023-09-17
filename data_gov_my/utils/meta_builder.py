@@ -534,10 +534,17 @@ class i18nBuilder(GeneralMetaBuilder):
         language, filename = os.path.split(filename)
         filename = filename.replace(".json", "")
 
-        obj, created = i18nJson.objects.update_or_create(
-            filename=filename, language=language, defaults=metadata.model_dump()
+        env_location = os.getenv("GITHUB_SHA_URL")
+        s3_key = f"{env_location}/{language}/{filename}.json"
+        res = upload_s3(
+            data=metadata.translation, bucket=os.getenv("S3_I18N_BUCKET"), key=s3_key
         )
-        return obj
+
+        if res:
+            obj, created = i18nJson.objects.update_or_create(
+                filename=filename, language=language, defaults=metadata.model_dump()
+            )
+            return obj
 
 
 class FormBuilder(GeneralMetaBuilder):
