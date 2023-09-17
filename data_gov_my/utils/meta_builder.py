@@ -534,7 +534,7 @@ class i18nBuilder(GeneralMetaBuilder):
         language, filename = os.path.split(filename)
         filename = filename.replace(".json", "")
 
-        env_location = os.getenv("GITHUB_SHA_URL")
+        env_location = os.getenv("ENV_LOCATION").lower()
         s3_key = f"{env_location}/{language}/{filename}.json"
         res = upload_s3(
             data=metadata.translation, bucket=os.getenv("S3_I18N_BUCKET"), key=s3_key
