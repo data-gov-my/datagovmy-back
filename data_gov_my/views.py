@@ -6,7 +6,7 @@ from threading import Thread
 
 import environ
 from django.core.cache import cache
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.timezone import get_current_timezone
@@ -48,6 +48,7 @@ from data_gov_my.serializers import (
     PublicationSerializer,
     PublicationUpcomingSerializer,
     ViewCountSerializer,
+    ViewCountPartialSerializer,
     i18nSerializer,
 )
 from data_gov_my.utils import cron_utils
@@ -418,10 +419,15 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    def get(self, request, format=None):
-        return JsonResponse(
-            ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
-        )
+    def get(self, request: request.Request, format=None):
+        views_only = request.query_params.get("views_only", "").lower() == "true"
+        serializer = ViewCountPartialSerializer if views_only else ViewCountSerializer
+        type = request.query_params.get("type")
+        if type:
+            queryset = ViewCount.objects.filter(type=type)
+        else:
+            queryset = ViewCount.objects.all()
+        return JsonResponse(serializer(queryset, many=True).data, safe=False)
 
     def post(self, request, format=None):
         id = request.query_params.get("id", None)
@@ -496,7 +502,9 @@ class PUBLICATION(generics.ListAPIView):
             raise ParseError(
                 detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
             )
-        return Publication.objects.filter(language=language)
+        return Publication.objects.filter(language=language).annotate(
+            total_downloads=Sum("resources__downloads")
+        )
 
     def filter_queryset(self, queryset):
         # apply filters
@@ -604,7 +612,7 @@ class PUBLICATION_DOCS(generics.ListAPIView):
             )
         return PublicationDocumentation.objects.filter(
             language=language, documentation_type=doc_type
-        )
+        ).annotate(total_downloads=Sum("resources__downloads"))
 
 
 class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):

@@ -67,6 +67,16 @@ class ViewCountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ViewCountPartialSerializer(serializers.ModelSerializer):
+    """
+    Only returns the `view_count` field for metrics based fields.
+    """
+
+    class Meta:
+        model = ViewCount
+        exclude = ["download_csv", "download_parquet", "download_png", "download_svg"]
+
+
 class ViewCountSerializerV2(serializers.ModelSerializer):
     class Meta:
         model = ViewCount
@@ -92,6 +102,8 @@ class PublicationDetailSerializer(serializers.ModelSerializer):
 
 
 class PublicationSerializer(serializers.ModelSerializer):
+    total_downloads = serializers.IntegerField()
+
     class Meta:
         model = Publication
         fields = [
@@ -100,10 +112,13 @@ class PublicationSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "release_date",
+            "total_downloads",
         ]
 
 
 class PublicationDocumentationSerializer(serializers.ModelSerializer):
+    total_downloads = serializers.IntegerField()
+
     class Meta:
         model = PublicationDocumentation
         fields = [
@@ -113,6 +128,7 @@ class PublicationDocumentationSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "release_date",
+            "total_downloads",
         ]
 
 
