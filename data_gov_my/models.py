@@ -247,7 +247,6 @@ class Publication(models.Model):
     )
 
     class Meta:
-        ordering = ["-release_date", "publication_id"]
         indexes = [
             models.Index(
                 fields=["publication_id", "language"],
@@ -299,7 +298,6 @@ class PublicationDocumentation(models.Model):
     release_date = models.DateField()
 
     class Meta:
-        ordering = ["-release_date", "publication_id"]
         indexes = [
             models.Index(
                 fields=["publication_id", "language"],
