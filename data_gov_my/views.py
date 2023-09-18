@@ -48,6 +48,7 @@ from data_gov_my.serializers import (
     PublicationSerializer,
     PublicationUpcomingSerializer,
     ViewCountSerializer,
+    ViewCountPartialSerializer,
     i18nSerializer,
 )
 from data_gov_my.utils import cron_utils
@@ -418,10 +419,15 @@ class FORMS(generics.ListAPIView):
 
 
 class VIEW_COUNT(APIView):
-    def get(self, request, format=None):
-        return JsonResponse(
-            ViewCountSerializer(ViewCount.objects.all(), many=True).data, safe=False
-        )
+    def get(self, request: request.Request, format=None):
+        views_only = request.query_params.get("views_only", "").lower() == "true"
+        serializer = ViewCountPartialSerializer if views_only else ViewCountSerializer
+        type = request.query_params.get("type")
+        if type:
+            queryset = ViewCount.objects.filter(type=type)
+        else:
+            queryset = ViewCount.objects.all()
+        return JsonResponse(serializer(queryset, many=True).data, safe=False)
 
     def post(self, request, format=None):
         id = request.query_params.get("id", None)

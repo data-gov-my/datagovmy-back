@@ -67,6 +67,16 @@ class ViewCountSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ViewCountPartialSerializer(serializers.ModelSerializer):
+    """
+    Only returns the `view_count` field for metrics based fields.
+    """
+
+    class Meta:
+        model = ViewCount
+        exclude = ["download_csv", "download_parquet", "download_png", "download_svg"]
+
+
 class ViewCountSerializerV2(serializers.ModelSerializer):
     class Meta:
         model = ViewCount
