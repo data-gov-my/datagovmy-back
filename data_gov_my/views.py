@@ -612,7 +612,7 @@ class PUBLICATION_DOCS(generics.ListAPIView):
             )
         return PublicationDocumentation.objects.filter(
             language=language, documentation_type=doc_type
-        )
+        ).annotate(total_downloads=Sum("resources__downloads"))
 
 
 class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
