@@ -92,6 +92,8 @@ class PublicationDetailSerializer(serializers.ModelSerializer):
 
 
 class PublicationSerializer(serializers.ModelSerializer):
+    total_downloads = serializers.IntegerField()
+
     class Meta:
         model = Publication
         fields = [
@@ -100,6 +102,7 @@ class PublicationSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "release_date",
+            "total_downloads",
         ]
 
 

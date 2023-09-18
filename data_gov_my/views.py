@@ -6,7 +6,7 @@ from threading import Thread
 
 import environ
 from django.core.cache import cache
-from django.db.models import F, Q
+from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.timezone import get_current_timezone
@@ -496,7 +496,9 @@ class PUBLICATION(generics.ListAPIView):
             raise ParseError(
                 detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
             )
-        return Publication.objects.filter(language=language)
+        return Publication.objects.filter(language=language).annotate(
+            total_downloads=Sum("resources__downloads")
+        )
 
     def filter_queryset(self, queryset):
         # apply filters
