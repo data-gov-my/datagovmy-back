@@ -502,8 +502,10 @@ class PUBLICATION(generics.ListAPIView):
             raise ParseError(
                 detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
             )
-        return Publication.objects.filter(language=language).annotate(
-            total_downloads=Sum("resources__downloads")
+        return (
+            Publication.objects.filter(language=language)
+            .annotate(total_downloads=Sum("resources__downloads"))
+            .order_by("-release_date", "publication_id")
         )
 
     def filter_queryset(self, queryset):
@@ -610,9 +612,13 @@ class PUBLICATION_DOCS(generics.ListAPIView):
             raise ParseError(
                 detail=f"Please ensure `language` query parameter is provided with either en-GB or ms-MY as the value."
             )
-        return PublicationDocumentation.objects.filter(
-            language=language, documentation_type=doc_type
-        ).annotate(total_downloads=Sum("resources__downloads"))
+        return (
+            PublicationDocumentation.objects.filter(
+                language=language, documentation_type=doc_type
+            )
+            .annotate(total_downloads=Sum("resources__downloads"))
+            .order_by("publication_id")
+        )
 
 
 class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
