@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
     path(
-        "publication-resource/downloads",
+        "publication-resource-downloads",
         views.get_publication_resource_downloads,
     ),
     path(
