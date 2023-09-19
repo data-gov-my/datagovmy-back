@@ -545,6 +545,18 @@ class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
         return pub_object
 
 
+@api_view(["GET"])
+def get_publication_resource_downloads(request):
+    cols = ["pub_id", "resource_id", "downloads"]
+    queryset = (
+        PublicationResource.objects.filter(publication__language="en-GB")
+        .annotate(pub_id=F("publication__publication_id"))
+        .values(*cols)
+        .order_by(*cols)
+    )
+    return Response(queryset, status=status.HTTP_200_OK)
+
+
 @api_view(["POST"])
 def publication_resource_download(request: request.Request):
     if request.query_params.get("documentation_type", "").lower() == "true":

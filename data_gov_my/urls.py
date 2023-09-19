@@ -42,6 +42,10 @@ urlpatterns = [
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
     path(
+        "publication-resource/downloads",
+        views.get_publication_resource_downloads,
+    ),
+    path(
         "publication-resource/<str:id>",
         views.PUBLICATION_RESOURCE.as_view(),
         name="PUBLICATION",
