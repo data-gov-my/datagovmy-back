@@ -137,7 +137,7 @@ class GeneralMetaBuilder(ABC):
         refreshed = GeneralMetaBuilder.refresh_meta_repo()
 
         if not refreshed:
-            logging.warning("Github repo has not been refreshed, abort building")
+            logger.warning("Github repo has not been refreshed, abort building")
         else:
             # build operation (for newly created or modified files)
             filtered_changes = cls.filter_changed_files(
@@ -531,6 +531,10 @@ class i18nBuilder(GeneralMetaBuilder):
     MODEL = i18nJson
     GITHUB_DIR = "i18n"
     VALIDATOR = i18nValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        logger.warning(f"Please handle deleting {filename} from S3")
+        return 0, {}
 
     def get_meta_files(self):
         """
