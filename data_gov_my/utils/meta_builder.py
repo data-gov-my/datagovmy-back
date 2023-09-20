@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
 from urllib.request import urlopen
+from pathlib import Path
 
 import pandas as pd
 from django.apps import apps
@@ -299,7 +300,7 @@ class GeneralMetaBuilder(ABC):
                 triggers.send_telegram(telegram_msg)
 
     @abstractmethod
-    def delete_file(self, file: dict):
+    def delete_file(self, filename: str, data: dict):
         # override to handle delete logic
         pass
 
@@ -309,7 +310,9 @@ class GeneralMetaBuilder(ABC):
             # read the deleted content
             deleted_json = urlopen(file["raw_url"])
             deleted_content = json.loads(deleted_json.read())
-            deleted_count, deleted_items = self.delete_file(deleted_content)
+            deleted_count, deleted_items = self.delete_file(
+                file["filename"], deleted_content
+            )
             deleted.append(f"{file.get('filename')}\n{deleted_items}")
 
         triggers.send_telegram(
@@ -416,12 +419,12 @@ class DashboardBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "dashboards"
     VALIDATOR = DashboardValidateModel
 
-    def delete_file(self, file: dict):
+    def delete_file(self, filename: str, data: dict):
         meta_count, meta_deleted = MetaJson.objects.filter(
-            dashboard_name=file.get("dashboard_name")
+            dashboard_name=data.get("dashboard_name")
         ).delete()
         dashboard_count, dashboard_deleted = DashboardJson.objects.filter(
-            dashboard_name=file.get("dashboard_name")
+            dashboard_name=data.get("dashboard_name")
         ).delete()
         meta_deleted.update(dashboard_deleted)
         return meta_count + dashboard_count, meta_deleted
@@ -568,6 +571,10 @@ class FormBuilder(GeneralMetaBuilder):
     MODEL = FormTemplate
     GITHUB_DIR = "forms"
     VALIDATOR = FormValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        form_type = Path(filename).stem
+        return FormTemplate.objects.filter(form_type=form_type).delete()
 
     def update_or_create_meta(self, filename: str, metadata: FormValidateModel):
         form_type = filename.replace(".json", "")
