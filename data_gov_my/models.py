@@ -229,6 +229,9 @@ class ExplorersUpdate(models.Model):
     file_name = models.CharField(max_length=100, null=False)
     last_update = models.CharField(max_length=100, null=False)
 
+    def __str__(self) -> str:
+        return f"{self.explorer} ({self.file_name})"
+
 
 class Publication(models.Model):
     publication_id = models.CharField(max_length=30)
