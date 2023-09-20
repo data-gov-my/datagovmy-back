@@ -587,6 +587,15 @@ class DataCatalogBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "catalog"
     VALIDATOR = DataCatalogValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        file = data["file"]
+        bucket = file.get("bucket", "")
+        file_name = file.get("file_name", "")
+
+        return CatalogJson.objects.filter(
+            id__contains=f"{bucket}_{file_name}_"
+        ).delete()
+
     def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
         file_data = metadata.file
         all_variable_data = metadata.file.variables
