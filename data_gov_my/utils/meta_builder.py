@@ -298,35 +298,25 @@ class GeneralMetaBuilder(ABC):
 
                 triggers.send_telegram(telegram_msg)
 
-    def remove_deleted_files(self):
-        """
-        Removes the deleted files in the repo, from the db
-        """
-        for i in ["dashboards", "catalog"]:
-            _DIR = os.path.join(
-                os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), i
-            )
+    @abstractmethod
+    def delete_file(self, file: dict):
+        # override to handle delete logic
+        pass
 
-            column = "dashboard_name" if i == "dashboards" else "file_src"
-            model_name = "DashboardJson" if i == "dashboards" else "CatalogJson"
-            model = apps.get_model("data_gov_my", model_name)
+    def delete_operation(self, meta_files=[]):
+        deleted = []
+        for file in meta_files:
+            # read the deleted content
+            deleted_json = urlopen(file["raw_url"])
+            deleted_content = json.loads(deleted_json.read())
+            deleted_count, deleted_items = self.delete_file(deleted_content)
+            deleted.append(f"{file.get('filename')}\n{deleted_items}")
 
-            distinct_db = [
-                m[column] for m in model.objects.values(column).distinct()
-            ]  # Change model here
-            distinct_dir = [
-                f.replace(".json", "")
-                for f in os.listdir(_DIR)
-                if isfile(join(_DIR, f))
-            ]
-            diff = list(set(distinct_db) - set(distinct_dir))
-            if diff:
-                query = {f"{column}__in": diff}
-                if i == "dashboards":
-                    DashboardJson.objects.filter(**query).delete()
-                    MetaJson.objects.filter(**query).delete()
-                else:
-                    CatalogJson.objects.filter(**query).delete()
+        triggers.send_telegram(
+            triggers.format_header(f"DELETED {self.CATEGORY} REMOVED FILES (SELECTIVE)")
+            + "\n"
+            + triggers.format_files_with_status_emoji(deleted, "🗑️")
+        )
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[], refresh=True):
         """
@@ -341,8 +331,6 @@ class GeneralMetaBuilder(ABC):
         """
         if refresh:
             self.refresh_meta_repo()
-        # Remove from db, deleted meta jsons
-        self.remove_deleted_files()  # FIXME: refactor to delete from *all* categories?
 
         # get meta files (prioritise input files)
         meta_files = (
