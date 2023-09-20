@@ -746,6 +746,14 @@ class PublicationBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "pub-dosm/publications"
     VALIDATOR = PublicationValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        """
+        This will also delete the download counts for relevant publication resource!
+        """
+        return Publication.objects.filter(
+            publication_id=data.get("publication")
+        ).delete()
+
     def update_or_create_meta(self, filename: str, metadata: PublicationValidateModel):
         # english publication
         pub_object_en, _ = Publication.objects.update_or_create(
@@ -815,6 +823,14 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
     MODEL = PublicationDocumentation
     GITHUB_DIR = "pub-dosm/documentation"
     VALIDATOR = PublicationDocumentationValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        This will also delete the download counts for relevant publication documentation resource!
+        """
+        return PublicationDocumentation.objects.filter(
+            publication_id=data.get("publication")
+        ).delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: PublicationDocumentationValidateModel
@@ -887,6 +903,12 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
     MODEL = PublicationUpcoming
     GITHUB_DIR = "pub-dosm/upcoming"
     VALIDATOR = PublicationUpcomingValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        Deletes the whole table because only a single file is supposed to reside within pub-dosm/upcoming
+        """
+        return PublicationUpcoming.objects.all().delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: PublicationUpcomingValidateModel
