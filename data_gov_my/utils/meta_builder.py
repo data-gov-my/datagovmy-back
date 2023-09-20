@@ -632,6 +632,16 @@ class ExplorerBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "explorers"
     VALIDATOR = ExplorerValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        meta_count, meta_deleted = MetaJson.objects.filter(
+            dashboard_name=data.get("explorer_name")
+        ).delete()
+        explorer_count, explorer_deleted = ExplorersUpdate.objects.filter(
+            explorer=data.get("explorer_name")
+        ).delete()
+        meta_deleted.update(explorer_deleted)
+        return meta_count + explorer_count, meta_deleted
+
     def update_or_create_meta(self, filename: str, metadata: ExplorerValidateModel):
         updated_values = {
             "dashboard_meta": metadata.model_dump(),
