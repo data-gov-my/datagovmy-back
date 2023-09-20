@@ -87,45 +87,6 @@ def get_latest_info_git(type, commit_id):
         triggers.send_telegram("!!! FAILED TO GET GITHUB " + type + " !!!")
 
 
-def remove_deleted_files():
-    """
-    Remove deleted files.
-    """
-    for k, v in common.REFRESH_VARIABLES.items():
-        model_name = apps.get_model("data_gov_my", k)
-        distinct_db = [
-            m[v["column_name"]]
-            for m in model_name.objects.values(v["column_name"]).distinct()
-        ]
-        DIR = os.path.join(
-            os.getcwd(),
-            "DATAGOVMY_SRC/" + os.getenv("GITHUB_DIR", "-") + v["directory"],
-        )
-        distinct_dir = [
-            f.replace(".json", "") for f in listdir(DIR) if isfile(join(DIR, f))
-        ]
-        diff = list(set(distinct_db) - set(distinct_dir))
-
-        if diff:
-            # Remove the deleted datasets
-            query = {v["column_name"] + "__in": diff}
-            del_int, deleted = model_name.objects.filter(**query).delete()
-            logging.warning(f"Deleted removed files: {deleted}")
-
-    # Update the cache
-    source_filters_cache()
-    catalog_list = list(
-        CatalogJson.objects.all().values(
-            "id",
-            "catalog_name",
-            "catalog_category",
-            "catalog_category_name",
-            "catalog_subcategory_name",
-        )
-    )
-    cache.set("catalog_list", catalog_list)
-
-
 def get_fe_url_by_site(site):
     """
     Returns the URL and authorization header for frontend revalidation.
