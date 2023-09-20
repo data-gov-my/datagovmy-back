@@ -8,6 +8,7 @@ import traceback
 from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
+from urllib.request import urlopen
 
 import pandas as pd
 from django.apps import apps
@@ -39,8 +40,8 @@ from data_gov_my.utils.cron_utils import (
     get_latest_info_git,
     remove_src_folders,
     revalidate_frontend,
-    write_as_binary,
     upload_s3,
+    write_as_binary,
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
@@ -124,14 +125,23 @@ class GeneralMetaBuilder(ABC):
         """
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
-        changed_files = [f["filename"] for f in data["files"]]
+        changed_files = []
+        delete_files = []
+
+        for f in data["files"]:
+            if f["status"] == "removed":
+                delete_files.append(f)
+            else:
+                changed_files.append(f)
         refreshed = GeneralMetaBuilder.refresh_meta_repo()
 
         if not refreshed:
             logging.warning("Github repo has not been refreshed, abort building")
         else:
-            filtered_changes = cls.filter_changed_files(changed_files)
-
+            # build operation (for newly created or modified files)
+            filtered_changes = cls.filter_changed_files(
+                changed_files, compare_github=True
+            )
             for dir, files in filtered_changes.items():
                 if files:
                     builder = GeneralMetaBuilder.create(dir, isCategory=False)
@@ -139,11 +149,15 @@ class GeneralMetaBuilder(ABC):
                         manual=False, rebuild=False, meta_files=files, refresh=False
                     )
 
+            # delete operation (for any files with "removed" as status)
+            deletes = cls.filter_changed_files(delete_files)
+            for dir, files in deletes.items():
+                if files:
+                    builder = GeneralMetaBuilder.create(dir, isCategory=False)
+                    builder.delete_operation(files)
+
     @staticmethod
-    def filter_changed_files(file_list) -> dict[str, list]:
-        """
-        Maps the files to respective categories and returns a dictionary where the keys are the categories and the values are the corresponding files.
-        """
+    def filter_changed_files(file_list, compare_github=False) -> dict[str, list[dict]]:
         changed_files = {
             category: [] for category in GeneralMetaBuilder.subclasses_by_github_dir
         }
@@ -152,7 +166,8 @@ class GeneralMetaBuilder(ABC):
         if not os.path.exists(meta_dir):
             GeneralMetaBuilder.refresh_meta_repo()
 
-        for f in file_list:
+        for file in file_list:
+            f = file["filename"]
             f_info = f.split("/")
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
@@ -160,7 +175,10 @@ class GeneralMetaBuilder(ABC):
                     dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
                         ".json", ""
                     )
-                    changed_files[github_dir].append(dir)
+                    if compare_github:  # used for filtering modified/created files
+                        changed_files[github_dir].append(dir)
+                    else:  # used for deleted files
+                        changed_files[github_dir].append(file)
         return changed_files
 
     @staticmethod
