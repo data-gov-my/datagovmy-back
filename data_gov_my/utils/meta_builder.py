@@ -416,6 +416,16 @@ class DashboardBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "dashboards"
     VALIDATOR = DashboardValidateModel
 
+    def delete_file(self, file: dict):
+        meta_count, meta_deleted = MetaJson.objects.filter(
+            dashboard_name=file.get("dashboard_name")
+        ).delete()
+        dashboard_count, dashboard_deleted = DashboardJson.objects.filter(
+            dashboard_name=file.get("dashboard_name")
+        ).delete()
+        meta_deleted.update(dashboard_deleted)
+        return meta_count + dashboard_count, meta_deleted
+
     def update_or_create_meta(self, filename: str, metadata: DashboardValidateModel):
         dashboard_meta = metadata.model_dump()
         updated_values = {
