@@ -229,15 +229,6 @@ class GeneralTransportExplorer(General_Explorer):
         return d
 
     def get_timeseries(self, service, origin, destination):
-        # timeseries = (
-        #     KTMBTimeseries.objects.filter(
-        #         service=service, origin=origin, destination=destination
-        #     )
-        #     .values("frequency")
-        #     .order_by("frequency")
-        #     .annotate(date=ArrayAgg("date", ordering="date"))
-        #     .annotate(passengers=ArrayAgg("passengers"))
-        # )
         timeseries = {}
         queryset = self.TIMESERIES_MODEL.objects.filter(
             service=service, origin=origin, destination=destination
@@ -269,9 +260,7 @@ class GeneralTransportExplorer(General_Explorer):
             self.TIMESERIES_CALLOUT_MODEL.objects.filter(
                 service=service, origin=origin, destination=destination
             )
-            .exclude(frequency="daily_7d")
             .values("frequency", "passengers")
-            # .annotate(passengers=ArrayAgg("passengers"))
             .order_by("frequency")
         )
         callout_data = {}
