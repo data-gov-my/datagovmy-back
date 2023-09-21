@@ -8,10 +8,10 @@ class Prasarana(GeneralTransportExplorer):
 
     # API handling
 
-    # Data Populate (FIXME: update after data creates correct parquet files)
+    # Data Populate
     data_populate = {
-        "PrasaranaTimeseries": "https://storage.data.gov.my/dashboards/ktmb_timeseries.parquet",
-        "PrasaranaTimeseriesCallout": "https://storage.data.gov.my/dashboards/ktmb_timeseries_callout.parquet",
+        "PrasaranaTimeseries": "https://storage.data.gov.my/dashboards/prasarana_timeseries.parquet",
+        "PrasaranaTimeseriesCallout": "https://storage.data.gov.my/dashboards/prasarana_timeseries_callout.parquet",
     }
 
     TIMESERIES_MODEL = PrasaranaTimeseries
