@@ -284,12 +284,15 @@ class DROPDOWN(APIView):
         if "dashboard" in param_list:
             res = handle_request(param_list, False)
             dropdown_lst = res["query_values"]["data"]["data"]
-            info = {"total": len(dropdown_lst)}
             filtered_res = dropdown_lst
+
+            if not filtered_res:
+                return JsonResponse({}, safe=False)
+
             if query := param_list.get("query"):
-                query = query[0].lower()
+                query = query.lower()
                 if filters := param_list.get("filters"):
-                    filters = filters[0].split(",")
+                    filters = filters.split(",")
                 else:
                     # by default take all columns
                     filters = filtered_res[0].keys()
@@ -304,6 +307,8 @@ class DROPDOWN(APIView):
                     for d in filtered_res
                     if any(query.lower() in d[column].lower() for column in filters)
                 ]
+
+            info = {"total": len(filtered_res)}
 
             if limit := param_list.get("limit"):
                 limit = int(limit)
