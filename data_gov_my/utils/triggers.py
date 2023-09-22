@@ -1,8 +1,10 @@
+import logging
 import os
 from typing import List
 
 import environ
 import requests
+from requests.exceptions import ConnectionError
 
 env = environ.Env()
 environ.Env.read_env()
@@ -10,6 +12,8 @@ environ.Env.read_env()
 """
 Sends a telegram message
 """
+
+logger = logging.getLogger("django")
 
 
 def format_header(text: str):
@@ -41,7 +45,10 @@ def send_telegram(message: str):
         tf_url = (
             f'https://api.telegram.org/bot{os.getenv("TELEGRAM_TOKEN")}/sendMessage'
         )
-        r = requests.get(url=tf_url, data=params)
+        try:
+            r = requests.post(url=tf_url, data=params)
+        except ConnectionError as e:
+            logger.warning(f"The following telegram msg could not be sent: \n{chunk}")
 
 
 """
