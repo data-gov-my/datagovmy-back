@@ -8,6 +8,8 @@ import traceback
 from abc import ABC, abstractmethod
 from os.path import isfile, join
 from typing import List
+from urllib.request import urlopen
+from pathlib import Path
 
 import pandas as pd
 from django.apps import apps
@@ -39,8 +41,8 @@ from data_gov_my.utils.cron_utils import (
     get_latest_info_git,
     remove_src_folders,
     revalidate_frontend,
-    write_as_binary,
     upload_s3,
+    write_as_binary,
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
@@ -124,14 +126,23 @@ class GeneralMetaBuilder(ABC):
         """
         latest_sha = get_latest_info_git("SHA", "")
         data = json.loads(get_latest_info_git("COMMIT", latest_sha))
-        changed_files = [f["filename"] for f in data["files"]]
+        changed_files = []
+        delete_files = []
+
+        for f in data["files"]:
+            if f["status"] == "removed":
+                delete_files.append(f)
+            else:
+                changed_files.append(f)
         refreshed = GeneralMetaBuilder.refresh_meta_repo()
 
         if not refreshed:
-            logging.warning("Github repo has not been refreshed, abort building")
+            logger.warning("Github repo has not been refreshed, abort building")
         else:
-            filtered_changes = cls.filter_changed_files(changed_files)
-
+            # build operation (for newly created or modified files)
+            filtered_changes = cls.filter_changed_files(
+                changed_files, compare_github=True
+            )
             for dir, files in filtered_changes.items():
                 if files:
                     builder = GeneralMetaBuilder.create(dir, isCategory=False)
@@ -139,11 +150,15 @@ class GeneralMetaBuilder(ABC):
                         manual=False, rebuild=False, meta_files=files, refresh=False
                     )
 
+            # delete operation (for any files with "removed" as status)
+            deletes = cls.filter_changed_files(delete_files)
+            for dir, files in deletes.items():
+                if files:
+                    builder = GeneralMetaBuilder.create(dir, isCategory=False)
+                    builder.delete_operation(files)
+
     @staticmethod
-    def filter_changed_files(file_list) -> dict[str, list]:
-        """
-        Maps the files to respective categories and returns a dictionary where the keys are the categories and the values are the corresponding files.
-        """
+    def filter_changed_files(file_list, compare_github=False) -> dict[str, list[dict]]:
         changed_files = {
             category: [] for category in GeneralMetaBuilder.subclasses_by_github_dir
         }
@@ -152,7 +167,8 @@ class GeneralMetaBuilder(ABC):
         if not os.path.exists(meta_dir):
             GeneralMetaBuilder.refresh_meta_repo()
 
-        for f in file_list:
+        for file in file_list:
+            f = file["filename"]
             f_info = f.split("/")
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
@@ -160,7 +176,10 @@ class GeneralMetaBuilder(ABC):
                     dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
                         ".json", ""
                     )
-                    changed_files[github_dir].append(dir)
+                    if compare_github:  # used for filtering modified/created files
+                        changed_files[github_dir].append(dir)
+                    else:  # used for deleted files
+                        changed_files[github_dir].append(file)
         return changed_files
 
     @staticmethod
@@ -280,35 +299,27 @@ class GeneralMetaBuilder(ABC):
 
                 triggers.send_telegram(telegram_msg)
 
-    def remove_deleted_files(self):
-        """
-        Removes the deleted files in the repo, from the db
-        """
-        for i in ["dashboards", "catalog"]:
-            _DIR = os.path.join(
-                os.getcwd(), "DATAGOVMY_SRC", os.getenv("GITHUB_DIR", "-"), i
+    @abstractmethod
+    def delete_file(self, filename: str, data: dict):
+        # override to handle delete logic
+        pass
+
+    def delete_operation(self, meta_files=[]):
+        deleted = []
+        for file in meta_files:
+            # read the deleted content
+            deleted_json = urlopen(file["raw_url"])
+            deleted_content = json.loads(deleted_json.read())
+            deleted_count, deleted_items = self.delete_file(
+                file["filename"], deleted_content
             )
+            deleted.append(f"{file.get('filename')}\n{deleted_items}")
 
-            column = "dashboard_name" if i == "dashboards" else "file_src"
-            model_name = "DashboardJson" if i == "dashboards" else "CatalogJson"
-            model = apps.get_model("data_gov_my", model_name)
-
-            distinct_db = [
-                m[column] for m in model.objects.values(column).distinct()
-            ]  # Change model here
-            distinct_dir = [
-                f.replace(".json", "")
-                for f in os.listdir(_DIR)
-                if isfile(join(_DIR, f))
-            ]
-            diff = list(set(distinct_db) - set(distinct_dir))
-            if diff:
-                query = {f"{column}__in": diff}
-                if i == "dashboards":
-                    DashboardJson.objects.filter(**query).delete()
-                    MetaJson.objects.filter(**query).delete()
-                else:
-                    CatalogJson.objects.filter(**query).delete()
+        triggers.send_telegram(
+            triggers.format_header(f"DELETED {self.CATEGORY} REMOVED FILES (SELECTIVE)")
+            + "\n"
+            + triggers.format_files_with_status_emoji(deleted, "🗑️")
+        )
 
     def build_operation(self, manual=True, rebuild=True, meta_files=[], refresh=True):
         """
@@ -323,8 +334,6 @@ class GeneralMetaBuilder(ABC):
         """
         if refresh:
             self.refresh_meta_repo()
-        # Remove from db, deleted meta jsons
-        self.remove_deleted_files()  # FIXME: refactor to delete from *all* categories?
 
         # get meta files (prioritise input files)
         meta_files = (
@@ -409,6 +418,16 @@ class DashboardBuilder(GeneralMetaBuilder):
     MODEL = MetaJson
     GITHUB_DIR = "dashboards"
     VALIDATOR = DashboardValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        meta_count, meta_deleted = MetaJson.objects.filter(
+            dashboard_name=data.get("dashboard_name")
+        ).delete()
+        dashboard_count, dashboard_deleted = DashboardJson.objects.filter(
+            dashboard_name=data.get("dashboard_name")
+        ).delete()
+        meta_deleted.update(dashboard_deleted)
+        return meta_count + dashboard_count, meta_deleted
 
     def update_or_create_meta(self, filename: str, metadata: DashboardValidateModel):
         dashboard_meta = metadata.model_dump()
@@ -513,6 +532,10 @@ class i18nBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "i18n"
     VALIDATOR = i18nValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        logger.warning(f"Please handle deleting {filename} from S3")
+        return 0, {}
+
     def get_meta_files(self):
         """
         Returns all meta files under each language sub-folder.
@@ -553,6 +576,10 @@ class FormBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "forms"
     VALIDATOR = FormValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        form_type = Path(filename).stem
+        return FormTemplate.objects.filter(form_type=form_type).delete()
+
     def update_or_create_meta(self, filename: str, metadata: FormValidateModel):
         form_type = filename.replace(".json", "")
         return FormTemplate.create(form_type=form_type, form_meta=metadata.model_dump())
@@ -563,6 +590,15 @@ class DataCatalogBuilder(GeneralMetaBuilder):
     MODEL = CatalogJson
     GITHUB_DIR = "catalog"
     VALIDATOR = DataCatalogValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        file = data["file"]
+        bucket = file.get("bucket", "")
+        file_name = file.get("file_name", "")
+
+        return CatalogJson.objects.filter(
+            id__contains=f"{bucket}_{file_name}_"
+        ).delete()
 
     def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
         file_data = metadata.file
@@ -608,6 +644,16 @@ class ExplorerBuilder(GeneralMetaBuilder):
     MODEL = ExplorersUpdate
     GITHUB_DIR = "explorers"
     VALIDATOR = ExplorerValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        meta_count, meta_deleted = MetaJson.objects.filter(
+            dashboard_name=data.get("explorer_name")
+        ).delete()
+        explorer_count, explorer_deleted = ExplorersUpdate.objects.filter(
+            explorer=data.get("explorer_name")
+        ).delete()
+        meta_deleted.update(explorer_deleted)
+        return meta_count + explorer_count, meta_deleted
 
     def update_or_create_meta(self, filename: str, metadata: ExplorerValidateModel):
         updated_values = {
@@ -700,6 +746,14 @@ class PublicationBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "pub-dosm/publications"
     VALIDATOR = PublicationValidateModel
 
+    def delete_file(self, filename: str, data: dict):
+        """
+        This will also delete the download counts for relevant publication resource!
+        """
+        return Publication.objects.filter(
+            publication_id=data.get("publication")
+        ).delete()
+
     def update_or_create_meta(self, filename: str, metadata: PublicationValidateModel):
         # english publication
         pub_object_en, _ = Publication.objects.update_or_create(
@@ -769,6 +823,14 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
     MODEL = PublicationDocumentation
     GITHUB_DIR = "pub-dosm/documentation"
     VALIDATOR = PublicationDocumentationValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        This will also delete the download counts for relevant publication documentation resource!
+        """
+        return PublicationDocumentation.objects.filter(
+            publication_id=data.get("publication")
+        ).delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: PublicationDocumentationValidateModel
@@ -841,6 +903,12 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
     MODEL = PublicationUpcoming
     GITHUB_DIR = "pub-dosm/upcoming"
     VALIDATOR = PublicationUpcomingValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        Deletes the whole table because only a single file is supposed to reside within pub-dosm/upcoming
+        """
+        return PublicationUpcoming.objects.all().delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: PublicationUpcomingValidateModel
