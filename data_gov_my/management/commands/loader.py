@@ -53,5 +53,12 @@ class Command(BaseCommand):
             "UPDATE",
             "REBUILD",
         ]:
+            if operation == "REBUILD" and category in [
+                "PUBLICATION",
+                "PUBLICATION_DOCS",
+            ]:
+                raise InterruptedError(
+                    "REBUILD operation is not allowed for models that contain `download` field. Please delete the objects individually to avoid data loss!"
+                )
             builder = GeneralMetaBuilder.create(property=category)
             builder.build_operation(manual=True, rebuild=rebuild, meta_files=files)
