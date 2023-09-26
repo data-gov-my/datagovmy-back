@@ -737,6 +737,9 @@ class ExplorerBuilder(GeneralMetaBuilder):
 
             triggers.send_telegram("\n".join(telegram_msg))
 
+        # need to revalidate the MetaJsons separately, since routes/sites info are stored in MetaJson, not ExplorersUpdate
+        self.revalidate_route(created_objects)
+
         return successful_meta
 
 
