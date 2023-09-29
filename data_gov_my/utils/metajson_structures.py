@@ -46,11 +46,11 @@ class DashboardChartModel(BaseModel):
         except ValueError:
             pass
 
-        if re.match(r"^\d{4}-Q[1-4]$", v):
+        if re.match(r"^\d{4}-Q[1-4]$", v) or re.match(r"^\d{4}$", v):
             return v
 
         raise ValueError(
-            "Invalid data_as_of formats! (should be %Y-%m-%d %H:%M, %Y-%m or r'^\d{4}-Q[1-4]$')"
+            "Invalid data_as_of formats! (should be %Y-%m-%d %H:%M, %Y-%m, %Y or r'^\d{4}-Q[1-4]$')"
         )
 
 
