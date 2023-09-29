@@ -40,12 +40,20 @@ class DashboardChartModel(BaseModel):
             pass
 
         try:
+            # Attempt to parse the input string as a datetime with format YYYY-MM-DD
+            datetime.strptime(v, "%Y-%m-%d")
+            return v
+        except ValueError:
+            pass
+
+        try:
             # Attempt to parse the input string as a datetime with format YYYY-MM
             datetime.strptime(v, "%Y-%m")
             return v
         except ValueError:
             pass
 
+        # Attempt to parse the input string as quarterly and yearly data
         if re.match(r"^\d{4}-Q[1-4]$", v) or re.match(r"^\d{4}$", v):
             return v
 
