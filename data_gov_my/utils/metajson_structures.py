@@ -1,5 +1,6 @@
 from __future__ import annotations
 from datetime import date, datetime
+import re
 from typing import Literal, Optional
 
 from pydantic import (
@@ -18,20 +19,39 @@ class DashboardChartModel(BaseModel):
     name: str
     chart_type: str
     chart_source: str
-    data_as_of: datetime
+    data_as_of: str
     api_type: Literal["dynamic", "static", "individual_chart"]
     variables: dict  # will be validated individually for each chart
     api_params: list[str]
-
-    @field_serializer("data_as_of")
-    def serialize_date(self, data_as_of: datetime):
-        return data_as_of.strftime("%Y-%m-%d %H:%M")
 
     @validator("chart_type")
     def valid_chart_type(cls, v: dict):
         if v not in ChartBuilder.subclasses.keys():
             raise ValueError(f"{v} is not a valid chart_type!")
         return v
+
+    @field_validator("data_as_of")
+    def proper_date_format(cls, v):
+        try:
+            # Attempt to parse the input string as a datetime with format YYYY-MM-DD HH:MM
+            datetime.strptime(v, "%Y-%m-%d %H:%M")
+            return v
+        except ValueError:
+            pass
+
+        try:
+            # Attempt to parse the input string as a datetime with format YYYY-MM
+            datetime.strptime(v, "%Y-%m")
+            return v
+        except ValueError:
+            pass
+
+        if re.match(r"^\d{4}-Q[1-4]$", v):
+            return v
+
+        raise ValueError(
+            "Invalid data_as_of formats! (should be %Y-%m-%d %H:%M, %Y-%m or r'^\d{4}-Q[1-4]$')"
+        )
 
 
 class DashboardValidateModel(BaseModel):
