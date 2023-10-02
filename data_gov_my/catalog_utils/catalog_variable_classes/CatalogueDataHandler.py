@@ -153,17 +153,17 @@ class CatalogueDataHandler:
         ]  # Get chart data
 
         defaults_api = {}  # Creates a default API
-        prev_key = ""
+        prev_key = []
 
         for d in self._data["API"]["filters"]:  # Gets all the default API values
             key = d["key"]
             val = ""
             if key not in ["date_slider", "range"]:
-                if prev_key == "" or key in self._params:  # The first key
+                if not prev_key or key in self._params:  # The first key
                     val = self._params[key][0] if key in self._params else d["default"]
                 else:
-                    val = d["options"][defaults_api[prev_key]][0]
-                prev_key = key
+                    val = self.get_nested_dict_by_list(d["options"], prev_key)[0]
+                prev_key.append(val)
             else:
                 val = self._params[key][0] if key in self._params else d["default"]
             defaults_api[key] = val
