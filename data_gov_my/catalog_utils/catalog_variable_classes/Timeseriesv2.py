@@ -383,7 +383,7 @@ class Timeseries(GeneralChartsUtil):
                     )
                     cur_level = dropdown
                     for dk in default_key:
-                        cur_level = dropdown[dk]
+                        cur_level = cur_level[dk]
                     def_key = cur_level[0]
                     filter_obj = self.build_api_object_filter(
                         key=api, def_val=def_key, options=dropdown
