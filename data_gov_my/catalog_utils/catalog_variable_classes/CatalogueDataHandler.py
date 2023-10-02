@@ -8,6 +8,8 @@ import json
 from dateutil.relativedelta import relativedelta
 from mergedeep import merge
 from data_gov_my.utils import translations as translation
+from functools import reduce  # forward compatibility for Python 3
+import operator
 
 
 class CatalogueDataHandler:
@@ -32,6 +34,10 @@ class CatalogueDataHandler:
     """
     Gets the results depending on which chart type
     """
+
+    @staticmethod
+    def get_nested_dict_by_list(nested_dict: dict, key_list: list):
+        return reduce(operator.getitem, key_list, nested_dict)
 
     def get_results(self):
         # Families with same format
