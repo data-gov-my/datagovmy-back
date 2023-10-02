@@ -202,6 +202,7 @@ class CatalogueDataHandler:
             first_filter = self._data["API"]["filters"][0]["key"]
             start_idx = 1 if first_filter == "date_slider" else 0
 
+        key_list = []  # keeps track of selected filter so far
         for idx, d in enumerate(self._data["API"]["filters"]):
             if (idx > start_idx) and (d["key"] != "range"):
                 prev_param = self._data["API"]["filters"][
@@ -209,13 +210,16 @@ class CatalogueDataHandler:
                 ]  # Take from previous selection
                 if prev_param["key"] in self._params:
                     choice = self._params[prev_param["key"]][0]
+                    key_list.append(choice)
                     if choice in d["options"]:
                         d["options"] = d["options"][choice]
                         d["default"] = d["options"][0]
                     else:
                         self._data["API"]["filters"].remove(d)
                 else:
-                    d["options"] = d["options"][prev_param["default"]]
+                    # d["options"] = d["options"][prev_param["default"]]
+                    key_list.append(prev_param["default"])
+                    d["options"] = self.get_nested_dict_by_list(d["options"], key_list)
 
     """
     Check if a chart has a date range element
