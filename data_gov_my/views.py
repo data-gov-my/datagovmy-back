@@ -144,8 +144,9 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
-        thread = Thread(target=GeneralMetaBuilder.selective_update)
-        thread.start()
+        # thread = Thread(target=GeneralMetaBuilder.selective_update)
+        GeneralMetaBuilder.selective_update()
+        # thread.start()
         return Response(status=status.HTTP_200_OK)
 
 
