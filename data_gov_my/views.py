@@ -797,17 +797,21 @@ def data_variable_handler(param_list):
     var_id = param_list["id"][0]
     catalog_data = cache.get(var_id)
     exclude_openapi = cache.get(f"{var_id}_openapi")
+    dataviz = cache.get(f"{var_id}_dataviz")
 
-    if not catalog_data or not exclude_openapi:
+    if not catalog_data or not exclude_openapi or not dataviz:
         info = get_object_or_404(CatalogJson, id=var_id)
         catalog_data = info.catalog_data
         exclude_openapi = info.exclude_openapi
+        dataviz = info.dataviz
         cache.set(var_id, catalog_data)
         cache.set(f"{var_id}_openapi", exclude_openapi)
+        cache.set(f"{var_id}_dataviz", dataviz)
 
     chart_type = catalog_data["API"]["chart_type"]
     res = data_variable_chart_handler(catalog_data, chart_type, param_list)
     res["exclude_openapi"] = exclude_openapi
+    res["dataviz"] = info.dataviz
 
     if len(res) == 0:  # If catalogues with the filter isn't found
         return {}

@@ -42,6 +42,7 @@ class Command(BaseCommand):
         """
         if category in [
             "DATA_CATALOG",
+            "DATA_CATALOGUE",
             "DASHBOARDS",
             "I18N",
             "FORMS",
