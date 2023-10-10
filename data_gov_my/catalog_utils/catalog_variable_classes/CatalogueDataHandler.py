@@ -153,7 +153,7 @@ class CatalogueDataHandler:
             key = d["key"]
             val = ""
             if key not in ["date_slider", "range"]:
-                if prev_key == "":  # The first key
+                if prev_key == "" or key in self._params:  # The first key
                     val = self._params[key][0] if key in self._params else d["default"]
                 else:
                     val = d["options"][defaults_api[prev_key]][0]
