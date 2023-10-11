@@ -585,6 +585,62 @@ class FormBuilder(GeneralMetaBuilder):
         return FormTemplate.create(form_type=form_type, form_meta=metadata.model_dump())
 
 
+class DataCatalogueBuilder(GeneralMetaBuilder):
+    CATEGORY = "DATA_CATALOGUE"
+    MODEL = CatalogJson
+    GITHUB_DIR = "data-catalogue"
+    VALIDATOR = DataCatalogValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        file = data["file"]
+        bucket = file.get("bucket", "")
+        file_name = file.get("file_name", "")
+
+        return CatalogJson.objects.filter(
+            id__contains=f"{bucket}_{file_name}_"
+        ).delete()
+
+    def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
+        file_data = metadata.file
+        all_variable_data = metadata.file.variables
+        full_meta = metadata
+        file_src = filename.replace(".json", "")
+
+        created_objects = []
+
+        for cur_data in all_variable_data:
+            if "catalog_data" in cur_data:  # Checks if the catalog_data is in
+                cur_catalog_data = cur_data["catalog_data"]
+                chart_type = cur_catalog_data["chart"]["chart_type"]
+                dataviz = cur_catalog_data.get("dataviz", {})
+
+                if chart_type in common.CHART_TYPES:
+                    args = {
+                        "full_meta": full_meta.model_dump(),
+                        "file_data": file_data.model_dump(),
+                        "cur_data": cur_data,
+                        "all_variable_data": all_variable_data,
+                        "file_src": file_src,
+                    }
+
+                    module_ = f"data_gov_my.catalog_utils.catalog_variable_classes.{common.CHART_TYPES[chart_type]['parent']}"
+                    constructor_ = common.CHART_TYPES[chart_type]["constructor"]
+                    class_ = getattr(importlib.import_module(module_), constructor_)
+                    obj = class_(**args)
+
+                    unique_id = obj.unique_id
+                    db_input = obj.db_input
+                    db_input["exclude_openapi"] = file_data.exclude_openapi
+                    db_input["dataviz"] = dataviz
+                    db_obj, created = CatalogJson.objects.update_or_create(
+                        id=unique_id, defaults=db_input
+                    )
+
+                    created_objects.append(db_obj)
+
+        return created_objects
+
+
 class DataCatalogBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOG"
     MODEL = CatalogJson
