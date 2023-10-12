@@ -29,6 +29,7 @@ from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     AuthTable,
     CatalogJson,
+    CatalogueJson,
     DashboardJson,
     FormData,
     FormTemplate,
@@ -262,6 +263,103 @@ class DATA_CATALOG(APIView):
                     res["dataset"][category][sub_category] = [obj]
 
         return JsonResponse(res, safe=False)
+
+
+class DataCatalogueListAPIView(APIView):
+    def get(self, request: request.Request, format=None):
+        catalog_category_name = "catalog_category_name"
+        catalog_subcategory_name = "catalog_subcategory_name"
+        if request.query_params.get("opendosm", "").lower() == "true":
+            catalog_category_name = "catalog_category_opendosm_name"
+            catalog_subcategory_name = "catalog_subcategory_opendosm_name"
+
+        param_list = dict(request.GET)
+        filters = get_filters_applied(param_list)
+        info = ""
+
+        if len(filters) > 0:
+            info = CatalogueJson.objects.filter(filters).values(
+                "id",
+                "catalog_name",
+                "catalog_category_name",
+                "catalog_subcategory_name",
+                "catalog_category_opendosm_name",
+                "catalog_subcategory_opendosm_name",
+            )
+        else:
+            catalog_list = cache.get("catalogue_list")
+
+            if catalog_list:
+                info = catalog_list
+            else:
+                info = list(
+                    CatalogueJson.objects.all().values(
+                        "id",
+                        "catalog_name",
+                        "catalog_category_name",
+                        "catalog_subcategory_name",
+                        "catalog_category_opendosm_name",
+                        "catalog_subcategory_opendosm_name",
+                    )
+                )
+                cache.set("catalogue_list", info)
+
+        res = {}
+        res["total_all"] = len(info)
+        if cache.get("data_catalogue_source_filters"):
+            res["source_filters"] = cache.get("data_catalogue_source_filters")
+        else:
+            source_filters = cron_utils.data_catalogue_source_filters_cache()
+            res["source_filters"] = source_filters
+            cache.set("data_catalogue_source_filters", source_filters)
+
+        res["dataset"] = {}
+
+        lang = request.query_params.get("lang", "en")
+        lang_mapping = {"en": 0, "bm": 1}
+
+        if lang not in lang_mapping:
+            lang = "en"
+
+        for item in info:
+            category = item.get(catalog_category_name)
+            sub_category = item.get(catalog_subcategory_name)
+            if not category or not sub_category:
+                res["total_all"] -= 1
+                continue
+            category = category.split(" | ")[lang_mapping[lang]]
+            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
+
+            obj = {}
+            obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
+            obj["id"] = item["id"]
+
+            if category not in res["dataset"]:
+                res["dataset"][category] = {}
+                res["dataset"][category][sub_category] = [obj]
+            else:
+                if sub_category in res["dataset"][category]:
+                    res["dataset"][category][sub_category].append(obj)
+                else:
+                    res["dataset"][category][sub_category] = [obj]
+
+        return JsonResponse(res, safe=False)
+
+
+class DataCatalogueDetailAPIView(APIView):
+    def get(self, request, format=None):
+        param_list = dict(request.GET)
+        params_req = ["id"]
+
+        if all(p in param_list for p in params_req):
+            res = data_catalogue_variable_handler(param_list)
+            if not res:
+                return JsonResponse(
+                    {"status": 404, "message": "Catalogue data not found."}, status=404
+                )
+            return JsonResponse(res, safe=False)
+        else:
+            return JsonResponse({}, safe=False)
 
 
 class EXPLORER(APIView):
@@ -793,6 +891,31 @@ General handler for data-variables
 """
 
 
+def data_catalogue_variable_handler(param_list):
+    var_id = param_list["id"][0]
+    catalog_data = cache.get(f"catalogue_{var_id}")
+    exclude_openapi = cache.get(f"catalogue_{var_id}_openapi")
+    dataviz = cache.get(f"catalogue_{var_id}_dataviz")
+
+    if not catalog_data or not exclude_openapi or not dataviz:
+        info = get_object_or_404(CatalogueJson, id=var_id)
+        catalog_data = info.catalog_data
+        exclude_openapi = info.exclude_openapi
+        dataviz = info.dataviz
+        cache.set(f"catalogue_{var_id}", catalog_data)
+        cache.set(f"catalogue_{var_id}_openapi", exclude_openapi)
+        cache.set(f"catalogue_{var_id}_dataviz", dataviz)
+
+    chart_type = catalog_data["API"]["chart_type"]
+    res = data_variable_chart_handler(catalog_data, chart_type, param_list)
+    res["exclude_openapi"] = exclude_openapi
+    res["dataviz"] = dataviz
+
+    if len(res) == 0:  # If catalogues with the filter isn't found
+        return {}
+    return res
+
+
 def data_variable_handler(param_list):
     var_id = param_list["id"][0]
     catalog_data = cache.get(var_id)
@@ -811,7 +934,7 @@ def data_variable_handler(param_list):
     chart_type = catalog_data["API"]["chart_type"]
     res = data_variable_chart_handler(catalog_data, chart_type, param_list)
     res["exclude_openapi"] = exclude_openapi
-    res["dataviz"] = info.dataviz
+    res["dataviz"] = dataviz
 
     if len(res) == 0:  # If catalogues with the filter isn't found
         return {}
