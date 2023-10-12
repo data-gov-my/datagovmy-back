@@ -67,6 +67,33 @@ class CatalogJson(models.Model):
         return f"{self.file_src} - {self.catalog_name}"
 
 
+class CatalogueJson(models.Model):
+    id = models.CharField(max_length=400, primary_key=True)
+    exclude_openapi = models.BooleanField(default=False)
+    catalog_meta = models.JSONField()
+    catalog_name = models.CharField(max_length=400)
+    catalog_category = models.CharField(max_length=300)
+    catalog_category_name = models.CharField(max_length=600, default="")
+    catalog_subcategory = models.CharField(max_length=300, default="")
+    catalog_subcategory_name = models.CharField(max_length=600, default="")
+    catalog_category_opendosm = models.CharField(max_length=300, null=True)
+    catalog_category_opendosm_name = models.CharField(max_length=600, null=True)
+    catalog_subcategory_opendosm = models.CharField(max_length=300, null=True)
+    catalog_subcategory_opendosm_name = models.CharField(max_length=600, null=True)
+    time_range = models.CharField(max_length=100)
+    geography = models.CharField(max_length=300)
+    demography = models.CharField(max_length=300)
+    dataset_begin = models.IntegerField(default=0)
+    dataset_end = models.IntegerField(default=0)
+    data_source = models.CharField(max_length=100)
+    catalog_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
+    dataviz = JSONField()
+    file_src = models.CharField(max_length=400, default="")
+
+    def __str__(self) -> str:
+        return f"{self.file_src} - {self.catalog_name}"
+
+
 class NameDashboard_FirstName(models.Model):
     name = models.CharField(max_length=30, primary_key=True)
     d_1920 = models.IntegerField(null=True, default=0)
