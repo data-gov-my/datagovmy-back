@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     CatalogJson,
+    CatalogueJson,
     DashboardJson,
     ExplorersUpdate,
     FormTemplate,
@@ -587,7 +588,7 @@ class FormBuilder(GeneralMetaBuilder):
 
 class DataCatalogueBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOGUE"
-    MODEL = CatalogJson
+    MODEL = CatalogueJson
     GITHUB_DIR = "data-catalogue"
     VALIDATOR = DataCatalogValidateModel
 
@@ -596,7 +597,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         bucket = file.get("bucket", "")
         file_name = file.get("file_name", "")
 
-        return CatalogJson.objects.filter(
+        return CatalogueJson.objects.filter(
             id__contains=f"{bucket}_{file_name}_"
         ).delete()
 
@@ -632,7 +633,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                     db_input = obj.db_input
                     db_input["exclude_openapi"] = file_data.exclude_openapi
                     db_input["dataviz"] = dataviz
-                    db_obj, created = CatalogJson.objects.update_or_create(
+                    db_obj, created = CatalogueJson.objects.update_or_create(
                         id=unique_id, defaults=db_input
                     )
 
