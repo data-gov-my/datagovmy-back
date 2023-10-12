@@ -16,6 +16,7 @@ from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
+from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
@@ -615,29 +616,25 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 chart_type = cur_catalog_data["chart"]["chart_type"]
                 dataviz = cur_catalog_data.get("dataviz", {})
 
-                if chart_type in common.CHART_TYPES:
-                    args = {
-                        "full_meta": full_meta.model_dump(),
-                        "file_data": file_data.model_dump(),
-                        "cur_data": cur_data,
-                        "all_variable_data": all_variable_data,
-                        "file_src": file_src,
-                    }
+                args = {
+                    "full_meta": full_meta.model_dump(),
+                    "file_data": file_data.model_dump(),
+                    "cur_data": cur_data,
+                    "all_variable_data": all_variable_data,
+                    "file_src": file_src,
+                }
 
-                    module_ = f"data_gov_my.catalog_utils.catalog_variable_classes.{common.CHART_TYPES[chart_type]['parent']}"
-                    constructor_ = common.CHART_TYPES[chart_type]["constructor"]
-                    class_ = getattr(importlib.import_module(module_), constructor_)
-                    obj = class_(**args)
+                obj = Table(**args)
 
-                    unique_id = obj.unique_id
-                    db_input = obj.db_input
-                    db_input["exclude_openapi"] = file_data.exclude_openapi
-                    db_input["dataviz"] = dataviz
-                    db_obj, created = CatalogueJson.objects.update_or_create(
-                        id=unique_id, defaults=db_input
-                    )
+                unique_id = obj.unique_id
+                db_input = obj.db_input
+                db_input["exclude_openapi"] = file_data.exclude_openapi
+                db_input["dataviz"] = dataviz
+                db_obj, created = CatalogueJson.objects.update_or_create(
+                    id=unique_id, defaults=db_input
+                )
 
-                    created_objects.append(db_obj)
+                created_objects.append(db_obj)
 
         return created_objects
 
