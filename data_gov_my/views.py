@@ -811,7 +811,7 @@ def data_variable_handler(param_list):
     chart_type = catalog_data["API"]["chart_type"]
     res = data_variable_chart_handler(catalog_data, chart_type, param_list)
     res["exclude_openapi"] = exclude_openapi
-    res["dataviz"] = info.dataviz
+    res["dataviz"] = dataviz
 
     if len(res) == 0:  # If catalogues with the filter isn't found
         return {}
