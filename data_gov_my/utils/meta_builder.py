@@ -6,18 +6,17 @@ import logging
 import os
 import traceback
 from abc import ABC, abstractmethod
-from os.path import isfile, join
+from os.path import isfile
+from pathlib import Path
 from typing import List
 from urllib.request import urlopen
-from pathlib import Path
 
 import pandas as pd
-from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
-from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 
+from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     CatalogJson,
@@ -828,7 +827,16 @@ class PublicationBuilder(GeneralMetaBuilder):
             },
         )
 
-        PublicationResource.objects.filter(publication=pub_object_en).delete()
+        # delete outdated publication resources (retain based on avail `resource_id`)
+        valid_pub_resource_ids = [
+            resource.resource_id for resource in metadata.en.resources
+        ]
+        del_total, del_objects = (
+            PublicationResource.objects.filter(publication=pub_object_en)
+            .exclude(resource_id__in=valid_pub_resource_ids)
+            .delete()
+        )
+
         resources_en = PublicationResource.objects.bulk_create(
             [
                 PublicationResource(
@@ -839,7 +847,14 @@ class PublicationBuilder(GeneralMetaBuilder):
                     publication=pub_object_en,
                 )
                 for resource in metadata.en.resources
-            ]
+            ],
+            update_conflicts=True,
+            unique_fields=["resource_id", "publication"],
+            update_fields=[
+                "resource_type",
+                "resource_name",
+                "resource_link",
+            ],
         )
 
         # bm publications
@@ -858,7 +873,16 @@ class PublicationBuilder(GeneralMetaBuilder):
             },
         )
 
-        PublicationResource.objects.filter(publication=pub_object_bm).delete()
+        # delete outdated publication resources (retain based on avail `resource_id`)
+        valid_pub_resource_ids = [
+            resource.resource_id for resource in metadata.bm.resources
+        ]
+        del_total, del_objects = (
+            PublicationResource.objects.filter(publication=pub_object_bm)
+            .exclude(resource_id__in=valid_pub_resource_ids)
+            .delete()
+        )
+
         resources_bm = PublicationResource.objects.bulk_create(
             [
                 PublicationResource(
@@ -869,7 +893,14 @@ class PublicationBuilder(GeneralMetaBuilder):
                     publication=pub_object_bm,
                 )
                 for resource in metadata.bm.resources
-            ]
+            ],
+            update_conflicts=True,
+            unique_fields=["resource_id", "publication"],
+            update_fields=[
+                "resource_type",
+                "resource_name",
+                "resource_link",
+            ],
         )
 
         return [pub_object_en, pub_object_bm]
@@ -906,9 +937,14 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
             },
         )
 
-        PublicationDocumentationResource.objects.filter(
-            publication=pub_object_en
-        ).delete()
+        # delete outdated publication resources (retain based on avail `resource_id`)
+        valid_ids = [resource.resource_id for resource in metadata.en.resources]
+        del_total, del_objects = (
+            PublicationDocumentationResource.objects.filter(publication=pub_object_en)
+            .exclude(resource_id__in=valid_ids)
+            .delete()
+        )
+
         resources_en = PublicationDocumentationResource.objects.bulk_create(
             [
                 PublicationDocumentationResource(
@@ -919,7 +955,14 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
                     publication=pub_object_en,
                 )
                 for resource in metadata.en.resources
-            ]
+            ],
+            update_conflicts=True,
+            unique_fields=["resource_id", "publication"],
+            update_fields=[
+                "resource_type",
+                "resource_name",
+                "resource_link",
+            ],
         )
 
         # bm publications
@@ -936,9 +979,13 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
             },
         )
 
-        PublicationDocumentationResource.objects.filter(
-            publication=pub_object_bm
-        ).delete()
+        valid_ids = [resource.resource_id for resource in metadata.bm.resources]
+        del_total, del_objects = (
+            PublicationDocumentationResource.objects.filter(publication=pub_object_bm)
+            .exclude(resource_id__in=valid_ids)
+            .delete()
+        )
+
         resources_bm = PublicationDocumentationResource.objects.bulk_create(
             [
                 PublicationDocumentationResource(
@@ -949,7 +996,14 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
                     publication=pub_object_bm,
                 )
                 for resource in metadata.bm.resources
-            ]
+            ],
+            update_conflicts=True,
+            unique_fields=["resource_id", "publication"],
+            update_fields=[
+                "resource_type",
+                "resource_name",
+                "resource_link",
+            ],
         )
 
         return [pub_object_en, pub_object_bm]
