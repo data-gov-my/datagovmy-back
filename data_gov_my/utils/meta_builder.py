@@ -6,18 +6,17 @@ import logging
 import os
 import traceback
 from abc import ABC, abstractmethod
-from os.path import isfile, join
+from os.path import isfile
+from pathlib import Path
 from typing import List
 from urllib.request import urlopen
-from pathlib import Path
 
 import pandas as pd
-from django.apps import apps
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
-from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 
+from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     CatalogJson,
