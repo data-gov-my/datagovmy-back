@@ -281,6 +281,8 @@ class DataCatalogueListAPIView(APIView):
             info = CatalogueJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
+                "catalog_meta",
+                "data_source",
                 "catalog_category_name",
                 "catalog_subcategory_name",
                 "catalog_category_opendosm_name",
@@ -296,6 +298,8 @@ class DataCatalogueListAPIView(APIView):
                     CatalogueJson.objects.all().values(
                         "id",
                         "catalog_name",
+                        "catalog_meta",
+                        "data_source",
                         "catalog_category_name",
                         "catalog_subcategory_name",
                         "catalog_category_opendosm_name",
@@ -331,8 +335,16 @@ class DataCatalogueListAPIView(APIView):
             sub_category = sub_category.split(" | ")[lang_mapping[lang]]
 
             obj = {}
-            obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
             obj["id"] = item["id"]
+            obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
+            obj["data_as_of"] = (
+                item["catalog_meta"]["file"]["variables"][-1]
+                .get("catalog_data", {})
+                .get("metadata_neutral", {})
+                .get("data_as_of", None)
+            )
+            obj["description"] = item["catalog_meta"]["file"]["description"][lang]
+            obj["data_source"] = item["data_source"].split(" | ")
 
             if category not in res["dataset"]:
                 res["dataset"][category] = {}
