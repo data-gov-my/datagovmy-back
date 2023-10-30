@@ -71,7 +71,7 @@ class GeneralChartsUtil:
         bucket_name = self.file_data["bucket"]
         file_name = self.file_data["file_name"].replace(".parquet", "")
         cur_id_str = str(self.cur_id)
-        self.unique_id = f"{bucket_name}_{file_name}_{cur_id_str}"
+        self.unique_id = f"{bucket_name}_{file_name}"
 
         # Sets the current variable name
         self.variable_name = self.cur_data["name"]

@@ -181,7 +181,7 @@ class _DataCatalogueFileValidateModel(BaseModel):
     link_csv: Optional[str] = None
     link_geojson: Optional[str] = None
     variables: list[dict]
-    related_datasets: list[dict]
+    related_datasets: list[dict] = []
 
 
 class DataCatalogueValidateModel(BaseModel):
