@@ -905,23 +905,36 @@ General handler for data-variables
 
 def data_catalogue_variable_handler(param_list):
     var_id = param_list["id"][0]
-    catalog_data = cache.get(f"catalogue_{var_id}")
-    exclude_openapi = cache.get(f"catalogue_{var_id}_openapi")
-    dataviz = cache.get(f"catalogue_{var_id}_dataviz")
+    lang = param_list.get("lang", ["en"])[0]
+    catalog_data = cache.get(f"{lang}_catalogue_{var_id}")
+    exclude_openapi = cache.get(f"{lang}_catalogue_{var_id}_openapi")
+    dataviz = cache.get(f"{lang}_catalogue_{var_id}_dataviz")
+    related_datasets = cache.get(f"{lang}_catalogue_{var_id}_related_datasets")
 
-    if not catalog_data or not exclude_openapi or not dataviz:
+    if not all([catalog_data, exclude_openapi, dataviz, related_datasets]):
         info = get_object_or_404(CatalogueJson, id=var_id)
         catalog_data = info.catalog_data
         exclude_openapi = info.exclude_openapi
         dataviz = info.dataviz
-        cache.set(f"catalogue_{var_id}", catalog_data)
-        cache.set(f"catalogue_{var_id}_openapi", exclude_openapi)
-        cache.set(f"catalogue_{var_id}_dataviz", dataviz)
+        related_datasets = info.related_datasets
+        related_datasets = []
+        for related_dataset in info.related_datasets:
+            temp = dict(
+                id=related_dataset.get("id"),
+                title=related_dataset.get("title", {}).get(lang, ""),
+                description=related_dataset.get("description", {}).get(lang, ""),
+            )
+            related_datasets.append(temp)
+        cache.set(f"{lang}_catalogue_{var_id}", catalog_data)
+        cache.set(f"{lang}_catalogue_{var_id}_openapi", exclude_openapi)
+        cache.set(f"{lang}_catalogue_{var_id}_dataviz", dataviz)
+        cache.set(f"{lang}_catalogue_{var_id}_related_datasets", related_datasets)
 
     chart_type = catalog_data["API"]["chart_type"]
     res = data_variable_chart_handler(catalog_data, chart_type, param_list)
     res["exclude_openapi"] = exclude_openapi
     res["dataviz"] = dataviz
+    res["related_datasets"] = related_datasets
 
     if len(res) == 0:  # If catalogues with the filter isn't found
         return {}
