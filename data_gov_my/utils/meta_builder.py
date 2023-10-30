@@ -48,6 +48,7 @@ from data_gov_my.utils.cron_utils import (
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
     DataCatalogValidateModel,
+    DataCatalogueValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
     PublicationDocumentationValidateModel,
@@ -590,7 +591,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOGUE"
     MODEL = CatalogueJson
     GITHUB_DIR = "data-catalogue"
-    VALIDATOR = DataCatalogValidateModel
+    VALIDATOR = DataCatalogueValidateModel
 
     def delete_file(self, filename: str, data: dict):
         file = data["file"]
@@ -601,9 +602,13 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
             id__contains=f"{bucket}_{file_name}_"
         ).delete()
 
-    def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
+    def update_or_create_meta(
+        self, filename: str, metadata: DataCatalogueValidateModel
+    ):
         file_data = metadata.file
         all_variable_data = metadata.file.variables
+        related_datasets = metadata.file.related_datasets
+
         full_meta = metadata
         file_src = filename.replace(".json", "")
 
@@ -629,6 +634,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 db_input = obj.db_input
                 db_input["exclude_openapi"] = file_data.exclude_openapi
                 db_input["dataviz"] = dataviz
+                db_input["related_datasets"] = related_datasets
                 db_obj, created = CatalogueJson.objects.update_or_create(
                     id=unique_id, defaults=db_input
                 )

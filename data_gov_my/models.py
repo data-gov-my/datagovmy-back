@@ -88,6 +88,7 @@ class CatalogueJson(models.Model):
     data_source = models.CharField(max_length=100)
     catalog_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
     dataviz = JSONField()
+    related_datasets = ArrayField(JSONField())
     file_src = models.CharField(max_length=400, default="")
 
     def __str__(self) -> str:

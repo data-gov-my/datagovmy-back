@@ -158,6 +158,36 @@ class DataCatalogValidateModel(BaseModel):
     file: _DataCatalogFileValidateModel
 
 
+class _DataCatalogueFileValidateModel(BaseModel):
+    manual_trigger: str = "0"
+    exclude_openapi: bool = False
+    bucket: str
+    file_name: str
+    category: str
+    category_en: str
+    category_bm: str
+    subcategory: str
+    subcategory_en: str
+    subcategory_bm: str
+    category_opendosm: str = ""
+    category_opendosm_en: str = ""
+    category_opendosm_bm: str = ""
+    subcategory_opendosm: str = ""
+    subcategory_opendosm_en: str = ""
+    subcategory_opendosm_bm: str = ""
+    description: dict[Literal["en", "bm"], str]
+    link_parquet: Optional[str] = None
+    link_preview: Optional[str] = None
+    link_csv: Optional[str] = None
+    link_geojson: Optional[str] = None
+    variables: list[dict]
+    related_datasets: list[dict]
+
+
+class DataCatalogueValidateModel(BaseModel):
+    file: _DataCatalogueFileValidateModel
+
+
 class _PublicationResourceValidateModel(BaseModel):
     resource_id: int
     resource_type: str
