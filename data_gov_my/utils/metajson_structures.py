@@ -175,6 +175,12 @@ class _DataCatalogueFileValidateModel(BaseModel):
     subcategory_opendosm: str = ""
     subcategory_opendosm_en: str = ""
     subcategory_opendosm_bm: str = ""
+    category_kkm: str = ""
+    category_kkm_en: str = ""
+    category_kkm_bm: str = ""
+    subcategory_kkm: str = ""
+    subcategory_kkm_en: str = ""
+    subcategory_kkm_bm: str = ""
     description: dict[Literal["en", "bm"], str]
     link_parquet: Optional[str] = None
     link_preview: Optional[str] = None
