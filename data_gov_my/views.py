@@ -272,6 +272,9 @@ class DataCatalogueListAPIView(APIView):
         if request.query_params.get("opendosm", "").lower() == "true":
             catalog_category_name = "catalog_category_opendosm_name"
             catalog_subcategory_name = "catalog_subcategory_opendosm_name"
+        elif request.query_params.get("kkm", "").lower() == "true":
+            catalog_category_name = "catalog_category_kkm_name"
+            catalog_subcategory_name = "catalog_subcategory_kkm_name"
 
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
@@ -287,6 +290,8 @@ class DataCatalogueListAPIView(APIView):
                 "catalog_subcategory_name",
                 "catalog_category_opendosm_name",
                 "catalog_subcategory_opendosm_name",
+                "catalog_category_kkm_name",
+                "catalog_subcategory_kkm_name",
             )
         else:
             catalog_list = cache.get("catalogue_list")
@@ -304,6 +309,8 @@ class DataCatalogueListAPIView(APIView):
                         "catalog_subcategory_name",
                         "catalog_category_opendosm_name",
                         "catalog_subcategory_opendosm_name",
+                        "catalog_category_kkm_name",
+                        "catalog_subcategory_kkm_name",
                     )
                 )
                 cache.set("catalogue_list", info)
@@ -328,11 +335,11 @@ class DataCatalogueListAPIView(APIView):
         for item in info:
             category = item.get(catalog_category_name)
             sub_category = item.get(catalog_subcategory_name)
+            category = category.split(" | ")[lang_mapping[lang]]
+            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
             if not category or not sub_category:
                 res["total_all"] -= 1
                 continue
-            category = category.split(" | ")[lang_mapping[lang]]
-            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
 
             obj = {}
             obj["id"] = item["id"]
