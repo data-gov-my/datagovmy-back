@@ -618,7 +618,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
             if "catalog_data" in cur_data:  # Checks if the catalog_data is in
                 cur_catalog_data = cur_data["catalog_data"]
                 chart_type = cur_catalog_data["chart"]["chart_type"]
-                dataviz = cur_catalog_data.get("dataviz", {})
+                dataviz = cur_catalog_data.get("dataviz", [])
 
                 args = {
                     "full_meta": full_meta.model_dump(),
