@@ -71,7 +71,7 @@ class GeneralChartsUtil:
         bucket_name = self.file_data["bucket"]
         file_name = self.file_data["file_name"].replace(".parquet", "")
         cur_id_str = str(self.cur_id)
-        self.unique_id = f"{bucket_name}_{file_name}_{cur_id_str}"
+        self.unique_id = f"{bucket_name}_{file_name}"
 
         # Sets the current variable name
         self.variable_name = self.cur_data["name"]
@@ -277,6 +277,22 @@ class GeneralChartsUtil:
         catalog_subcategory_bm = self.file_data["subcategory_opendosm_bm"]
         res[
             "catalog_subcategory_opendosm_name"
+        ] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
+
+        # Sets catalog category (kkm)
+        res["catalog_category_kkm"] = self.file_data["category_kkm"]
+        catalog_category_en = self.file_data["category_kkm_en"]
+        catalog_category_bm = self.file_data["category_kkm_bm"]
+        res[
+            "catalog_category_kkm_name"
+        ] = f"{catalog_category_en} | {catalog_category_bm}"
+
+        # Sets catalog subcategory (kkm)
+        res["catalog_subcategory_kkm"] = self.file_data["subcategory_kkm"]
+        catalog_subcategory_en = self.file_data["subcategory_kkm_en"]
+        catalog_subcategory_bm = self.file_data["subcategory_kkm_bm"]
+        res[
+            "catalog_subcategory_kkm_name"
         ] = f"{catalog_subcategory_en} | {catalog_subcategory_bm}"
 
         # Sets the frequency of the catalog

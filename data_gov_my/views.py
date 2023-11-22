@@ -272,6 +272,9 @@ class DataCatalogueListAPIView(APIView):
         if request.query_params.get("opendosm", "").lower() == "true":
             catalog_category_name = "catalog_category_opendosm_name"
             catalog_subcategory_name = "catalog_subcategory_opendosm_name"
+        elif request.query_params.get("kkm", "").lower() == "true":
+            catalog_category_name = "catalog_category_kkm_name"
+            catalog_subcategory_name = "catalog_subcategory_kkm_name"
 
         param_list = dict(request.GET)
         filters = get_filters_applied(param_list)
@@ -281,10 +284,14 @@ class DataCatalogueListAPIView(APIView):
             info = CatalogueJson.objects.filter(filters).values(
                 "id",
                 "catalog_name",
+                "catalog_meta",
+                "data_source",
                 "catalog_category_name",
                 "catalog_subcategory_name",
                 "catalog_category_opendosm_name",
                 "catalog_subcategory_opendosm_name",
+                "catalog_category_kkm_name",
+                "catalog_subcategory_kkm_name",
             )
         else:
             catalog_list = cache.get("catalogue_list")
@@ -296,10 +303,14 @@ class DataCatalogueListAPIView(APIView):
                     CatalogueJson.objects.all().values(
                         "id",
                         "catalog_name",
+                        "catalog_meta",
+                        "data_source",
                         "catalog_category_name",
                         "catalog_subcategory_name",
                         "catalog_category_opendosm_name",
                         "catalog_subcategory_opendosm_name",
+                        "catalog_category_kkm_name",
+                        "catalog_subcategory_kkm_name",
                     )
                 )
                 cache.set("catalogue_list", info)
@@ -324,15 +335,23 @@ class DataCatalogueListAPIView(APIView):
         for item in info:
             category = item.get(catalog_category_name)
             sub_category = item.get(catalog_subcategory_name)
+            category = category.split(" | ")[lang_mapping[lang]]
+            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
             if not category or not sub_category:
                 res["total_all"] -= 1
                 continue
-            category = category.split(" | ")[lang_mapping[lang]]
-            sub_category = sub_category.split(" | ")[lang_mapping[lang]]
 
             obj = {}
-            obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
             obj["id"] = item["id"]
+            obj["catalog_name"] = item["catalog_name"].split(" | ")[lang_mapping[lang]]
+            obj["data_as_of"] = (
+                item["catalog_meta"]["file"]["variables"][-1]
+                .get("catalog_data", {})
+                .get("metadata_neutral", {})
+                .get("data_as_of", None)
+            )
+            obj["description"] = item["catalog_meta"]["file"]["description"][lang]
+            obj["data_source"] = item["data_source"].split(" | ")
 
             if category not in res["dataset"]:
                 res["dataset"][category] = {}
@@ -893,23 +912,36 @@ General handler for data-variables
 
 def data_catalogue_variable_handler(param_list):
     var_id = param_list["id"][0]
-    catalog_data = cache.get(f"catalogue_{var_id}")
-    exclude_openapi = cache.get(f"catalogue_{var_id}_openapi")
-    dataviz = cache.get(f"catalogue_{var_id}_dataviz")
+    lang = param_list.get("lang", ["en"])[0]
+    catalog_data = cache.get(f"{lang}_catalogue_{var_id}")
+    exclude_openapi = cache.get(f"{lang}_catalogue_{var_id}_openapi")
+    dataviz = cache.get(f"{lang}_catalogue_{var_id}_dataviz")
+    related_datasets = cache.get(f"{lang}_catalogue_{var_id}_related_datasets")
 
-    if not catalog_data or not exclude_openapi or not dataviz:
+    if not all([catalog_data, exclude_openapi, dataviz, related_datasets]):
         info = get_object_or_404(CatalogueJson, id=var_id)
         catalog_data = info.catalog_data
         exclude_openapi = info.exclude_openapi
         dataviz = info.dataviz
-        cache.set(f"catalogue_{var_id}", catalog_data)
-        cache.set(f"catalogue_{var_id}_openapi", exclude_openapi)
-        cache.set(f"catalogue_{var_id}_dataviz", dataviz)
+        related_datasets = info.related_datasets
+        related_datasets = []
+        for related_dataset in info.related_datasets:
+            temp = dict(
+                id=related_dataset.get("id"),
+                title=related_dataset.get("title", {}).get(lang, ""),
+                description=related_dataset.get("description", {}).get(lang, ""),
+            )
+            related_datasets.append(temp)
+        cache.set(f"{lang}_catalogue_{var_id}", catalog_data)
+        cache.set(f"{lang}_catalogue_{var_id}_openapi", exclude_openapi)
+        cache.set(f"{lang}_catalogue_{var_id}_dataviz", dataviz)
+        cache.set(f"{lang}_catalogue_{var_id}_related_datasets", related_datasets)
 
     chart_type = catalog_data["API"]["chart_type"]
     res = data_variable_chart_handler(catalog_data, chart_type, param_list)
     res["exclude_openapi"] = exclude_openapi
     res["dataviz"] = dataviz
+    res["related_datasets"] = related_datasets
 
     if len(res) == 0:  # If catalogues with the filter isn't found
         return {}

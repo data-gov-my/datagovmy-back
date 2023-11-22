@@ -80,6 +80,10 @@ class CatalogueJson(models.Model):
     catalog_category_opendosm_name = models.CharField(max_length=600, null=True)
     catalog_subcategory_opendosm = models.CharField(max_length=300, null=True)
     catalog_subcategory_opendosm_name = models.CharField(max_length=600, null=True)
+    catalog_category_kkm = models.CharField(max_length=300, null=True)
+    catalog_category_kkm_name = models.CharField(max_length=600, null=True)
+    catalog_subcategory_kkm = models.CharField(max_length=300, null=True)
+    catalog_subcategory_kkm_name = models.CharField(max_length=600, null=True)
     time_range = models.CharField(max_length=100)
     geography = models.CharField(max_length=300)
     demography = models.CharField(max_length=300)
@@ -87,7 +91,8 @@ class CatalogueJson(models.Model):
     dataset_end = models.IntegerField(default=0)
     data_source = models.CharField(max_length=100)
     catalog_data = JSONField(load_kwargs={"object_pairs_hook": collections.OrderedDict})
-    dataviz = JSONField()
+    dataviz = JSONField(default=list)
+    related_datasets = ArrayField(JSONField())
     file_src = models.CharField(max_length=400, default="")
 
     def __str__(self) -> str:
