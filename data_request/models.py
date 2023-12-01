@@ -16,8 +16,8 @@ class DataRequest(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
     institution = models.CharField(max_length=255, blank=True, null=True)
-    dataset_title = models.CharField(max_length=255)
-    dataset_description = models.TextField()
+    dataset_title = models.CharField(max_length=255)  # translatable
+    dataset_description = models.TextField()  # translatable
     agency = models.CharField(max_length=255)
     purpose_of_request = models.CharField(max_length=255)
     status = models.CharField(
