@@ -179,7 +179,7 @@ USE_TZ = True
 gettext = lambda s: s
 LANGUAGES = (
     ("en", gettext("English")),
-    ("bm", gettext("Bahasa Melayu")),
+    ("ms", gettext("Bahasa Melayu")),
 )
 
 
