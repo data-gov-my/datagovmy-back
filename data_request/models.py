@@ -11,8 +11,7 @@ class DataRequest(models.Model):
         ("in_progress", "In Progress"),
         ("data_published", "Data Published"),
     ]
-
-    ticket_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    ticket_id = models.AutoField(primary_key=True, editable=False)
     name = models.CharField(max_length=255)
     email = models.EmailField()
     institution = models.CharField(max_length=255, blank=True, null=True)
@@ -23,3 +22,6 @@ class DataRequest(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
+
+    def __str__(self) -> str:
+        return f"{self.ticket_id} ({self.dataset_title})"
