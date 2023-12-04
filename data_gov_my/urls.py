@@ -90,6 +90,10 @@ urlpatterns = [
         views.publication_resource_download,
         name="PUB_RESOURCE_DL",
     ),
+    path(
+        "data-request/",
+        include("data_request.urls"),
+    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
