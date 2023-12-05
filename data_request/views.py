@@ -4,7 +4,7 @@ from django.utils import translation
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from post_office import mail
 from data_request.models import DataRequest
 from data_request.serializers import DataRequestSerializer
 
@@ -24,7 +24,16 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
 
         headers = self.get_success_headers(serializer.data)
 
-        # TODO: send email
+        # FIXME: use proper email templating
+        recipient = serializer.validated_data.get("email")
+        email = mail.send(
+            recipients=recipient,
+            language=language,
+            priority="now",
+            subject="Data Request Ticket Submitted",
+            message="Your data request is now received.",
+            html_message="Your <strong>data request</strong> is now received.",
+        )
 
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
