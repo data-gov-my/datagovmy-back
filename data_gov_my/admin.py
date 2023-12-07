@@ -23,10 +23,14 @@ admin.site.register(i18nJson)
 admin.site.register(FormTemplate)
 admin.site.register(FormData)
 admin.site.register(ViewCount)
-admin.site.register(Publication)
 admin.site.register(PublicationResource)
 admin.site.register(PublicationDocumentation)
 admin.site.register(PublicationDocumentationResource)
 admin.site.register(PublicationUpcoming)
 admin.site.register(CatalogueJson)
 admin.site.register(ExplorersUpdate)
+
+
+@admin.register(Publication)
+class PublicationAdmin(admin.ModelAdmin):
+    search_fields = ["publication_id"]

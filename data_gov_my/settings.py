@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "data_gov_my",
     "corsheaders",
+    "modeltranslation",  # must be above admin to reflect in admin panel
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "django_rq",
     "drf_api_logger",
     "data_catalogue",
+    "data_request",
 ]
 
 MIDDLEWARE = [
@@ -172,6 +174,14 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+# modeltranslation
+
+gettext = lambda s: s
+LANGUAGES = (
+    ("en", gettext("English")),
+    ("ms", gettext("Bahasa Melayu")),
+)
 
 
 # Static files (CSS, JavaScript, Images)
