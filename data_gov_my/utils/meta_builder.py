@@ -15,6 +15,16 @@ import pandas as pd
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
+from data_catalogue.metajson_structure import (
+    DataCatalogueValidateModel as DataCatalogueValidateModelV2,
+)
+from data_catalogue.models import (
+    DataCatalogue,
+    DataCatalogueMeta,
+    Field,
+    RelatedDataset,
+    SiteCategory,
+)
 
 from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 from data_gov_my.explorers import class_list as exp_class
@@ -47,7 +57,7 @@ from data_gov_my.utils.cron_utils import (
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
-    DataCatalogValidateModel,
+    # DataCatalogValidateModel,
     DataCatalogueValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
@@ -642,6 +652,108 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 created_objects.append(db_obj)
 
         return created_objects
+
+
+class DataCatalogueBuilder(GeneralMetaBuilder):
+    CATEGORY = "DATA_CATALOGUE2"
+    MODEL = DataCatalogueMeta
+    GITHUB_DIR = "data-catalogue2"
+    VALIDATOR = DataCatalogueValidateModelV2
+
+    def delete_file(self, filename: str, data: dict):
+        pass
+        # file = data["file"]
+        # bucket = file.get("bucket", "")
+        # file_name = file.get("file_name", "")
+
+        # return CatalogueJson.objects.filter(
+        #     id__contains=f"{bucket}_{file_name}_"
+        # ).delete()
+
+    def update_or_create_meta(
+        self, filename: str, metadata: DataCatalogueValidateModelV2
+    ):
+        dc_meta, is_dc_meta_created = DataCatalogueMeta.objects.update_or_create(
+            id=f"{metadata.bucket}_{metadata.filename}",
+            defaults=dict(
+                exclude_openapi=metadata.exclude_openapi,
+                manual_trigger=metadata.manual_trigger,
+                data_as_of=metadata.data_as_of,
+                last_updated=metadata.last_updated,
+                next_update=metadata.next_update,
+                methodology_en=metadata.methodology_en,
+                methodology_ms=metadata.methodology_ms,
+                caveat_en=metadata.caveat_en,
+                caveat_ms=metadata.caveat_ms,
+                publication_en=metadata.publication_en,
+                publication_ms=metadata.publication_ms,
+                description_en=metadata.description_en,
+                description_ms=metadata.description_ms,
+                link_parquet=metadata.link_parquet,
+                link_csv=metadata.link_csv,
+                link_preview=metadata.link_preview,
+                frequency=metadata.frequency,
+                geography=metadata.geography,
+                demography=metadata.demography,
+                dataset_begin=metadata.dataset_begin,
+                dataset_end=metadata.dataset_end,
+                data_source=metadata.data_source,
+                dataviz=metadata.dataviz,
+                translations=metadata.translations,
+            ),
+        )
+
+        # Avoid bulk_create as PK is not included in returned list (affects many-to-many .set())
+        fields = [
+            Field.objects.update_or_create(**field_data.model_dump())[0]
+            for field_data in metadata.fields
+        ]
+
+        site_categories = [
+            SiteCategory.objects.update_or_create(**site_cat_data.model_dump())[0]
+            for site_cat_data in metadata.site_category
+        ]
+
+        related_datasets = RelatedDataset.objects.bulk_create(
+            [
+                RelatedDataset(**dataset.model_dump())
+                for dataset in metadata.related_datasets
+            ],
+            update_conflicts=True,
+            update_fields=[
+                # "title",
+                # "description",
+                "title_en",
+                "title_ms",
+                "description_en",
+                "description_ms",
+            ],
+            unique_fields=["id"],
+        )
+
+        # handle many-to-many fields separately.
+        dc_meta.related_datasets.set(related_datasets)
+        dc_meta.site_category.set(site_categories)
+        dc_meta.fields.set(fields)
+
+        # populate the table data
+        parquet_link = metadata.link_preview or metadata.link_parquet
+        df = pd.read_parquet(str(parquet_link))
+        if "date" in df.columns:
+            df["date"] = df["date"].astype(str)
+
+        data = df.to_dict(orient="records")
+
+        catalogue_data = [
+            DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
+        ]
+
+        _, deleted_dc_data = DataCatalogue.objects.filter(
+            catalogue_meta=dc_meta
+        ).delete()
+        DataCatalogue.objects.bulk_create(catalogue_data)
+
+        return dc_meta
 
 
 class ExplorerBuilder(GeneralMetaBuilder):
