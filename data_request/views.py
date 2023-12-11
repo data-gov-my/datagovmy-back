@@ -15,6 +15,13 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         # Determine the language from the query parameters
         language = request.query_params.get("language", "en")
+        language = "ms" if language == "bm" else language
+
+        if language not in ["en", "ms"]:
+            return Response(
+                {"error": "language param should be `en`, `ms` or `bm` only."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # Set the language for translation
         with translation.override(language):
@@ -46,11 +53,13 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
 @api_view(["GET"])
 def list_data_request(request):
     lang = request.query_params.get("language", "en")
+    lang = "ms" if lang == "bm" else lang
     if lang not in ["en", "ms"]:
         return Response(
-            {"error": "language param should be `en` or `ms` only."},
+            {"error": "language param should be `en`, `ms` or `bm` only."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
     ticket_id = request.query_params.get("ticket_id", None)
     ticket_status = request.query_params.get("status", None)
     query = request.query_params.get("query", None)
