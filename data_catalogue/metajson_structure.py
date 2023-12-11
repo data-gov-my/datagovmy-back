@@ -36,6 +36,10 @@ class DataCatalogueValidateModel(BaseModel):
     bucket: str
     filename: str
     exclude_openapi: bool
+    title_en: str
+    title_ms: str
+    description_en: str
+    description_ms: str
     manual_trigger: str
     data_as_of: str
     last_updated: str
@@ -47,8 +51,6 @@ class DataCatalogueValidateModel(BaseModel):
     publication_en: str
     publication_ms: str
     site_category: list[SiteCategory]
-    description_en: str
-    description_ms: str
     link_parquet: HttpUrl
     link_csv: HttpUrl
     link_preview: HttpUrl

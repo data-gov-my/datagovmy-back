@@ -47,6 +47,7 @@ class DataCatalogueMeta(models.Model):
     exclude_openapi = models.BooleanField()
     manual_trigger = models.CharField(max_length=255)
     site_category = models.ManyToManyField(SiteCategory)
+    title = models.CharField(max_length=255)  # translatable
     description = models.TextField()  # translatable
 
     # FIXME: move to metadata?
