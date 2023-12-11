@@ -10,6 +10,7 @@ from os.path import isfile
 from pathlib import Path
 from typing import List
 from urllib.request import urlopen
+import numpy as np
 
 import pandas as pd
 from django.core.cache import cache
@@ -701,7 +702,8 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 dataset_end=metadata.dataset_end,
                 data_source=metadata.data_source,
                 dataviz=metadata.dataviz,
-                translations=metadata.translations,
+                translations_en=metadata.translations_en,
+                translations_ms=metadata.translations_ms,
             ),
         )
 
@@ -744,6 +746,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         if "date" in df.columns:
             df["date"] = df["date"].astype(str)
 
+        df = df.replace({np.nan: None})
         data = df.to_dict(orient="records")
 
         catalogue_data = [
