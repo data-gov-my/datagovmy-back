@@ -24,4 +24,11 @@ class SiteCategoryTranslationOptions(TranslationOptions):
 
 @register(DataCatalogueMeta)
 class DataCatalogueTranslationOptions(TranslationOptions):
-    fields = ("title", "description", "methodology", "caveat", "publication")
+    fields = (
+        "title",
+        "description",
+        "methodology",
+        "caveat",
+        "publication",
+        "translations",
+    )

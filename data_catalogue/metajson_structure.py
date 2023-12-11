@@ -63,5 +63,6 @@ class DataCatalogueValidateModel(BaseModel):
     fields: list[Field] = []
     # table: Table
     dataviz: list[dict] = []  # TODO: table @ dataviz[0] enforcd
-    translations: dict = {}
+    translations_en: dict = {}
+    translations_ms: dict = {}
     related_datasets: list[RelatedDataset] = []

@@ -74,7 +74,7 @@ class DataCatalogueMeta(models.Model):
 
     # FIXME: dataviz refactor to be foreign key?
     dataviz = ArrayField(models.JSONField())
-    translations = models.JSONField()
+    translations = models.JSONField()  # translatable
     related_datasets = models.ManyToManyField(RelatedDataset)
 
 
