@@ -94,6 +94,10 @@ urlpatterns = [
         "data-request/",
         include("data_request.urls"),
     ),
+    path(
+        "data-catalogue2/",
+        include("data_catalogue.urls"),
+    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
