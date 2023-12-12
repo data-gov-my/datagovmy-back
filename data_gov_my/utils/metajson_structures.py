@@ -65,7 +65,7 @@ class DashboardChartModel(BaseModel):
 class DashboardValidateModel(BaseModel):
     dashboard_name: str
     data_last_updated: datetime
-    data_next_update: Optional[datetime]
+    data_next_update: Optional[datetime] = None
     route: str
     sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     manual_trigger: str
