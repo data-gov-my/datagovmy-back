@@ -127,15 +127,19 @@ class BIRTHDAY_POPULARITY(General_Explorer):
         else:
             valid_dates = self.dates_in_month()
 
-        data_last_updated = MetaJson.objects.get(
+        dashboard_meta = MetaJson.objects.get(
             dashboard_name="birthday_popularity"
-        ).dashboard_meta.get("data_last_updated", None)
+        ).dashboard_meta
+        data_last_updated = dashboard_meta.get("data_last_updated", None)
+        data_next_update = dashboard_meta.get("data_next_update", None)
+
         timeseries = {
             "data_as_of": timeseries.get("data_as_of", None),
             "x": valid_dates,
             "y": count,
         }
         res["data_last_updated"] = data_last_updated
+        res["data_next_update"] = data_next_update
         res["timeseries"] = timeseries
         if birthday is not None:
             rank_table_res["data_as_of"] = rank_table.get("data_as_of", None)
