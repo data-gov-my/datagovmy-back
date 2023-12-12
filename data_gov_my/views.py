@@ -998,8 +998,12 @@ def handle_request(param_list: QueryDict, isDashboard=True):
         params_req = dbd_info["required_params"]
         params_opt = dbd_info.get("optional_params", [])
         data_last_updated = dbd_info.get("data_last_updated", None)
+        data_next_update = dbd_info.get("data_next_update", None)
 
-    res = {"data_last_updated": data_last_updated}
+    res = {
+        "data_last_updated": data_last_updated,
+        "data_next_update": data_next_update,
+    }
     if (
         all(p in param_list for p in params_req)
         or all(p in param_list for p in params_opt)
