@@ -65,6 +65,7 @@ class DashboardChartModel(BaseModel):
 class DashboardValidateModel(BaseModel):
     dashboard_name: str
     data_last_updated: datetime
+    data_next_update: Optional[datetime]
     route: str
     sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
     manual_trigger: str
@@ -73,8 +74,12 @@ class DashboardValidateModel(BaseModel):
     charts: dict[str, DashboardChartModel]
 
     @field_serializer("data_last_updated")
-    def serialize_date(self, data_last_updated: datetime):
+    def serialize_date_last_updated(self, data_last_updated: datetime):
         return data_last_updated.strftime("%Y-%m-%d %H:%M")
+
+    @field_serializer("data_next_update")
+    def serialize_date_next_update(self, data_next_update: datetime):
+        return data_next_update.strftime("%Y-%m-%d %H:%M") if data_next_update else None
 
 
 class i18nValidateModel(BaseModel):
