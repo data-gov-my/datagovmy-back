@@ -261,6 +261,7 @@ class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
     file_name = models.CharField(max_length=100, null=False)
     last_update = models.CharField(max_length=100, null=False)
+    data_next_update = models.CharField(max_length=100, null=False)
 
     def __str__(self) -> str:
         return f"{self.explorer} ({self.file_name})"
