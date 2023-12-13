@@ -104,7 +104,6 @@ class FormValidateModel(BaseModel):
 
 class ExplorerValidateModel(BaseModel):
     data_last_updated: datetime
-    data_next_update: Optional[datetime] = None
     manual_trigger: str = "0"
     explorer_name: str
     route: str
@@ -114,10 +113,6 @@ class ExplorerValidateModel(BaseModel):
     @field_serializer("data_last_updated")
     def serialize_date_last_updated(self, data_last_updated: datetime):
         return data_last_updated.strftime("%Y-%m-%d %H:%M")
-
-    @field_serializer("data_next_update")
-    def serialize_date_next_update(self, data_next_update: datetime):
-        return data_next_update.strftime("%Y-%m-%d %H:%M") if data_next_update else None
 
 
 # class CatalogData(BaseModel):
