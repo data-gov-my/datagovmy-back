@@ -111,7 +111,7 @@ class ExplorerValidateModel(BaseModel):
     tables: dict[str, dict]
 
     @field_serializer("data_last_updated")
-    def serialize_date(self, data_last_updated: datetime, _info):
+    def serialize_date_last_updated(self, data_last_updated: datetime):
         return data_last_updated.strftime("%Y-%m-%d %H:%M")
 
 

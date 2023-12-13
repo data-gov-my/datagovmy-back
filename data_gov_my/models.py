@@ -257,6 +257,10 @@ class ViewCount(models.Model):
         return f"{self.id} ({self.view_count})"
 
 
+class ExplorersMetaJson(MetaJson):
+    pass
+
+
 class ExplorersUpdate(models.Model):
     explorer = models.CharField(max_length=100, null=False)
     file_name = models.CharField(max_length=100, null=False)
