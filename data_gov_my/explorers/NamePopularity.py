@@ -155,7 +155,7 @@ class NAME_POPULARITY(General_Explorer):
 
         res = {
             "data_last_updated": last_update,
-            "data_next_update": next_update or None,
+            "data_next_update": next_update,
             "data": fin,
         }
 
