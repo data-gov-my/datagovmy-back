@@ -144,13 +144,13 @@ class General_Explorer:
             model_rows = [model_choice(**i) for i in v.to_dict("records")]
             model_choice.objects.bulk_create(model_rows)
 
-    def get_last_update(self, model_name=""):
+    def get_last_update_and_next_update(self, model_name=""):
         obj = ExplorersUpdate.objects.filter(
             explorer=self.explorer_name, file_name=model_name
         ).first()
         if obj:
-            return obj.last_update
-        return None
+            return obj.last_update, obj.data_next_update
+        return None, None
 
     """
     Validates a request,
@@ -205,14 +205,17 @@ class GeneralTransportExplorer(General_Explorer):
         timeseries = self.get_timeseries(service, origin, destination)
         callout = self.get_timeseries_callout(service, origin, destination)
 
-        data_last_updated = MetaJson.objects.get(
-            dashboard_name=self.explorer_name
-        ).dashboard_meta.get("data_last_updated", None)
+        data_last_updated, data_next_update = self.get_last_update_and_next_update(
+            self.explorer_name
+        )
+
         res = dict(
             data_last_updated=data_last_updated,
+            data_next_update=data_next_update,
             timeseries=timeseries,
             timeseries_callout=callout,
         )
+
         return response.Response(res)
 
     def get_dropdown(self):
