@@ -8,7 +8,7 @@ from django.apps import apps
 from django.http import JsonResponse
 from rest_framework import response
 
-from data_gov_my.models import ExplorersUpdate, MetaJson
+from data_gov_my.models import ExplorersMetaJson, ExplorersUpdate, MetaJson
 from data_gov_my.utils.general_chart_helpers import STATE_ABBR
 
 
@@ -145,12 +145,11 @@ class General_Explorer:
             model_choice.objects.bulk_create(model_rows)
 
     def get_last_update_and_next_update(self, model_name=""):
-        obj = ExplorersUpdate.objects.filter(
-            explorer=self.explorer_name, file_name=model_name
-        ).first()
-        if obj:
-            return obj.last_update, obj.data_next_update
-        return None, None
+        obj = ExplorersMetaJson.objects.get(dashboard_name=self.explorer_name)
+        dashboard_meta = obj.dashboard_meta
+        return dashboard_meta.get("data_last_updated"), dashboard_meta.get(
+            "data_next_update"
+        )
 
     """
     Validates a request,
