@@ -33,6 +33,7 @@ from data_gov_my.models import (
     CatalogJson,
     CatalogueJson,
     DashboardJson,
+    ExplorersMetaJson,
     ExplorersUpdate,
     FormTemplate,
     MetaJson,
@@ -768,7 +769,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
     VALIDATOR = ExplorerValidateModel
 
     def delete_file(self, filename: str, data: dict):
-        meta_count, meta_deleted = MetaJson.objects.filter(
+        meta_count, meta_deleted = ExplorersMetaJson.objects.filter(
             dashboard_name=data.get("explorer_name")
         ).delete()
         explorer_count, explorer_deleted = ExplorersUpdate.objects.filter(
@@ -783,7 +784,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
             "route": metadata.route,
             "sites": metadata.sites,
         }
-        obj, created = MetaJson.objects.update_or_create(
+        obj, created = ExplorersMetaJson.objects.update_or_create(
             dashboard_name=metadata.explorer_name,
             defaults=updated_values,
         )
