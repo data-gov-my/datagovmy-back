@@ -1,6 +1,7 @@
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
     DataCatalogueMeta,
+    Dataviz,
     Field,
     RelatedDataset,
     SiteCategory,
@@ -32,3 +33,8 @@ class DataCatalogueTranslationOptions(TranslationOptions):
         "publication",
         "translations",
     )
+
+
+@register(Dataviz)
+class DatavizTranslationOptions(TranslationOptions):
+    fields = ("title",)
