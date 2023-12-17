@@ -26,20 +26,20 @@ class RelatedDataset(BaseModel):
     description_ms: str
 
 
-# class Table(BaseModel):
-#     precision: int
-#     filter_columns: list[str] = []
-#     freeze_columns: list[str] = []
+class Dataviz(BaseModel):
+    dataviz_id: str
+    title_en: str
+    title_ms: str
+    chart_type: str
+    config: dict
 
 
 class DataCatalogueValidateModel(BaseModel):
-    bucket: str
-    filename: str
-    exclude_openapi: bool
     title_en: str
     title_ms: str
     description_en: str
     description_ms: str
+    exclude_openapi: bool
     manual_trigger: str
     data_as_of: str
     last_updated: str
@@ -62,7 +62,7 @@ class DataCatalogueValidateModel(BaseModel):
     data_source: list[str]
     fields: list[Field] = []
     # table: Table
-    dataviz: list[dict] = []  # TODO: table @ dataviz[0] enforcd
+    dataviz: list[Dataviz] = []  # TODO: table @ dataviz[0] enforced
     translations_en: dict = {}
     translations_ms: dict = {}
     related_datasets: list[RelatedDataset] = []

@@ -73,7 +73,6 @@ class DataCatalogueMeta(models.Model):
     publication = models.TextField()  # translatable
 
     # FIXME: dataviz refactor to be foreign key?
-    dataviz = ArrayField(models.JSONField())
     translations = models.JSONField()  # translatable
     related_datasets = models.ManyToManyField(RelatedDataset)
 
@@ -84,7 +83,23 @@ class DataCatalogue(models.Model):
     """
 
     catalogue_meta = models.ForeignKey(DataCatalogueMeta, on_delete=models.CASCADE)
-    data = models.JSONField()
+    data = models.JSONField()  # e.g. {"country": "New Zealand"}
+    # slug_fields = models.JSONField()  # e.g. {"country": "new-zealand"}
 
     class Meta:
         indexes = [models.Index(fields=["id"], name="data_catalogue_idx")]
+
+
+class Dataviz(models.Model):
+    catalogue_meta = models.ForeignKey(DataCatalogueMeta, on_delete=models.CASCADE)
+    dataviz_id = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)  # translatable
+    chart_type = models.CharField(max_length=25)
+    config = models.JSONField()  # precision, filter_columns etc. all goes here
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["catalogue_meta", "id"], name="unique_dataviz"
+            )
+        ]
