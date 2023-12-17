@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+from pathlib import Path
 import json
 import logging
 import os
@@ -676,7 +676,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         self, filename: str, metadata: DataCatalogueValidateModelV2
     ):
         dc_meta, is_dc_meta_created = DataCatalogueMeta.objects.update_or_create(
-            id=f"{metadata.bucket}_{metadata.filename}",
+            id=Path(filename).stem,
             defaults=dict(
                 exclude_openapi=metadata.exclude_openapi,
                 manual_trigger=metadata.manual_trigger,
