@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from slugify import slugify
 from pathlib import Path
 import json
 import logging
@@ -22,6 +22,7 @@ from data_catalogue.metajson_structure import (
 from data_catalogue.models import (
     DataCatalogue,
     DataCatalogueMeta,
+    Dataviz,
     Field,
     RelatedDataset,
     SiteCategory,
@@ -702,7 +703,6 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 dataset_begin=metadata.dataset_begin,
                 dataset_end=metadata.dataset_end,
                 data_source=metadata.data_source,
-                dataviz=metadata.dataviz,
                 translations_en=metadata.translations_en,
                 translations_ms=metadata.translations_ms,
             ),
@@ -736,6 +736,13 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
             unique_fields=["id"],
         )
 
+        dataviz_objects = [
+            Dataviz(catalogue_meta=dc_meta, **dv.model_dump())
+            for dv in metadata.dataviz
+        ]
+        dc_meta.dataviz_set.all().delete()
+        Dataviz.objects.bulk_create(dataviz_objects)
+
         # handle many-to-many fields separately.
         dc_meta.related_datasets.set(related_datasets)
         dc_meta.site_category.set(site_categories)
@@ -750,9 +757,26 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         df = df.replace({np.nan: None})
         data = df.to_dict(orient="records")
 
-        catalogue_data = [
-            DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
-        ]
+        # take all slug fields
+        dataviz = metadata.dataviz
+        slug_fields = set()
+        for dv in dataviz:
+            filter_columns = set(dv.config.get("filter_columns", []))
+            slug_fields.update(filter_columns)
+
+        slug_df = df[list(slug_fields)].copy()
+        for col in slug_df.columns:
+            slug_df[col] = slug_df[col].apply(slugify)
+
+        if slug_fields:
+            catalogue_data = [
+                DataCatalogue(catalogue_meta=dc_meta, data=row, slug=slug)
+                for (row, slug) in zip(data, slug_df.to_dict("records"))
+            ]
+        else:
+            catalogue_data = [
+                DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
+            ]
 
         _, deleted_dc_data = DataCatalogue.objects.filter(
             catalogue_meta=dc_meta

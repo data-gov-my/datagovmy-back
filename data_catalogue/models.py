@@ -84,7 +84,7 @@ class DataCatalogue(models.Model):
 
     catalogue_meta = models.ForeignKey(DataCatalogueMeta, on_delete=models.CASCADE)
     data = models.JSONField()  # e.g. {"country": "New Zealand"}
-    # slug_fields = models.JSONField()  # e.g. {"country": "new-zealand"}
+    slug = models.JSONField(default=dict)  # e.g. {"country": "new-zealand"}
 
     class Meta:
         indexes = [models.Index(fields=["id"], name="data_catalogue_idx")]
