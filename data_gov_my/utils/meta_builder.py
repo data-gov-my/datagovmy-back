@@ -754,7 +754,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         dataviz = metadata.dataviz
         slug_fields = set()
         for dv in dataviz:
-            filter_columns = set(dv.config.get("filter_columns", []))
+            filter_columns = dv.config.get("filter_columns", [])
             slug_fields.update(filter_columns)
 
         slug_df = df[list(slug_fields)].copy()
@@ -770,6 +770,16 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
             catalogue_data = [
                 DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
             ]
+
+        # side quest: handle the dataviz "dropdown" building
+        for dv in dataviz:
+            filter_columns = dv.config.get("filter_columns", [])
+            dropdown: pd.DataFrame = (
+                slug_df[filter_columns].drop_duplicates().to_dict("records")
+            )
+            Dataviz.objects.filter(
+                catalogue_meta=dc_meta, dataviz_id=dv.dataviz_id
+            ).update(dropdown=dropdown)
 
         _, deleted_dc_data = DataCatalogue.objects.filter(
             catalogue_meta=dc_meta
