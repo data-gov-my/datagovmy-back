@@ -1,13 +1,13 @@
-from django.shortcuts import get_object_or_404, render
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import generics, status, request
-from django.utils import translation
-
-from data_catalogue.models import DataCatalogueMeta, SiteCategory
 from collections import defaultdict
-from django.db.models import Q
 
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils import translation
+from rest_framework import generics, request, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from data_catalogue.models import DataCatalogueMeta, Dataviz, SiteCategory
 from data_catalogue.serializers import DataCatalogueMetaSerializer
 
 
@@ -92,8 +92,15 @@ class DataCatalogueListAPIView(APIView):
         )
 
 
-class DataCatalogueRetrieveAPIView(APIView):
-    def get(self, request: request.Request, *args, **kwargs):
+class DataCatalogueRetrieveAPIView(generics.RetrieveAPIView):
+    lookup_field = "id"
+    lookup_url_kwarg = "catalogue_id"
+    serializer_class = DataCatalogueMetaSerializer
+
+    def get_queryset(self):
+        return DataCatalogueMeta.objects.all()
+
+    def get(self, request, *args, **kwargs):
         # get language
         language = request.query_params.get("language", "en")
         language = "ms" if language == "bm" else language
@@ -105,6 +112,54 @@ class DataCatalogueRetrieveAPIView(APIView):
 
         translation.activate(language)
 
-        catalogue_id = kwargs.get("catalogue_id")
-        dc_meta = get_object_or_404(DataCatalogueMeta, id=catalogue_id)
-        return Response({"lang": language, "data": dc_meta.methodology})
+        # table key should be a reserve (dataviz[0])
+        dataviz_id = request.query_params.get("dataviz_id", "table")
+        dataviz_object = get_object_or_404(
+            Dataviz, catalogue_meta=kwargs.get("catalogue_id"), dataviz_id=dataviz_id
+        )
+
+        filter_columns = dataviz_object.config.get("filter_columns", [])
+        dropdown = []
+        can_be_filtered = True
+        selected_or_default_filter_map = {}
+        for i, filter_column in enumerate(filter_columns):
+            if can_be_filtered:
+                valid_options = [
+                    str(item[filter_column])
+                    for item in dataviz_object.dropdown
+                    if all(
+                        selected_or_default_filter_map.get(f"slug__{param}")
+                        == str(item[param])
+                        for param in filter_columns[:i]
+                    )
+                ]
+            else:
+                valid_options = []
+
+            default = dataviz_object.dropdown[0][filter_column]
+            filter_column_input = request.query_params.get(filter_column)
+            selected = (
+                filter_column_input if filter_column_input in valid_options else default
+            )
+            selected_or_default_filter_map[f"slug__{filter_column}"] = selected
+
+            dropdown.append(
+                {
+                    "name": filter_column,
+                    "selected": selected,
+                    "options": list(dict.fromkeys(valid_options)),
+                }
+            )
+
+        instance = self.get_object()
+        data = instance.datacatalogue_set.filter(
+            **selected_or_default_filter_map
+        ).values_list("data", flat=True)
+        serializer = self.get_serializer(instance)
+        res = serializer.data
+        res["dropdown"] = dropdown
+        res["data"] = data
+
+        # get the data after filtering
+
+        return Response(res)
