@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
+from data_request.models import DataRequest
+
 # Create your models here.
 
 
@@ -75,6 +77,11 @@ class DataCatalogueMeta(models.Model):
     # FIXME: dataviz refactor to be foreign key?
     translations = models.JSONField()  # translatable
     related_datasets = models.ManyToManyField(RelatedDataset)
+
+    # a data catalogue can related to 0 or 1 data request ticket
+    data_request = models.ForeignKey(
+        DataRequest, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
 
 class DataCatalogue(models.Model):

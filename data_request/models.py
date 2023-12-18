@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 
 
@@ -22,6 +21,7 @@ class DataRequest(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
+    rejection_reason = models.TextField(blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
