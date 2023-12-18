@@ -92,14 +92,7 @@ class DataCatalogueListAPIView(APIView):
         )
 
 
-class DataCatalogueRetrieveAPIView(generics.RetrieveAPIView):
-    lookup_field = "id"
-    lookup_url_kwarg = "catalogue_id"
-    serializer_class = DataCatalogueMetaSerializer
-
-    def get_queryset(self):
-        return DataCatalogueMeta.objects.all()
-
+class DataCatalogueRetrieveAPIView(APIView):
     def get(self, request, *args, **kwargs):
         # get language
         language = request.query_params.get("language", "en")
@@ -151,15 +144,13 @@ class DataCatalogueRetrieveAPIView(generics.RetrieveAPIView):
                 }
             )
 
-        instance = self.get_object()
+        instance = get_object_or_404(DataCatalogueMeta, id=kwargs.get("catalogue_id"))
         data = instance.datacatalogue_set.filter(
             **selected_or_default_filter_map
         ).values_list("data", flat=True)
-        serializer = self.get_serializer(instance)
+        serializer = DataCatalogueMetaSerializer(instance)
         res = serializer.data
         res["dropdown"] = dropdown
         res["data"] = data
-
-        # get the data after filtering
 
         return Response(res)
