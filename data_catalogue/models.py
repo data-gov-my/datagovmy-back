@@ -96,6 +96,7 @@ class Dataviz(models.Model):
     title = models.CharField(max_length=255)  # translatable
     chart_type = models.CharField(max_length=25)
     config = models.JSONField()  # precision, filter_columns etc. all goes here
+    dropdown = models.JSONField(default=list)
 
     class Meta:
         constraints = [
@@ -103,3 +104,6 @@ class Dataviz(models.Model):
                 fields=["catalogue_meta", "id"], name="unique_dataviz"
             )
         ]
+
+    def __str__(self) -> str:
+        return f"{self.catalogue_meta.id} ({self.dataviz_id})"
