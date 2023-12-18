@@ -664,14 +664,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
     VALIDATOR = DataCatalogueValidateModelV2
 
     def delete_file(self, filename: str, data: dict):
-        pass
-        # file = data["file"]
-        # bucket = file.get("bucket", "")
-        # file_name = file.get("file_name", "")
-
-        # return CatalogueJson.objects.filter(
-        #     id__contains=f"{bucket}_{file_name}_"
-        # ).delete()
+        return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: DataCatalogueValidateModelV2
