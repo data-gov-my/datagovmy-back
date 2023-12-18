@@ -1,6 +1,6 @@
 from __future__ import annotations
-
-import importlib
+from slugify import slugify
+from pathlib import Path
 import json
 import logging
 import os
@@ -10,11 +10,23 @@ from os.path import isfile
 from pathlib import Path
 from typing import List
 from urllib.request import urlopen
+import numpy as np
 
 import pandas as pd
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
+from data_catalogue.metajson_structure import (
+    DataCatalogueValidateModel as DataCatalogueValidateModelV2,
+)
+from data_catalogue.models import (
+    DataCatalogue,
+    DataCatalogueMeta,
+    Dataviz,
+    Field,
+    RelatedDataset,
+    SiteCategory,
+)
 
 from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 from data_gov_my.explorers import class_list as exp_class
@@ -48,7 +60,7 @@ from data_gov_my.utils.cron_utils import (
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
-    DataCatalogValidateModel,
+    # DataCatalogValidateModel,
     DataCatalogueValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
@@ -645,58 +657,136 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         return created_objects
 
 
-class DataCatalogBuilder(GeneralMetaBuilder):
-    CATEGORY = "DATA_CATALOG"
-    MODEL = CatalogJson
-    GITHUB_DIR = "catalog"
-    VALIDATOR = DataCatalogValidateModel
+class DataCatalogueBuilder(GeneralMetaBuilder):
+    CATEGORY = "DATA_CATALOGUE2"
+    MODEL = DataCatalogueMeta
+    GITHUB_DIR = "data-catalogue2"
+    VALIDATOR = DataCatalogueValidateModelV2
 
     def delete_file(self, filename: str, data: dict):
-        file = data["file"]
-        bucket = file.get("bucket", "")
-        file_name = file.get("file_name", "")
+        return DataCatalogueMeta.objects.filter(id=filename).delete()
 
-        return CatalogJson.objects.filter(
-            id__contains=f"{bucket}_{file_name}_"
+    def update_or_create_meta(
+        self, filename: str, metadata: DataCatalogueValidateModelV2
+    ):
+        dc_meta, is_dc_meta_created = DataCatalogueMeta.objects.update_or_create(
+            id=Path(filename).stem,
+            defaults=dict(
+                exclude_openapi=metadata.exclude_openapi,
+                manual_trigger=metadata.manual_trigger,
+                title_en=metadata.title_en,
+                title_ms=metadata.title_ms,
+                description_en=metadata.description_en,
+                description_ms=metadata.description_ms,
+                data_as_of=metadata.data_as_of,
+                last_updated=metadata.last_updated,
+                next_update=metadata.next_update,
+                methodology_en=metadata.methodology_en,
+                methodology_ms=metadata.methodology_ms,
+                caveat_en=metadata.caveat_en,
+                caveat_ms=metadata.caveat_ms,
+                publication_en=metadata.publication_en,
+                publication_ms=metadata.publication_ms,
+                link_parquet=metadata.link_parquet,
+                link_csv=metadata.link_csv,
+                link_preview=metadata.link_preview,
+                frequency=metadata.frequency,
+                geography=metadata.geography,
+                demography=metadata.demography,
+                dataset_begin=metadata.dataset_begin,
+                dataset_end=metadata.dataset_end,
+                data_source=metadata.data_source,
+                translations_en=metadata.translations_en,
+                translations_ms=metadata.translations_ms,
+            ),
+        )
+
+        # Avoid bulk_create as PK is not included in returned list (affects many-to-many .set())
+        fields = [
+            Field.objects.update_or_create(**field_data.model_dump())[0]
+            for field_data in metadata.fields
+        ]
+
+        site_categories = [
+            SiteCategory.objects.update_or_create(**site_cat_data.model_dump())[0]
+            for site_cat_data in metadata.site_category
+        ]
+
+        related_datasets = RelatedDataset.objects.bulk_create(
+            [
+                RelatedDataset(**dataset.model_dump())
+                for dataset in metadata.related_datasets
+            ],
+            update_conflicts=True,
+            update_fields=[
+                # "title",
+                # "description",
+                "title_en",
+                "title_ms",
+                "description_en",
+                "description_ms",
+            ],
+            unique_fields=["id"],
+        )
+
+        dataviz_objects = [
+            Dataviz(catalogue_meta=dc_meta, **dv.model_dump())
+            for dv in metadata.dataviz
+        ]
+        dc_meta.dataviz_set.all().delete()
+        Dataviz.objects.bulk_create(dataviz_objects)
+
+        # handle many-to-many fields separately.
+        dc_meta.related_datasets.set(related_datasets)
+        dc_meta.site_category.set(site_categories)
+        dc_meta.fields.set(fields)
+
+        # populate the table data
+        parquet_link = metadata.link_preview or metadata.link_parquet
+        df = pd.read_parquet(str(parquet_link))
+        if "date" in df.columns:
+            df["date"] = df["date"].astype(str)
+
+        df = df.replace({np.nan: None})
+        data = df.to_dict(orient="records")
+
+        # take all slug fields
+        dataviz = metadata.dataviz
+        slug_fields = set()
+        for dv in dataviz:
+            filter_columns = dv.config.get("filter_columns", [])
+            slug_fields.update(filter_columns)
+
+        slug_df = df[list(slug_fields)].copy()
+        for col in slug_df.columns:
+            slug_df[col] = slug_df[col].apply(slugify)
+
+        if slug_fields:
+            catalogue_data = [
+                DataCatalogue(catalogue_meta=dc_meta, data=row, slug=slug)
+                for (row, slug) in zip(data, slug_df.to_dict("records"))
+            ]
+        else:
+            catalogue_data = [
+                DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
+            ]
+
+        # side quest: handle the dataviz "dropdown" building
+        for dv in dataviz:
+            filter_columns = dv.config.get("filter_columns", [])
+            dropdown: pd.DataFrame = (
+                slug_df[filter_columns].drop_duplicates().to_dict("records")
+            )
+            Dataviz.objects.filter(
+                catalogue_meta=dc_meta, dataviz_id=dv.dataviz_id
+            ).update(dropdown=dropdown)
+
+        _, deleted_dc_data = DataCatalogue.objects.filter(
+            catalogue_meta=dc_meta
         ).delete()
+        DataCatalogue.objects.bulk_create(catalogue_data)
 
-    def update_or_create_meta(self, filename: str, metadata: DataCatalogValidateModel):
-        file_data = metadata.file
-        all_variable_data = metadata.file.variables
-        full_meta = metadata
-        file_src = filename.replace(".json", "")
-
-        created_objects = []
-
-        for cur_data in all_variable_data:
-            if "catalog_data" in cur_data:  # Checks if the catalog_data is in
-                cur_catalog_data = cur_data["catalog_data"]
-                chart_type = cur_catalog_data["chart"]["chart_type"]
-
-                if chart_type in common.CHART_TYPES:
-                    args = {
-                        "full_meta": full_meta.model_dump(),
-                        "file_data": file_data.model_dump(),
-                        "cur_data": cur_data,
-                        "all_variable_data": all_variable_data,
-                        "file_src": file_src,
-                    }
-
-                    module_ = f"data_gov_my.catalog_utils.catalog_variable_classes.{common.CHART_TYPES[chart_type]['parent']}"
-                    constructor_ = common.CHART_TYPES[chart_type]["constructor"]
-                    class_ = getattr(importlib.import_module(module_), constructor_)
-                    obj = class_(**args)
-
-                    unique_id = obj.unique_id
-                    db_input = obj.db_input
-                    db_input["exclude_openapi"] = file_data.exclude_openapi
-                    db_obj, created = CatalogJson.objects.update_or_create(
-                        id=unique_id, defaults=db_input
-                    )
-
-                    created_objects.append(db_obj)
-
-        return created_objects
+        return dc_meta
 
 
 class ExplorerBuilder(GeneralMetaBuilder):

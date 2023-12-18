@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "post_office",
     "django_rq",
     "drf_api_logger",
+    "data_catalogue",
     "data_request",
 ]
 
