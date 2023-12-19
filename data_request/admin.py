@@ -53,16 +53,11 @@ class DataRequestAdmin(TranslationAdmin):
             form.base_fields["published_data"].initial = obj.published_data.values_list(
                 "pk", flat=True
             )
-        if self.has_change_permission(request):
-            # data request manager must update both en and ms fields
-            form.base_fields["dataset_title_ms"].required = True
-            form.base_fields["dataset_description_ms"].required = True
+        # data request manager must update both en and ms fields
+        form.base_fields["dataset_title_ms"].required = True
+        form.base_fields["dataset_description_ms"].required = True
 
         return form
-
-    def has_change_permission(self, request, obj=None):
-        # Allow users in the "Data Request Manager" group to change the object
-        return request.user.groups.filter(name="Data Request Manager").exists()
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
