@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from data_request.models import DataRequest
-
 # Create your models here.
 
 
@@ -80,7 +78,7 @@ class DataCatalogueMeta(models.Model):
 
     # a data catalogue can related to 0 or 1 data request ticket
     data_request = models.ForeignKey(
-        DataRequest, on_delete=models.SET_NULL, blank=True, null=True
+        "data_request.DataRequest", on_delete=models.SET_NULL, blank=True, null=True
     )
 
 
