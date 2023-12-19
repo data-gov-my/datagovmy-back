@@ -78,7 +78,11 @@ class DataCatalogueMeta(models.Model):
 
     # a data catalogue can related to 0 or 1 data request ticket
     data_request = models.ForeignKey(
-        "data_request.DataRequest", on_delete=models.SET_NULL, blank=True, null=True
+        "data_request.DataRequest",
+        related_name="published_data",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
 
 
