@@ -51,9 +51,9 @@ class DataCatalogueMeta(models.Model):
     description = models.TextField()  # translatable
 
     # FIXME: move to metadata?
-    link_parquet = models.URLField()
-    link_csv = models.URLField()
-    link_preview = models.URLField()
+    link_parquet = models.URLField(null=True)
+    link_csv = models.URLField(null=True)
+    link_preview = models.URLField(null=True)
 
     # filters
     frequency = models.CharField(max_length=50)
