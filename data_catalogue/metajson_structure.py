@@ -57,8 +57,8 @@ class DataCatalogueValidateModel(BaseModel):
     frequency: str
     geography: list[str]
     demography: list[str]
-    dataset_begin: str
-    dataset_end: str
+    dataset_begin: int
+    dataset_end: int
     data_source: list[str]
     fields: list[Field] = []
     # table: Table
