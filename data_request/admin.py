@@ -10,9 +10,9 @@ from data_request.models import DataRequest
 
 
 class DataRequestAdminForm(forms.ModelForm):
-    valid_catalogue_meta_ids = forms.ModelMultipleChoiceField(
+    published_data = forms.ModelMultipleChoiceField(
         queryset=DataCatalogueMeta.objects.all(),
-        widget=FilteredSelectMultiple("Valid Catalogue Meta IDs", False),
+        widget=FilteredSelectMultiple("Data Catalogue Items", False),
         required=False,
     )
 
@@ -23,13 +23,13 @@ class DataRequestAdminForm(forms.ModelForm):
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
         status = cleaned_data.get("status")
-        valid_catalogue_meta_ids = cleaned_data.get("valid_catalogue_meta_ids")
+        published_data = cleaned_data.get("published_data")
 
         # Check if more than one DataCatalogueMeta is selected only if status is "rejected"
-        if status == "data_published" and not valid_catalogue_meta_ids.exists():
+        if status == "data_published" and not published_data.exists():
             raise forms.ValidationError(
                 {
-                    "valid_catalogue_meta_ids": 'At least one Data Catalogue must be selected for "data_published" status.'
+                    "published_data": 'At least one Data Catalogue must be selected for "data_published" status.'
                 }
             )
         return cleaned_data
@@ -50,9 +50,9 @@ class DataRequestAdmin(TranslationAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         if obj and obj.pk:
-            form.base_fields[
-                "valid_catalogue_meta_ids"
-            ].initial = obj.published_data.values_list("pk", flat=True)
+            form.base_fields["published_data"].initial = obj.published_data.values_list(
+                "pk", flat=True
+            )
         if self.has_change_permission(request):
             # data request manager must update both en and ms fields
             form.base_fields["dataset_title_ms"].required = True
@@ -66,7 +66,7 @@ class DataRequestAdmin(TranslationAdmin):
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         super().save_model(request, obj, form, change)
-        obj.published_data.set(form.cleaned_data.get("valid_catalogue_meta_ids"))
+        obj.published_data.set(form.cleaned_data.get("published_data"))
 
 
 admin.site.register(DataRequest, DataRequestAdmin)
