@@ -40,7 +40,7 @@ class DataCatalogueListAPIView(APIView):
         frequency = request.query_params.get("frequency", "")
         geography = request.query_params.getlist("geography", [])
         demography = request.query_params.getlist("demography", [])
-        dataset_begin = request.query_params.get("start", "")
+        dataset_begin = request.query_params.get("begin", "")
         dataset_end = request.query_params.get("end", "")
 
         # Prepare filter conditions based on query parameters
@@ -54,9 +54,9 @@ class DataCatalogueListAPIView(APIView):
         if demography:
             filters &= Q(demography__overlap=demography)
         if dataset_begin and dataset_begin.isdigit():
-            filters &= Q(dataset_begin__gte=int(dataset_begin))
+            filters &= Q(dataset_begin__lte=int(dataset_begin))
         if dataset_end and dataset_end.isdigit():
-            filters &= Q(dataset_end__lte=int(dataset_end))
+            filters &= Q(dataset_end__gte=int(dataset_end))
 
         # Query the SiteCategory objects with related DataCatalogueMeta
         site_categories = (
