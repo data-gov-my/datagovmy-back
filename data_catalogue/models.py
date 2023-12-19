@@ -76,6 +76,15 @@ class DataCatalogueMeta(models.Model):
     translations = models.JSONField()  # translatable
     related_datasets = models.ManyToManyField(RelatedDataset)
 
+    # a data catalogue can related to 0 or 1 data request ticket
+    data_request = models.ForeignKey(
+        "data_request.DataRequest",
+        related_name="published_data",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+
 
 class DataCatalogue(models.Model):
     """
