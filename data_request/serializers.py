@@ -16,6 +16,7 @@ class DataRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataRequest
         fields = [
+            "ticket_id",
             "name",
             "email",
             "institution",
