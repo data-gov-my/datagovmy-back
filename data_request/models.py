@@ -36,13 +36,4 @@ class DataRequest(models.Model):
                 }
             )
 
-        if self.status == "data_published":
-            linked_catalogues_count = DataCatalogueMeta.objects.filter(
-                data_request=self
-            ).count()
-            if linked_catalogues_count < 1:
-                raise ValidationError(
-                    'At least one data catalogue must be linked when the status is "data_published".'
-                )
-
         return super().clean()
