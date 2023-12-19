@@ -85,4 +85,5 @@ def list_data_request(request):
         )
 
     translation.activate(lang)
-    return Response(queryset.values())
+
+    return Response(DataRequestSerializer(queryset, many=True).data)
