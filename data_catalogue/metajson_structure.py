@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 
@@ -51,9 +52,10 @@ class DataCatalogueValidateModel(BaseModel):
     publication_en: str
     publication_ms: str
     site_category: list[SiteCategory]
-    link_parquet: HttpUrl
-    link_csv: HttpUrl
-    link_preview: HttpUrl
+    link_parquet: Optional[HttpUrl] = None
+    link_preview: Optional[HttpUrl] = None
+    link_csv: Optional[HttpUrl] = None
+    link_geojson: Optional[HttpUrl] = None
     frequency: str
     geography: list[str]
     demography: list[str]
