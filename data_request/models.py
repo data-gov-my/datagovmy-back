@@ -9,7 +9,6 @@ class DataRequest(models.Model):
         ("submitted", "Submitted"),
         ("under_review", "Under Review"),
         ("rejected", "Rejected"),
-        ("in_progress", "In Progress"),
         ("data_published", "Data Published"),
     ]
     ticket_id = models.AutoField(primary_key=True, editable=False)
@@ -24,6 +23,10 @@ class DataRequest(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     remark = models.TextField(blank=True, null=True)  # translatable
+    # keep track of dates
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_under_review = models.DateTimeField(null=True, blank=True)
+    date_completed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
