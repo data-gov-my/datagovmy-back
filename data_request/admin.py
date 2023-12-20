@@ -15,6 +15,7 @@ class DataRequestAdminForm(forms.ModelForm):
         widget=FilteredSelectMultiple("Data Catalogue Items", False),
         required=False,
     )
+    DOCS_SITE_URL = "developer.data.gov.my"
 
     class Meta:
         model = DataRequest
@@ -24,12 +25,24 @@ class DataRequestAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         status = cleaned_data.get("status")
         published_data = cleaned_data.get("published_data")
-
-        # Check if more than one DataCatalogueMeta is selected only if status is "rejected"
-        if status == "data_published" and not published_data.exists():
+        remark_en: str = cleaned_data.get("remark_en") or ""
+        remark_ms: str = cleaned_data.get("remark_ms") or ""
+        if status in ("under_review", "rejected") and not (remark_en and remark_ms):
             raise forms.ValidationError(
                 {
-                    "published_data": 'At least one Data Catalogue must be selected for "data_published" status.'
+                    "remark_en": "This field is required.",
+                    "remark_ms": "This field is required.",
+                }
+            )
+        if status == "data_published" and not (
+            published_data.exists()
+            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+        ):
+            raise forms.ValidationError(
+                {
+                    "published_data": 'At least one Data Catalogue must be selected for "data_published" status, else update remark to appropriate link in developer.data.gov.my.',
+                    "remark_en": 'This field is required if there is no published data, make sure to include "developer.data.gov.my" in the remark.',
+                    "remark_ms": 'This field is required if there is no published data, make sure to include "developer.data.gov.my" in the remark.',
                 }
             )
         return cleaned_data
