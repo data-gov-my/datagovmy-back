@@ -1,4 +1,5 @@
 # Create your views here.
+import logging
 from django.db.models import Q
 from django.utils import translation
 from rest_framework import generics, status
@@ -11,6 +12,7 @@ from data_request.serializers import DataRequestSerializer
 
 class DataRequestCreateAPIView(generics.CreateAPIView):
     serializer_class = DataRequestSerializer
+    FORM_TYPE = "data_request_submitted"
 
     def create(self, request, *args, **kwargs):
         # Determine the language from the query parameters
@@ -30,17 +32,19 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             self.perform_create(serializer)
 
         headers = self.get_success_headers(serializer.data)
-
-        # FIXME: use proper email templating
         recipient = serializer.validated_data.get("email")
-        email = mail.send(
-            recipients=recipient,
-            language=language,
-            priority="now",
-            subject="Data Request Ticket Submitted",
-            message="Your data request is now received.",
-            html_message="Your <strong>data request</strong> is now received.",
-        )
+        # FIXME: use proper celery worker to queue send emails
+        try:
+            email_lang = "en-GB" if language == "en" else "ms-MY"
+            email = mail.send(
+                recipients=recipient,
+                language=email_lang,
+                priority="now",
+                template=self.FORM_TYPE,
+                context=serializer.data,
+            )
+        except Exception as e:
+            logging.error(e)
 
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
