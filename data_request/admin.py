@@ -41,7 +41,6 @@ class DataRequestAdmin(TranslationAdmin):
         "name",
         "email",
         "institution",
-        "agency",
         "purpose_of_request",
     ]
     form = DataRequestAdminForm
