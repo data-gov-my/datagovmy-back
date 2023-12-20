@@ -23,17 +23,7 @@ class DataRequest(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
-    rejection_reason = models.TextField(blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)  # translatable
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
-
-    def clean(self) -> None:
-        if self.status == "rejected" and not self.rejection_reason:
-            raise ValidationError(
-                {
-                    "rejection_reason": 'Rejection reason is required when the status is "rejected".'
-                }
-            )
-
-        return super().clean()
