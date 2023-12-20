@@ -1,3 +1,4 @@
+from django.utils import timezone
 from typing import Any
 
 from django import forms
@@ -56,6 +57,9 @@ class DataRequestAdmin(TranslationAdmin):
         "email",
         "institution",
         "purpose_of_request",
+        "date_submitted",
+        "date_under_review",
+        "date_completed",
     ]
     form = DataRequestAdminForm
     list_filter = ["status"]  # Add the 'status' field to enable filtering
@@ -73,8 +77,12 @@ class DataRequestAdmin(TranslationAdmin):
         return form
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
-        super().save_model(request, obj, form, change)
         obj.published_data.set(form.cleaned_data.get("published_data"))
+        if obj.status == "under_review" and not obj.date_under_review:
+            obj.date_under_review = timezone.now()
+        elif obj.status in ["rejected", "data_published"]:
+            obj.date_completed = timezone.now()
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(DataRequest, DataRequestAdmin)
