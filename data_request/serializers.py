@@ -17,6 +17,9 @@ class DataRequestSerializer(serializers.ModelSerializer):
         model = DataRequest
         fields = [
             "ticket_id",
+            "date_submitted",
+            "date_under_review",
+            "date_completed",
             "name",
             "email",
             "institution",
@@ -25,6 +28,6 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "agency",
             "purpose_of_request",
             "status",
-            "rejection_reason",
+            "remark",
             "published_data",
         ]
