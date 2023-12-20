@@ -9,7 +9,6 @@ class DataRequest(models.Model):
         ("submitted", "Submitted"),
         ("under_review", "Under Review"),
         ("rejected", "Rejected"),
-        ("in_progress", "In Progress"),
         ("data_published", "Data Published"),
     ]
     ticket_id = models.AutoField(primary_key=True, editable=False)
@@ -23,17 +22,11 @@ class DataRequest(models.Model):
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
-    rejection_reason = models.TextField(blank=True, null=True)
+    remark = models.TextField(blank=True, null=True)  # translatable
+    # keep track of dates
+    date_submitted = models.DateTimeField(auto_now_add=True)
+    date_under_review = models.DateTimeField(null=True, blank=True)
+    date_completed = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
-
-    def clean(self) -> None:
-        if self.status == "rejected" and not self.rejection_reason:
-            raise ValidationError(
-                {
-                    "rejection_reason": 'Rejection reason is required when the status is "rejected".'
-                }
-            )
-
-        return super().clean()

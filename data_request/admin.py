@@ -1,3 +1,4 @@
+from django.utils import timezone
 from typing import Any
 
 from django import forms
@@ -15,6 +16,7 @@ class DataRequestAdminForm(forms.ModelForm):
         widget=FilteredSelectMultiple("Data Catalogue Items", False),
         required=False,
     )
+    DOCS_SITE_URL = "developer.data.gov.my"
 
     class Meta:
         model = DataRequest
@@ -24,12 +26,25 @@ class DataRequestAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         status = cleaned_data.get("status")
         published_data = cleaned_data.get("published_data")
-
-        # Check if more than one DataCatalogueMeta is selected only if status is "rejected"
-        if status == "data_published" and not published_data.exists():
+        remark_en: str = cleaned_data.get("remark_en") or ""
+        remark_ms: str = cleaned_data.get("remark_ms") or ""
+        if status in ("under_review", "rejected"):
+            errors = {}
+            if not remark_en:
+                errors["remark_en"] = "This field is required!"
+            if not remark_ms:
+                errors["remark_ms"] = "This field is required"
+            if errors:
+                raise forms.ValidationError(errors)
+        if status == "data_published" and not (
+            published_data.exists()
+            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+        ):
             raise forms.ValidationError(
                 {
-                    "published_data": 'At least one Data Catalogue must be selected for "data_published" status.'
+                    "published_data": 'At least one Data Catalogue must be selected for "data_published" status, else update remark to appropriate link in developer.data.gov.my.',
+                    "remark_en": 'This field is required if there is no published data, include "developer.data.gov.my" in the remark.',
+                    "remark_ms": 'This field is required if there is no published data, include "developer.data.gov.my" in the remark.',
                 }
             )
         return cleaned_data
@@ -41,8 +56,10 @@ class DataRequestAdmin(TranslationAdmin):
         "name",
         "email",
         "institution",
-        "agency",
         "purpose_of_request",
+        "date_submitted",
+        "date_under_review",
+        "date_completed",
     ]
     form = DataRequestAdminForm
     list_filter = ["status"]  # Add the 'status' field to enable filtering
@@ -53,20 +70,19 @@ class DataRequestAdmin(TranslationAdmin):
             form.base_fields["published_data"].initial = obj.published_data.values_list(
                 "pk", flat=True
             )
-        if self.has_change_permission(request):
-            # data request manager must update both en and ms fields
-            form.base_fields["dataset_title_ms"].required = True
-            form.base_fields["dataset_description_ms"].required = True
+        # data request manager must update both en and ms fields
+        form.base_fields["dataset_title_ms"].required = True
+        form.base_fields["dataset_description_ms"].required = True
 
         return form
 
-    def has_change_permission(self, request, obj=None):
-        # Allow users in the "Data Request Manager" group to change the object
-        return request.user.groups.filter(name="Data Request Manager").exists()
-
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
-        super().save_model(request, obj, form, change)
         obj.published_data.set(form.cleaned_data.get("published_data"))
+        if obj.status == "under_review" and not obj.date_under_review:
+            obj.date_under_review = timezone.now()
+        elif obj.status in ["rejected", "data_published"]:
+            obj.date_completed = timezone.now()
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(DataRequest, DataRequestAdmin)
