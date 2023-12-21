@@ -183,7 +183,7 @@ class FormTemplate(models.Model):
         #     name=meta["name"], language=meta["language"]
         # ).delete()
 
-        default_template: EmailTemplate = EmailTemplate.objects.get_or_create(
+        default_template, _ = EmailTemplate.objects.update_or_create(
             name=meta["name"],
             language=meta["language"],
             defaults={
@@ -191,15 +191,17 @@ class FormTemplate(models.Model):
                 "content": meta["content"],
                 "html_content": meta["html_content"],
             },
-        )[0]
+        )
 
         for i in range(1, len(email_template_meta)):
             meta = email_template_meta[i]
-            alt_template = default_template.translated_templates.get_or_create(
-                subject=meta["subject"],
-                content=meta["content"],
-                html_content=meta["html_content"],
+            alt_template, _ = default_template.translated_templates.update_or_create(
                 language=meta["language"],
+                defaults={
+                    "subject": meta["subject"],
+                    "content": meta["content"],
+                    "html_content": meta["html_content"],
+                },
             )
 
         return default_template
