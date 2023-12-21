@@ -1,9 +1,12 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from data_catalogue.models import DataCatalogueMeta
+from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 
 # Create your models here.
+
+
 class DataRequest(models.Model):
     STATUS_CHOICES = [
         ("submitted", "Submitted"),
@@ -12,9 +15,7 @@ class DataRequest(models.Model):
         ("data_published", "Data Published"),
     ]
     ticket_id = models.AutoField(primary_key=True, editable=False)
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-    institution = models.CharField(max_length=255, blank=True, null=True)
+
     dataset_title = models.CharField(max_length=255)  # translatable
     dataset_description = models.TextField()  # translatable
     agency = models.CharField(max_length=255)
@@ -30,3 +31,22 @@ class DataRequest(models.Model):
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
+
+
+class Subscription(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    institution = models.CharField(max_length=255, blank=True, null=True)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+    # FIXME disable null=True after migration completed
+    data_request = models.ForeignKey(DataRequest, on_delete=models.CASCADE, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.email}))"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["email", "data_request"], name="unique_subscription"
+            )
+        ]
