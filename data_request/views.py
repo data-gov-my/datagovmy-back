@@ -1,16 +1,67 @@
 # Create your views here.
+import logging
+
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils import translation
+from post_office import mail
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from post_office import mail
+from rest_framework.serializers import ValidationError
+
 from data_request.models import DataRequest
-from data_request.serializers import DataRequestSerializer
+from data_request.serializers import DataRequestSerializer, SubscriptionSerializer
+
+
+class SubscriptionCreateAPIView(generics.CreateAPIView):
+    serializer_class = SubscriptionSerializer
+    FORM_TYPE = "data_request_subscription"
+
+    def perform_create(self, serializer):
+        ticket_id = self.kwargs.get("ticket_id")
+        data_request = get_object_or_404(DataRequest, ticket_id=ticket_id)
+        # Check if the email already exists in data_request.subscriptions
+        email = serializer.validated_data["email"]
+
+        if data_request.status != "under_review":
+            raise ValidationError(
+                {"status": "You cannot subscribe to tickets that are not under review."}
+            )
+
+        if data_request.subscription_set.filter(email=email).exists():
+            raise ValidationError(
+                {"email": "This email is already in use for this data request ticket."}
+            )
+
+        subscription = serializer.save()
+        data_request.subscription_set.add(subscription)
+
+        # send email to notify subscription
+        try:
+            mail.send(
+                recipients=email,
+                language=serializer.validated_data["language"],
+                priority="now",
+                template=self.FORM_TYPE,
+                context={
+                    "ticket_id": data_request.ticket_id,
+                    "name": serializer.validated_data["name"],
+                    "email": serializer.validated_data["email"],
+                    "institution": serializer.validated_data.get("institution"),
+                    "dataset_title": data_request.dataset_title_en
+                    if serializer.validated_data["language"] == "en-GB"
+                    else data_request.dataset_title_ms,
+                    "agency": data_request.agency,
+                },
+            )
+        except Exception as e:
+            logging.error(e)
 
 
 class DataRequestCreateAPIView(generics.CreateAPIView):
     serializer_class = DataRequestSerializer
+    FORM_TYPE = "data_request_submitted"
 
     def create(self, request, *args, **kwargs):
         # Determine the language from the query parameters
@@ -24,23 +75,29 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             )
 
         # Set the language for translation
+        email_lang = "en-GB" if language == "en" else "ms-MY"
         with translation.override(language):
-            serializer = self.get_serializer(data=request.data)
+            data = request.data.dict()
+            data["language"] = email_lang
+            serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
 
         headers = self.get_success_headers(serializer.data)
-
-        # FIXME: use proper email templating
         recipient = serializer.validated_data.get("email")
-        email = mail.send(
-            recipients=recipient,
-            language=language,
-            priority="now",
-            subject="Data Request Ticket Submitted",
-            message="Your data request is now received.",
-            html_message="Your <strong>data request</strong> is now received.",
-        )
+        # FIXME: use proper celery worker to queue send emails
+        try:
+            context = serializer.data
+            context["name"] = data.get("name")
+            email = mail.send(
+                recipients=recipient,
+                language=email_lang,
+                priority="now",
+                template=self.FORM_TYPE,
+                context=context,
+            )
+        except Exception as e:
+            logging.error(e)
 
         return Response(
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
