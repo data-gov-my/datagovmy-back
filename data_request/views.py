@@ -26,8 +26,11 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             )
 
         # Set the language for translation
+        email_lang = "en-GB" if language == "en" else "ms-MY"
         with translation.override(language):
-            serializer = self.get_serializer(data=request.data)
+            data = request.data.dict()
+            data["language"] = email_lang
+            serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
 
@@ -35,13 +38,14 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
         recipient = serializer.validated_data.get("email")
         # FIXME: use proper celery worker to queue send emails
         try:
-            email_lang = "en-GB" if language == "en" else "ms-MY"
+            context = serializer.data
+            context["name"] = data.get("name")
             email = mail.send(
                 recipients=recipient,
                 language=email_lang,
                 priority="now",
                 template=self.FORM_TYPE,
-                context=serializer.data,
+                context=context,
             )
         except Exception as e:
             logging.error(e)
