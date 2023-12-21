@@ -1,5 +1,6 @@
 from django.utils import timezone
 from typing import Any
+from django.utils import translation
 
 from django import forms
 from django.contrib import admin
@@ -8,6 +9,9 @@ from modeltranslation.admin import TranslationAdmin
 
 from data_catalogue.models import DataCatalogueMeta
 from data_request.models import DataRequest
+from post_office import mail
+
+from data_request.serializers import DataRequestSerializer
 
 
 class DataRequestAdminForm(forms.ModelForm):
@@ -53,9 +57,6 @@ class DataRequestAdminForm(forms.ModelForm):
 class DataRequestAdmin(TranslationAdmin):
     readonly_fields = [
         "ticket_id",
-        "name",
-        "email",
-        "institution",
         "purpose_of_request",
         "date_submitted",
         "date_under_review",
@@ -64,6 +65,8 @@ class DataRequestAdmin(TranslationAdmin):
     form = DataRequestAdminForm
     list_filter = ["status"]  # Add the 'status' field to enable filtering
     DATA_REQUEST_UNDER_REVIEW_TEMPLATE = "data_request_under_review"
+    DATA_REQUEST_DATA_PUBLISHED_TEMPLATE = "data_request_data_published"
+    DATA_REQUEST_REJECTED_TEMPLATE = "data_request_rejected"
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -115,6 +118,16 @@ class DataRequestAdmin(TranslationAdmin):
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)
+
+        # after model is saved, make sure to send relevant emails
+        if obj.status == "rejected":
+            self.send_subscribtion_emails(
+                obj=obj, template=self.DATA_REQUEST_REJECTED_TEMPLATE
+            )
+        if obj.status == "data_published":
+            self.send_subscribtion_emails(
+                obj=obj, template=self.DATA_REQUEST_DATA_PUBLISHED_TEMPLATE
+            )
 
 
 admin.site.register(DataRequest, DataRequestAdmin)
