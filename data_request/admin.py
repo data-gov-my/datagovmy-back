@@ -63,6 +63,7 @@ class DataRequestAdmin(TranslationAdmin):
     ]
     form = DataRequestAdminForm
     list_filter = ["status"]  # Add the 'status' field to enable filtering
+    DATA_REQUEST_UNDER_REVIEW_TEMPLATE = "data_request_under_review"
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -76,10 +77,41 @@ class DataRequestAdmin(TranslationAdmin):
 
         return form
 
+    def send_subscribtion_emails(self, obj: DataRequest, template: str):
+        with translation.override("en"):
+            recipients = obj.subscription_set.filter(language="en-GB").values_list(
+                "email", flat=True
+            )
+            if recipients.exists():
+                mail.send(
+                    bcc=list(recipients),
+                    template=template,
+                    priority="now",
+                    language="en-GB",
+                    context=DataRequestSerializer(obj).data,
+                )
+
+        with translation.override("ms"):
+            recipients = obj.subscription_set.filter(language="ms-MY").values_list(
+                "email", flat=True
+            )
+            if recipients.exists():
+                mail.send(
+                    bcc=list(recipients),
+                    template=template,
+                    priority="now",
+                    language="ms-MY",
+                    context=DataRequestSerializer(obj).data,
+                )
+
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.published_data.set(form.cleaned_data.get("published_data"))
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
+            self.send_subscribtion_emails(
+                obj=obj, template=self.DATA_REQUEST_UNDER_REVIEW_TEMPLATE
+            )
+            # send email updating user that it is now under review
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)
