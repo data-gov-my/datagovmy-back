@@ -24,7 +24,7 @@ class DataRequest(models.Model):
 
     dataset_title = models.CharField(max_length=255)  # translatable
     dataset_description = models.TextField()  # translatable
-    agency = models.OneToOneField(Agency, null=True, on_delete=models.SET_NULL)
+    agency = models.ForeignKey(Agency, null=True, on_delete=models.SET_NULL)
     purpose_of_request = models.CharField(max_length=255)
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
