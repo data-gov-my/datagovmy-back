@@ -35,9 +35,9 @@ class DataRequestAdminForm(forms.ModelForm):
         if status in ("under_review", "rejected"):
             errors = {}
             if not remark_en:
-                errors["remark_en"] = "This field is required!"
+                errors["remark_en"] = "This field is required."
             if not remark_ms:
-                errors["remark_ms"] = "This field is required"
+                errors["remark_ms"] = "This field is required."
             if errors:
                 raise forms.ValidationError(errors)
         if status == "data_published" and not (
