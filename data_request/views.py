@@ -1,7 +1,8 @@
 # Create your views here.
 import logging
 
-from django.db.models import Q
+import pandas as pd
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import translation
 from post_office import mail
@@ -10,9 +11,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
-from data_request.models import DataRequest
-from data_request.serializers import DataRequestSerializer, SubscriptionSerializer
-from django.db.models import Count
+from data_request.models import Agency, DataRequest
+from data_request.serializers import (
+    AgencySerializer,
+    DataRequestSerializer,
+    SubscriptionSerializer,
+)
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
@@ -147,3 +151,40 @@ def list_data_request(request):
     translation.activate(lang)
 
     return Response(DataRequestSerializer(queryset, many=True).data)
+
+
+# Handle Agency population
+
+
+class AgencyListAPIView(generics.ListAPIView):
+    serializer_class = AgencySerializer
+
+    def list(self, request, *args, **kwargs):
+        language = request.query_params.get("language", "en")
+        language = "ms" if language == "bm" else language
+        translation.activate(language)
+
+        return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return Agency.objects.all()
+
+
+class AgencyCreateAPIView(generics.CreateAPIView):
+    AGENCY_PARQUET = "https://storage.data.gov.my/agencies.parquet"
+
+    def post(self, request, *args, **kwargs):
+        df = pd.read_parquet(self.AGENCY_PARQUET)
+        agency_objects = [Agency(**row) for row in df.to_dict("records")]
+        update_or_created_agencies = Agency.objects.bulk_create(
+            agency_objects,
+            update_conflicts=True,
+            unique_fields=["acronym"],
+            update_fields=["name_en", "name_ms"],
+        )
+        return Response(
+            {
+                "detail": f"Bulk update/create {len(update_or_created_agencies)} agencies successful."
+            },
+            status=status.HTTP_201_CREATED,
+        )
