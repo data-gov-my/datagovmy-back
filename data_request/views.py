@@ -12,6 +12,7 @@ from rest_framework.serializers import ValidationError
 
 from data_request.models import DataRequest
 from data_request.serializers import DataRequestSerializer, SubscriptionSerializer
+from django.db.models import Count
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
@@ -140,6 +141,8 @@ def list_data_request(request):
         queryset = queryset.filter(
             Q(dataset_title__icontains=query) | Q(dataset_description__icontains=query)
         )
+
+    queryset = queryset.annotate(total_subscribers=Count("subscription"))
 
     translation.activate(lang)
 

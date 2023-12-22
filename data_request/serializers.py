@@ -23,8 +23,8 @@ class DataRequestSerializer(serializers.ModelSerializer):
         write_only=True, required=False, allow_blank=True
     )
     language = serializers.CharField(write_only=True)
+    total_subscribers = serializers.IntegerField()
     published_data = DataCatalogueMetaSerializer(many=True, read_only=True)
-    subscription_set = SubscriptionSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         """
@@ -55,10 +55,10 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "purpose_of_request",
             "status",
             "remark",
-            "published_data",
             "name",
             "email",
             "institution",
             "language",
-            "subscription_set",
+            "total_subscribers",
+            "published_data",
         ]
