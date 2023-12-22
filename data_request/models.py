@@ -7,6 +7,14 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 # Create your models here.
 
 
+class Agency(models.Model):
+    acronym = models.CharField(max_length=15, primary_key=True)
+    name = models.CharField(max_length=255)  # translatable
+
+    def __str__(self) -> str:
+        return self.acronym
+
+
 class DataRequest(models.Model):
     STATUS_CHOICES = [
         ("submitted", "Submitted"),
@@ -18,7 +26,7 @@ class DataRequest(models.Model):
 
     dataset_title = models.CharField(max_length=255)  # translatable
     dataset_description = models.TextField()  # translatable
-    agency = models.CharField(max_length=255)
+    agency = models.OneToOneField(Agency, null=True, on_delete=models.SET_NULL)
     purpose_of_request = models.CharField(max_length=255)
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="submitted"
