@@ -11,6 +11,9 @@ class Agency(models.Model):
     acronym = models.CharField(max_length=15, primary_key=True)
     name = models.CharField(max_length=255)  # translatable
 
+    def __str__(self) -> str:
+        return self.acronym
+
 
 class DataRequest(models.Model):
     STATUS_CHOICES = [
