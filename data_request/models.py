@@ -1,8 +1,6 @@
 from django.db import models
-from django.core.exceptions import ValidationError
-from data_catalogue.models import DataCatalogueMeta
-from data_gov_my.utils.common import LANGUAGE_CHOICES
 
+from data_gov_my.utils.common import LANGUAGE_CHOICES
 
 # Create your models here.
 
@@ -36,6 +34,9 @@ class DataRequest(models.Model):
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_under_review = models.DateTimeField(null=True, blank=True)
     date_completed = models.DateTimeField(null=True, blank=True)
+    published_data = models.ManyToManyField(
+        "data_catalogue.DataCatalogueMeta", blank=True
+    )
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
