@@ -175,6 +175,7 @@ class AgencyCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         df = pd.read_parquet(self.AGENCY_PARQUET)
+        acronym_lst = df["acronym"].tolist()
         agency_objects = [Agency(**row) for row in df.to_dict("records")]
         update_or_created_agencies = Agency.objects.bulk_create(
             agency_objects,
@@ -182,9 +183,13 @@ class AgencyCreateAPIView(generics.CreateAPIView):
             unique_fields=["acronym"],
             update_fields=["name_en", "name_ms"],
         )
+
+        _, deleted = Agency.objects.exclude(acronym__in=acronym_lst).delete()
+
         return Response(
             {
-                "detail": f"Bulk update/create {len(update_or_created_agencies)} agencies successful."
+                "detail": f"Bulk update/create {len(update_or_created_agencies)} agencies successful.",
+                "deleted": deleted,
             },
             status=status.HTTP_201_CREATED,
         )
