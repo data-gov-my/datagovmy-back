@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from data_catalogue.models import DataCatalogueMeta
-from data_request.models import DataRequest, Subscription
+from data_request.models import Agency, DataRequest, Subscription
 
 
 class DataCatalogueMetaSerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class DataRequestSerializer(serializers.ModelSerializer):
         write_only=True, required=False, allow_blank=True
     )
     language = serializers.CharField(write_only=True)
-    total_subscribers = serializers.IntegerField()
+    total_subscribers = serializers.IntegerField(read_only=True)
     published_data = DataCatalogueMetaSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
@@ -62,3 +62,9 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "total_subscribers",
             "published_data",
         ]
+
+
+class AgencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agency
+        fields = ["acronym", "name"]
