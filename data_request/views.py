@@ -1,12 +1,13 @@
 # Create your views here.
 import logging
+from django.http import QueryDict
 
 import pandas as pd
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import translation
 from post_office import mail
-from rest_framework import generics, status
+from rest_framework import generics, status, request
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -68,7 +69,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
     serializer_class = DataRequestSerializer
     FORM_TYPE = "data_request_submitted"
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: request.Request, *args, **kwargs):
         # Determine the language from the query parameters
         language = request.query_params.get("language", "en")
         language = "ms" if language == "bm" else language
@@ -82,7 +83,11 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
         # Set the language for translation
         email_lang = "en-GB" if language == "en" else "ms-MY"
         with translation.override(language):
-            data = request.data.dict()
+            data = (
+                request.data.dict()
+                if isinstance(request.data, QueryDict)
+                else request.data
+            )
             data["language"] = email_lang
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
