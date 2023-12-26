@@ -80,31 +80,35 @@ class DataRequestAdmin(TranslationAdmin):
 
         return form
 
-    def send_subscribtion_emails(self, obj: DataRequest, template: str):
+    def send_subscribtion_emails(self, obj: DataRequest, template: str, context={}):
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
             )
+            email_context = DataRequestSerializer(obj).data
+            email_context.update(context)
             if recipients.exists():
                 mail.send(
                     bcc=list(recipients),
                     template=template,
                     priority="now",
                     language="en-GB",
-                    context=DataRequestSerializer(obj).data,
+                    context=email_context,
                 )
 
         with translation.override("ms"):
             recipients = obj.subscription_set.filter(language="ms-MY").values_list(
                 "email", flat=True
             )
+            email_context = DataRequestSerializer(obj).data
+            email_context.update(context)
             if recipients.exists():
                 mail.send(
                     bcc=list(recipients),
                     template=template,
                     priority="now",
                     language="ms-MY",
-                    context=DataRequestSerializer(obj).data,
+                    context=email_context,
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
@@ -112,7 +116,9 @@ class DataRequestAdmin(TranslationAdmin):
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
             self.send_subscribtion_emails(
-                obj=obj, template=self.DATA_REQUEST_UNDER_REVIEW_TEMPLATE
+                obj=obj,
+                template=self.DATA_REQUEST_UNDER_REVIEW_TEMPLATE,
+                context={"name": obj.subscription_set.first().name},
             )
             # send email updating user that it is now under review
         elif obj.status in ["rejected", "data_published"]:
