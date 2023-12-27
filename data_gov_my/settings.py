@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "drf_api_logger",
     "data_catalogue",
     "data_request",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -220,9 +221,12 @@ if not DEBUG:
     AWS_SES_REGION_NAME = os.getenv("AWS_SES_REGION_NAME")
     AWS_SES_REGION_ENDPOINT = os.getenv("AWS_SES_REGION_ENDPOINT")
 
-# celery (task queue)
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+# Celery Configuration Options
+CELERY_BROKER_URL = os.getenv("REDIS_CONNECTION_STR")
+CELERY_TIMEZONE = "Asia/Kuala_Lumpur"
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
+CELERY_RESULT_EXTENDED = True
 
 # Logging
 

@@ -14,6 +14,7 @@ cramjam==2.6.2
 distlib==0.3.6
 Django==4.1.7
 django-cache-lock==0.2.5
+django-celery-results==2.5.1
 django-cors-headers==3.14.0
 django-environ==0.10.0
 django-extensions==3.2.1
