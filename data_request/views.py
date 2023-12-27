@@ -131,7 +131,9 @@ def list_data_request(request):
     ticket_status = request.query_params.get("status", None)
     query = request.query_params.get("query", None)
 
-    queryset = DataRequest.objects.exclude(status="submitted")
+    queryset = DataRequest.objects.exclude(status="submitted").prefetch_related(
+        "published_data"
+    )
     if ticket_id:
         if not ticket_id.isdigit():
             return Response(
