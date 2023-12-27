@@ -27,6 +27,7 @@ drf-api-logger==1.1.14
 fastparquet==2023.2.0
 filelock==3.9.0
 fsspec==2023.3.0
+gevent==23.7.0
 gunicorn==20.1.0
 identify==2.5.18
 idna==3.4
