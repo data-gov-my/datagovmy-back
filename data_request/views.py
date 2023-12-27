@@ -48,7 +48,6 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
             mail.send(
                 recipients=email,
                 language=serializer.validated_data["language"],
-                priority="now",
                 template=self.FORM_TYPE,
                 context={
                     "ticket_id": data_request.ticket_id,
@@ -102,7 +101,6 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             email = mail.send(
                 recipients=recipient,
                 language=email_lang,
-                priority="now",
                 template=self.FORM_TYPE,
                 context=context,
             )

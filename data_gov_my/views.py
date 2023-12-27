@@ -505,7 +505,6 @@ class FORMS(generics.ListAPIView):
                     recipients=recipient,
                     template=template.email_template,
                     language=form_data.language,
-                    priority="now",
                     context=form_data.form_data,
                 )
                 form_data.email = email
