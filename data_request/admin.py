@@ -91,7 +91,6 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     bcc=list(recipients),
                     template=template,
-                    priority="now",
                     language="en-GB",
                     context=email_context,
                 )
@@ -106,7 +105,6 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     bcc=list(recipients),
                     template=template,
-                    priority="now",
                     language="ms-MY",
                     context=email_context,
                 )
