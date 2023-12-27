@@ -495,7 +495,7 @@ class FORMS(generics.ListAPIView):
     def post(self, request, *args, **kwargs):
         # get FormTemplate instance by request query param, then validate & store new form data
         form_type = kwargs.get("form_type")
-        template = FormTemplate.objects.get(form_type=form_type)
+        template = get_object_or_404(FormTemplate, form_type=form_type)
         form_data: FormData = template.create_form_data(request.data)
 
         if template.can_send_email():
