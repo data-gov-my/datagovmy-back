@@ -209,12 +209,10 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TSL")
 
-if not DEBUG:
-    POST_OFFICE = {
-        "CELERY_ENABLED": False,
-        "BACKENDS": {"default": "django_ses.SESBackend"},
-    }
 
+POST_OFFICE = {"CELERY_ENABLED": True}
+if not DEBUG:
+    POST_OFFICE["BACKENDS"] = {"default": "django_ses.SESBackend"}
     # django-ses
     AWS_SES_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
     AWS_SES_SECRET_ACCESS_KEY = os.getenv("AWS_SES_SECRET_ACCESS_KEY")
