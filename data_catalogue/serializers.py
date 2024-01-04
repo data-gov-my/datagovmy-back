@@ -55,7 +55,7 @@ class DataCatalogueMetaSerializer(serializers.ModelSerializer):
             # "demography",
             # "dataset_begin",
             # "dataset_end",
-            # "data_source",
+            "data_source",
             "fields",
             "data_as_of",
             "last_updated",
