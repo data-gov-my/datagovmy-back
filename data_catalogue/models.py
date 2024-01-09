@@ -87,12 +87,14 @@ class DataCatalogue(models.Model):
     Each row in a dataframe that belongs to a data catalogue corresponds to a single row in this table.
     """
 
+    index = models.PositiveIntegerField()
     catalogue_meta = models.ForeignKey(DataCatalogueMeta, on_delete=models.CASCADE)
     data = JSONField()  # e.g. {"country": "New Zealand"}
     slug = models.JSONField(default=dict)  # e.g. {"country": "new-zealand"}
 
     class Meta:
         indexes = [models.Index(fields=["id"], name="data_catalogue_idx")]
+        ordering = ["index"]
 
 
 class Dataviz(models.Model):
