@@ -703,8 +703,8 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
 
         # Avoid bulk_create as PK is not included in returned list (affects many-to-many .set())
         fields = [
-            Field.objects.get_or_create(**field_data.model_dump())[0]
-            for field_data in metadata.fields
+            Field.objects.get_or_create(index=i, **field_data.model_dump())[0]
+            for i, field_data in enumerate(metadata.fields)
         ]
 
         site_categories = [

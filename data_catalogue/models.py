@@ -6,12 +6,16 @@ from jsonfield import JSONField
 
 
 class Field(models.Model):
+    index = models.PositiveSmallIntegerField()
     name = models.CharField(max_length=255)
     title = models.CharField(max_length=255)  # translatable
     description = models.TextField()  # translatable
 
     def __str__(self) -> str:
         return f"Field object ({self.name})"
+
+    class Meta:
+        ordering = ["index"]
 
     # class Meta:
     #     constraints = [
