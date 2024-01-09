@@ -59,8 +59,7 @@ class DataCatalogueListAPIView(APIView):
         if dataset_end and dataset_end.isdigit():
             filters &= Q(dataset_end__lte=int(dataset_end))
         if search:
-            filters &= Q(title__icontains=search)
-            filters |= Q(description__icontains=search)
+            filters &= Q(title__icontains=search) | Q(description__icontains=search)
 
         # Query the SiteCategory objects with related DataCatalogueMeta
         site_categories = (
