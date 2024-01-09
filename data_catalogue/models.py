@@ -12,12 +12,12 @@ class Field(models.Model):
     def __str__(self) -> str:
         return f"Field object ({self.name})"
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["name", "title", "description"], name="unique_field"
-            )
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=["name", "title", "description"], name="unique_field"
+    #         )
+    #     ]
 
 
 class RelatedDataset(models.Model):

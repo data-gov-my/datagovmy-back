@@ -42,6 +42,7 @@ class DataCatalogueListAPIView(APIView):
         demography = request.query_params.getlist("demography", [])
         dataset_begin = request.query_params.get("begin", "")
         dataset_end = request.query_params.get("end", "")
+        search = request.query_params.get("search", "")
 
         # Prepare filter conditions based on query parameters
         filters = Q()
@@ -57,6 +58,9 @@ class DataCatalogueListAPIView(APIView):
             filters &= Q(dataset_begin__gte=int(dataset_begin))
         if dataset_end and dataset_end.isdigit():
             filters &= Q(dataset_end__lte=int(dataset_end))
+        if search:
+            filters &= Q(title__icontains=search)
+            filters |= Q(description__icontains=search)
 
         # Query the SiteCategory objects with related DataCatalogueMeta
         site_categories = (
