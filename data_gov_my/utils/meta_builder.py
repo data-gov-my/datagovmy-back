@@ -703,8 +703,8 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
 
         # Avoid bulk_create as PK is not included in returned list (affects many-to-many .set())
         fields = [
-            Field.objects.get_or_create(**field_data.model_dump())[0]
-            for field_data in metadata.fields
+            Field.objects.get_or_create(index=i, **field_data.model_dump())[0]
+            for i, field_data in enumerate(metadata.fields)
         ]
 
         site_categories = [
@@ -762,13 +762,17 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
             slug_df[col] = slug_df[col].apply(slugify)
 
         if slug_fields:
+            slug_data = slug_df.to_dict("records")
             catalogue_data = [
-                DataCatalogue(catalogue_meta=dc_meta, data=row, slug=slug)
-                for (row, slug) in zip(data, slug_df.to_dict("records"))
+                DataCatalogue(
+                    index=i, catalogue_meta=dc_meta, data=row, slug=slug_data[i]
+                )
+                for i, row in enumerate(data)
             ]
         else:
             catalogue_data = [
-                DataCatalogue(catalogue_meta=dc_meta, data=row) for row in data
+                DataCatalogue(index=i, catalogue_meta=dc_meta, data=row)
+                for i, row in enumerate(data)
             ]
 
         # side quest: handle the dataviz "dropdown" building
