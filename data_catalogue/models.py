@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from jsonfield import JSONField
 
 # Create your models here.
 
@@ -83,7 +84,7 @@ class DataCatalogue(models.Model):
     """
 
     catalogue_meta = models.ForeignKey(DataCatalogueMeta, on_delete=models.CASCADE)
-    data = models.JSONField()  # e.g. {"country": "New Zealand"}
+    data = JSONField()  # e.g. {"country": "New Zealand"}
     slug = models.JSONField(default=dict)  # e.g. {"country": "new-zealand"}
 
     class Meta:
