@@ -179,21 +179,29 @@ class FormTemplate(models.Model):
         # first email template in meta is used as the default template
         meta = email_template_meta[0]
 
-        default_template: EmailTemplate = EmailTemplate.objects.get_or_create(
+        # EmailTemplate.objects.filter(
+        #     name=meta["name"], language=meta["language"]
+        # ).delete()
+
+        default_template, _ = EmailTemplate.objects.update_or_create(
             name=meta["name"],
-            subject=meta["subject"],
-            content=meta["content"],
-            html_content=meta["html_content"],
             language=meta["language"],
-        )[0]
+            defaults={
+                "subject": meta["subject"],
+                "content": meta["content"],
+                "html_content": meta["html_content"],
+            },
+        )
 
         for i in range(1, len(email_template_meta)):
             meta = email_template_meta[i]
-            alt_template = default_template.translated_templates.get_or_create(
-                subject=meta["subject"],
-                content=meta["content"],
-                html_content=meta["html_content"],
+            alt_template, _ = default_template.translated_templates.update_or_create(
                 language=meta["language"],
+                defaults={
+                    "subject": meta["subject"],
+                    "content": meta["content"],
+                    "html_content": meta["html_content"],
+                },
             )
 
         return default_template

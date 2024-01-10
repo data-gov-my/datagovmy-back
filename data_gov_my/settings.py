@@ -52,7 +52,9 @@ INSTALLED_APPS = [
     "post_office",
     "django_rq",
     "drf_api_logger",
+    "data_catalogue",
     "data_request",
+    "django_celery_results",
 ]
 
 MIDDLEWARE = [
@@ -65,13 +67,14 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
     "data_gov_my.middleware.auth_middleware.AuthMiddleware",
+    "data_gov_my.middleware.tinybird_middleware.TinyBirdAPILoggerMiddleware",
 ]
 
 ROOT_URLCONF = "data_gov_my.urls"
 
 DRF_API_LOGGER_DATABASE = False  # Default to False
+TINYBIRD_API_LOGGER_ENABLED = os.getenv("TINYBIRD_API_LOGGER_ENABLED", False)
 
 TEMPLATES = [
     {
@@ -168,7 +171,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kuala_Lumpur"
 
 USE_I18N = True
 
@@ -208,12 +211,10 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TSL")
 
-if not DEBUG:
-    POST_OFFICE = {
-        "CELERY_ENABLED": False,
-        "BACKENDS": {"default": "django_ses.SESBackend"},
-    }
 
+POST_OFFICE = {"CELERY_ENABLED": True}
+if not DEBUG:
+    POST_OFFICE["BACKENDS"] = {"default": "django_ses.SESBackend"}
     # django-ses
     AWS_SES_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
     AWS_SES_SECRET_ACCESS_KEY = os.getenv("AWS_SES_SECRET_ACCESS_KEY")
@@ -221,9 +222,12 @@ if not DEBUG:
     AWS_SES_REGION_NAME = os.getenv("AWS_SES_REGION_NAME")
     AWS_SES_REGION_ENDPOINT = os.getenv("AWS_SES_REGION_ENDPOINT")
 
-# celery (task queue)
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+# Celery Configuration Options
+CELERY_BROKER_URL = os.getenv("REDIS_CONNECTION_STR")
+CELERY_TIMEZONE = "Asia/Kuala_Lumpur"
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "default"
+CELERY_RESULT_EXTENDED = True
 
 # Logging
 

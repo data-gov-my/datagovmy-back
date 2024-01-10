@@ -5,6 +5,7 @@ black==23.7.0
 bleach==6.0.0
 boto3==1.26.141
 botocore==1.29.141
+celery==5.2.7
 certifi==2022.12.7
 cfgv==3.3.1
 charset-normalizer==3.0.1
@@ -13,6 +14,7 @@ cramjam==2.6.2
 distlib==0.3.6
 Django==4.1.7
 django-cache-lock==0.2.5
+django-celery-results==2.5.1
 django-cors-headers==3.14.0
 django-environ==0.10.0
 django-extensions==3.2.1
@@ -26,6 +28,7 @@ drf-api-logger==1.1.14
 fastparquet==2023.2.0
 filelock==3.9.0
 fsspec==2023.3.0
+gevent==23.7.0
 gunicorn==20.1.0
 identify==2.5.18
 idna==3.4
@@ -50,6 +53,7 @@ pytest==7.3.1
 pytest-django==4.5.2
 python-dateutil==2.8.2
 python-redis-lock==4.0.0
+python-slugify==8.0.1
 pytz==2022.7.1
 PyYAML==6.0
 redis==4.5.1

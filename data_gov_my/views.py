@@ -495,7 +495,7 @@ class FORMS(generics.ListAPIView):
     def post(self, request, *args, **kwargs):
         # get FormTemplate instance by request query param, then validate & store new form data
         form_type = kwargs.get("form_type")
-        template = FormTemplate.objects.get(form_type=form_type)
+        template = get_object_or_404(FormTemplate, form_type=form_type)
         form_data: FormData = template.create_form_data(request.data)
 
         if template.can_send_email():
@@ -505,7 +505,6 @@ class FORMS(generics.ListAPIView):
                     recipients=recipient,
                     template=template.email_template,
                     language=form_data.language,
-                    priority="now",
                     context=form_data.form_data,
                 )
                 form_data.email = email
@@ -888,9 +887,9 @@ def get_filters_applied(param_list):
         elif k == "search":
             query &= Q(catalog_name__icontains=v)
         if k == "begin":
-            query &= Q(dataset_begin__lte=v)
+            query &= Q(dataset_begin__gte=int(v))
         if k == "end":
-            query &= Q(dataset_end__gte=v)
+            query &= Q(dataset_end__lte=int(v))
 
     return query
 

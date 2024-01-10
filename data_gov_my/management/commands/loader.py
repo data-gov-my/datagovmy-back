@@ -41,8 +41,8 @@ class Command(BaseCommand):
         - python manage.py loader DASHBOARDS UPDATE meta_1,meta_2
         """
         if category in [
-            "DATA_CATALOG",
             "DATA_CATALOGUE",
+            "DATA_CATALOGUE2",
             "DASHBOARDS",
             "I18N",
             "FORMS",
