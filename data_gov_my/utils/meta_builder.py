@@ -16,6 +16,7 @@ import pandas as pd
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
+from data_catalogue.utils import translation
 from data_catalogue.metajson_structure import (
     DataCatalogueValidateModel as DataCatalogueValidateModelV2,
 )
@@ -663,12 +664,32 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
     GITHUB_DIR = "data-catalogue2"
     VALIDATOR = DataCatalogueValidateModelV2
 
+    default_translation_mapping = {
+        "state": translation.STATE_TRANSLATIONS,
+        "parlimen": translation.PARLIMEN_TRANSLATIONS,
+        "district": translation.DISTRICT_TRANSLATIONS,
+        "dun": translation.DUN_TRANSLATIONS,
+        "range": translation.RANGE_TRANSLATIONS,
+    }
+
     def delete_file(self, filename: str, data: dict):
         return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
         self, filename: str, metadata: DataCatalogueValidateModelV2
     ):
+        # check if need to add default translations
+        default_keys = set(self.default_translation_mapping)
+        filter_keys = set()
+        translations_en = metadata.translations_en
+        translations_ms = metadata.translations_ms
+
+        for dv in metadata.dataviz:
+            filter_keys.update(dv.config.get("filter_columns", []))
+        for key in filter_keys.intersection(default_keys):
+            translations_en.update(self.default_translation_mapping[key])
+            translations_ms.update(self.default_translation_mapping[key])
+
         dc_meta, is_dc_meta_created = DataCatalogueMeta.objects.update_or_create(
             id=Path(filename).stem,
             defaults=dict(
