@@ -1,14 +1,12 @@
 from rest_framework import serializers
 
 from data_gov_my.models import (
-    CatalogJson,
     DashboardJson,
     FormData,
     MetaJson,
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationUpcoming,
-    ViewCount,
     Publication,
     PublicationResource,
     i18nJson,
@@ -27,22 +25,6 @@ class DashboardSerializer(serializers.ModelSerializer):
         fields = ["dashboard_name", "chart_name", "chart_type", "chart_data"]
 
 
-class CatalogSerializer(serializers.ModelSerializer):
-    class Catalog:
-        model = CatalogJson
-        fields = [
-            "id",
-            "catalog_meta",
-            "catalog_name",
-            "catalog_category",
-            "time_range",
-            "geography",
-            "dataset_range",
-            "data_source",
-            "catalog_data",
-        ]
-
-
 class i18nSerializer(serializers.ModelSerializer):
     class Meta:
         model = i18nJson
@@ -59,32 +41,6 @@ class FormDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormData
         fields = ["language", "form_data"]
-
-
-class ViewCountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ViewCount
-        fields = "__all__"
-
-
-class ViewCountPartialSerializer(serializers.ModelSerializer):
-    """
-    Only returns the `view_count` field for metrics based fields.
-    """
-
-    class Meta:
-        model = ViewCount
-        exclude = ["download_csv", "download_parquet", "download_png", "download_svg"]
-
-
-class ViewCountSerializerV2(serializers.ModelSerializer):
-    class Meta:
-        model = ViewCount
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        return dict(data)
 
 
 class PublicationResourceSerializer(serializers.ModelSerializer):

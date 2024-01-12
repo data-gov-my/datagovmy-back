@@ -1,18 +1,3 @@
-REFRESH_VARIABLES = {
-    "MetaJson": {
-        "column_name": "dashboard_name",
-        "directory": "/dashboards/",
-    },
-    "DashboardJson": {
-        "column_name": "dashboard_name",
-        "directory": "/dashboards/",
-    },
-    "CatalogJson": {
-        "column_name": "file_src",
-        "directory": "/catalog/",
-    },
-}
-
 LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]
 
 SITE_CHOICES = [

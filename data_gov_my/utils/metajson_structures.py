@@ -10,7 +10,6 @@ from pydantic import (
     model_validator,
     validator,
 )
-from pydantic_core.core_schema import FieldValidationInfo
 
 from data_gov_my.utils.chart_builders import ChartBuilder
 
@@ -118,90 +117,6 @@ class ExplorerValidateModel(BaseModel):
     @field_serializer("data_next_update")
     def serialize_date_next_update(self, data_next_update: datetime):
         return data_next_update.strftime("%Y-%m-%d %H:%M") if data_next_update else None
-
-
-# class CatalogData(BaseModel):
-#     catalog_filters: dict
-#     metadata_neutral: dict
-#     metadata_lang: dict[Literal["en", "bm"], dict]
-#     chart: dict
-
-
-# class DataCatalogVariable(BaseModel):
-#     id: int
-#     name: str
-#     title_en: str
-#     title_bm: str
-#     desc_en: str
-#     desc_bm: str
-#     catalog_data: Optional[dict]
-
-
-# TODO: data catalog metajson not that thoroughly handled,
-# for proper refactor on this involves updating catalog_variable_classes as well (in future)
-class _DataCatalogFileValidateModel(BaseModel):
-    manual_trigger: str = "0"
-    exclude_openapi: bool = False
-    bucket: str
-    file_name: str
-    category: str
-    category_en: str
-    category_bm: str
-    subcategory: str
-    subcategory_en: str
-    subcategory_bm: str
-    category_opendosm: str = ""
-    category_opendosm_en: str = ""
-    category_opendosm_bm: str = ""
-    subcategory_opendosm: str = ""
-    subcategory_opendosm_en: str = ""
-    subcategory_opendosm_bm: str = ""
-    description: dict[Literal["en", "bm"], str]
-    link_parquet: Optional[str] = None
-    link_preview: Optional[str] = None
-    link_csv: Optional[str] = None
-    link_geojson: Optional[str] = None
-    variables: list[dict]
-
-
-class DataCatalogValidateModel(BaseModel):
-    file: _DataCatalogFileValidateModel
-
-
-class _DataCatalogueFileValidateModel(BaseModel):
-    manual_trigger: str = "0"
-    exclude_openapi: bool = False
-    bucket: str
-    file_name: str
-    category: str
-    category_en: str
-    category_bm: str
-    subcategory: str
-    subcategory_en: str
-    subcategory_bm: str
-    category_opendosm: str = ""
-    category_opendosm_en: str = ""
-    category_opendosm_bm: str = ""
-    subcategory_opendosm: str = ""
-    subcategory_opendosm_en: str = ""
-    subcategory_opendosm_bm: str = ""
-    category_kkm: str = ""
-    category_kkm_en: str = ""
-    category_kkm_bm: str = ""
-    subcategory_kkm: str = ""
-    subcategory_kkm_en: str = ""
-    subcategory_kkm_bm: str = ""
-    description: dict[Literal["en", "bm"], str]
-    link_parquet: Optional[str] = None
-    link_preview: Optional[str] = None
-    link_csv: Optional[str] = None
-    link_geojson: Optional[str] = None
-    variables: list[dict]
-    related_datasets: list[dict] = []
-
-
-class DataCatalogueValidateModel(BaseModel):
-    file: _DataCatalogueFileValidateModel
 
 
 class _PublicationResourceValidateModel(BaseModel):

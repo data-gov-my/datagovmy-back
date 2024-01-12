@@ -1,13 +1,13 @@
 import environ
-from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-from data_gov_my.models import (
-    CatalogJson,
-    DashboardJson,
-    FormTemplate,
-    MetaJson,
-    i18nJson,
-)
-import pytest
+
+# from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+# from data_gov_my.models import (
+#     DashboardJson,
+#     FormTemplate,
+#     MetaJson,
+#     i18nJson,
+# )
+# import pytest
 
 env = environ.Env()
 environ.Env.read_env()
