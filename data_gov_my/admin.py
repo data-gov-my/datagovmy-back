@@ -1,7 +1,5 @@
 from django.contrib import admin
 from data_gov_my.models import (
-    CatalogJson,
-    CatalogueJson,
     ExplorersUpdate,
     FormData,
     FormTemplate,
@@ -27,7 +25,6 @@ admin.site.register(PublicationResource)
 admin.site.register(PublicationDocumentation)
 admin.site.register(PublicationDocumentationResource)
 admin.site.register(PublicationUpcoming)
-admin.site.register(CatalogueJson)
 admin.site.register(ExplorersUpdate)
 
 

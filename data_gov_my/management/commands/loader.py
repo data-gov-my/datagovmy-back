@@ -42,7 +42,6 @@ class Command(BaseCommand):
         """
         if category in [
             "DATA_CATALOGUE",
-            "DATA_CATALOGUE2",
             "DASHBOARDS",
             "I18N",
             "FORMS",

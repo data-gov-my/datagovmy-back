@@ -17,9 +17,8 @@ from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
 from pydantic import BaseModel
 from data_catalogue.utils import translation
-from data_catalogue.metajson_structure import (
-    DataCatalogueValidateModel as DataCatalogueValidateModelV2,
-)
+from data_catalogue.metajson_structure import DataCatalogueValidateModel
+
 from data_catalogue.models import (
     DataCatalogue,
     DataCatalogueMeta,
@@ -29,11 +28,8 @@ from data_catalogue.models import (
     SiteCategory,
 )
 
-from data_gov_my.catalog_utils.catalog_variable_classes.Tablev3 import Table
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
-    CatalogJson,
-    CatalogueJson,
     DashboardJson,
     ExplorersMetaJson,
     ExplorersUpdate,
@@ -61,8 +57,6 @@ from data_gov_my.utils.cron_utils import (
 )
 from data_gov_my.utils.metajson_structures import (
     DashboardValidateModel,
-    # DataCatalogValidateModel,
-    DataCatalogueValidateModel,
     ExplorerValidateModel,
     FormValidateModel,
     PublicationDocumentationValidateModel,
@@ -603,66 +597,9 @@ class FormBuilder(GeneralMetaBuilder):
 
 class DataCatalogueBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOGUE"
-    MODEL = CatalogueJson
-    GITHUB_DIR = "data-catalogue"
-    VALIDATOR = DataCatalogueValidateModel
-
-    def delete_file(self, filename: str, data: dict):
-        file = data["file"]
-        bucket = file.get("bucket", "")
-        file_name = file.get("file_name", "")
-
-        return CatalogueJson.objects.filter(
-            id__contains=f"{bucket}_{file_name}_"
-        ).delete()
-
-    def update_or_create_meta(
-        self, filename: str, metadata: DataCatalogueValidateModel
-    ):
-        file_data = metadata.file
-        all_variable_data = metadata.file.variables
-        related_datasets = metadata.file.related_datasets
-
-        full_meta = metadata
-        file_src = filename.replace(".json", "")
-
-        created_objects = []
-
-        for cur_data in all_variable_data:
-            if "catalog_data" in cur_data:  # Checks if the catalog_data is in
-                cur_catalog_data = cur_data["catalog_data"]
-                chart_type = cur_catalog_data["chart"]["chart_type"]
-                dataviz = cur_catalog_data.get("dataviz", [])
-
-                args = {
-                    "full_meta": full_meta.model_dump(),
-                    "file_data": file_data.model_dump(),
-                    "cur_data": cur_data,
-                    "all_variable_data": all_variable_data,
-                    "file_src": file_src,
-                }
-
-                obj = Table(**args)
-
-                unique_id = obj.unique_id
-                db_input = obj.db_input
-                db_input["exclude_openapi"] = file_data.exclude_openapi
-                db_input["dataviz"] = dataviz
-                db_input["related_datasets"] = related_datasets
-                db_obj, created = CatalogueJson.objects.update_or_create(
-                    id=unique_id, defaults=db_input
-                )
-
-                created_objects.append(db_obj)
-
-        return created_objects
-
-
-class DataCatalogueBuilder(GeneralMetaBuilder):
-    CATEGORY = "DATA_CATALOGUE2"
     MODEL = DataCatalogueMeta
-    GITHUB_DIR = "data-catalogue2"
-    VALIDATOR = DataCatalogueValidateModelV2
+    GITHUB_DIR = "data-catalogue2"  # FIXME: change to data-catalogue
+    VALIDATOR = DataCatalogueValidateModel
 
     default_translation_mapping = {
         "state": translation.STATE_TRANSLATIONS,
@@ -676,7 +613,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: DataCatalogueValidateModelV2
+        self, filename: str, metadata: DataCatalogueValidateModel
     ):
         # check if need to add default translations
         default_keys = set(self.default_translation_mapping)
