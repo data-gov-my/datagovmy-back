@@ -6,7 +6,6 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationUpcoming,
-    ViewCount,
     i18nJson,
 )
 from data_gov_my.models import (
@@ -20,7 +19,6 @@ from data_gov_my.models import (
 admin.site.register(i18nJson)
 admin.site.register(FormTemplate)
 admin.site.register(FormData)
-admin.site.register(ViewCount)
 admin.site.register(PublicationResource)
 admin.site.register(PublicationDocumentation)
 admin.site.register(PublicationDocumentationResource)

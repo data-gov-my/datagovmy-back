@@ -193,19 +193,6 @@ class FormData(models.Model):
         return self.form_data.get("email", None)
 
 
-class ViewCount(models.Model):
-    id = models.CharField(max_length=100, primary_key=True)
-    type = models.CharField(max_length=100, null=False)
-    view_count = models.IntegerField(null=False, default=0)
-    download_csv = models.IntegerField(null=False, default=0)
-    download_parquet = models.IntegerField(null=False, default=0)
-    download_png = models.IntegerField(null=False, default=0)
-    download_svg = models.IntegerField(null=False, default=0)
-
-    def __str__(self) -> str:
-        return f"{self.id} ({self.view_count})"
-
-
 class ExplorersMetaJson(MetaJson):
     pass
 

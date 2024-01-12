@@ -20,7 +20,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import data_gov_my.utils.viewcount_cache as vcc
 from data_gov_my.api_handling import handle
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
@@ -34,7 +33,6 @@ from data_gov_my.models import (
     PublicationDocumentationResource,
     PublicationResource,
     PublicationUpcoming,
-    ViewCount,
     i18nJson,
 )
 from data_gov_my.serializers import (
@@ -43,8 +41,6 @@ from data_gov_my.serializers import (
     PublicationDocumentationSerializer,
     PublicationSerializer,
     PublicationUpcomingSerializer,
-    ViewCountPartialSerializer,
-    ViewCountSerializer,
     i18nSerializer,
 )
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
@@ -318,74 +314,6 @@ class FORMS(generics.ListAPIView):
             data={"Total deleted": count, "Data deleted": deleted},
             status=status.HTTP_200_OK,
         )
-
-
-class VIEW_COUNT(APIView):
-    def get(self, request: request.Request, format=None):
-        views_only = request.query_params.get("views_only", "").lower() == "true"
-        serializer = ViewCountPartialSerializer if views_only else ViewCountSerializer
-        type = request.query_params.get("type")
-        if type:
-            queryset = ViewCount.objects.filter(type=type)
-        else:
-            queryset = ViewCount.objects.all()
-        return JsonResponse(serializer(queryset, many=True).data, safe=False)
-
-    def post(self, request, format=None):
-        id = request.query_params.get("id", None)
-        type = request.query_params.get("type", None)
-        metric = request.query_params.get("metric", None)
-
-        default_values = {
-            "type": ["dashboard", "data-catalogue"],
-            "metric": [
-                "view_count",
-                "download_png",
-                "download_csv",
-                "download_svg",
-                "download_parquet",
-            ],
-        }
-
-        # Checks if all parameters have values
-        if not all([id, type, metric]):
-            return JsonResponse(
-                {
-                    "status": 400,
-                    "message": "Parameters id, type and metric must be supplied",
-                },
-                status=400,
-            )
-
-        # Checks if parameter 'type' and 'metric' has appropriate values
-        for k, v in default_values.items():
-            if request.query_params.get(k) not in v:
-                pos_values = ", ".join(v)
-                return JsonResponse(
-                    {
-                        "status": 400,
-                        "message": f"Parameter '{k}' has to hold either values : {pos_values}",
-                    },
-                    status=400,
-                )
-
-        res = vcc.ViewCountCache().handle_viewcount(id=id, type=type, metric=metric)
-
-        if type == "dashboard":
-            for i in ["csv", "parquet", "png", "svg"]:
-                res.pop(f"download_{i}")
-
-        return JsonResponse(res, status=200, safe=False)
-
-
-class UPDATE_VIEW_COUNT(APIView):
-    def post(self, request, format=None):
-        res = vcc.ViewCountCache.update_cache()
-
-        if res:
-            return JsonResponse({"update": "successful"}, status=200, safe=False)
-
-        return JsonResponse({"update": "failed"}, status=500, safe=False)
 
 
 class PublicationPagination(PageNumberPagination):

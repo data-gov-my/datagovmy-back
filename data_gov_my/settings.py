@@ -104,12 +104,7 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-    },
-    "viewcount": {
-        "BACKEND": "redis_lock.django_cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_VIEWCOUNT_CONNECTION_STR"),
-        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
-    },
+    }
 }
 
 RQ_QUEUES = {"high": {"USE_REDIS_CACHE": "default"}}

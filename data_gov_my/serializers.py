@@ -7,7 +7,6 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationUpcoming,
-    ViewCount,
     Publication,
     PublicationResource,
     i18nJson,
@@ -42,32 +41,6 @@ class FormDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormData
         fields = ["language", "form_data"]
-
-
-class ViewCountSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ViewCount
-        fields = "__all__"
-
-
-class ViewCountPartialSerializer(serializers.ModelSerializer):
-    """
-    Only returns the `view_count` field for metrics based fields.
-    """
-
-    class Meta:
-        model = ViewCount
-        exclude = ["download_csv", "download_parquet", "download_png", "download_svg"]
-
-
-class ViewCountSerializerV2(serializers.ModelSerializer):
-    class Meta:
-        model = ViewCount
-        fields = "__all__"
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        return dict(data)
 
 
 class PublicationResourceSerializer(serializers.ModelSerializer):
