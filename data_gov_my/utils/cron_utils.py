@@ -1,18 +1,12 @@
-import logging
+import json
 import os
 import shutil
 import zipfile
+
 import boto3
-import json
-from os import listdir
-from os.path import isfile, join
-
 import requests
-from django.apps import apps
-from django.core.cache import cache
 
-from data_gov_my.models import CatalogJson, CatalogueJson
-from data_gov_my.utils import common, triggers
+from data_gov_my.utils import triggers
 
 
 def create_directory(dir_name):
@@ -127,46 +121,6 @@ def revalidate_frontend(routes=[], site="datagovmy"):
 
     response = requests.post(url, headers=headers, data=payload)
     return response
-
-
-def source_filters_cache():
-    """
-    Set Source Filters Cache.
-    """
-    filter_sources_distinct = CatalogJson.objects.values("data_source").distinct()
-    source_filters = set()
-
-    for x in filter_sources_distinct:
-        if "|" in x["data_source"]:
-            sources = x["data_source"].split(" | ")
-            for s in sources:
-                source_filters.add(s)
-        else:
-            source_filters.add(x["data_source"])
-
-    cache.set("source_filters", list(source_filters))
-
-    return list(source_filters)
-
-
-def data_catalogue_source_filters_cache():
-    """
-    Set Source Filters Cache.
-    """
-    filter_sources_distinct = CatalogueJson.objects.values("data_source").distinct()
-    source_filters = set()
-
-    for x in filter_sources_distinct:
-        if "|" in x["data_source"]:
-            sources = x["data_source"].split(" | ")
-            for s in sources:
-                source_filters.add(s)
-        else:
-            source_filters.add(x["data_source"])
-
-    cache.set("data_catalogue_source_filters", list(source_filters))
-
-    return list(source_filters)
 
 
 def remove_src_folders():

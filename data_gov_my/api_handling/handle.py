@@ -1,5 +1,5 @@
 from django.http import QueryDict
-from data_gov_my.models import CatalogJson, DashboardJson
+from data_gov_my.models import DashboardJson
 
 """
 Build methods for any post-handling / additional info,
@@ -10,11 +10,7 @@ not covered by Meta Json
 def dashboard_additional_handling(params: QueryDict, res: dict):
     dashboard = params["dashboard"]
 
-    if dashboard == "homepage":
-        catalog_count = CatalogJson.objects.all().count()
-        res["total_catalog"] = catalog_count
-        return res
-    elif dashboard == "kawasanku_admin":
+    if dashboard == "kawasanku_admin":
         if params["area_type"] == "country":
             jitter_data = (
                 DashboardJson.objects.filter(

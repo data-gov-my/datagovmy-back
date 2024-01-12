@@ -21,30 +21,12 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
     path("dashboard/", views.DASHBOARD.as_view(), name="DASHBOARD"),
-    path("data-variable/", views.DATA_VARIABLE.as_view(), name="DATA_VARIABLE"),
-    path("data-catalog/", views.DATA_CATALOG.as_view(), name="DATA_CATALOG"),
-    path(
-        "data-catalogue/",
-        views.DataCatalogueListAPIView.as_view(),
-        name="DATA_CATALOGUE",
-    ),
-    path(
-        "data-catalogue-variable/",
-        views.DataCatalogueDetailAPIView.as_view(),
-        name="DATA_CATALOGUE_VARIABLE",
-    ),
     path("update/", views.UPDATE.as_view(), name="UPDATE"),
     path("chart/", views.CHART.as_view(), name="CHART"),
     path("dropdown/", views.DROPDOWN.as_view(), name="DROPDOWN"),
     path("explorer/", views.EXPLORER.as_view(), name="EXPLORER"),
     # path("i18n/", views.I18N.as_view(), name="I18N"),
     path("forms/<str:form_type>", views.FORMS.as_view(), name="FORMS"),
-    path("view-count/", views.VIEW_COUNT.as_view(), name="VIEW_COUNT"),
-    path(
-        "update-view-count/",
-        views.UPDATE_VIEW_COUNT.as_view(),
-        name="UPDATE_VIEW_COUNT",
-    ),
     path(
         "publication-dropdown/",
         views.PUBLICATION_DROPDOWN.as_view(),
@@ -95,7 +77,7 @@ urlpatterns = [
         include("data_request.urls"),
     ),
     path(
-        "data-catalogue2/",
+        "data-catalogue/",
         include("data_catalogue.urls"),
     ),
 ]
