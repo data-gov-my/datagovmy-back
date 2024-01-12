@@ -77,7 +77,7 @@ urlpatterns = [
         include("data_request.urls"),
     ),
     path(
-        "data-catalogue2/",
+        "data-catalogue/",
         include("data_catalogue.urls"),
     ),
 ]

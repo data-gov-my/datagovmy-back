@@ -598,7 +598,7 @@ class FormBuilder(GeneralMetaBuilder):
 class DataCatalogueBuilder(GeneralMetaBuilder):
     CATEGORY = "DATA_CATALOGUE"
     MODEL = DataCatalogueMeta
-    GITHUB_DIR = "data-catalogue2"  # FIXME: change to data-catalogue
+    GITHUB_DIR = "data-catalogue"
     VALIDATOR = DataCatalogueValidateModel
 
     default_translation_mapping = {
