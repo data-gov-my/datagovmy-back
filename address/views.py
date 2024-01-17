@@ -49,21 +49,22 @@ class AddressSearchView(ListAPIView):
         # full text search (fuzzy)
         if not postcode and not unit:
             address = self.request.query_params.get("address")
+
+            if address is None:
+                return Address.objects.none()
+            # Use trigram similarity for fuzzy search
+
             address = ",".join(
                 [portion.strip() for portion in address.split(",")]
             ).lower()
 
-            if address is None:
-                return Address.objects.none()
-            if address is not None:
-                # Use trigram similarity for fuzzy search
-                queryset = (
-                    queryset.annotate(
-                        similarity=TrigramSimilarity("combined_address", address)
-                    )
-                    .filter(similarity__gt=0.2)
-                    .order_by("-similarity")
+            queryset = (
+                queryset.annotate(
+                    similarity=TrigramSimilarity("combined_address", address)
                 )
+                .filter(similarity__gt=0.2)
+                .order_by("-similarity")
+            )
 
         return queryset[:n]
 
@@ -102,4 +103,3 @@ class AddressUploadView(APIView):
         return Response(
             {"message": f"Created {Address.objects.count()} addresses."}, status=200
         )
-
