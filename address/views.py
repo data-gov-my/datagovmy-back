@@ -6,6 +6,8 @@ import pandas as pd
 from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from address.tasks import rebuild_address
 from .models import Address
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -100,3 +102,4 @@ class AddressUploadView(APIView):
         return Response(
             {"message": f"Created {Address.objects.count()} addresses."}, status=200
         )
+
