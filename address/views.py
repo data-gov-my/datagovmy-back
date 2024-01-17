@@ -60,7 +60,7 @@ class AddressSearchView(ListAPIView):
 
             queryset = (
                 queryset.annotate(
-                    similarity=TrigramSimilarity("combined_address", address)
+                    similarity=TrigramWordSimilarity(address, "combined_address")
                 )
                 .filter(similarity__gt=0.2)
                 .order_by("-similarity")
