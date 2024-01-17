@@ -12,7 +12,11 @@ from .models import Address
 from .serializers import AddressSerializer
 
 
-class AddressSearchView(ListAPIView):
+class AddressSearchByAddView(ListAPIView):
+    pass
+
+
+class AddressSearchByPostcodeView(ListAPIView):
     serializer_class = AddressSerializer
 
     def get_queryset(self):
