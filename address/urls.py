@@ -1,11 +1,11 @@
 from django.urls import path
-from address.views import AddressSearchByPostcodeView, AddressUploadView
+from address.views import AddressSearchView, AddressUploadView
 
 urlpatterns = [
     path("", AddressUploadView.as_view(), name="address-upload"),
     path(
-        "postcode/<str:postcode>",
-        AddressSearchByPostcodeView.as_view(),
+        "search/",
+        AddressSearchView.as_view(),
         name="address-search",
     ),
 ]
