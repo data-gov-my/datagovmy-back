@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
 
 
 class Address(models.Model):
@@ -23,4 +24,5 @@ class Address(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["postcode"]),
+            GinIndex(fields=["combined_address"]),
         ]
