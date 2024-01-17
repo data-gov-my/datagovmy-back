@@ -18,6 +18,7 @@ class Address(models.Model):
     latitud1 = models.FloatField()
     longitud1 = models.FloatField()
     postcode = models.CharField(max_length=8)
+    combined_address = models.TextField()
 
     class Meta:
         indexes = [
