@@ -80,6 +80,10 @@ urlpatterns = [
         "data-catalogue/",
         include("data_catalogue.urls"),
     ),
+    path(
+        "address/",
+        include("address.urls"),
+    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
