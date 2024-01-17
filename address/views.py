@@ -54,7 +54,7 @@ class AddressSearchView(ListAPIView):
                 return Address.objects.none()
             # Use trigram similarity for fuzzy search
 
-            address = ",".join(
+            address = " ".join(
                 [portion.strip() for portion in address.split(",")]
             ).lower()
 
@@ -74,26 +74,22 @@ class AddressUploadView(APIView):
         file = request.data["file"]
         df = pd.read_csv(file)
         df["combined_address"] = (
-            (
-                df["unit"].fillna("")
-                + ","
-                + df["namaBangunan"].fillna("")
-                + ","
-                + df["namaJalan"].fillna("")
-                + ","
-                + df["lokaliti"]
-                + ","
-                + df["poskod"].astype(str)
-                + ","
-                + df["bandar"]
-                + ","
-                + df["negeri"]
-                + ","
-                + df["negara"]
-            )
-            .str.lower()
-            .str.strip(",")
-        )
+            df["unit"].fillna("")
+            + " "
+            + df["namaBangunan"].fillna("")
+            + " "
+            + df["namaJalan"].fillna("")
+            + " "
+            + df["lokaliti"]
+            + " "
+            + df["poskod"].astype(str)
+            + " "
+            + df["bandar"]
+            + " "
+            + df["negeri"]
+            + " "
+            + df["negara"]
+        ).str.lower()
         df.replace({np.nan: None}, inplace=True)
 
         address_data = df.to_dict(orient="records")
