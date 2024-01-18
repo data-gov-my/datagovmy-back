@@ -26,7 +26,7 @@ class AddressSearchView(ListAPIView):
 
     def get_queryset(self):
         """
-        Exact case insensitive match postcode, partial match unit,
+        Exact case insensitive match postcode, partial match unit, fuzzy search address.
         """
         queryset = Address.objects.all()
 
@@ -37,34 +37,22 @@ class AddressSearchView(ListAPIView):
             size = int(size)
             n = size
 
-        # postcode (exact) and unit (contains)
-        postcode = self.request.query_params.get("postcode")
-        if postcode is not None:
-            queryset = queryset.filter(postcode=postcode)
-
-        unit = self.request.query_params.get("unit")
-        if unit is not None:
-            queryset = queryset.filter(unit__icontains=unit)
-
         # full text search (fuzzy)
-        if not postcode and not unit:
-            address = self.request.query_params.get("address")
+        address = self.request.query_params.get("address")
+        if address:
+            queryset = queryset.annotate(
+                similarity=TrigramSimilarity("address", address)
+            ).order_by("-similarity")
 
-            if address is None:
-                return Address.objects.none()
-            # Use trigram similarity for fuzzy search
+        else:
+            # postcode (exact) and unit (contains)
+            postcode = self.request.query_params.get("postcode")
+            if postcode is not None:
+                queryset = queryset.filter(postcode__iexact=postcode)
 
-            address = " ".join(
-                [portion.strip() for portion in address.split(",")]
-            ).lower()
-
-            queryset = (
-                queryset.annotate(
-                    similarity=TrigramSimilarity("combined_address", address)
-                )
-                .filter(similarity__gt=0.2)
-                .order_by("-similarity")
-            )
+            unit = self.request.query_params.get("unit")
+            if unit is not None:
+                queryset = queryset.filter(address_icontains=unit)
 
         return queryset[:n]
 
