@@ -70,32 +70,15 @@ class AddressSearchView(ListAPIView):
 
 
 class AddressUploadView(APIView):
-    def post(self, request, *args, **kwargs):
-        file = request.data["file"]
-        df = pd.read_csv(file)
-        df["combined_address"] = (
-            df["unit"].fillna("")
-            + " "
-            + df["namaBangunan"].fillna("")
-            + " "
-            + df["namaJalan"].fillna("")
-            + " "
-            + df["lokaliti"]
-            + " "
-            + df["poskod"].astype(str)
-            + " "
-            + df["bandar"]
-            + " "
-            + df["negeri"]
-            + " "
-            + df["negara"]
-        ).str.lower()
-        df.replace({np.nan: None}, inplace=True)
+    PARQUET_LINK = "https://storage.data.gov.my/dashboards/alamat_sample.parquet"
 
+    def post(self, request, *args, **kwargs):
+        df = pd.read_parquet(self.PARQUET_LINK)
+        df.replace({np.nan: None}, inplace=True)
         address_data = df.to_dict(orient="records")
         address_instances = [Address(**data) for data in address_data]
         Address.objects.all().delete()
-        Address.objects.bulk_create(address_instances, batch_size=20000)
+        Address.objects.bulk_create(address_instances, batch_size=10000)
         return Response(
             {"message": f"Created {Address.objects.count()} addresses."}, status=200
         )
