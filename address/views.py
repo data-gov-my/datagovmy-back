@@ -52,7 +52,10 @@ class AddressSearchView(ListAPIView):
 
             unit = self.request.query_params.get("unit")
             if unit is not None:
-                queryset = queryset.filter(address_icontains=unit)
+                temp = queryset.filter(address__istartswith=unit)
+                if not queryset.exists():
+                    temp = queryset.filter(address__icontains=unit)
+                queryset = temp
 
         return queryset[:n]
 
