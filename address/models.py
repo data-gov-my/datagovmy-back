@@ -7,22 +7,21 @@ from django.contrib.postgres.indexes import GinIndex
 
 
 class Address(models.Model):
-    unit = models.CharField(max_length=255, null=True)
-    namaBangunan = models.CharField(max_length=255, null=True)
-    poBox = models.CharField(null=True, blank=True, max_length=255)
-    namaJalan = models.CharField(max_length=255)
-    lokaliti = models.CharField(max_length=255)
-    poskod = models.CharField(max_length=5)
-    bandar = models.CharField(max_length=255)
-    negeri = models.CharField(max_length=255)
-    negara = models.CharField(max_length=255)
-    latitud1 = models.FloatField()
-    longitud1 = models.FloatField()
+    address = models.TextField()
+    district = models.CharField(max_length=100)
+    subdistrict = models.CharField(max_length=100)
+    locality = models.CharField(max_length=255)
+    parlimen = models.CharField(max_length=100)
+    dun = models.CharField(max_length=100)
+    lat = models.DecimalField(max_digits=10, decimal_places=7)
+    lon = models.DecimalField(max_digits=10, decimal_places=7)
     postcode = models.CharField(max_length=8)
-    combined_address = models.TextField()
+
+    def __str__(self):
+        return self.address
 
     class Meta:
         indexes = [
             models.Index(fields=["postcode"]),
-            GinIndex(fields=["combined_address"]),
+            GinIndex(fields=["address"]),
         ]
