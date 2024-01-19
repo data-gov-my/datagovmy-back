@@ -23,5 +23,7 @@ class Address(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["postcode"]),
-            GinIndex(fields=["address"]),
+            GinIndex(
+                name="address_gin_idx", fields=["address"], opclasses=["gin_trgm_ops"]
+            ),
         ]
