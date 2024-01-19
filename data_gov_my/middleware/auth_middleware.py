@@ -5,7 +5,6 @@ from data_gov_my.models import AuthTable
 
 
 class AuthMiddleware:
-
     # Declares endpoints to exclude, as well as the request methods
     _exclude = {
         "UPDATE": ["POST"],
@@ -55,6 +54,6 @@ class AuthMiddleware:
                     )
 
     def is_admin_panel(self, request):
-        if "/admin/" in request.path_info:
+        if "/admin/" in request.path_info or "/silk/" in request.path_info:
             return True
         return False
