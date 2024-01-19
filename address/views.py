@@ -42,9 +42,11 @@ class AddressSearchView(ListAPIView):
         # full text search (fuzzy)
         address = self.request.query_params.get("address")
         if address:
-            queryset = queryset.annotate(
-                similarity=TrigramSimilarity("address", address)
-            ).order_by("-similarity")
+            queryset = (
+                queryset.annotate(similarity=TrigramSimilarity("address", address))
+                .filter(similarity__gt=0.2)
+                .order_by("-similarity")
+            )
 
         else:
             # postcode (exact) and unit (contains)
