@@ -6,6 +6,7 @@
 *.sqlite3
 __pycache__/
 .DS_Store
+static/*
 
 # Environments
 .env

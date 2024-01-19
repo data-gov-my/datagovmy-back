@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from .models import Address
 from .serializers import AddressSerializer
 from django.contrib.postgres.search import TrigramSimilarity, TrigramWordSimilarity
+from silk.profiling.profiler import silk_profile
 
 
 class AddressSearchByAddView(ListAPIView):
@@ -24,6 +25,7 @@ class AddressSearchByAddView(ListAPIView):
 class AddressSearchView(ListAPIView):
     serializer_class = AddressSerializer
 
+    @silk_profile(name="Search Address")
     def get_queryset(self):
         """
         Exact case insensitive match postcode, partial match unit, fuzzy search address.
@@ -56,7 +58,6 @@ class AddressSearchView(ListAPIView):
                 if not queryset.exists():
                     temp = queryset.filter(address__icontains=unit)
                 queryset = temp
-
         return queryset[:n]
 
 
