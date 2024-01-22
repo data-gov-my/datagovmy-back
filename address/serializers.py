@@ -14,6 +14,7 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = [
             "address",
+            "state",
             "district",
             "subdistrict",
             "locality",

@@ -8,6 +8,7 @@ from django.contrib.postgres.indexes import GinIndex
 
 class Address(models.Model):
     address = models.TextField()
+    state = models.CharField(max_length=100)
     district = models.CharField(max_length=100)
     subdistrict = models.CharField(max_length=100)
     locality = models.CharField(max_length=255)
