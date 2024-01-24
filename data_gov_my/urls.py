@@ -87,4 +87,3 @@ urlpatterns = [
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
-urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]
