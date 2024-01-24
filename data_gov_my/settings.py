@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "data_request",
     "django_celery_results",
     "address",
-    "silk",
 ]
 
 MIDDLEWARE = [
@@ -72,7 +71,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "data_gov_my.middleware.auth_middleware.AuthMiddleware",
     "data_gov_my.middleware.tinybird_middleware.TinyBirdAPILoggerMiddleware",
-    "silk.middleware.SilkyMiddleware",
 ]
 
 ROOT_URLCONF = "data_gov_my.urls"

@@ -54,6 +54,6 @@ class AuthMiddleware:
                     )
 
     def is_admin_panel(self, request):
-        if "/admin/" in request.path_info or "/silk/" in request.path_info:
+        if "/admin/" in request.path_info:
             return True
         return False
