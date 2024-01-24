@@ -610,6 +610,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
     }
 
     def delete_file(self, filename: str, data: dict):
+        filename = Path(filename).stem
         return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
