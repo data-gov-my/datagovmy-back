@@ -6,8 +6,10 @@ class SiteCategory(BaseModel):
     site: str
     category_en: str
     category_ms: str
+    category_sort: int = None
     subcategory_en: str
     subcategory_ms: str
+    subcategory_sort: int = None
 
 
 class Field(BaseModel):
@@ -38,6 +40,7 @@ class Dataviz(BaseModel):
 class DataCatalogueValidateModel(BaseModel):
     title_en: str
     title_ms: str
+    title_sort: int = None
     description_en: str
     description_ms: str
     exclude_openapi: bool
