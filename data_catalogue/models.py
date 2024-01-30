@@ -34,7 +34,9 @@ class RelatedDataset(models.Model):
 class SiteCategory(models.Model):
     site = models.CharField(max_length=10)
     category = models.CharField(max_length=255)
+    category_sort = models.IntegerField(null=True)
     subcategory = models.CharField(max_length=255)
+    subcategory_sort = models.IntegerField(null=True)
 
     def __str__(self) -> str:
         return f"SiteCategory ({self.site} - {self.category} / {self.subcategory})"
@@ -53,6 +55,7 @@ class DataCatalogueMeta(models.Model):
     manual_trigger = models.CharField(max_length=255)
     site_category = models.ManyToManyField(SiteCategory)
     title = models.CharField(max_length=255)  # translatable
+    title_sort = models.IntegerField(null=True)
     description = models.TextField()  # translatable
 
     # FIXME: move to metadata?

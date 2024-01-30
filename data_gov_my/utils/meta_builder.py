@@ -635,6 +635,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 manual_trigger=metadata.manual_trigger,
                 title_en=metadata.title_en,
                 title_ms=metadata.title_ms,
+                title_sort=metadata.title_sort,
                 description_en=metadata.description_en,
                 description_ms=metadata.description_ms,
                 data_as_of=metadata.data_as_of,
@@ -667,8 +668,17 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         ]
 
         site_categories = [
-            SiteCategory.objects.update_or_create(**site_cat_data.model_dump())[0]
-            for site_cat_data in metadata.site_category
+            SiteCategory.objects.update_or_create(
+                site=sc.site,
+                category_en=sc.category_en,
+                category_ms=sc.category_ms,
+                subcategory_en=sc.subcategory_en,
+                subcategory_ms=sc.subcategory_ms,
+                defaults=dict(
+                    category_sort=sc.category_sort, subcategory_sort=sc.subcategory_sort
+                ),
+            )[0]
+            for sc in metadata.site_category
         ]
 
         related_datasets = RelatedDataset.objects.bulk_create(

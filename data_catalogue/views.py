@@ -65,7 +65,7 @@ class DataCatalogueListAPIView(APIView):
         site_categories = (
             SiteCategory.objects.filter(site=site)
             .prefetch_related("datacataloguemeta_set")
-            .order_by("category_en", "subcategory_en")
+            .order_by("category_sort", "category", "subcategory_sort", "subcategory")
         )
 
         # Initialize nested dictionary and set
@@ -81,9 +81,11 @@ class DataCatalogueListAPIView(APIView):
         for site_category in site_categories:
             category = site_category.category
             subcategory = site_category.subcategory
-            data_catalogue_metas = site_category.datacataloguemeta_set.filter(
-                filters
-            ).values("id", "title", "data_as_of", "description", "data_source")
+            data_catalogue_metas = (
+                site_category.datacataloguemeta_set.filter(filters)
+                .values("id", "title", "data_as_of", "description", "data_source")
+                .order_by("title_sort", "title")
+            )
 
             # Append relevant DataCatalogueMeta ids to the nested dictionary
             for data_catalogue_meta in data_catalogue_metas:
