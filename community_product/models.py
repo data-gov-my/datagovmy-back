@@ -21,10 +21,9 @@ class CommunityProduct(models.Model):
         ("web_application", "Web application"),
         ("mobile_application", "Mobile application"),
         ("dashboard", "Dashboard"),
-        ("academic", "Academic work"),
+        ("academic_publication", "Academic Publication"),
         ("machine_learning", "Machine Learning (ML) product"),
         ("analytics", "Analytics"),
-        ("publications", "Publications"),
     ]
 
     # owner details
@@ -35,8 +34,11 @@ class CommunityProduct(models.Model):
     # product details
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
+    problem_statement = models.TextField()
+    solutions_developed = models.TextField()
+
     product_type = models.CharField(
-        max_length=18, choices=PRODUCT_TYPE_CHOICES, default="web_application"
+        max_length=20, choices=PRODUCT_TYPE_CHOICES, default="web_application"
     )
     product_year = models.PositiveIntegerField(
         default=get_current_year, validators=[MaxValueValidator(3000)]
