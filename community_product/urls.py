@@ -1,10 +1,10 @@
 from django.urls import path
-from .views import CommunityProductListCreateView, CommunityProductDetailView
+from .views import CommunityProductCreateView, CommunityProductDetailView
 
 urlpatterns = [
     path(
         "",
-        CommunityProductListCreateView.as_view(),
+        CommunityProductCreateView.as_view(),
         name="community-product-list",
     ),
     path(

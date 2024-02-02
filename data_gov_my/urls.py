@@ -81,6 +81,10 @@ urlpatterns = [
         include("data_catalogue.urls"),
     ),
     path(
+        "community-product/",
+        include("community_product.urls"),
+    ),
+    path(
         "address/",
         include("address.urls"),
     ),

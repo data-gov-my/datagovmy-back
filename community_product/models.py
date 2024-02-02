@@ -11,6 +11,14 @@ class CommunityProduct(models.Model):
         ("approved", "Approved"),
         ("rejected", "Rejected"),
     ]
+
+    PRODUCT_TYPE_CHOICES = [
+        ("web", "Web app"),
+        ("mobile", "Mobile app"),
+        ("academic", "Academic work"),
+        ("ai_ml", "Artificial Intelligence/Machine Learning"),
+    ]
+
     # owner details
     name = models.CharField(max_length=255)
     email = models.EmailField()
@@ -25,6 +33,8 @@ class CommunityProduct(models.Model):
     dataset_used = models.TextField()  # FIXME:TextField?
     created_at = models.DateTimeField(auto_now_add=True)
     # language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
+
+    # TODO: add image field
 
     def __str__(self):
         return f"{self.product_name} ({self.name})"

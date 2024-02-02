@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "data_request",
     "django_celery_results",
     "address",
+    "community_product",
 ]
 
 MIDDLEWARE = [
