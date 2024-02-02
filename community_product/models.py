@@ -34,6 +34,9 @@ class CommunityProduct(models.Model):
     # product details
     product_name = models.CharField(max_length=255)
     product_description = models.TextField()
+    problem_statement = models.TextField()
+    solutions_developed = models.TextField()
+
     product_type = models.CharField(
         max_length=20, choices=PRODUCT_TYPE_CHOICES, default="web_application"
     )
