@@ -6,6 +6,7 @@ class CommunityProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityProduct
         fields = [
+            "id",
             "name",
             "email",
             "institution",
