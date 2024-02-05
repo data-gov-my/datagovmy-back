@@ -1,3 +1,4 @@
+import logging
 from django.http import QueryDict
 from django.utils import translation
 from rest_framework import filters, generics, status
@@ -6,6 +7,7 @@ from rest_framework.response import Response
 
 from .models import CommunityProduct
 from .serializers import CommunityProductSerializer
+from post_office import mail
 
 
 class CommunityProductPagination(PageNumberPagination):
@@ -17,6 +19,7 @@ class CommunityProductPagination(PageNumberPagination):
 class CommunityProductCreateView(generics.CreateAPIView):
     queryset = CommunityProduct.objects.all()
     serializer_class = CommunityProductSerializer
+    FORM_TYPE = "community_product_submitted"
 
     def create(self, request, *args, **kwargs):
         language = request.query_params.get("language", "en")
@@ -38,6 +41,19 @@ class CommunityProductCreateView(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
+
+            # send email
+            try:
+                email = mail.send(
+                    recipients=serializer.data.get("email"),
+                    language=language,
+                    template=self.FORM_TYPE,
+                    context=serializer.data,
+                )
+
+            except Exception as e:
+                logging.error(e)
+
             return Response(
                 serializer.data, status=status.HTTP_201_CREATED, headers=headers
             )
