@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.core.exceptions import ValidationError
 
 # from data_gov_my.utils.common import LANGUAGE_CHOICES
 from django.core.validators import MaxValueValidator
@@ -32,10 +33,10 @@ class CommunityProduct(models.Model):
     institution = models.CharField(max_length=255, blank=True, null=True)
 
     # product details
-    product_name = models.CharField(max_length=255)
-    product_description = models.TextField()
-    problem_statement = models.TextField()
-    solutions_developed = models.TextField()
+    product_name = models.CharField(max_length=255)  # translatable
+    product_description = models.TextField()  # translatable
+    problem_statement = models.TextField()  # translatable
+    solutions_developed = models.TextField()  # translatable
 
     product_type = models.CharField(
         max_length=20, choices=PRODUCT_TYPE_CHOICES, default="web_application"
@@ -51,9 +52,27 @@ class CommunityProduct(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    # language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
 
     # TODO: add image field
+
+    def clean(self) -> None:
+        if self.status == "approved":
+            translate_fields = (
+                "product_name",
+                "product_description",
+                "problem_statement",
+                "solutions_developed",
+            )
+            errors = dict()
+            for field in translate_fields:
+                for lang in ("en", "ms"):
+                    lang_field = f"{field}_{lang}"
+                    if not getattr(self, lang_field):
+                        errors[lang_field] = "This field is required."
+            if errors:
+                raise ValidationError(errors)
+
+        return super().clean()
 
     def __str__(self):
         return f"{self.product_name} ({self.name})"
