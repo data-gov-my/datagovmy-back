@@ -5,4 +5,18 @@ from .models import CommunityProduct
 class CommunityProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunityProduct
-        fields = "__all__"
+        fields = [
+            "name",
+            "email",
+            "institution",
+            "product_name",
+            "product_description",
+            "problem_statement",
+            "solutions_developed",
+            "product_type",
+            "product_year",
+            "product_link",
+            "dataset_used",
+            "status",
+            "created_at",
+        ]

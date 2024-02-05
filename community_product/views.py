@@ -49,8 +49,14 @@ class CommunityProductDetailView(generics.ListAPIView):
     filter_backends = [filters.SearchFilter]
     search_fields = ["product_name", "product_description"]
 
+    def list(self, request, *args, **kwargs):
+        language = request.query_params.get("language", "en")
+        language = "ms" if language == "bm" else language
+        with translation.override(language):
+            return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
-        queryset = CommunityProduct.objects.all()
+        queryset = CommunityProduct.objects.filter(status="approved")
 
         # Filter by product_year if provided in the query parameters
         product_year = self.request.query_params.get("product_year", None)
