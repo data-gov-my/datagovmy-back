@@ -65,10 +65,8 @@ class CommunityProduct(models.Model):
             )
             errors = dict()
             for field in translate_fields:
-                for lang in ("en", "ms"):
-                    lang_field = f"{field}_{lang}"
-                    if not getattr(self, lang_field):
-                        errors[lang_field] = "This field is required."
+                if not getattr(self, field + "_ms"):
+                    errors[field + "_ms"] = "This field is required."
             if errors:
                 raise ValidationError(errors)
 
