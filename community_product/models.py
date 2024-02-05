@@ -32,10 +32,10 @@ class CommunityProduct(models.Model):
     institution = models.CharField(max_length=255, blank=True, null=True)
 
     # product details
-    product_name = models.CharField(max_length=255)
-    product_description = models.TextField()
-    problem_statement = models.TextField()
-    solutions_developed = models.TextField()
+    product_name = models.CharField(max_length=255)  # translatable
+    product_description = models.TextField()  # translatable
+    problem_statement = models.TextField()  # translatable
+    solutions_developed = models.TextField()  # translatable
 
     product_type = models.CharField(
         max_length=20, choices=PRODUCT_TYPE_CHOICES, default="web_application"
@@ -51,7 +51,6 @@ class CommunityProduct(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    # language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
 
     # TODO: add image field
 
