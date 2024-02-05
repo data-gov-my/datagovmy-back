@@ -1,7 +1,11 @@
-from rest_framework import generics, filters
+from django.http import QueryDict
+from django.utils import translation
+from rest_framework import filters, generics, status
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 from .models import CommunityProduct
 from .serializers import CommunityProductSerializer
-from rest_framework.pagination import PageNumberPagination
 
 
 class CommunityProductPagination(PageNumberPagination):
@@ -13,6 +17,30 @@ class CommunityProductPagination(PageNumberPagination):
 class CommunityProductCreateView(generics.CreateAPIView):
     queryset = CommunityProduct.objects.all()
     serializer_class = CommunityProductSerializer
+
+    def create(self, request, *args, **kwargs):
+        language = request.query_params.get("language", "en")
+        language = "ms" if language == "bm" else language
+
+        if language not in ["en", "ms"]:
+            return Response(
+                {"error": "language param should be `en`, `ms` or `bm` only."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with translation.override(language):
+            data = (
+                request.data.dict()
+                if isinstance(request.data, QueryDict)
+                else request.data
+            )
+            serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(
+                serializer.data, status=status.HTTP_201_CREATED, headers=headers
+            )
 
 
 class CommunityProductDetailView(generics.ListAPIView):
