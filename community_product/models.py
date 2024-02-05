@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.core.exceptions import ValidationError
 
 # from data_gov_my.utils.common import LANGUAGE_CHOICES
 from django.core.validators import MaxValueValidator
@@ -53,6 +54,25 @@ class CommunityProduct(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # TODO: add image field
+
+    def clean(self) -> None:
+        if self.status == "approved":
+            translate_fields = (
+                "product_name",
+                "product_description",
+                "problem_statement",
+                "solutions_developed",
+            )
+            errors = dict()
+            for field in translate_fields:
+                for lang in ("en", "ms"):
+                    lang_field = f"{field}_{lang}"
+                    if not getattr(self, lang_field):
+                        errors[lang_field] = "This field is required."
+            if errors:
+                raise ValidationError(errors)
+
+        return super().clean()
 
     def __str__(self):
         return f"{self.product_name} ({self.name})"
