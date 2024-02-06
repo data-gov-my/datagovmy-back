@@ -35,6 +35,7 @@ class CommunityProduct(models.Model):
     institution = models.CharField(max_length=255, blank=True, null=True)
 
     # product details
+    thumbnail = models.ImageField(null=True, upload_to="community-products/")
     product_name = models.CharField(max_length=255)  # translatable
     product_description = models.TextField()  # translatable
     problem_statement = models.TextField()  # translatable
