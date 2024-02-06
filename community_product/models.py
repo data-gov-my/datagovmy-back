@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
 
+from data_gov_my.utils.common import SHORT_LANGUAGE_CHOICES
+
 
 # Create your models here.
 def get_current_year():
@@ -52,6 +54,9 @@ class CommunityProduct(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    language = models.CharField(
+        max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en"
+    )
 
     # TODO: add image field
 

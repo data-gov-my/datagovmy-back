@@ -1,5 +1,7 @@
 LANGUAGE_CHOICES = [("en-GB", "English"), ("ms-MY", "Bahasa Melayu")]
 
+SHORT_LANGUAGE_CHOICES = [("en", "English"), ("ms", "Bahasa Melayu")]
+
 SITE_CHOICES = [
     ("datagovmy", "https://data.gov.my"),
     ("kkmnow", "https://data.moh.gov.my/"),
