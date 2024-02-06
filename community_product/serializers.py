@@ -20,4 +20,5 @@ class CommunityProductSerializer(serializers.ModelSerializer):
             "dataset_used",
             "status",
             "created_at",
+            "language",
         ]
