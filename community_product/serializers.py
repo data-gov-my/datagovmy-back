@@ -7,6 +7,7 @@ class CommunityProductListSerializer(serializers.ModelSerializer):
         model = CommunityProduct
         fields = [
             "id",
+            "thumbnail",
             "product_name",
             "product_description",
             "product_type",
@@ -23,6 +24,7 @@ class CommunityProductSerializer(serializers.ModelSerializer):
         model = CommunityProduct
         fields = [
             "id",
+            "thumbnail",
             "name",
             "email",
             "institution",
