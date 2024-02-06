@@ -54,6 +54,7 @@ class CommunityProduct(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    date_approved = models.DateTimeField(null=True, blank=True)
     language = models.CharField(
         max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en"
     )
