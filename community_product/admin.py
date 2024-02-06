@@ -1,10 +1,9 @@
 import logging
 
 from django.contrib import admin
-from django.utils import translation
+from django.utils import translation, timezone
 from modeltranslation.admin import TranslationAdmin
 from post_office import mail
-
 from .models import CommunityProduct
 
 # Register your models here.
@@ -18,6 +17,7 @@ class CommunityProductAdmin(TranslationAdmin):
         "created_at",
         "product_link",
         "product_year",
+        "date_approved",
     ]
     list_filter = ["product_type"]
     FORM_TYPE = "community_product_approved"
@@ -36,9 +36,10 @@ class CommunityProductAdmin(TranslationAdmin):
 
     def save_model(self, request, obj: CommunityProduct, form, change) -> None:
         """
-        Send out approval emails to product owner
+        Update date_approved timestamp and send out approval emails to product owner
         """
         if obj.status == "approved":
+            obj.date_approved = timezone.now()
             with translation.override(obj.language):
                 try:
                     mail.send(

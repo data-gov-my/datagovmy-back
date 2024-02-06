@@ -21,4 +21,5 @@ class CommunityProductSerializer(serializers.ModelSerializer):
             "status",
             "created_at",
             "language",
+            "date_approved",
         ]
