@@ -1,13 +1,14 @@
 import logging
+
 from django.http import QueryDict
 from django.utils import translation
+from post_office import mail
 from rest_framework import filters, generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .models import CommunityProduct
-from .serializers import CommunityProductSerializer
-from post_office import mail
+from .serializers import CommunityProductListSerializer, CommunityProductSerializer
 
 
 class CommunityProductPagination(PageNumberPagination):
@@ -60,8 +61,19 @@ class CommunityProductCreateView(generics.CreateAPIView):
             )
 
 
-class CommunityProductDetailView(generics.ListAPIView):
+class CommunityProductDetailAPIView(generics.RetrieveAPIView):
     serializer_class = CommunityProductSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        language = self.request.query_params.get("language", "en")
+        language = "ms" if language == "bm" else language
+        translation.activate(language)
+        return CommunityProduct.objects.filter(status="approved")
+
+
+class CommunityProductListView(generics.ListAPIView):
+    serializer_class = CommunityProductListSerializer
     pagination_class = CommunityProductPagination
     filter_backends = [filters.SearchFilter]
     search_fields = ["product_name", "product_description"]
