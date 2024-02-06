@@ -18,6 +18,7 @@ class CommunityProductAdmin(TranslationAdmin):
         "product_link",
         "product_year",
         "date_approved",
+        "language",
     ]
     list_filter = ["product_type"]
     FORM_TYPE = "community_product_approved"
