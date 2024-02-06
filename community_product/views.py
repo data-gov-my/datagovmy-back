@@ -37,6 +37,7 @@ class CommunityProductCreateView(generics.CreateAPIView):
                 if isinstance(request.data, QueryDict)
                 else request.data
             )
+            data["language"] = language
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)

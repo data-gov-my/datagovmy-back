@@ -1,6 +1,11 @@
+import logging
+
 from django.contrib import admin
-from .models import CommunityProduct
+from django.utils import translation
 from modeltranslation.admin import TranslationAdmin
+from post_office import mail
+
+from .models import CommunityProduct
 
 # Register your models here.
 
@@ -15,12 +20,7 @@ class CommunityProductAdmin(TranslationAdmin):
         "product_year",
     ]
     list_filter = ["product_type"]
-    MUST_TRANSLATE_FIELDS = [
-        "product_name",
-        "product_description",
-        "problem_statement",
-        "solutions_developed",
-    ]
+    FORM_TYPE = "community_product_approved"
 
     # def get_form(self, request, obj=None, **kwargs):
     #     form = super().get_form(request, obj, **kwargs)
@@ -33,6 +33,27 @@ class CommunityProductAdmin(TranslationAdmin):
     #     ):
     #         form.base_fields[field].required = False
     #     return form
+
+    def save_model(self, request, obj: CommunityProduct, form, change) -> None:
+        """
+        Send out approval emails to product owner
+        """
+        if obj.status == "approved":
+            with translation.override(obj.language):
+                try:
+                    mail.send(
+                        recipients=obj.email,
+                        language=obj.language,
+                        template=self.FORM_TYPE,
+                        context=dict(
+                            name=obj.name,
+                            product_name=getattr(obj, f"product_name_{obj.language}"),
+                        ),
+                    )
+                except Exception as e:
+                    logging.error(e)
+
+        return super().save_model(request, obj, form, change)
 
 
 admin.site.register(CommunityProduct, CommunityProductAdmin)
