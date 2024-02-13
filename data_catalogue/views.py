@@ -134,7 +134,7 @@ class DataCatalogueRetrieveAPIView(APIView):
             else:
                 valid_options = []
 
-            default = dataviz_object.dropdown[0][filter_column]
+            default = valid_options[0]
             filter_column_input = request.query_params.get(filter_column)
             selected = (
                 filter_column_input if filter_column_input in valid_options else default

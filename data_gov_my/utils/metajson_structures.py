@@ -92,7 +92,7 @@ class _EmailTemplateValidateModel(BaseModel):
     subject: str
     content: str
     html_content: str
-    language: Literal["en-GB", "ms-MY"]
+    language: Literal["en-GB", "ms-MY", "en", "ms"]
 
 
 class FormValidateModel(BaseModel):
