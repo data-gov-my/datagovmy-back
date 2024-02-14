@@ -99,6 +99,7 @@ class DataCatalogueListAPIView(APIView):
                     "data_as_of",
                     "description",
                     "data_source",
+                    "frequency",
                     "link_parquet",
                     "link_csv",
                     "size_parquet",
