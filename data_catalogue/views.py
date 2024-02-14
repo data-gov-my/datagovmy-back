@@ -68,6 +68,16 @@ class DataCatalogueListAPIView(APIView):
             .order_by("category_sort", "category", "subcategory_sort", "subcategory")
         )
 
+        # filter category/subcat
+        category = request.query_params.get("category", "")
+        subcategory = request.query_params.get("subcategory", "")
+        if category:
+            site_categories = site_categories.filter(category__iexact=category)
+            if subcategory:
+                site_categories = site_categories.filter(
+                    subcategory__iexact=subcategory
+                )
+
         # Initialize nested dictionary and set
         source_filters = DataCatalogueMeta.objects.filter(
             site_category__in=site_categories
@@ -83,7 +93,17 @@ class DataCatalogueListAPIView(APIView):
             subcategory = site_category.subcategory
             data_catalogue_metas = (
                 site_category.datacataloguemeta_set.filter(filters)
-                .values("id", "title", "data_as_of", "description", "data_source")
+                .values(
+                    "id",
+                    "title",
+                    "data_as_of",
+                    "description",
+                    "data_source",
+                    "link_parquet",
+                    "link_csv",
+                    "size_parquet",
+                    "size_csv",
+                )
                 .order_by("title_sort", "title")
             )
 

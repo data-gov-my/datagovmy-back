@@ -59,6 +59,8 @@ class DataCatalogueValidateModel(BaseModel):
     link_preview: Optional[HttpUrl] = None
     link_csv: Optional[HttpUrl] = None
     link_geojson: Optional[HttpUrl] = None
+    size_parquet: Optional[int] = None
+    size_csv: Optional[int] = None
     frequency: str
     geography: list[str]
     demography: list[str]
