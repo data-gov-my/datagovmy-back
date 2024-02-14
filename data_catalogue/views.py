@@ -83,7 +83,17 @@ class DataCatalogueListAPIView(APIView):
             subcategory = site_category.subcategory
             data_catalogue_metas = (
                 site_category.datacataloguemeta_set.filter(filters)
-                .values("id", "title", "data_as_of", "description", "data_source")
+                .values(
+                    "id",
+                    "title",
+                    "data_as_of",
+                    "description",
+                    "data_source",
+                    "link_parquet",
+                    "link_csv",
+                    "size_parquet",
+                    "size_csv",
+                )
                 .order_by("title_sort", "title")
             )
 
