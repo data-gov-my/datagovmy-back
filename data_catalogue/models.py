@@ -62,6 +62,8 @@ class DataCatalogueMeta(models.Model):
     link_parquet = models.URLField(null=True)
     link_csv = models.URLField(null=True)
     link_preview = models.URLField(null=True)
+    size_parquet = models.URLField(null=True)
+    size_csv = models.URLField(null=True)
 
     # filters
     frequency = models.CharField(max_length=50)
