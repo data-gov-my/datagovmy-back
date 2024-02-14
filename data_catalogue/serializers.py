@@ -50,7 +50,7 @@ class DataCatalogueMetaSerializer(serializers.ModelSerializer):
             "link_parquet",
             "link_csv",
             "link_preview",
-            # "frequency",
+            "frequency",
             # "geography",
             # "demography",
             # "dataset_begin",
