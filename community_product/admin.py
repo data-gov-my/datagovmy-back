@@ -21,7 +21,7 @@ class CommunityProductAdmin(TranslationAdmin):
         "date_rejected",
         "language",
     ]
-    list_filter = ["product_type"]
+    list_filter = ["product_type", "status"]
     COMMUNITY_PRODUCT_APPROVED_TEMPLATE = "community_product_approved"
     COMMUNITY_PRODUCT_REJECTED_TEMPLATE = "community_product_rejected"
 
