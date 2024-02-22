@@ -4,11 +4,12 @@ from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils import timezone, translation
-from modeltranslation.admin import TranslationAdmin
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
+from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
 from data_catalogue.models import DataCatalogueMeta
-from data_request.models import DataRequest
+from data_request.models import Agency, DataRequest
 from data_request.serializers import DataRequestSerializer
 
 
@@ -142,4 +143,13 @@ class DataRequestAdmin(TranslationAdmin):
             )
 
 
+class AgencyInline(TranslationTabularInline):
+    model = Agency
+
+
+class AgencyAdmin(TranslationAdmin, DynamicArrayMixin):
+    list_display = ["acronym", "name_en", "name_ms"]
+
+
 admin.site.register(DataRequest, DataRequestAdmin)
+admin.site.register(Agency, AgencyAdmin)
