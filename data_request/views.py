@@ -1,14 +1,14 @@
 # Create your views here.
 import ast
 import logging
-from django.http import QueryDict
 
 import pandas as pd
 from django.db.models import Count, Q
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.utils import translation
 from post_office import mail
-from rest_framework import generics, status, request
+from rest_framework import generics, request, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
