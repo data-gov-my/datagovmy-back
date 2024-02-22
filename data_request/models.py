@@ -1,7 +1,7 @@
 from django.db import models
 
 from data_gov_my.utils.common import LANGUAGE_CHOICES
-from django.contrib.postgres.fields import ArrayField
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 # Create your models here.
 
@@ -13,6 +13,9 @@ class Agency(models.Model):
 
     def __str__(self) -> str:
         return self.acronym
+
+    class Meta:
+        verbose_name_plural = "agencies"
 
 
 class DataRequest(models.Model):
