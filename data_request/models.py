@@ -1,7 +1,7 @@
 from django.db import models
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 from data_gov_my.utils.common import LANGUAGE_CHOICES
-from django_better_admin_arrayfield.models.fields import ArrayField
 
 # Create your models here.
 

@@ -1,4 +1,5 @@
-from django.urls import path, include
+from django.urls import path
+
 from data_request.views import (
     AgencyCreateAPIView,
     AgencyListAPIView,
@@ -6,8 +7,6 @@ from data_request.views import (
     SubscriptionCreateAPIView,
     list_data_request,
 )
-from rest_framework.routers import DefaultRouter
-
 
 urlpatterns = [
     path("", DataRequestCreateAPIView.as_view(), name="data-request-create"),
