@@ -44,6 +44,7 @@ from data_gov_my.serializers import (
     i18nSerializer,
 )
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+from django.db.models import Q
 
 env = environ.Env()
 environ.Env.read_env()
@@ -339,6 +340,12 @@ class PUBLICATION(generics.ListAPIView):
         )
 
     def filter_queryset(self, queryset):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+
         # apply filters
         pub_type = self.request.query_params.get("pub_type")
         if pub_type:
@@ -462,6 +469,14 @@ class PUBLICATION_DOCS(generics.ListAPIView):
             .order_by("publication_id")
         )
 
+    def filter_queryset(self, queryset):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+        return queryset
+
 
 class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
     serializer_class = PublicationDetailSerializer
@@ -520,6 +535,13 @@ class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
 
     def filter_queryset(self, queryset):
         # apply filters
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(publication_title__icontains=search)
+                | Q(publication_type_title__icontains=search)
+            )
+
         pub_type = self.request.query_params.get("pub_type")
         if pub_type:
             queryset = queryset.filter(publication_type__iexact=pub_type)
