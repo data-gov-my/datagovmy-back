@@ -469,6 +469,14 @@ class PUBLICATION_DOCS(generics.ListAPIView):
             .order_by("publication_id")
         )
 
+    def filter_queryset(self, queryset):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+        return queryset
+
 
 class PUBLICATION_DOCS_RESOURCE(generics.RetrieveAPIView):
     serializer_class = PublicationDetailSerializer
