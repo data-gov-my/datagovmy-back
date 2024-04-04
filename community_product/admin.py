@@ -18,10 +18,12 @@ class CommunityProductAdmin(TranslationAdmin):
         "product_link",
         "product_year",
         "date_approved",
+        "date_rejected",
         "language",
     ]
-    list_filter = ["product_type"]
-    FORM_TYPE = "community_product_approved"
+    list_filter = ["product_type", "status"]
+    COMMUNITY_PRODUCT_APPROVED_TEMPLATE = "community_product_approved"
+    COMMUNITY_PRODUCT_REJECTED_TEMPLATE = "community_product_rejected"
 
     # def get_form(self, request, obj=None, **kwargs):
     #     form = super().get_form(request, obj, **kwargs)
@@ -46,10 +48,26 @@ class CommunityProductAdmin(TranslationAdmin):
                     mail.send(
                         recipients=obj.email,
                         language=obj.language,
-                        template=self.FORM_TYPE,
+                        template=self.COMMUNITY_PRODUCT_APPROVED_TEMPLATE,
                         context=dict(
                             name=obj.name,
                             product_name=getattr(obj, f"product_name_{obj.language}"),
+                        ),
+                    )
+                except Exception as e:
+                    logging.error(e)
+        elif obj.status == "rejected":
+            obj.date_rejected = timezone.now()
+            with translation.override(obj.language):
+                try:
+                    mail.send(
+                        recipients=obj.email,
+                        language=obj.language,
+                        template=self.COMMUNITY_PRODUCT_REJECTED_TEMPLATE,
+                        context=dict(
+                            name=obj.name,
+                            product_name=getattr(obj, f"product_name_{obj.language}"),
+                            reason=getattr(obj, f"remark_{obj.language}"),
                         ),
                     )
                 except Exception as e:

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django_celery_results",
     "address",
     "community_product",
+    "django_better_admin_arrayfield",
 ]
 
 MIDDLEWARE = [

@@ -1,16 +1,15 @@
-from django.utils import timezone
 from typing import Any
-from django.utils import translation
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from modeltranslation.admin import TranslationAdmin
-
-from data_catalogue.models import DataCatalogueMeta
-from data_request.models import DataRequest
+from django.utils import timezone, translation
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
+from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
+from data_catalogue.models import DataCatalogueMeta
+from data_request.models import Agency, DataRequest
 from data_request.serializers import DataRequestSerializer
 
 
@@ -65,6 +64,7 @@ class DataRequestAdmin(TranslationAdmin):
     form = DataRequestAdminForm
     list_filter = ["status"]  # Add the 'status' field to enable filtering
     DATA_REQUEST_UNDER_REVIEW_TEMPLATE = "data_request_under_review"
+    DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE = "data_request_agency_notification"
     DATA_REQUEST_DATA_PUBLISHED_TEMPLATE = "data_request_data_published"
     DATA_REQUEST_REJECTED_TEMPLATE = "data_request_rejected"
 
@@ -113,12 +113,21 @@ class DataRequestAdmin(TranslationAdmin):
         obj.published_data.set(form.cleaned_data.get("published_data"))
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
+            # send email updating user that it is now under review
             self.send_subscribtion_emails(
                 obj=obj,
                 template=self.DATA_REQUEST_UNDER_REVIEW_TEMPLATE,
                 context={"name": obj.subscription_set.first().name},
             )
-            # send email updating user that it is now under review
+            # send email to agency to request for review
+            with translation.override("ms"):
+                context = DataRequestSerializer(obj).data
+                mail.send(
+                    recipients=obj.agency.emails,
+                    template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
+                    language="ms",
+                    context=context,
+                )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)
@@ -134,4 +143,13 @@ class DataRequestAdmin(TranslationAdmin):
             )
 
 
+class AgencyInline(TranslationTabularInline):
+    model = Agency
+
+
+class AgencyAdmin(TranslationAdmin, DynamicArrayMixin):
+    list_display = ["acronym", "name_en", "name_ms"]
+
+
 admin.site.register(DataRequest, DataRequestAdmin)
+admin.site.register(Agency, AgencyAdmin)

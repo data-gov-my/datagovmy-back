@@ -35,7 +35,9 @@ class CommunityProduct(models.Model):
     institution = models.CharField(max_length=255, blank=True, null=True)
 
     # product details
-    thumbnail = models.ImageField(null=True, upload_to="community-products/")
+    thumbnail = models.ImageField(
+        null=True, blank=True, upload_to="community-products/"
+    )
     product_name = models.CharField(max_length=255)  # translatable
     product_description = models.TextField()  # translatable
     problem_statement = models.TextField()  # translatable
@@ -56,13 +58,14 @@ class CommunityProduct(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     date_approved = models.DateTimeField(null=True, blank=True)
+    date_rejected = models.DateTimeField(null=True, blank=True)
+    remark = models.TextField(blank=True, null=True)  # translatable
     language = models.CharField(
         max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en"
     )
 
-    # TODO: add image field
-
     def clean(self) -> None:
+        errors = dict()
         if self.status == "approved":
             translate_fields = (
                 "product_name",
@@ -70,12 +73,20 @@ class CommunityProduct(models.Model):
                 "problem_statement",
                 "solutions_developed",
             )
-            errors = dict()
             for field in translate_fields:
                 if not getattr(self, field + "_ms"):
                     errors[field + "_ms"] = "This field is required."
-            if errors:
-                raise ValidationError(errors)
+            if not self.thumbnail:
+                errors["thumbnail"] = "This field is required."
+
+        elif self.status == "rejected":
+            if not self.remark_en:
+                errors["remark_en"] = "This field is required."
+            if not self.remark_ms:
+                errors["remark_ms"] = "This field is required."
+
+        if errors:
+            raise ValidationError(errors)
 
         return super().clean()
 

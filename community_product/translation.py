@@ -9,5 +9,6 @@ class CommunityProductTranslationOptions(TranslationOptions):
         "product_description",
         "problem_statement",
         "solutions_developed",
+        "remark",
     )
     fallback_languages = {"default": ("en", "ms")}

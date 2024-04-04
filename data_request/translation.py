@@ -1,4 +1,5 @@
-from modeltranslation.translator import register, TranslationOptions
+from modeltranslation.translator import TranslationOptions, register
+
 from data_request.models import Agency, DataRequest
 
 

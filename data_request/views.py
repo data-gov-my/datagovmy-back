@@ -1,13 +1,14 @@
 # Create your views here.
+import ast
 import logging
-from django.http import QueryDict
 
 import pandas as pd
 from django.db.models import Count, Q
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.utils import translation
 from post_office import mail
-from rest_framework import generics, status, request
+from rest_framework import generics, request, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
@@ -54,9 +55,11 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                     "name": serializer.validated_data["name"],
                     "email": serializer.validated_data["email"],
                     "institution": serializer.validated_data.get("institution"),
-                    "dataset_title": data_request.dataset_title_en
-                    if serializer.validated_data["language"] == "en-GB"
-                    else data_request.dataset_title_ms,
+                    "dataset_title": (
+                        data_request.dataset_title_en
+                        if serializer.validated_data["language"] == "en-GB"
+                        else data_request.dataset_title_ms
+                    ),
                     "agency": data_request.agency,
                 },
             )
@@ -180,13 +183,17 @@ class AgencyCreateAPIView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         df = pd.read_parquet(self.AGENCY_PARQUET)
+        df["emails"] = df["emails"].apply(
+            lambda x: ast.literal_eval(x.decode("utf-8")) if isinstance(x, bytes) else x
+        )
+
         acronym_lst = df["acronym"].tolist()
         agency_objects = [Agency(**row) for row in df.to_dict("records")]
         update_or_created_agencies = Agency.objects.bulk_create(
             agency_objects,
             update_conflicts=True,
             unique_fields=["acronym"],
-            update_fields=["name_en", "name_ms"],
+            update_fields=["name_en", "name_ms", "emails"],
         )
 
         _, deleted = Agency.objects.exclude(acronym__in=acronym_lst).delete()

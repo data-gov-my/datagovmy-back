@@ -1,4 +1,5 @@
 from django.db import models
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 
@@ -8,9 +9,13 @@ from data_gov_my.utils.common import LANGUAGE_CHOICES
 class Agency(models.Model):
     acronym = models.CharField(max_length=15, primary_key=True)
     name = models.CharField(max_length=255)  # translatable
+    emails = ArrayField(models.EmailField())
 
     def __str__(self) -> str:
         return self.acronym
+
+    class Meta:
+        verbose_name_plural = "agencies"
 
 
 class DataRequest(models.Model):
