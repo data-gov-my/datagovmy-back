@@ -44,6 +44,7 @@ from data_gov_my.serializers import (
     i18nSerializer,
 )
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+from django.db.models import Q
 
 env = environ.Env()
 environ.Env.read_env()
@@ -339,6 +340,12 @@ class PUBLICATION(generics.ListAPIView):
         )
 
     def filter_queryset(self, queryset):
+        search = self.request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(description__icontains=search)
+            )
+
         # apply filters
         pub_type = self.request.query_params.get("pub_type")
         if pub_type:
