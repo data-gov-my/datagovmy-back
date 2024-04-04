@@ -343,7 +343,9 @@ class PUBLICATION(generics.ListAPIView):
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
-                Q(title__icontains=search) | Q(description__icontains=search)
+                Q(title__icontains=search)
+                | Q(description__icontains=search)
+                | Q(publication_id__icontains=search)
             )
 
         # apply filters
@@ -473,7 +475,9 @@ class PUBLICATION_DOCS(generics.ListAPIView):
         search = self.request.query_params.get("search")
         if search:
             queryset = queryset.filter(
-                Q(title__icontains=search) | Q(description__icontains=search)
+                Q(title__icontains=search)
+                | Q(description__icontains=search)
+                | Q(publication_id__icontains=search)
             )
         return queryset
 
@@ -540,6 +544,7 @@ class PUBLICATION_UPCOMING_LIST(generics.ListAPIView):
             queryset = queryset.filter(
                 Q(publication_title__icontains=search)
                 | Q(publication_type_title__icontains=search)
+                | Q(publication_id__icontains=search)
             )
 
         pub_type = self.request.query_params.get("pub_type")
