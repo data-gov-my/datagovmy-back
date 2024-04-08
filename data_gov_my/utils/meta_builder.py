@@ -180,6 +180,8 @@ class GeneralMetaBuilder(ABC):
         for file in file_list:
             f = file["filename"]
             f_info = f.split("/")
+            if f_info[:2] == ["data-catalogue", "openapi"]:
+                continue
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
                 if f_info[: len(github_dir_info)] == github_dir_info:
