@@ -38,8 +38,8 @@ class DataCatalogueListAPIView(APIView):
         # Extract additional query parameters
         data_source = request.query_params.getlist("source", [])
         frequency = request.query_params.get("frequency", "")
-        geography = request.query_params.getlist("geography", [])
-        demography = request.query_params.getlist("demography", [])
+        geography = request.query_params.get("geography", "")
+        demography = request.query_params.get("demography", "")
         dataset_begin = request.query_params.get("begin", "")
         dataset_end = request.query_params.get("end", "")
         search = request.query_params.get("search", "")
@@ -51,9 +51,11 @@ class DataCatalogueListAPIView(APIView):
         if frequency:
             filters &= Q(frequency=frequency)
         if geography:
-            filters &= Q(geography__overlap=geography)
+            geography = geography.split(",")
+            filters &= Q(geography__contains=geography)
         if demography:
-            filters &= Q(demography__overlap=demography)
+            demography = demography.split(",")
+            filters &= Q(demography__contains=demography)
         if dataset_begin and dataset_begin.isdigit():
             filters &= Q(dataset_begin__gte=int(dataset_begin))
         if dataset_end and dataset_end.isdigit():
