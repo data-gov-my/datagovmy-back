@@ -52,10 +52,10 @@ class DataCatalogueListAPIView(APIView):
             filters &= Q(frequency=frequency)
         if geography:
             geography = geography.split(",")
-            filters &= Q(geography__overlap=geography)
+            filters &= Q(geography__contains=geography)
         if demography:
             demography = demography.split(",")
-            filters &= Q(demography__overlap=demography)
+            filters &= Q(demography__contains=demography)
         if dataset_begin and dataset_begin.isdigit():
             filters &= Q(dataset_begin__gte=int(dataset_begin))
         if dataset_end and dataset_end.isdigit():
