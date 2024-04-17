@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
+from data_gov_my.utils.throttling import FormRateThrottle
 from data_request.models import Agency, DataRequest
 from data_request.serializers import (
     AgencySerializer,
@@ -70,6 +71,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
 class DataRequestCreateAPIView(generics.CreateAPIView):
     serializer_class = DataRequestSerializer
     FORM_TYPE = "data_request_submitted"
+    throttle_classes = [FormRateThrottle]
 
     def create(self, request: request.Request, *args, **kwargs):
         # Determine the language from the query parameters
