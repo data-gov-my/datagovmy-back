@@ -46,6 +46,8 @@ from data_gov_my.serializers import (
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 from django.db.models import Q
 
+from data_gov_my.utils.throttling import FormRateThrottle
+
 env = environ.Env()
 environ.Env.read_env()
 
@@ -269,6 +271,11 @@ class I18N(APIView):
 
 class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
+
+    def get_throttles(self):
+        if self.request.method == "POST":
+            self.throttle_classes = [FormRateThrottle]
+        return super().get_throttles()
 
     def post(self, request, *args, **kwargs):
         # get FormTemplate instance by request query param, then validate & store new form data

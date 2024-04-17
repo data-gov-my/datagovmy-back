@@ -7,6 +7,8 @@ from rest_framework import filters, generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from data_gov_my.utils.throttling import FormRateThrottle
+
 from .models import CommunityProduct
 from .serializers import CommunityProductListSerializer, CommunityProductSerializer
 
@@ -21,6 +23,7 @@ class CommunityProductCreateView(generics.CreateAPIView):
     queryset = CommunityProduct.objects.all()
     serializer_class = CommunityProductSerializer
     FORM_TYPE = "community_product_submitted"
+    throttle_classes = [FormRateThrottle]
 
     def create(self, request, *args, **kwargs):
         language = request.query_params.get("language", "en")
