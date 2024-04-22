@@ -97,9 +97,12 @@ def get_fe_url_by_site(site):
         return os.getenv("KKMNOW_FRONTEND_URL"), os.getenv(
             "KKMNOW_FRONTEND_REBUILD_AUTH"
         )
+    elif site == "databnm":
+        # TODO: add databnm url to rebuild
+        pass
     else:
         raise ValueError(
-            f"{site} is not a valid site for revalidation! (Currently supports datagovmy, opendosm, kkmnow only.)"
+            f"{site} is not a valid site for revalidation! (Currently supports datagovmy, opendosm, kkmnow, databnm only.)"
         )
 
 
