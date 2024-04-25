@@ -817,7 +817,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                 last_update = exp_meta["tables"][k]["data_as_of"]
                 try:
                     obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta["explorer_name"]]()
-
+                    source = table_list[k].get("source")
                     upd, create = ExplorersUpdate.objects.update_or_create(
                         explorer=exp_name,
                         file_name=k,
@@ -827,7 +827,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                     if table_operation == "SLEEP":
                         continue
                     elif table_operation == "REBUILD":
-                        obj.populate_db(table=table_name, rebuild=True)
+                        obj.populate_db(table=table_name, source=source, rebuild=True)
                     elif table_operation == "UPDATE":
                         unique_keys = exp_meta["tables"][k]["unique_keys"]
                         obj.update(table_name=table_name, unique_keys=unique_keys)

@@ -87,7 +87,7 @@ class General_Explorer:
     pre-population.
     """
 
-    def populate_db(self, table="", rebuild=False):
+    def populate_db(self, table="", source=None, rebuild=False):
         if table:  # If set, builds only the table requested
             self.bulk_insert(
                 self.data_populate[table],
