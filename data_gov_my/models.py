@@ -411,3 +411,19 @@ class PrasaranaTimeseriesCallout(models.Model):
                 name="prasarana_callout_idx",
             )
         ]
+
+
+class Car(models.Model):
+    maker = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+
+    # class Meta:
+    #     indexes = [
+    #         GinIndex(fields=["maker", "model"]),
+    #     ]
+
+
+class CarPopularityTimeseries(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    date = models.DateField()
+    cars = models.IntegerField(null=True)
