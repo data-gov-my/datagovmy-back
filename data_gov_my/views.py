@@ -6,7 +6,9 @@ from threading import Thread
 
 import environ
 from django.core.cache import cache
-from django.db.models import F, Sum
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.timezone import get_current_timezone
@@ -32,6 +34,7 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationResource,
+    PublicationSubscription,
     PublicationUpcoming,
     i18nJson,
 )
@@ -44,7 +47,6 @@ from data_gov_my.serializers import (
     i18nSerializer,
 )
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-from django.db.models import Q
 
 env = environ.Env()
 environ.Env.read_env()
@@ -367,6 +369,55 @@ class PUBLICATION(generics.ListAPIView):
             demography = demography.split(",")
             queryset = queryset.filter(demography__contains=demography)
         return queryset
+
+
+class SubscribePublicationAPIView(APIView):
+    def post(self, request):
+        publication_type = request.data.get("publication_type")
+        email = request.data.get("email")
+
+        if not publication_type or not email:
+            return Response(
+                {"error": "Provide both `publication_type` and `email` form data."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if publication_type is vaild
+        if not Publication.objects.filter(publication_type=publication_type).exists():
+            return Response(
+                {"error": "Invalid publication_type (does not exist)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if the publication type exists in the database
+        subscription, created = PublicationSubscription.objects.get_or_create(
+            publication_type=publication_type
+        )
+
+        if not created:
+            # If the publication type already exists, check if the email is already subscribed
+            if email in subscription.emails:
+                return Response(
+                    {"error": "Email is already subscribed to this publication type."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # Append the email to the list of subscribed emails
+        try:
+            validate_email(email)
+        except ValidationError as e:
+            return Response(
+                {"error": "Invalid email format."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            subscription.emails.append(email)
+            subscription.save()
+
+        return Response(
+            {"success": f"Subscribed to {publication_type}."},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class PUBLICATION_RESOURCE(generics.RetrieveAPIView):
