@@ -240,6 +240,11 @@ class Publication(models.Model):
         return f"{self.publication_id} ({self.language})"
 
 
+class PublicationSubscription(models.Model):
+    publication_type = models.CharField(max_length=50, primary_key=True)
+    emails = ArrayField(models.EmailField(), default=list)
+
+
 class PublicationResource(models.Model):
     resource_id = models.IntegerField()
     resource_type = models.CharField(max_length=50)
