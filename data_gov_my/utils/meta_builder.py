@@ -793,7 +793,6 @@ class ExplorerBuilder(GeneralMetaBuilder):
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata.explorer_name, metadata)
         return obj
 
     def additional_handling(
