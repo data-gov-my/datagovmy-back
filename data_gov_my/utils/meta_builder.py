@@ -451,11 +451,11 @@ class DashboardBuilder(GeneralMetaBuilder):
             "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata.dashboard_name,
+            dashboard_name=Path(filename).stem,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata.dashboard_name, dashboard_meta)
+        cache.set("META_" + Path(filename).stem, dashboard_meta)
         return obj
 
     def additional_handling(
