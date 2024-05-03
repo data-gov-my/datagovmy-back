@@ -435,10 +435,10 @@ class DashboardBuilder(GeneralMetaBuilder):
 
     def delete_file(self, filename: str, data: dict):
         meta_count, meta_deleted = MetaJson.objects.filter(
-            dashboard_name=data.get("dashboard_name")
+            dashboard_name=Path(filename).stem
         ).delete()
         dashboard_count, dashboard_deleted = DashboardJson.objects.filter(
-            dashboard_name=data.get("dashboard_name")
+            dashboard_name=Path(filename).stem
         ).delete()
         meta_deleted.update(dashboard_deleted)
         return meta_count + dashboard_count, meta_deleted
