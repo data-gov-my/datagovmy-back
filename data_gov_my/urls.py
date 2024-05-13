@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import include, path
 from data_gov_my import views
@@ -33,6 +34,11 @@ urlpatterns = [
         name="PUBLICATION_DROPDOWN",
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
+    path(
+        "publication/subscribe",
+        views.SubscribePublicationAPIView.as_view(),
+        name="PUBLICATION_SUBSCRIBE",
+    ),
     path(
         "publication-resource-downloads",
         views.get_publication_resource_downloads,

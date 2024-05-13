@@ -13,6 +13,8 @@ from pydantic import (
 
 from data_gov_my.utils.chart_builders import ChartBuilder
 
+SITES = Literal["datagovmy", "kkmnow", "opendosm", "databnm"]
+
 
 class DashboardChartModel(BaseModel):
     name: str
@@ -66,7 +68,7 @@ class DashboardValidateModel(BaseModel):
     data_last_updated: datetime
     data_next_update: Optional[datetime] = None
     route: str
-    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
+    sites: list[SITES]
     manual_trigger: str
     required_params: list[str] = []
     optional_params: list[str] = []
@@ -83,7 +85,7 @@ class DashboardValidateModel(BaseModel):
 
 class i18nValidateModel(BaseModel):
     route: str | None
-    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
+    sites: list[SITES]
     translation: dict
 
 
@@ -107,7 +109,7 @@ class ExplorerValidateModel(BaseModel):
     manual_trigger: str = "0"
     explorer_name: str
     route: str
-    sites: list[Literal["datagovmy", "kkmnow", "opendosm"]]
+    sites: list[SITES]
     tables: dict[str, dict]
 
     @field_serializer("data_last_updated")

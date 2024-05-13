@@ -1,24 +1,25 @@
 from __future__ import annotations
-from slugify import slugify
-from pathlib import Path
+
 import json
 import logging
 import os
 import traceback
 from abc import ABC, abstractmethod
+from datetime import date
 from os.path import isfile
 from pathlib import Path
 from typing import List
 from urllib.request import urlopen
-import numpy as np
 
+import numpy as np
 import pandas as pd
 from django.core.cache import cache
 from django.core.exceptions import FieldDoesNotExist
+from post_office import mail
 from pydantic import BaseModel
-from data_catalogue.utils import translation
-from data_catalogue.metajson_structure import DataCatalogueValidateModel
+from slugify import slugify
 
+from data_catalogue.metajson_structure import DataCatalogueValidateModel
 from data_catalogue.models import (
     DataCatalogue,
     DataCatalogueMeta,
@@ -27,7 +28,7 @@ from data_catalogue.models import (
     RelatedDataset,
     SiteCategory,
 )
-
+from data_catalogue.utils import translation
 from data_gov_my.explorers import class_list as exp_class
 from data_gov_my.models import (
     DashboardJson,
@@ -39,10 +40,11 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationResource,
+    PublicationSubscription,
     PublicationUpcoming,
     i18nJson,
 )
-from data_gov_my.utils import common, triggers
+from data_gov_my.utils import triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
 from data_gov_my.utils.common import LANGUAGE_CHOICES
 from data_gov_my.utils.cron_utils import (
@@ -791,7 +793,6 @@ class ExplorerBuilder(GeneralMetaBuilder):
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata.explorer_name, metadata)
         return obj
 
     def additional_handling(
@@ -817,7 +818,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                 last_update = exp_meta["tables"][k]["data_as_of"]
                 try:
                     obj = exp_class.EXPLORERS_CLASS_LIST[exp_meta["explorer_name"]]()
-
+                    source = table_list[k].get("source")
                     upd, create = ExplorersUpdate.objects.update_or_create(
                         explorer=exp_name,
                         file_name=k,
@@ -827,7 +828,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
                     if table_operation == "SLEEP":
                         continue
                     elif table_operation == "REBUILD":
-                        obj.populate_db(table=table_name, rebuild=True)
+                        obj.populate_db(table=table_name, source=source, rebuild=True)
                     elif table_operation == "UPDATE":
                         unique_keys = exp_meta["tables"][k]["unique_keys"]
                         obj.update(table_name=table_name, unique_keys=unique_keys)
@@ -974,6 +975,23 @@ class PublicationBuilder(GeneralMetaBuilder):
                 "resource_link",
             ],
         )
+
+        # Send notification to all subscribers of the publication type only if release date is today
+        if metadata.release_date == date.today():
+            try:
+                subscription = PublicationSubscription.objects.get(
+                    publication_type=metadata.publication_type
+                )
+                if subscription.emails:
+                    # TODO: set up proper email template
+                    mail.send(
+                        bcc=subscription.emails,
+                        subject="Just Published: {{publication_type}}",
+                        html_message="Just Published: {{publication_type}} (Proper email content WIP)",
+                        context={"publication_type": metadata.publication_type},
+                    )
+            except PublicationSubscription.DoesNotExist:
+                pass
 
         return [pub_object_en, pub_object_bm]
 

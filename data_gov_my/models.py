@@ -16,7 +16,7 @@ class AuthTable(models.Model):
     timestamp = models.DateTimeField()
 
 
-class MetaJson(models.Model):
+class AbstractMetaJson(models.Model):
     dashboard_name = models.CharField(max_length=200, primary_key=True)
     dashboard_meta = models.JSONField()
     route = models.CharField(max_length=100, null=True)  # routes are comma-separated
@@ -27,6 +27,13 @@ class MetaJson(models.Model):
 
     def __str__(self) -> str:
         return f"{self.dashboard_name}"
+
+    class Meta:
+        abstract = True
+
+
+class MetaJson(AbstractMetaJson):
+    pass
 
 
 class DashboardJson(models.Model):
@@ -193,7 +200,7 @@ class FormData(models.Model):
         return self.form_data.get("email", None)
 
 
-class ExplorersMetaJson(MetaJson):
+class ExplorersMetaJson(AbstractMetaJson):
     pass
 
 
@@ -238,6 +245,11 @@ class Publication(models.Model):
 
     def __str__(self) -> str:
         return f"{self.publication_id} ({self.language})"
+
+
+class PublicationSubscription(models.Model):
+    publication_type = models.CharField(max_length=50, primary_key=True)
+    emails = ArrayField(models.EmailField(), default=list)
 
 
 class PublicationResource(models.Model):
@@ -411,3 +423,19 @@ class PrasaranaTimeseriesCallout(models.Model):
                 name="prasarana_callout_idx",
             )
         ]
+
+
+class Car(models.Model):
+    maker = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+
+    # class Meta:
+    #     indexes = [
+    #         GinIndex(fields=["maker", "model"]),
+    #     ]
+
+
+class CarPopularityTimeseries(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    date = models.DateField()
+    cars = models.IntegerField(null=True)

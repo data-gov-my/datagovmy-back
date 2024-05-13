@@ -6,6 +6,7 @@ SITE_CHOICES = [
     ("datagovmy", "https://data.gov.my"),
     ("kkmnow", "https://data.moh.gov.my/"),
     ("opendosm", "https://open.dosm.gov.my/"),
+    ("databnm", "https://bnm.data.gov.my/"),
 ]
 
 CHART_TYPES = {
