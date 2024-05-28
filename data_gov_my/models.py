@@ -425,17 +425,32 @@ class PrasaranaTimeseriesCallout(models.Model):
         ]
 
 
-class Car(models.Model):
+class CarPopularityTimeseriesMaker(models.Model):
+    maker = models.CharField(max_length=100)
+    date = models.DateField()
+    cars = models.IntegerField(default=0, null=True)
+    cars_cumul = models.IntegerField(default=0, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["maker", "date"],
+                name="car_popularity_maker_idx",
+            )
+        ]
+
+
+class CarPopularityTimeseriesModel(models.Model):
     maker = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
-
-    # class Meta:
-    #     indexes = [
-    #         GinIndex(fields=["maker", "model"]),
-    #     ]
-
-
-class CarPopularityTimeseries(models.Model):
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
     date = models.DateField()
-    cars = models.IntegerField(null=True)
+    cars = models.IntegerField(default=0, null=True)
+    cars_cumul = models.IntegerField(default=0, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["maker", "model", "date"],
+                name="car_popularity_model_idx",
+            )
+        ]
