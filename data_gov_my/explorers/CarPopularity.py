@@ -1,14 +1,19 @@
 from datetime import date, datetime
 from itertools import groupby
 
-import numpy as np
 import pandas as pd
+from django.apps import apps
 from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models import CharField, Q, Value
+from django.db.models.functions import Concat
 from django.http import JsonResponse
 from rest_framework import response
 
 from data_gov_my.explorers.General import General_Explorer
-from data_gov_my.models import Car, CarPopularityTimeseries
+from data_gov_my.models import (
+    CarPopularityTimeseriesMaker,
+    CarPopularityTimeseriesModel,
+)
 
 
 class CarPopularityExplorer(General_Explorer):
@@ -23,34 +28,20 @@ class CarPopularityExplorer(General_Explorer):
 
     def populate_db(self, table="", source=None, rebuild=False):
         """
-        Populate Car and CarPopularityTimeseries tables
+        Populate CarPopularityTimeseriesMaker and CarPopularityTimeseriesModel tables
         """
-        if not source:
-            raise ValueError(
-                "There is no valid source URL for reading car popularity data!"
-            )
-
-        # Delete previous cars
-        Car.objects.all().delete()
-
+        # Read parquet file
         df = pd.read_parquet(source)
-        df = df.replace({np.nan: None})
+        model = apps.get_model("data_gov_my", table)
 
-        # Group DataFrame by unique combinations of maker and model
-        grouped_data = df.groupby(["maker", "model"])
+        # Bulk insert into the table
+        if rebuild:
+            model.objects.all().delete()
 
-        # Create Car instances and populate CarPopularityTimeseries instances in bulk
-        instances_to_create = []
-        for (maker, model), group_df in grouped_data:
-            # Create or get the Car instance
-            car, created = Car.objects.get_or_create(maker=maker, model=model)
-            # Create instances of CarPopularityTimeseries
-            for _, row in group_df.iterrows():
-                instances_to_create.append(
-                    CarPopularityTimeseries(car=car, date=row["date"], cars=row["cars"])
-                )
-        # Bulk create instances of CarPopularityTimeseries
-        CarPopularityTimeseries.objects.bulk_create(instances_to_create)
+        res = model.objects.bulk_create(
+            [model(**row) for row in df.to_dict(orient="records")],
+            batch_size=self.batch_size,
+        )
 
     def handle_api(self, request_params: dict):
         """
@@ -65,8 +56,9 @@ class CarPopularityExplorer(General_Explorer):
             return self.get_cars_by_fuzzy_search(query=model, isMaker=False)
 
         # compile timeseries chart data based on car params
-        cars = request_params.get("car", [])
-        if not cars:
+        maker_id = request_params.get("maker_id", [])
+        model_id = request_params.get("model_id", [])
+        if not maker_id and not model_id:
             return JsonResponse(
                 {
                     "status": 400,
@@ -75,7 +67,26 @@ class CarPopularityExplorer(General_Explorer):
                 status=400,
             )
 
-        timeseries_data = self.get_timeseries(cars)
+        if maker_id and model_id:
+            if len(maker_id) != len(model_id) or len(maker_id) > 3:
+                return JsonResponse(
+                    {
+                        "status": 400,
+                        "message": f"Please provide equal number of maker_id and model_id that are <= 3.",
+                    },
+                    status=400,
+                )
+            timeseries_data = self.get_timeseries(maker_id, model_id)
+        elif maker_id:
+            if len(maker_id) > 3:
+                return JsonResponse(
+                    {
+                        "status": 400,
+                        "message": f"Please provide <=3 maker_id.",
+                    },
+                    status=400,
+                )
+            timeseries_data = self.get_timeseries(maker_id)
 
         data_last_updated, data_next_update = self.get_last_update_and_next_update(
             self.explorer_name
@@ -94,32 +105,81 @@ class CarPopularityExplorer(General_Explorer):
         self, query: str = None, isMaker=True, limit: int = 10
     ):
         search_type = "maker" if isMaker else "model"
-        queryset = (
-            Car.objects.all()
-            .annotate(similarity=TrigramSimilarity(search_type, query))
-            .order_by("-similarity")[:limit]
+        if isMaker:
+
+            queryset = (
+                CarPopularityTimeseriesMaker.objects.all()
+                .annotate(similarity=TrigramSimilarity(search_type, query))
+                .distinct()
+                .order_by("-similarity")[:limit]
+                .values("maker", "similarity")
+            )
+        else:
+            queryset = (
+                CarPopularityTimeseriesModel.objects.all()
+                .annotate(
+                    maker_model=Concat(
+                        "maker", Value(" "), "model", output_field=CharField()
+                    )
+                )
+                .annotate(similarity=TrigramSimilarity("maker_model", query))
+                .distinct()
+                .order_by("-similarity")[:limit]
+                .values("maker", "model", "similarity")
+            )
+
+        return response.Response(queryset)
+
+    def get_timeseries(self, maker_ids: list[str], model_ids: list[str] = None):
+
+        timeseries = dict(
+            x=[],
         )
+        if maker_ids and model_ids:
+            queryset = CarPopularityTimeseriesModel.objects.all()
+            filter = Q()
+            for maker_id, model_id in zip(maker_ids, model_ids):
+                filter |= Q(maker=maker_id, model=model_id)
+            queryset = queryset.filter(filter)
+            x_completed = False
+            for car, group in groupby(queryset, lambda x: (x.maker, x.model)):
+                maker, model = car
+                # assure ordering (else returned not ordered)
+                objects = sorted(list(group), key=lambda x: x.date)
 
-        return response.Response(queryset.values("id", "maker", "model", "similarity"))
+                # we only want to populate x array once taking from the first car (rest are same)
+                if not x_completed:
+                    for object in objects:
+                        timeseries["x"].append(self.unix_time_millis(object.date))
 
-    def get_timeseries(self, car_ids: list[str]):
-        timeseries = dict(x=[])
-        queryset = CarPopularityTimeseries.objects.filter(car__id__in=car_ids)
-        x_completed = False
-        for car, group in groupby(queryset, lambda x: x.car):
-            # assure ordering (else returned not ordered)
-            objects = sorted(list(group), key=lambda x: x.date)
-
-            # we only want to populate x array once taking from the first car (rest are same)
-            if not x_completed:
+                # compile queried car timeseries data
+                timeseries[f"{maker} {model}"] = dict(
+                    maker=maker, model=model, cars=[], cars_cumul=[]
+                )
                 for object in objects:
-                    timeseries["x"].append(self.unix_time_millis(object.date))
+                    timeseries[f"{maker} {model}"]["cars"].append(object.cars)
+                    timeseries[f"{maker} {model}"]["cars_cumul"].append(
+                        object.cars_cumul
+                    )
 
-            # compile queried car timeseries data
-            timeseries[car.id] = dict(maker=car.maker, model=car.model, cars=[])
-            for object in objects:
-                timeseries[car.id]["cars"].append(object.cars)
+                x_completed = True
+        else:  # only makers
+            queryset = CarPopularityTimeseriesMaker.objects.filter(maker__in=maker_ids)
+            x_completed = False
+            for car, group in groupby(queryset, lambda x: (x.maker)):
+                # assure ordering (else returned not ordered)
+                objects = sorted(list(group), key=lambda x: x.date)
 
-            x_completed = True
+                # we only want to populate x array once taking from the first car (rest are same)
+                if not x_completed:
+                    for object in objects:
+                        timeseries["x"].append(self.unix_time_millis(object.date))
 
+                # compile queried car timeseries data
+                timeseries[car] = dict(maker=car, cars=[], cars_cumul=[])
+                for object in objects:
+                    timeseries[object.maker]["cars"].append(object.cars)
+                    timeseries[object.maker]["cars_cumul"].append(object.cars_cumul)
+
+                x_completed = True
         return timeseries
