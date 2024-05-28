@@ -434,7 +434,7 @@ class CarPopularityTimeseriesMaker(models.Model):
     class Meta:
         indexes = [
             models.Index(
-                fields=["maker", "date"],
+                fields=["maker"],
                 name="car_popularity_maker_idx",
             )
         ]
@@ -450,7 +450,7 @@ class CarPopularityTimeseriesModel(models.Model):
     class Meta:
         indexes = [
             models.Index(
-                fields=["maker", "model", "date"],
+                fields=["maker", "model"],
                 name="car_popularity_model_idx",
             )
         ]
