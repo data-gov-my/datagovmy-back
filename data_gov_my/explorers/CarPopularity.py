@@ -11,6 +11,7 @@ from rest_framework import response
 
 from data_gov_my.explorers.General import General_Explorer
 from data_gov_my.models import (
+    Car,
     CarPopularityTimeseriesMaker,
     CarPopularityTimeseriesModel,
 )
@@ -42,6 +43,22 @@ class CarPopularityExplorer(General_Explorer):
             [model(**row) for row in df.to_dict(orient="records")],
             batch_size=self.batch_size,
         )
+
+        # Update car table for fuzzy search
+        if table == "CarPopularityTimeseriesModel":
+            Car.objects.all().delete()
+            df = df[["maker", "model"]].drop_duplicates()
+            Car.objects.bulk_create(
+                [
+                    Car(
+                        maker=row["maker"],
+                        model=row["model"],
+                        maker_model=f"{row['maker']} {row['model']}",
+                    )
+                    for _, row in df.iterrows()
+                ],
+                batch_size=self.batch_size,
+            )
 
     def handle_api(self, request_params: dict):
         """
@@ -116,14 +133,7 @@ class CarPopularityExplorer(General_Explorer):
             )
         else:
             queryset = (
-                CarPopularityTimeseriesModel.objects.all()
-                .annotate(
-                    maker_model=Concat(
-                        "maker", Value(" "), "model", output_field=CharField()
-                    )
-                )
-                .annotate(similarity=TrigramSimilarity("maker_model", query))
-                .distinct()
+                Car.objects.annotate(similarity=TrigramSimilarity("maker_model", query))
                 .order_by("-similarity")[:limit]
                 .values("maker", "model", "similarity")
             )
