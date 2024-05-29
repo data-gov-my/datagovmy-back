@@ -425,6 +425,12 @@ class PrasaranaTimeseriesCallout(models.Model):
         ]
 
 
+class Car(models.Model):
+    maker = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    maker_model = models.CharField(max_length=200)
+
+
 class CarPopularityTimeseriesMaker(models.Model):
     maker = models.CharField(max_length=100)
     date = models.DateField()
