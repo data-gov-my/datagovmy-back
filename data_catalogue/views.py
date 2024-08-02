@@ -173,8 +173,6 @@ class DataCatalogueRetrieveAPIView(APIView):
             )
 
         instance = get_object_or_404(DataCatalogueMeta, id=kwargs.get("catalogue_id"))
-        print(f"Debug: link_editions = {instance.link_editions}")  # TODO delete later
-
         data = instance.datacatalogue_set.filter(
             **selected_or_default_filter_map
         ).values_list("data", flat=True)
