@@ -105,6 +105,7 @@ class DataCatalogueListAPIView(APIView):
                     "link_csv",
                     "size_parquet",
                     "size_csv",
+                    "link_editions",
                 )
                 .order_by("title_sort", "title")
             )
@@ -179,5 +180,9 @@ class DataCatalogueRetrieveAPIView(APIView):
         res = serializer.data
         res["dropdown"] = dropdown
         res["data"] = data
+
+        # Add link_editions to the response if exists
+        if instance.link_editions:
+            res["link_editions"] = instance.link_editions
 
         return Response(res)

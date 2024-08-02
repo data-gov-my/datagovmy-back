@@ -654,6 +654,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
                 link_parquet=metadata.link_parquet,
                 link_csv=metadata.link_csv,
                 link_preview=metadata.link_preview,
+                link_editions=metadata.link_editions,
                 frequency=metadata.frequency,
                 geography=metadata.geography,
                 demography=metadata.demography,
