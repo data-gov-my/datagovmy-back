@@ -72,7 +72,7 @@ class DataCatalogueMeta(models.Model):
     demography = ArrayField(models.CharField(max_length=10, blank=True))
     dataset_begin = models.PositiveIntegerField()
     dataset_end = models.PositiveIntegerField()
-    data_source = ArrayField(models.CharField(max_length=10, blank=True))
+    data_source = ArrayField(models.CharField(max_length=20, blank=True))
 
     # metadata & others
     fields = models.ManyToManyField(Field)
