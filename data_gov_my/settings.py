@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "address",
     "community_product",
     "django_better_admin_arrayfield",
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
