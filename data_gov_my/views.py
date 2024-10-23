@@ -1,10 +1,13 @@
 import json
 import logging
+import pandas as pd
 from datetime import datetime
+from io import BytesIO
 from itertools import groupby
 from threading import Thread
 
 import environ
+import requests
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -270,6 +273,31 @@ class I18N(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+class PublicationTypeSubtypeList(APIView):
+    def get(self, request, format=None):
+        lang = request.query_params.get("lang")
+        print(f'lang: {lang}')
+        r = requests.get('https://storage.dosm.gov.my/meta/arc_types.parquet')
+        if r.status_code == 200:
+            data = dict()
+            parquet_file = BytesIO(r.content)
+            df = pd.read_parquet(parquet_file)
+            if lang == 'ms':
+                # Iterate through the grouped data by 'type'
+                for type_value, group in df.groupby('type_bm'):
+                    # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
+                    data[type_value] = dict(zip(group['subtype'], group['subtype_bm']))
+            else: # lang == 'en'
+                # Iterate through the grouped data by 'type'
+                for type_value, group in df.groupby('type_en'):
+                    # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
+                    data[type_value] = dict(zip(group['subtype'], group['subtype_en']))
+            return JsonResponse(data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {'error': 'Unable to get arc_types.parquet file.'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
 
 class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
