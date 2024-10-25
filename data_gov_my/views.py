@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 from datetime import datetime
@@ -12,6 +13,7 @@ from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.utils.timezone import get_current_timezone
+from jose import jwt
 from post_office import mail
 from post_office.models import Email
 from rest_framework import generics, request, status
@@ -46,8 +48,8 @@ from data_gov_my.serializers import (
     PublicationUpcomingSerializer,
     i18nSerializer,
 )
+from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-
 from data_gov_my.utils.throttling import FormRateThrottle
 
 env = environ.Env()
@@ -167,8 +169,8 @@ class EXPLORER(APIView):
     def get(self, request, format=None):
         params = dict(request.GET)
         if (
-            "explorer" in params
-            and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
+                "explorer" in params
+                and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
         ):
             obj = exp_class.EXPLORERS_CLASS_LIST[params["explorer"][0]]()
             return obj.handle_api(params)
@@ -376,6 +378,48 @@ class PUBLICATION(generics.ListAPIView):
             demography = demography.split(",")
             queryset = queryset.filter(demography__contains=demography)
         return queryset
+
+
+class PublicationSubscribeView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        email = normalize_email(email)
+
+        # Clear all existing subscription - can make it cleaner?
+        for publication in PublicationSubscription.objects.all():
+            if email in publication.emails:
+                publication.emails.remove(email)
+                publication.save()
+
+        publications_list = request.POST.getlist("publication_type")
+        # print(f'publications_list: {publications_list}')
+        if type(publications_list) is not list:
+            return Response(
+                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        for publication in publications_list:
+            if not publication or not email:
+                return Response(
+                    {"error": "Provide both `publication_type` and `email` form data."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                return Response(
+                    {"error": "Invalid email format."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+                pub_sub.emails.append(email)
+                pub_sub.save()
+
+        return Response(
+            {"success": f"Subscribed to {publications_list}."},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class SubscribePublicationAPIView(APIView):
@@ -668,9 +712,9 @@ def handle_request(param_list: QueryDict, isDashboard=True):
         "data_next_update": data_next_update,
     }
     if (
-        all(p in param_list for p in params_req)
-        or all(p in param_list for p in params_opt)
-        or not isDashboard
+            all(p in param_list for p in params_req)
+            or all(p in param_list for p in params_opt)
+            or not isDashboard
     ):
         data = dbd_info["charts"]
 
@@ -682,7 +726,7 @@ def handle_request(param_list: QueryDict, isDashboard=True):
 
                 # dashboard endpoint should ignore this unless the chart name is query_values
                 if (isDashboard and k == "query_values") or (
-                    not isDashboard and k != "query_values"
+                        not isDashboard and k != "query_values"
                 ):
                     continue
 
@@ -715,10 +759,10 @@ def handle_request(param_list: QueryDict, isDashboard=True):
 
 
 def get_nested_data(
-    dbd_info: dict,
-    api_params: list[str],
-    param_list: QueryDict,
-    data: dict,
+        dbd_info: dict,
+        api_params: list[str],
+        param_list: QueryDict,
+        data: dict,
 ):
     """
     Slices dictionary,
@@ -740,3 +784,58 @@ def get_nested_data(
             break
 
     return data
+
+
+class SendEmailSubscription(APIView):
+    def post(self, request):
+        to = request.data.get("email", None)
+        # check if the email exists in any subscription
+        is_email_subscribed = PublicationSubscription.objects.filter(emails__contains=[to])
+        # print(is_email_subscribed)
+        data = [p.publication_type for p in is_email_subscribed]
+        if data:
+            return Response({'data': data, 'message': 'Email subscribed'}, status=200)
+        else:
+            return Response({'message': 'Email not subscribed'}, status=200)
+
+
+class SubscribeToPublication(APIView):
+    def post(self, request):
+        email = request.data.get("email", None)
+        publications = request.data.get("publications", None)
+        normalized_email = normalize_email(email)
+
+        for publication in publications:
+            pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+            pub_sub.emails.append(normalized_email)
+            pub_sub.save()
+
+
+class SendEmailLogin(APIView):
+    def post(self, request):
+        to = request.data.get("email", None)
+        message = jwt.encode({
+            'sub': to
+        }, os.getenv("WORKFLOW_TOKEN"))
+        if to:
+            mail.send(
+                sender='notif@opendosm.my',
+                recipients=[to],
+                subject='Your link to login.',
+                message=f'{message}',
+                priority='now'
+            )
+            return Response({'message': 'Email sent'}, status=200)
+        else:
+            return Response({'message': 'Email not sent'}, status=400)
+
+
+class ValidateTokenView(APIView):
+    def post(self, request):
+        token = request.data.get("token", None)
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        return_data = [p.publication_type for p in PublicationSubscription.objects.filter(emails__contains=[email])]
+        return Response({'message': 'List of subscription returned.', 'data': return_data}, status=200)
