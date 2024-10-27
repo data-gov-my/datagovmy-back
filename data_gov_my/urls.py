@@ -41,6 +41,7 @@ urlpatterns = [
         name="PUBLICATION_DROPDOWN",
     ),
     path("publication/", views.PUBLICATION.as_view(), name="PUBLICATION"),
+    path("publication-type-list/", views.PublicationTypeSubtypeList.as_view(), name="PublicationTypeSubtypeList"),
     path(
         "publication/subscribe",
         views.SubscribePublicationAPIView.as_view(),
