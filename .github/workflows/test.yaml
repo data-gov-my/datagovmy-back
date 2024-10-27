@@ -31,6 +31,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Test with pytest
       run: |
-        pytest
+        pytest data_gov_my/tests/test_loader.py data_gov_my/tests/test_utils.py
+        python manage.py test
       env:
         DJANGO_ALLOWED_HOST: https://127.0.0.1
