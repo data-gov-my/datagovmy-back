@@ -19,10 +19,13 @@ from django.urls import include, path
 from data_gov_my import views
 
 urlpatterns = [
-    path('validate-email/', views.ValidateTokenView.as_view(), name='validate_email'),
+    # For subscriber token request flow
+    path('token/request/', views.TokenRequestView.as_view(), name='token_request'),
+    path('token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
+
     path('send-email-subscription/', views.SendEmailSubscription.as_view(), name='send_email_subscription'),
     path('publication-subscribe/', views.PublicationSubscribeView.as_view(), name='publication_subscribe'),
-    path('send-email-login/', views.SendEmailLogin.as_view(), name='send_email_login'),
+
     path("admin/", admin.site.urls),
     path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
     path("dashboard/", views.DASHBOARD.as_view(), name="DASHBOARD"),

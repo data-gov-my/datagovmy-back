@@ -811,7 +811,7 @@ class SubscribeToPublication(APIView):
             pub_sub.save()
 
 
-class SendEmailLogin(APIView):
+class TokenRequestView(APIView):
     def post(self, request):
         to = request.data.get("email", None)
         message = jwt.encode({
@@ -830,7 +830,7 @@ class SendEmailLogin(APIView):
             return Response({'message': 'Email not sent'}, status=400)
 
 
-class ValidateTokenView(APIView):
+class TokenVerifyView(APIView):
     def post(self, request):
         token = request.data.get("token", None)
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
@@ -838,4 +838,4 @@ class ValidateTokenView(APIView):
         email = normalize_email(email)
 
         return_data = [p.publication_type for p in PublicationSubscription.objects.filter(emails__contains=[email])]
-        return Response({'message': 'List of subscription returned.', 'data': return_data}, status=200)
+        return Response({'message': 'List of subscription returned.', 'data': return_data, 'email': email}, status=200)
