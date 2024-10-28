@@ -46,7 +46,6 @@ class TestEmailSubscribeSubmission(APITestCase):
                 print(subtype)
             PublicationSubscription.objects.create(publication_type=subtype)
 
-
         # Generate SHA-256 hash
         data = "Your input data here"
         hash_object = hashlib.sha256(data.encode())
@@ -58,52 +57,6 @@ class TestEmailSubscribeSubmission(APITestCase):
                                  value=self.value,
                                  timestamp=timezone.now()
                                  )
-
-    def test_send_email_subscription(self):
-        test_email = 'test@gmail.com' # TODO: change using dynamic email
-
-        url = reverse('send_email_subscription')
-        r = self.client.post(url, {'email': test_email})
-        # print(r.json())
-        self.assertEqual(r.status_code, 200)
-
-        self.assertEqual(PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 0)
-        url = reverse('publication_subscribe')
-        r = self.client.post(
-            url,
-            {
-                'email': test_email,
-                'publication_type': [
-                    'agriculture_supply_util',
-                    'bci',
-                    'bop',
-                    'bop_annual_dia',
-                    'bop_annual_fdi'
-                ]
-            }
-        )
-        # print(r.json())
-        self.assertEqual(r.status_code, 201)
-        self.assertEqual(
-            PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 5
-        )
-
-        r = self.client.post(
-            url,
-            {
-                'email': test_email,
-                'publication_type': [
-                    'trade_annual_sbh',
-                    'trade_annual_services',
-                    'trade_annual_state',
-                    'trade_annual_swk',
-                    'tradeindices',
-                    'wrt'
-                ]
-            }
-        )
-        self.assertEqual(r.status_code, 201)
-        self.assertEqual(PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 6)
 
     @override_settings(
         POST_OFFICE={
@@ -122,7 +75,8 @@ class TestEmailSubscribeSubmission(APITestCase):
         # print(mail.outbox[0].subject)
         # print(f'mail body:{mail.outbox[0].body}')
 
-        decoded_token = jwt.decode(mail.outbox[0].body, os.getenv("WORKFLOW_TOKEN"))
+        TOKEN = mail.outbox[0].body
+        decoded_token = jwt.decode(TOKEN, os.getenv("WORKFLOW_TOKEN"))
         self.assertEqual(decoded_token['sub'], to)
 
         url = reverse("token_verify")
@@ -133,3 +87,80 @@ class TestEmailSubscribeSubmission(APITestCase):
         self.assertEqual(r.json()['email'], to)
         self.assertEqual(type(r.json()['data']), list)
         # print(r.json()['data'])
+
+        # test subscribe to empty list
+        url = reverse("token_manage_subscription")
+        self.assertEqual(url, '/token/manage-subscription/')
+        r = self.client.post(url, {"token": TOKEN, 'publication_type': []})
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(PublicationSubscription.objects.filter(emails__contains=[to]).count(), 0)
+
+        # test subscribe to list
+        url = reverse('token_manage_subscription')
+        self.assertEqual(url, '/token/manage-subscription/')
+        r = self.client.post(
+            url,
+            {
+                'token': TOKEN,
+                'publication_type': [
+                    'agriculture_supply_util',
+                    'bci',
+                    'bop',
+                    'bop_annual_dia',
+                    'bop_annual_fdi'
+                ]
+            }
+        )
+        self.assertEqual(r.status_code, 201)
+
+        url = reverse("token_get_subscription")
+        self.assertEqual(url, '/token/subscription/')
+        r = self.client.post(
+            url,
+            {
+                'token': TOKEN,
+            }
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['data'], ['agriculture_supply_util',
+                                            'bci',
+                                            'bop',
+                                            'bop_annual_dia',
+                                            'bop_annual_fdi']
+                         )
+
+        # Test subscribe to diferent list
+        url = reverse('token_manage_subscription')
+        self.assertEqual(url, '/token/manage-subscription/')
+        r = self.client.post(
+            url,
+            {
+                'token': TOKEN,
+                'publication_type': [
+                    'trade_annual_sbh',
+                    'trade_annual_services',
+                    'trade_annual_state',
+                    'trade_annual_swk',
+                    'tradeindices',
+                    'wrt'
+                ]
+            }
+        )
+        self.assertEqual(r.status_code, 201)
+
+        url = reverse("token_get_subscription")
+        self.assertEqual(url, '/token/subscription/')
+        r = self.client.post(
+            url,
+            {
+                'token': TOKEN,
+            }
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['data'], ['trade_annual_sbh',
+                                            'trade_annual_services',
+                                            'trade_annual_state',
+                                            'trade_annual_swk',
+                                            'tradeindices',
+                                            'wrt']
+                         )

@@ -275,6 +275,7 @@ class I18N(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+
 class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
@@ -289,7 +290,7 @@ class PublicationTypeSubtypeList(APIView):
                 for type_value, group in df.groupby('type_bm'):
                     # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
                     data[type_value] = dict(zip(group['subtype'], group['subtype_bm']))
-            else: # lang == 'en'
+            else:  # lang == 'en'
                 # Iterate through the grouped data by 'type'
                 for type_value, group in df.groupby('type_en'):
                     # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
@@ -300,6 +301,7 @@ class PublicationTypeSubtypeList(APIView):
                 {'error': 'Unable to get arc_types.parquet file.'},
                 status=status.HTTP_204_NO_CONTENT,
             )
+
 
 class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
@@ -406,48 +408,6 @@ class PUBLICATION(generics.ListAPIView):
             demography = demography.split(",")
             queryset = queryset.filter(demography__contains=demography)
         return queryset
-
-
-class PublicationSubscribeView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        email = normalize_email(email)
-
-        # Clear all existing subscription - can make it cleaner?
-        for publication in PublicationSubscription.objects.all():
-            if email in publication.emails:
-                publication.emails.remove(email)
-                publication.save()
-
-        publications_list = request.POST.getlist("publication_type")
-        # print(f'publications_list: {publications_list}')
-        if type(publications_list) is not list:
-            return Response(
-                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        for publication in publications_list:
-            if not publication or not email:
-                return Response(
-                    {"error": "Provide both `publication_type` and `email` form data."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            try:
-                validate_email(email)
-            except ValidationError as e:
-                return Response(
-                    {"error": "Invalid email format."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            else:
-                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
-                pub_sub.emails.append(email)
-                pub_sub.save()
-
-        return Response(
-            {"success": f"Subscribed to {publications_list}."},
-            status=status.HTTP_201_CREATED,
-        )
 
 
 class SubscribePublicationAPIView(APIView):
@@ -867,3 +827,51 @@ class TokenVerifyView(APIView):
 
         return_data = [p.publication_type for p in PublicationSubscription.objects.filter(emails__contains=[email])]
         return Response({'message': 'List of subscription returned.', 'data': return_data, 'email': email}, status=200)
+
+
+class TokenManageSubscriptionView(APIView):
+    def post(self, request):
+        token = request.data.get("token", None)
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        # Clear all existing subscription - can make it cleaner?
+        for publication in PublicationSubscription.objects.all():
+            if email in publication.emails:
+                publication.emails.remove(email)
+                publication.save()
+
+        publications_list = request.POST.getlist("publication_type")
+        # print(f'publications_list: {publications_list}')
+        if type(publications_list) is not list:
+            return Response(
+                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        for publication in publications_list:
+            if not publication or not email:
+                return Response(
+                    {"error": "Provide both `publication_type` and `email` data."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                return Response(
+                    {"error": "Invalid email format."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+                pub_sub.emails.append(email)
+                pub_sub.save()
+
+        return Response(
+            {"success": f"Subscribed to {publications_list}."},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class TokenGetSubscriptionView(TokenVerifyView):
+    pass
