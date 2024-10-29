@@ -9,43 +9,21 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
-from data_gov_my.models import AuthTable, PublicationSubscription
+from data_gov_my.models import AuthTable, PublicationSubscription, PublicationType, PublicationSubtype, Subscription, \
+    Publication
+from data_gov_my.utils.publication_helpers import type_dict, subtype_dict, type_list, subtype_list, \
+    populate_publication_types, populate_publication_subtypes
 
 
 class TestEmailSubscribeSubmission(APITestCase):
     def setUp(self):
-        subtype_list = [
-            'agriculture_supply_util', 'bci', 'bop', 'bop_annual_dia', 'bop_annual_fdi',
-            'businesses', 'census_mukim', 'census_economy', 'census_economy_accom',
-            'census_economy_admin', 'census_economy_arts', 'census_economy_bumi',
-            'census_economy_education', 'census_economy_electricity',
-            'census_economy_employees', 'census_economy_establishment',
-            'census_economy_finance', 'census_economy_fnb', 'census_economy_foreign',
-            'census_economy_health', 'census_economy_ict', 'census_economy_infocomm',
-            'census_economy_personal', 'census_economy_professional',
-            'census_economy_property', 'census_economy_sector', 'census_economy_sme',
-            'census_economy_transport', 'census_economy_water', 'census_economy_women',
-            'census_economy_wrt', 'census_economy_youth', 'construction', 'cpi', 'crime',
-            'bumi', 'children', 'cod', 'demography', 'matrimony', 'population', 'pwd',
-            'vitalstatistics', 'women', 'capstock', 'digitalecon', 'gdp', 'gdp_advance',
-            'gdp_district', 'gdp_income', 'gdp_state', 'gfcf', 'ictsa', 'msme', 'nea',
-            'sports_sa', 'tourism', 'icths', 'iip', 'bts', 'mei', 'ipi', 'employment',
-            'formal_wages', 'graduates', 'jobs', 'lfs', 'lfs_informal', 'productivity',
-            'wages', 'lifetables', 'mfg', 'mfg_util', 'mining_png', 'mywi', 'osh', 'ppi',
-            'sppi', 'rubber', 'sdg', 'services', 'sa_matrix', 'special_floods',
-            'mydistrict', 'socioecon_state', 'handbook', 'lmr', 'mesr', 'msb',
-            'pocketstats', 'social_bulletin', 'social_review', 'yearbook',
-            'yearbook_sabah', 'yearbook_sarawak', 'fats', 'tourism_domestic',
-            'tourism_domestic_state', 'trade', 'trade_annual_sbh',
-            'trade_annual_services', 'trade_annual_state', 'trade_annual_swk',
-            'tradeindices', 'wrt'
-        ]
 
-        for subtype in subtype_list:
-            if len(subtype) > 50:
-                print(subtype)
-            PublicationSubscription.objects.create(publication_type=subtype)
+        # Populate PublicationType and PublicationSubtype
+        populate_publication_types()
+        self.assertEqual(PublicationType.objects.count(), len(type_list))
 
+        populate_publication_subtypes()
+        self.assertEqual(PublicationSubtype.objects.count(), len(subtype_list))
 
         # Generate SHA-256 hash
         data = "Your input data here"
@@ -59,59 +37,13 @@ class TestEmailSubscribeSubmission(APITestCase):
                                  timestamp=timezone.now()
                                  )
 
-    def test_send_email_subscription(self):
-        test_email = 'test@gmail.com' # TODO: change using dynamic email
-
-        url = reverse('send_email_subscription')
-        r = self.client.post(url, {'email': test_email})
-        # print(r.json())
-        self.assertEqual(r.status_code, 200)
-
-        self.assertEqual(PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 0)
-        url = reverse('publication_subscribe')
-        r = self.client.post(
-            url,
-            {
-                'email': test_email,
-                'publication_type': [
-                    'agriculture_supply_util',
-                    'bci',
-                    'bop',
-                    'bop_annual_dia',
-                    'bop_annual_fdi'
-                ]
-            }
-        )
-        # print(r.json())
-        self.assertEqual(r.status_code, 201)
-        self.assertEqual(
-            PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 5
-        )
-
-        r = self.client.post(
-            url,
-            {
-                'email': test_email,
-                'publication_type': [
-                    'trade_annual_sbh',
-                    'trade_annual_services',
-                    'trade_annual_state',
-                    'trade_annual_swk',
-                    'tradeindices',
-                    'wrt'
-                ]
-            }
-        )
-        self.assertEqual(r.status_code, 201)
-        self.assertEqual(PublicationSubscription.objects.filter(emails__contains=[test_email]).count(), 6)
-
     @override_settings(
         POST_OFFICE={
             'BACKENDS': {'default': 'django.core.mail.backends.locmem.EmailBackend'},
             'DEFAULT_PRIORITY': 'now',
         }
     )
-    def test_get_login_email(self):
+    def test_full_subscription_flow(self):
         to = 'test@gmail.com'
         self.assertEqual(len(mail.outbox), 0)
         url = reverse("token_request")
@@ -122,14 +54,83 @@ class TestEmailSubscribeSubmission(APITestCase):
         # print(mail.outbox[0].subject)
         # print(f'mail body:{mail.outbox[0].body}')
 
-        decoded_token = jwt.decode(mail.outbox[0].body, os.getenv("WORKFLOW_TOKEN"))
+        token = mail.outbox[0].body
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         self.assertEqual(decoded_token['sub'], to)
 
         url = reverse("token_verify")
         self.assertEqual(url, '/token/verify/')
-        r = self.client.post(url, {"token": mail.outbox[0].body})
+        r = self.client.post(url, {"token": token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['message'], 'List of subscription returned.')
         self.assertEqual(r.json()['email'], to)
         self.assertEqual(type(r.json()['data']), list)
         # print(r.json()['data'])
+
+        url = reverse('subscriptions')
+        self.assertEqual(url, '/subscriptions/')
+        r = self.client.get(url + f'?token={token}')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['email'], to)
+        # self.assertEqual(r.json()['data'], to)
+        subscription = r.json()['data']
+        for s in subscription:
+            self.assertEqual(s['is_subscribed'], False)
+
+        url = reverse('subscriptions')
+        self.assertEqual(url, '/subscriptions/')
+        r = self.client.put(
+            url,
+            {'token': token,
+             'publications': [
+                 'agriculture_supply_util',
+                 'bci',
+                 'bop',
+                 'bop_annual_dia',
+                 'bop_annual_fdi'
+             ]
+             }
+        )
+        # print(r.json())
+        self.assertEqual(r.status_code, 200)
+        subs = Subscription.objects.get(email=to)
+        self.assertEqual(
+            subs.publications.count(), 5
+        )
+        for pubs in subs.publications.all():
+            self.assertIn(pubs.id, [
+                'agriculture_supply_util',
+                'bci',
+                'bop',
+                'bop_annual_dia',
+                'bop_annual_fdi'
+            ])
+
+        r = self.client.put(
+            url,
+            {
+                'token': token,
+                'publications': [
+                    'trade_annual_sbh',
+                    'trade_annual_services',
+                    'trade_annual_state',
+                    'trade_annual_swk',
+                    'tradeindices',
+                    'wrt'
+                ]
+            }
+        )
+        self.assertEqual(r.status_code, 200)
+        subs = Subscription.objects.get(email=to)
+        self.assertEqual(
+            subs.publications.count(), 6
+        )
+        for pubs in subs.publications.all():
+            self.assertIn(pubs.id, [
+                'trade_annual_sbh',
+                'trade_annual_services',
+                'trade_annual_state',
+                'trade_annual_swk',
+                'tradeindices',
+                'wrt'
+            ])

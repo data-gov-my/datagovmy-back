@@ -1,6 +1,8 @@
 import os
 import json
 import logging
+from http import HTTPStatus
+
 import pandas as pd
 from datetime import datetime
 from io import BytesIO
@@ -41,7 +43,8 @@ from data_gov_my.models import (
     PublicationResource,
     PublicationSubscription,
     PublicationUpcoming,
-    i18nJson,
+    Subscription,
+    i18nJson, PublicationSubtype,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -275,6 +278,7 @@ class I18N(APIView):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+
 class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
@@ -289,7 +293,7 @@ class PublicationTypeSubtypeList(APIView):
                 for type_value, group in df.groupby('type_bm'):
                     # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
                     data[type_value] = dict(zip(group['subtype'], group['subtype_bm']))
-            else: # lang == 'en'
+            else:  # lang == 'en'
                 # Iterate through the grouped data by 'type'
                 for type_value, group in df.groupby('type_en'):
                     # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
@@ -300,6 +304,7 @@ class PublicationTypeSubtypeList(APIView):
                 {'error': 'Unable to get arc_types.parquet file.'},
                 status=status.HTTP_204_NO_CONTENT,
             )
+
 
 class FORMS(generics.ListAPIView):
     serializer_class = FormDataSerializer
@@ -827,16 +832,53 @@ class SendEmailSubscription(APIView):
             return Response({'message': 'Email not subscribed'}, status=200)
 
 
-class SubscribeToPublication(APIView):
-    def post(self, request):
-        email = request.data.get("email", None)
-        publications = request.data.get("publications", None)
-        normalized_email = normalize_email(email)
+class SubscriptionView(APIView):
+    def put(self, request):
+        token = request.data.get("token", None)
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
 
-        for publication in publications:
-            pub_sub = PublicationSubscription.objects.get(publication_type=publication)
-            pub_sub.emails.append(normalized_email)
-            pub_sub.save()
+        # Always do the cleanup
+        if Subscription.objects.filter(email=email).exists():
+            PublicationSubtype.objects.filter(subscription__email=email).delete()
+        else:
+            Subscription.objects.create(email=email)
+
+        publication_list = request.data.getlist("publications", None)
+        for publication in publication_list:
+            subs = Subscription.objects.get(email=email)
+            pubs = PublicationSubtype.objects.get(id=publication)
+            subs.publications.add(pubs)
+
+        return Response({'message': 'Subscriptions updated.'}, HTTPStatus.OK)
+
+    def get(self, request):
+        token = request.GET.get("token")
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        return_data = []
+        for subtype in PublicationSubtype.objects.all():
+            if Subscription.objects.filter(publications__subscription__email=email).exists():
+                is_subscribed = True
+            else:
+                is_subscribed = False
+            return_data.append({'id': subtype.id, 'subtype_bm': subtype.subtype_bm, 'is_subscribed': is_subscribed})
+        return Response({'email': email, 'data': return_data}, HTTPStatus.OK)
+
+
+# class SubscribeToPublication(APIView):
+#     def post(self, request):
+#         email = request.data.get("email", None)
+#         publications = request.data.get("publications", None)
+#         normalized_email = normalize_email(email)
+#
+#         for publication in publications:
+#             pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+#             pub_sub.emails.append(normalized_email)
+#             pub_sub.save()
 
 
 class TokenRequestView(APIView):

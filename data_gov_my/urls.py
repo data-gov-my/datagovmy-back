@@ -22,7 +22,7 @@ urlpatterns = [
     # For subscriber token request flow
     path('token/request/', views.TokenRequestView.as_view(), name='token_request'),
     path('token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
-
+    path('subscriptions/', views.SubscriptionView.as_view(), name='subscriptions'),
     path('send-email-subscription/', views.SendEmailSubscription.as_view(), name='send_email_subscription'),
     path('publication-subscribe/', views.PublicationSubscribeView.as_view(), name='publication_subscribe'),
 
