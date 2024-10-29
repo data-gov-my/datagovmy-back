@@ -43,6 +43,7 @@ class TestEmailSubscribeSubmission(APITestCase):
             'DEFAULT_PRIORITY': 'now',
         }
     )
+
     def test_full_subscription_flow(self):
         to = 'test@gmail.com'
         self.assertEqual(len(mail.outbox), 0)

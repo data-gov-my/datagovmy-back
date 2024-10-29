@@ -413,48 +413,6 @@ class PUBLICATION(generics.ListAPIView):
         return queryset
 
 
-class PublicationSubscribeView(APIView):
-    def post(self, request):
-        email = request.data.get("email")
-        email = normalize_email(email)
-
-        # Clear all existing subscription - can make it cleaner?
-        for publication in PublicationSubscription.objects.all():
-            if email in publication.emails:
-                publication.emails.remove(email)
-                publication.save()
-
-        publications_list = request.POST.getlist("publication_type")
-        # print(f'publications_list: {publications_list}')
-        if type(publications_list) is not list:
-            return Response(
-                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        for publication in publications_list:
-            if not publication or not email:
-                return Response(
-                    {"error": "Provide both `publication_type` and `email` form data."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            try:
-                validate_email(email)
-            except ValidationError as e:
-                return Response(
-                    {"error": "Invalid email format."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            else:
-                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
-                pub_sub.emails.append(email)
-                pub_sub.save()
-
-        return Response(
-            {"success": f"Subscribed to {publications_list}."},
-            status=status.HTTP_201_CREATED,
-        )
-
-
 class SubscribePublicationAPIView(APIView):
     def post(self, request):
         publication_type = request.data.get("publication_type")
@@ -909,3 +867,51 @@ class TokenVerifyView(APIView):
 
         return_data = [p.publication_type for p in PublicationSubscription.objects.filter(emails__contains=[email])]
         return Response({'message': 'List of subscription returned.', 'data': return_data, 'email': email}, status=200)
+
+
+class TokenManageSubscriptionView(APIView):
+    def post(self, request):
+        token = request.data.get("token", None)
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        # Clear all existing subscription - can make it cleaner?
+        for publication in PublicationSubscription.objects.all():
+            if email in publication.emails:
+                publication.emails.remove(email)
+                publication.save()
+
+        publications_list = request.POST.getlist("publication_type")
+        # print(f'publications_list: {publications_list}')
+        if type(publications_list) is not list:
+            return Response(
+                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        for publication in publications_list:
+            if not publication or not email:
+                return Response(
+                    {"error": "Provide both `publication_type` and `email` data."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                return Response(
+                    {"error": "Invalid email format."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+                pub_sub.emails.append(email)
+                pub_sub.save()
+
+        return Response(
+            {"success": f"Subscribed to {publications_list}."},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class TokenGetSubscriptionView(TokenVerifyView):
+    pass
