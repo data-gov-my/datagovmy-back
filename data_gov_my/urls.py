@@ -25,7 +25,7 @@ urlpatterns = [
     path('subscriptions/', views.SubscriptionView.as_view(), name='subscriptions'),
   
     path('send-email-subscription/', views.SendEmailSubscription.as_view(), name='send_email_subscription'),
-    path('publication-subscribe/', views.PublicationSubscribeView.as_view(), name='publication_subscribe'),
+    # path('publication-subscribe/', views.PublicationSubscribeView.as_view(), name='publication_subscribe'),
     # path('token/subscription/', views.TokenGetSubscriptionView.as_view(), name='token_get_subscription'),
     # path('token/manage-subscription/', views.TokenManageSubscriptionView.as_view(), name='token_manage_subscription'),
 
