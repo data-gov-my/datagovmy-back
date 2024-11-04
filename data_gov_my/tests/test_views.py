@@ -43,13 +43,13 @@ class TestEmailSubscribeSubmission(APITestCase):
             'DEFAULT_PRIORITY': 'now',
         }
     )
-
     def test_full_subscription_flow(self):
         to = 'test@gmail.com'
         self.assertEqual(len(mail.outbox), 0)
         url = reverse("token_request")
         self.assertEqual(url, '/token/request/')
         r = self.client.post(url, {"email": to})
+        # print(r.json())
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(mail.outbox), 1)
         # print(mail.outbox[0].subject)
@@ -62,35 +62,35 @@ class TestEmailSubscribeSubmission(APITestCase):
         url = reverse("token_verify")
         self.assertEqual(url, '/token/verify/')
         r = self.client.post(url, {"token": token})
+        # print(r.json())
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['message'], 'List of subscription returned.')
+        self.assertEqual(r.json()['message'], 'Email verified.')
         self.assertEqual(r.json()['email'], to)
-        self.assertEqual(type(r.json()['data']), list)
         # print(r.json()['data'])
 
+        # Get all subscriptions
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
         r = self.client.get(url + f'?token={token}')
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['email'], to)
-        # self.assertEqual(r.json()['data'], to)
-        subscription = r.json()['data']
-        for s in subscription:
-            self.assertEqual(s['is_subscribed'], False)
+        # print(r.json())
 
+        # Edit current subscriptions
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
         r = self.client.put(
             url,
-            {'token': token,
-             'publications': [
-                 'agriculture_supply_util',
-                 'bci',
-                 'bop',
-                 'bop_annual_dia',
-                 'bop_annual_fdi'
-             ]
-             }
+            {
+                'token': token,
+                'publications': [
+                    'agriculture_supply_util',
+                    'bci',
+                    'bop',
+                    'bop_annual_dia',
+                    'bop_annual_fdi'
+                ]
+            }
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
@@ -107,6 +107,14 @@ class TestEmailSubscribeSubmission(APITestCase):
                 'bop_annual_fdi'
             ])
 
+        url = reverse('subscriptions')
+        self.assertEqual(url, '/subscriptions/')
+        r = self.client.get(url + f'?token={token}')
+        # print(r.json())
+        for p in subs.publications.all():
+            self.assertIn(p.id, r.json()['data'])
+
+        # Edit subscriptions second time
         r = self.client.put(
             url,
             {
@@ -121,17 +129,14 @@ class TestEmailSubscribeSubmission(APITestCase):
                 ]
             }
         )
+        # print(r.json())
         self.assertEqual(r.status_code, 200)
         subs = Subscription.objects.get(email=to)
         self.assertEqual(
             subs.publications.count(), 6
         )
-        for pubs in subs.publications.all():
-            self.assertIn(pubs.id, [
-                'trade_annual_sbh',
-                'trade_annual_services',
-                'trade_annual_state',
-                'trade_annual_swk',
-                'tradeindices',
-                'wrt'
-            ])
+        url = reverse('subscriptions')
+        self.assertEqual(url, '/subscriptions/')
+        r = self.client.get(url + f'?token={token}')
+        for p in subs.publications.all():
+            self.assertIn(p.id, r.json()['data'])

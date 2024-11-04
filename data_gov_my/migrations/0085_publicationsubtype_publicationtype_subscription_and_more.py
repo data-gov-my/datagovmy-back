@@ -35,15 +35,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Subscription",
             fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("email", models.EmailField(max_length=254, primary_key=True, serialize=False)),
                 (
                     "language",
                     models.CharField(
@@ -52,7 +44,6 @@ class Migration(migrations.Migration):
                         max_length=2,
                     ),
                 ),
-                ("email", models.EmailField(max_length=254, unique=True)),
                 (
                     "publications",
                     models.ManyToManyField(to="data_gov_my.publicationsubtype"),

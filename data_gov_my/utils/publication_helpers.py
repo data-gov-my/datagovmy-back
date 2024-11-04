@@ -358,7 +358,7 @@ subtype_dict = {
 
 def populate_publication_types():
     for k in type_dict:
-        PublicationType.objects.create(
+        PublicationType.objects.get_or_create(
             id=k,
             type_en=type_dict[k]['type_en'],
             type_bm=type_dict[k]['type_bm']
@@ -366,8 +366,8 @@ def populate_publication_types():
 
 def populate_publication_subtypes():
     for k in subtype_dict:
-        publication_type = PublicationType.objects.get(id=subtype_dict[k]['type'])
-        PublicationSubtype.objects.create(
+        publication_type, created = PublicationType.objects.get_or_create(id=subtype_dict[k]['type'])
+        PublicationSubtype.objects.get_or_create(
             id=k,
             publication_type=publication_type,
             subtype_bm=subtype_dict[k]['subtype_bm'],

@@ -56,6 +56,7 @@ from data_gov_my.serializers import (
 )
 from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+from data_gov_my.utils.publication_helpers import subtype_list
 from data_gov_my.utils.throttling import FormRateThrottle
 
 env = environ.Env()
@@ -776,20 +777,6 @@ def get_nested_data(
 
     return data
 
-
-class SendEmailSubscription(APIView):
-    def post(self, request):
-        to = request.data.get("email", None)
-        # check if the email exists in any subscription
-        is_email_subscribed = PublicationSubscription.objects.filter(emails__contains=[to])
-        # print(is_email_subscribed)
-        data = [p.publication_type for p in is_email_subscribed]
-        if data:
-            return Response({'data': data, 'message': 'Email subscribed'}, status=200)
-        else:
-            return Response({'message': 'Email not subscribed'}, status=200)
-
-
 class SubscriptionView(APIView):
     def put(self, request):
         token = request.data.get("token", None)
@@ -798,14 +785,11 @@ class SubscriptionView(APIView):
         email = normalize_email(email)
 
         # Always do the cleanup
-        if Subscription.objects.filter(email=email).exists():
-            PublicationSubtype.objects.filter(subscription__email=email).delete()
-        else:
-            Subscription.objects.create(email=email)
+        subs = Subscription.objects.get(email=email)
+        subs.publications.clear()
 
         publication_list = request.data.getlist("publications", None)
         for publication in publication_list:
-            subs = Subscription.objects.get(email=email)
             pubs = PublicationSubtype.objects.get(id=publication)
             subs.publications.add(pubs)
 
@@ -817,27 +801,8 @@ class SubscriptionView(APIView):
         email = decoded_token["sub"]
         email = normalize_email(email)
 
-        return_data = []
-        for subtype in PublicationSubtype.objects.all():
-            if Subscription.objects.filter(publications__subscription__email=email).exists():
-                is_subscribed = True
-            else:
-                is_subscribed = False
-            return_data.append({'id': subtype.id, 'subtype_bm': subtype.subtype_bm, 'is_subscribed': is_subscribed})
-        return Response({'email': email, 'data': return_data}, HTTPStatus.OK)
-
-
-# class SubscribeToPublication(APIView):
-#     def post(self, request):
-#         email = request.data.get("email", None)
-#         publications = request.data.get("publications", None)
-#         normalized_email = normalize_email(email)
-#
-#         for publication in publications:
-#             pub_sub = PublicationSubscription.objects.get(publication_type=publication)
-#             pub_sub.emails.append(normalized_email)
-#             pub_sub.save()
-
+        sub = Subscription.objects.get(email=email)
+        return Response({'email': email, 'data': [p.id for p in sub.publications.all()]}, HTTPStatus.OK)
 
 class TokenRequestView(APIView):
     def post(self, request):
@@ -846,6 +811,7 @@ class TokenRequestView(APIView):
             'sub': to
         }, os.getenv("WORKFLOW_TOKEN"))
         if to:
+            Subscription.objects.get_or_create(email=to)
             mail.send(
                 sender='notif@opendosm.my',
                 recipients=[to],
@@ -865,8 +831,11 @@ class TokenVerifyView(APIView):
         email = decoded_token["sub"]
         email = normalize_email(email)
 
-        return_data = [p.publication_type for p in PublicationSubscription.objects.filter(emails__contains=[email])]
-        return Response({'message': 'List of subscription returned.', 'data': return_data, 'email': email}, status=200)
+        try:
+            sub = Subscription.objects.get(email=email)
+            return Response({'message': 'Email verified.', 'email': sub.email}, status=200)
+        except Subscription.DoesNotExist:
+            return Response({'message': 'Email not verified.'}, status=400)
 
 
 class TokenManageSubscriptionView(APIView):
@@ -883,7 +852,6 @@ class TokenManageSubscriptionView(APIView):
                 publication.save()
 
         publications_list = request.POST.getlist("publication_type")
-        # print(f'publications_list: {publications_list}')
         if type(publications_list) is not list:
             return Response(
                 {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
