@@ -264,7 +264,7 @@ class PublicationSubtype(models.Model):
 
 class Subscription(models.Model):
     language = models.CharField(max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en")
-    email = models.EmailField(unique=True)
+    email = models.EmailField(primary_key=True)
     publications = models.ManyToManyField(PublicationSubtype)
 
 class PublicationResource(models.Model):
