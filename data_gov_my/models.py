@@ -7,7 +7,7 @@ from post_office.models import Email, EmailTemplate
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 
-from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES
+from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES, SHORT_LANGUAGE_CHOICES
 
 
 class AuthTable(models.Model):
@@ -251,6 +251,21 @@ class PublicationSubscription(models.Model):
     publication_type = models.CharField(max_length=50, primary_key=True)
     emails = ArrayField(models.EmailField(), default=list)
 
+class PublicationType(models.Model):
+    id = models.CharField(max_length=50, primary_key=True)
+    type_en = models.CharField(max_length=100)
+    type_bm = models.CharField(max_length=100)
+
+class PublicationSubtype(models.Model):
+    id = models.CharField(max_length=50, primary_key=True)
+    publication_type = models.ForeignKey(PublicationType, on_delete=models.CASCADE)
+    subtype_en = models.CharField(max_length=100)
+    subtype_bm = models.CharField(max_length=100)
+
+class Subscription(models.Model):
+    language = models.CharField(max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en")
+    email = models.EmailField(primary_key=True)
+    publications = models.ManyToManyField(PublicationSubtype)
 
 class PublicationResource(models.Model):
     resource_id = models.IntegerField()

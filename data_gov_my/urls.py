@@ -22,8 +22,8 @@ urlpatterns = [
     # For subscriber token request flow
     path('token/request/', views.TokenRequestView.as_view(), name='token_request'),
     path('token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
-    path('token/subscription/', views.TokenGetSubscriptionView.as_view(), name='token_get_subscription'),
-    path('token/manage-subscription/', views.TokenManageSubscriptionView.as_view(), name='token_manage_subscription'),
+    path('subscriptions/', views.SubscriptionView.as_view(), name='subscriptions'),
+
 
     path("admin/", admin.site.urls),
     path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
