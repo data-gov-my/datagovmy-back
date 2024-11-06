@@ -779,30 +779,25 @@ def get_nested_data(
 
 class SubscriptionView(APIView):
     def put(self, request):
-        token = request.data.get("token", None)
+        token = request.META.get('headers')['Authorization']
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         email = decoded_token["sub"]
         email = normalize_email(email)
 
-        # Always do the cleanup
-        subs = Subscription.objects.get(email=email)
-        subs.publications.clear()
-
+        subscriber = Subscription.objects.get(email=email)
         publication_list = request.data.getlist("publications", None)
-        for publication in publication_list:
-            pubs = PublicationSubtype.objects.get(id=publication)
-            subs.publications.add(pubs)
-
+        subscriber.publications = publication_list
+        subscriber.save()
         return Response({'message': 'Subscriptions updated.'}, HTTPStatus.OK)
 
     def get(self, request):
-        token = request.GET.get("token")
+        token = request.META.get('headers')['Authorization']
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         email = decoded_token["sub"]
         email = normalize_email(email)
 
-        sub = Subscription.objects.get(email=email)
-        return Response({'email': email, 'data': [p.id for p in sub.publications.all()]}, HTTPStatus.OK)
+        sub = Subscription.objects.get(email=email).publications
+        return Response({'email': email, 'data': sub}, HTTPStatus.OK)
 
 class TokenRequestView(APIView):
     def post(self, request):

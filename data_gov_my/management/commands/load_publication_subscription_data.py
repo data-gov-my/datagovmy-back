@@ -5,8 +5,8 @@ from data_gov_my.utils.publication_helpers import populate_publication_types, po
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        populate_publication_types()
-        populate_publication_subtypes()
+        # populate_publication_types()
+        # populate_publication_subtypes()
 
         subs, created = Subscription.objects.get_or_create(
             email='test@gmail.com'
@@ -19,6 +19,5 @@ class Command(BaseCommand):
             'bop_annual_dia',
             'bop_annual_fdi'
         ]
-        pst_list = [PublicationSubtype.objects.get(id=p) for p in publication_list]
-        for pst in pst_list:
-            subs.publications.add(pst)
+        subs.publications = publication_list
+        subs.save()

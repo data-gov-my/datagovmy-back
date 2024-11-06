@@ -263,9 +263,8 @@ class PublicationSubtype(models.Model):
     subtype_bm = models.CharField(max_length=100)
 
 class Subscription(models.Model):
-    language = models.CharField(max_length=2, choices=SHORT_LANGUAGE_CHOICES, default="en")
     email = models.EmailField(primary_key=True)
-    publications = models.ManyToManyField(PublicationSubtype)
+    publications = ArrayField(models.CharField(max_length=100), default=list)
 
 class PublicationResource(models.Model):
     resource_id = models.IntegerField()
