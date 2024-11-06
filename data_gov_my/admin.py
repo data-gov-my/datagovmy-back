@@ -1,12 +1,11 @@
 from django.contrib import admin
+
 from data_gov_my.models import (
     ExplorersUpdate,
-    FormData,
-    FormTemplate,
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationUpcoming,
-    i18nJson,
+    Subscription,
 )
 from data_gov_my.models import (
     FormData,
@@ -24,6 +23,7 @@ admin.site.register(PublicationDocumentation)
 admin.site.register(PublicationDocumentationResource)
 admin.site.register(PublicationUpcoming)
 admin.site.register(ExplorersUpdate)
+admin.site.register(Subscription)
 
 
 @admin.register(Publication)
