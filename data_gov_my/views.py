@@ -779,8 +779,7 @@ def get_nested_data(
 
 class SubscriptionView(APIView):
     def put(self, request):
-        print(request.META)
-        token = request.META['headers']['token']
+        token = request.headers.get("Authorization")
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         email = decoded_token["sub"]
         email = normalize_email(email)
@@ -792,8 +791,10 @@ class SubscriptionView(APIView):
         return Response({'message': 'Subscriptions updated.'}, HTTPStatus.OK)
 
     def get(self, request):
-        print(request.META)
-        token = request.META['headers']['token']
+        print(f'request: {request}')
+        print(f'request.META: {request.META}')
+        print(f'request.headers: {request.headers}')
+        token = request.headers.get("Authorization")
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         email = decoded_token["sub"]
         email = normalize_email(email)
@@ -823,7 +824,7 @@ class TokenRequestView(APIView):
 
 class TokenVerifyView(APIView):
     def post(self, request):
-        token = request.data.get("token", None)
+        token = request.data["token"]
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         email = decoded_token["sub"]
         email = normalize_email(email)
