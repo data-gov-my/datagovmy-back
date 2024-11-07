@@ -1,18 +1,90 @@
-import os
-import json
 import hashlib
+import os
+from datetime import date
 
-from django.test import override_settings
-from jose import jwt
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
+from jose import jwt
 from rest_framework.test import APITestCase
 
-from data_gov_my.models import AuthTable, PublicationSubscription, PublicationType, PublicationSubtype, Subscription, \
-    Publication
-from data_gov_my.utils.publication_helpers import type_dict, subtype_dict, type_list, subtype_list, \
-    populate_publication_types, populate_publication_subtypes
+from data_gov_my.models import AuthTable, PublicationType, PublicationSubtype, Subscription, Publication
+from data_gov_my.utils.meta_builder import GeneralMetaBuilder
+from data_gov_my.utils.publication_helpers import type_list, subtype_list, \
+    populate_publication_types, populate_publication_subtypes, send_email_to_subscribers
+
+
+class TestEmailSubscription(APITestCase):
+    def setUp(self):
+        self.test_email = 'test@gmail.com'
+        self.another_email = 'test2@gmail.com'
+        builder = GeneralMetaBuilder.create(property='PUBLICATION')
+        builder.build_operation(manual=True, rebuild="REBUILD", meta_files=[])
+        Subscription.objects.create(email=self.test_email, publications=[])
+        Subscription.objects.create(email=self.another_email, publications=[])
+        Subscription.objects.create(email='thisisarandomemail@yahoo.com', publications=[])
+        self.assertEqual(Subscription.objects.count(), 3)
+
+    @override_settings(
+        POST_OFFICE={
+            'BACKENDS': {'default': 'django.core.mail.backends.locmem.EmailBackend'},
+            'DEFAULT_PRIORITY': 'now',
+        })
+    def test_update_endpoint(self):
+        # ensure that we have publication(s) to work on
+        publications = Publication.objects.all()
+        self.assertGreater(publications.count(), 0)
+
+        # ensure that we have publication(s) released today, if not make one
+        today = date.today()
+        publications_today = Publication.objects.filter(
+            release_date__year=today.year,
+            release_date__month=today.month,
+            release_date__day=today.day,
+            language='en-GB'  # TODO: Get it dynamically
+        )
+        if not publications_today.count():
+            mock_pub = publications[0]
+            mock_pub.release_date = today
+            mock_pub.save()
+
+        publications_today = Publication.objects.filter(
+            release_date__year=today.year,
+            release_date__month=today.month,
+            release_date__day=today.day,
+            language='en-GB'  # TODO: Get it dynamically
+        )
+
+        for p in publications_today:
+            # test first email
+            subscription = Subscription.objects.get(email=self.test_email)
+            subscription.publications.append(p.publication_type)
+            subscription.save()
+
+            # test second email
+            subscription2 = Subscription.objects.get(email=self.another_email)
+            subscription2.publications.append(p.publication_type)
+            subscription2.save()
+
+        publications_today_recount = Publication.objects.filter(
+            release_date__year=today.year,
+            release_date__month=today.month,
+            release_date__day=today.day,
+            language='en-GB')  # TODO: Get it dynamically
+        # print(f'publications_today_recount: {publications_today_recount}')
+        self.assertGreater(publications_today_recount.count(), 0)
+
+        self.assertEqual(len(mail.outbox), 0)
+        send_email_to_subscribers()
+        self.assertEqual(len(mail.outbox), publications_today_recount.count()*2)
+        subscriber_list = [s.email for s in Subscription.objects.all()]
+        for o in mail.outbox:
+            self.assertEqual(len(o.recipients()), 1)
+            self.assertIn(o.recipients()[0], subscriber_list)
+            # print(f'recipients: {o.to}')
+            # print(f'subject: {o.subject}')
+            # print(f'content: {o.body}')
 
 
 class TestEmailSubscribeSubmission(APITestCase):
@@ -100,16 +172,16 @@ class TestEmailSubscribeSubmission(APITestCase):
         )
         for p in subs.publications:
             self.assertIn(p, [
-            'agriculture_supply_util',
-            'bci',
-            'bop',
-            'bop_annual_dia',
-            'bop_annual_fdi'
-        ])
+                'agriculture_supply_util',
+                'bci',
+                'bop',
+                'bop_annual_dia',
+                'bop_annual_fdi'
+            ])
 
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url,  headers={'Authorization': token})
+        r = self.client.get(url, headers={'Authorization': token})
         # print(r.json())
         for p in subs.publications:
             self.assertIn(p, r.json()['data'])
