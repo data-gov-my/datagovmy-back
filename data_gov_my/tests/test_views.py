@@ -121,7 +121,6 @@ class TestEmailSubscribeSubmission(APITestCase):
         url = reverse("token_request")
         self.assertEqual(url, '/token/request/')
         r = self.client.post(url, {"email": to})
-        # print(r.json())
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(mail.outbox), 1)
         # print(mail.outbox[0].subject)
@@ -133,7 +132,7 @@ class TestEmailSubscribeSubmission(APITestCase):
 
         url = reverse("token_verify")
         self.assertEqual(url, '/token/verify/')
-        r = self.client.post(url, {"Authorization": os.getenv("WORKFLOW_TOKEN"), "token": token})
+        r = self.client.post(url, {"token": token})
         # print(r.json())
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['message'], 'Email verified.')
@@ -143,7 +142,7 @@ class TestEmailSubscribeSubmission(APITestCase):
         # Get all subscriptions
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={"Authorization": os.getenv("WORKFLOW_TOKEN"), 'token': token})
+        r = self.client.get(url, headers={'token': token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['email'], to)
         # print(r.json())
@@ -162,7 +161,7 @@ class TestEmailSubscribeSubmission(APITestCase):
                     'bop_annual_fdi'
                 ]
             },
-            headers={"Authorization": os.getenv("WORKFLOW_TOKEN"), 'token': token}
+            headers={'token': token}
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
@@ -181,7 +180,7 @@ class TestEmailSubscribeSubmission(APITestCase):
 
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={"Authorization": os.getenv("WORKFLOW_TOKEN"), 'token': token})
+        r = self.client.get(url, headers={'token': token})
         # print(r.json())
         for p in subs.publications:
             self.assertIn(p, r.json()['data'])
@@ -199,7 +198,7 @@ class TestEmailSubscribeSubmission(APITestCase):
                     'wrt'
                 ]
             },
-            headers={"Authorization": os.getenv("WORKFLOW_TOKEN"), 'token': token}
+            headers={'token': token}
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
@@ -209,6 +208,6 @@ class TestEmailSubscribeSubmission(APITestCase):
         )
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={"Authorization": os.getenv("WORKFLOW_TOKEN"), 'token': token})
+        r = self.client.get(url, headers={'token': token})
         for p in subs.publications:
             self.assertIn(p, r.json()['data'])
