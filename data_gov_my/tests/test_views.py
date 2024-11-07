@@ -121,7 +121,6 @@ class TestEmailSubscribeSubmission(APITestCase):
         url = reverse("token_request")
         self.assertEqual(url, '/token/request/')
         r = self.client.post(url, {"email": to})
-        # print(r.json())
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(mail.outbox), 1)
         # print(mail.outbox[0].subject)
