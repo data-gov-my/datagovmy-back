@@ -66,6 +66,7 @@ from data_gov_my.utils.metajson_structures import (
     PublicationValidateModel,
     i18nValidateModel,
 )
+from data_gov_my.utils.publication_helpers import send_email_to_subscribers
 
 logger = logging.getLogger("django")
 
@@ -169,6 +170,8 @@ class GeneralMetaBuilder(ABC):
                     builder = GeneralMetaBuilder.create(dir, isCategory=False)
                     builder.delete_operation(files)
 
+        send_email_to_subscribers()
+
     @staticmethod
     def filter_changed_files(file_list, compare_github=False) -> dict[str, list[dict]]:
         changed_files = {
@@ -187,7 +190,7 @@ class GeneralMetaBuilder(ABC):
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
                 if f_info[: len(github_dir_info)] == github_dir_info:
-                    dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
+                    dir = os.path.join(*f_info[len(github_dir_info):]).replace(
                         ".json", ""
                     )
                     if compare_github:  # used for filtering modified/created files
@@ -275,10 +278,10 @@ class GeneralMetaBuilder(ABC):
                 failed_routes = []
                 failed_info = []
                 telegram_msg = (
-                    triggers.format_header(
-                        f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
-                    )
-                    + "\n"
+                        triggers.format_header(
+                            f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
+                        )
+                        + "\n"
                 )
                 if routes:
                     response = revalidate_frontend(routes=routes, site=site)
@@ -459,7 +462,7 @@ class DashboardBuilder(GeneralMetaBuilder):
         return obj
 
     def additional_handling(
-        self, rebuild: bool, meta_files, created_objects: List[MetaJson]
+            self, rebuild: bool, meta_files, created_objects: List[MetaJson]
     ):
         """
         Update or create new DashboardJson instances (unique chart data) based on each created MetaJson instance.
@@ -618,7 +621,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: DataCatalogueValidateModel
+            self, filename: str, metadata: DataCatalogueValidateModel
     ):
         # check if need to add default translations
         default_keys = set(self.default_translation_mapping)
@@ -797,7 +800,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
         return obj
 
     def additional_handling(
-        self, rebuild: bool, meta_files, created_objects: List[MetaJson]
+            self, rebuild: bool, meta_files, created_objects: List[MetaJson]
     ):
         """
         Update or create new ExplorersUpdate instances (Entire Table) based on each created MetaJson instance.
@@ -1012,7 +1015,7 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
         ).delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: PublicationDocumentationValidateModel
+            self, filename: str, metadata: PublicationDocumentationValidateModel
     ):
         # english publications
         pub_object_en, _ = PublicationDocumentation.objects.update_or_create(
@@ -1113,7 +1116,7 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
         return PublicationUpcoming.objects.all().delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: PublicationUpcomingValidateModel
+            self, filename: str, metadata: PublicationUpcomingValidateModel
     ):
         df = pd.read_parquet(metadata.parquet_link)
 

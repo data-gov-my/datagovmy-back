@@ -1,4 +1,7 @@
-from data_gov_my.models import PublicationType, PublicationSubtype
+from datetime import date
+
+from post_office import mail
+from data_gov_my.models import PublicationType, PublicationSubtype, Publication, Subscription
 
 type_list = [
     'agriculture', 'bc', 'bop', 'businesses', 'census', 'census_economy',
@@ -356,6 +359,7 @@ subtype_dict = {
             'type': 'wrt'}
 }
 
+
 def populate_publication_types():
     for k in type_dict:
         PublicationType.objects.get_or_create(
@@ -363,6 +367,7 @@ def populate_publication_types():
             type_en=type_dict[k]['type_en'],
             type_bm=type_dict[k]['type_bm']
         )
+
 
 def populate_publication_subtypes():
     for k in subtype_dict:
@@ -372,3 +377,68 @@ def populate_publication_subtypes():
             publication_type=publication_type,
             subtype_bm=subtype_dict[k]['subtype_bm'],
             subtype_en=subtype_dict[k]['subtype_en'], )
+
+
+def craft_template_en(publication_id, publication_type_title):
+    return f"""
+The Department of Statistics Malaysia (DOSM) has released the latest data and analysis of the {publication_type_title}. The publication contains official consumer price data, covering headline, core, and state-level inflation. 
+
+You may access the publication at this link:
+https://open.dosm.gov.my/publications/{publication_id}
+
+If you have any questions about the data, you may write to data@dosm.gov.my with your enquiry.
+
+Warm regards,
+OpenDOSM Notification Bot
+
+Note: To stop or amend your OpenDOSM notifications, go to: https://open.dosm.gov.my/publications/subscribe
+
+--------
+"""
+
+
+def craft_template_bm(publication_id, publication_type_title):
+    return f'''
+Jabatan Perangkaan Malaysia (DOSM) telah menerbitkan data dan analisis terkini bagi {publication_type_title}. Penerbitan ini mengandungi data harga pengguna rasmi, merangkumi inflasi, inflasi teras, dan inflasi mengikut negeri.
+
+Anda boleh mengakses penerbitan tersebut di pautan ini:
+https://open.dosm.gov.my/publications/{publication_id}
+
+Sekiranya anda ada sebarang pertanyaan mengenai data tersebut, anda boleh menghantar enkuiri kepada data@dosm.gov.my.
+
+Sekian, terima kasih.
+
+Bot Notifikasi OpenDOSM
+
+Nota: Untuk menghentikan atau meminda notifikasi anda daripada OpenDOSM, sila ke: https://open.dosm.gov.my/publications/subscribe
+'''
+
+def craft_title(title):
+    # Extract the month/year within square brackets
+    period = title.split(']')[0].strip('[')
+    topic = title.split(']')[1]
+    new_title = f"{topic}: {period}"
+    return new_title
+
+def send_email_to_subscribers():
+    # TODO: get_preferred_language()
+    today = date.today()
+    publications_today = Publication.objects.filter(
+        release_date__year=today.year,
+        release_date__month=today.month,
+        release_date__day=today.day,
+        language='en-GB'  # TODO: Get it dynamically
+    )
+
+    for p in publications_today:
+        subscribers_email = [
+            s.email for s in Subscription.objects.filter(publications__contains=[p.publication_type])
+        ]
+        for s in subscribers_email:
+            mail.send(
+                sender='notif@opendosm.my',
+                recipients=[s],
+                subject=craft_title(p.title),
+                message=craft_template_en(p.publication_id, p.title),
+                priority='now'
+            )
