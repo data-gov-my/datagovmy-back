@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase
 from data_gov_my.models import AuthTable, PublicationType, PublicationSubtype, Subscription, Publication
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 from data_gov_my.utils.publication_helpers import type_list, subtype_list, \
-    populate_publication_types, populate_publication_subtypes, send_email_to_subscribers
+    populate_publication_types, populate_publication_subtypes, send_email_to_subscribers, craft_title, craft_template_en
 
 
 class TestEmailSubscription(APITestCase):
@@ -86,6 +86,42 @@ class TestEmailSubscription(APITestCase):
             # print(f'subject: {o.subject}')
             # print(f'content: {o.body}')
 
+class TestPreviewSubscriptionEmail(APITestCase):
+    def setUp(self):
+        self.test_email = 'test3@gmail.com'
+        builder = GeneralMetaBuilder.create(property='PUBLICATION')
+        builder.build_operation(manual=True, rebuild="REBUILD", meta_files=[])
+        Subscription.objects.create(email=self.test_email, publications=[])
+        self.assertEqual(Subscription.objects.count(), 1)
+
+    @override_settings(
+        POST_OFFICE={
+            'BACKENDS': {'default': 'django.core.mail.backends.locmem.EmailBackend'},
+            'DEFAULT_PRIORITY': 'now',
+        })
+    def test_preview_email(self):
+        self.assertEqual(len(mail.outbox), 0)
+        pub = Publication.objects.all()[0]
+        sub = Subscription.objects.all()[0]
+
+        subject = craft_title(pub.title)
+        content = craft_template_en(pub.publication_id, pub.title, pub.description)
+        from_email = 'notif@opendosm.my'
+        recepient_list = [sub.email]
+        print(
+            f'Subject: {subject}\n'
+            f'Content: {content}\n'
+            f'From: {from_email}\n'
+            f'Recipients: {recepient_list}\n'
+        )
+        mail.send_mail(
+            subject,
+            content,
+            from_email,
+            recepient_list,
+            fail_silently=False,
+        )
+        self.assertEqual(len(mail.outbox), 1)
 
 class TestEmailSubscribeSubmission(APITestCase):
     def setUp(self):

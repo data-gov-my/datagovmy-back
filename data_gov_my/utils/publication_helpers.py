@@ -379,9 +379,10 @@ def populate_publication_subtypes():
             subtype_en=subtype_dict[k]['subtype_en'], )
 
 
-def craft_template_en(publication_id, publication_type_title):
+def craft_template_en(publication_id, publication_type_title, description):
+    description = description[0].lower() + description[1:]
     return f"""
-The Department of Statistics Malaysia (DOSM) has released the latest data and analysis of the {publication_type_title}. The publication contains official consumer price data, covering headline, core, and state-level inflation. 
+The Department of Statistics Malaysia (DOSM) has released the latest data and analysis of the {publication_type_title}. The publication contains {description}. 
 
 You may access the publication at this link:
 https://open.dosm.gov.my/publications/{publication_id}
@@ -397,9 +398,10 @@ Note: To stop or amend your OpenDOSM notifications, go to: https://open.dosm.gov
 """
 
 
-def craft_template_bm(publication_id, publication_type_title):
+def craft_template_bm(publication_id, publication_type_title, description):
+    description = description[0].lower() + description[1:]
     return f'''
-Jabatan Perangkaan Malaysia (DOSM) telah menerbitkan data dan analisis terkini bagi {publication_type_title}. Penerbitan ini mengandungi data harga pengguna rasmi, merangkumi inflasi, inflasi teras, dan inflasi mengikut negeri.
+Jabatan Perangkaan Malaysia (DOSM) telah menerbitkan data dan analisis terkini bagi {publication_type_title}. Penerbitan ini mengandungi {description}.
 
 Anda boleh mengakses penerbitan tersebut di pautan ini:
 https://open.dosm.gov.my/publications/{publication_id}
@@ -434,11 +436,12 @@ def send_email_to_subscribers():
         subscribers_email = [
             s.email for s in Subscription.objects.filter(publications__contains=[p.publication_type])
         ]
+
         for s in subscribers_email:
             mail.send(
                 sender='notif@opendosm.my',
                 recipients=[s],
                 subject=craft_title(p.title),
-                message=craft_template_en(p.publication_id, p.title),
+                message=craft_template_en(p.publication_id, p.title, p.description),
                 priority='now'
             )
