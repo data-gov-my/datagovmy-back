@@ -815,7 +815,7 @@ class TokenRequestView(APIView):
 
         email = normalize_email(to)
         try:
-            sub = Subscription.objects.get(email=to)
+            sub = Subscription.objects.get(email=email)
             validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
             message = jwt.encode({
                 'sub': email,
