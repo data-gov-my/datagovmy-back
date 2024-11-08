@@ -2,9 +2,10 @@ import os
 import json
 import logging
 from http import HTTPStatus
+from logging import exception
 
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
 from itertools import groupby
 from threading import Thread
@@ -777,6 +778,7 @@ def get_nested_data(
 
     return data
 
+
 class SubscriptionView(APIView):
     def put(self, request):
         token = request.META['headers']['token']
@@ -799,38 +801,53 @@ class SubscriptionView(APIView):
         sub = Subscription.objects.get(email=email).publications
         return Response({'email': email, 'data': sub}, HTTPStatus.OK)
 
+
 class TokenRequestView(APIView):
     def post(self, request):
         to = request.data.get("email", None)
-        message = jwt.encode({
-            'sub': to
-        }, os.getenv("WORKFLOW_TOKEN"))
-        if to:
-            Subscription.objects.get_or_create(email=to)
+        if not to:
+            Response(status=HTTPStatus.BAD_REQUEST)
+
+        email = normalize_email(to)
+        try:
+            sub = Subscription.objects.get(email=to)
+            validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
+            message = jwt.encode({
+                'sub': email,
+                'validity': int(validity.timestamp()),
+            }, os.getenv("WORKFLOW_TOKEN"))
             mail.send(
                 sender='notif@opendosm.my',
-                recipients=[to],
-                subject='Your link to login.',
+                recipients=[sub.email],
+                subject='Your login token.',
                 message=f'{message}',
                 priority='now'
             )
-            return Response({'message': 'Email sent'}, status=200)
-        else:
-            return Response({'message': 'Email not sent'}, status=400)
+            return Response({'message': 'User subscribed. Email with login token sent'}, status=HTTPStatus.OK)
+        except Subscription.DoesNotExist:
+            return Response({'message': 'Not subscribed. Proceed to sign up.'}, status=HTTPStatus.OK)
 
 
 class TokenVerifyView(APIView):
     def post(self, request):
         token = request.data.get("token", None)
-        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
-        email = decoded_token["sub"]
-        email = normalize_email(email)
+
+        try:
+            decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+            email = decoded_token["sub"]
+            email = normalize_email(email)
+        except Exception as e:
+            return Response({'message': f'Error {e}'}, status=HTTPStatus.OK)
 
         try:
             sub = Subscription.objects.get(email=email)
-            return Response({'message': 'Email verified.', 'email': sub.email}, status=200)
+            validity_timestamp = decoded_token["validity"]
+            if datetime.now() < datetime.fromtimestamp(validity_timestamp):
+                return Response({'message': 'Token verified.', 'email': sub.email}, status=HTTPStatus.OK)
+            else:
+                return Response({'message': 'Token expired.', 'email': sub.email}, status=HTTPStatus.OK)
         except Subscription.DoesNotExist:
-            return Response({'message': 'Email not verified.'}, status=400)
+            return Response({'message': 'Email not verified.'}, status=HTTPStatus.OK)
 
 
 class TokenManageSubscriptionView(APIView):
@@ -874,7 +891,3 @@ class TokenManageSubscriptionView(APIView):
             {"success": f"Subscribed to {publications_list}."},
             status=status.HTTP_201_CREATED,
         )
-
-
-class TokenGetSubscriptionView(TokenVerifyView):
-    pass
