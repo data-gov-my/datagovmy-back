@@ -152,15 +152,27 @@ class TestEmailSubscribeSubmission(APITestCase):
         }
     )
     def test_full_subscription_flow(self):
+        # test user not exist yet
         to = 'test@gmail.com'
         self.assertEqual(len(mail.outbox), 0)
         url = reverse("token_request")
         self.assertEqual(url, '/token/request/')
         r = self.client.post(url, {"email": to})
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(r.json()['message'], 'Not subscribed. Proceed to sign up.')
+        self.assertEqual(len(mail.outbox), 0)
         # print(mail.outbox[0].subject)
         # print(f'mail body:{mail.outbox[0].body}')
+
+        # now user exists
+        Subscription.objects.create(email=to, publications=[])
+        self.assertEqual(len(mail.outbox), 0)
+        url = reverse("token_request")
+        self.assertEqual(url, '/token/request/')
+        r = self.client.post(url, {"email": to})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['message'], 'User subscribed. Email with login token sent')
+        self.assertEqual(len(mail.outbox), 1)
 
         token = mail.outbox[0].body
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
@@ -171,7 +183,7 @@ class TestEmailSubscribeSubmission(APITestCase):
         r = self.client.post(url, {"token": token})
         # print(r.json())
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['message'], 'Email verified.')
+        self.assertEqual(r.json()['message'], 'Token verified.')
         self.assertEqual(r.json()['email'], to)
         # print(r.json()['data'])
 
