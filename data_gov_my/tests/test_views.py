@@ -190,7 +190,7 @@ class TestEmailSubscribeSubmission(APITestCase):
         # Get all subscriptions
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={'token': token})
+        r = self.client.get(url, headers={'Authorization': token})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['email'], to)
         # print(r.json())
@@ -209,7 +209,7 @@ class TestEmailSubscribeSubmission(APITestCase):
                     'bop_annual_fdi'
                 ]
             },
-            headers={'token': token}
+            headers={'Authorization': token}
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
@@ -228,7 +228,7 @@ class TestEmailSubscribeSubmission(APITestCase):
 
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={'token': token})
+        r = self.client.get(url, headers={'Authorization': token})
         # print(r.json())
         for p in subs.publications:
             self.assertIn(p, r.json()['data'])
@@ -246,7 +246,7 @@ class TestEmailSubscribeSubmission(APITestCase):
                     'wrt'
                 ]
             },
-            headers={'token': token}
+            headers={'Authorization':  token}
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
@@ -256,6 +256,6 @@ class TestEmailSubscribeSubmission(APITestCase):
         )
         url = reverse('subscriptions')
         self.assertEqual(url, '/subscriptions/')
-        r = self.client.get(url, headers={'token': token})
+        r = self.client.get(url, headers={'Authorization': token})
         for p in subs.publications:
             self.assertIn(p, r.json()['data'])
