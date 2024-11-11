@@ -20,10 +20,10 @@ from data_gov_my import views
 
 urlpatterns = [
     # For subscriber token request flow
+    path('check-subscription/', views.CheckSubscriptionView.as_view(), name='check-subscription'),
     path('token/request/', views.TokenRequestView.as_view(), name='token_request'),
     path('token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
     path('subscriptions/', views.SubscriptionView.as_view(), name='subscriptions'),
-
 
     path("admin/", admin.site.urls),
     path("auth-token/", views.AUTH_TOKEN.as_view(), name="AUTH_TOKEN"),
