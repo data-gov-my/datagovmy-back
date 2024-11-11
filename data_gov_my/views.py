@@ -779,6 +779,17 @@ def get_nested_data(
     return data
 
 
+class CheckSubscriptionView(APIView):
+    def post(self, request):
+        email = request.data["email"]
+        email = normalize_email(email)
+        try:
+            Subscription.objects.get(email=email)
+            return Response({'message': f'Email does exist'}, status=status.HTTP_200_OK)
+        except Subscription.DoesNotExist:
+            return Response({'message': f"Email does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class SubscriptionView(APIView):
     def put(self, request):
         token = request.headers.get("Authorization", None)
@@ -843,7 +854,7 @@ class TokenVerifyView(APIView):
             email = normalize_email(email)
         except Exception as e:
             return Response({'message': f'Error {e}'}, status=HTTPStatus.OK)
-          
+
         try:
             sub = Subscription.objects.get(email=email)
             validity_timestamp = decoded_token["validity"]

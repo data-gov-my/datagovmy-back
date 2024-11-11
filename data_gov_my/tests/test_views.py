@@ -15,6 +15,25 @@ from data_gov_my.utils.publication_helpers import type_list, subtype_list, \
     populate_publication_types, populate_publication_subtypes, send_email_to_subscribers, craft_title, craft_template_en
 
 
+class TestCheckSubscription(APITestCase):
+    def setUp(self):
+        pass
+
+    def test_subscription_exists(self):
+        email = 'test4@gmail.com'
+        url = reverse('check-subscription')
+        self.assertEqual(url, '/check-subscription/')
+        r = self.client.post(url,  data={'email': email})
+        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.json()['message'], f'Email does not exist')
+
+        # now let's create it!
+        Subscription.objects.create(email=email, publications=[])
+
+        r = self.client.post(url, data={'email': email})
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['message'], f'Email does exist')
+
 class TestEmailSubscription(APITestCase):
     def setUp(self):
         self.test_email = 'test@gmail.com'
