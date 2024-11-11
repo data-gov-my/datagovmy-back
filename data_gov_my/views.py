@@ -787,7 +787,7 @@ class CheckSubscriptionView(APIView):
             Subscription.objects.get(email=email)
             return Response({'message': f'Email does exist'}, status=status.HTTP_200_OK)
         except Subscription.DoesNotExist:
-            return Response({'message': f"Email does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
 
 
 class SubscriptionView(APIView):

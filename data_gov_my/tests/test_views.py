@@ -24,7 +24,7 @@ class TestCheckSubscription(APITestCase):
         url = reverse('check-subscription')
         self.assertEqual(url, '/check-subscription/')
         r = self.client.post(url,  data={'email': email})
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 200)
         self.assertEqual(r.json()['message'], f'Email does not exist')
 
         # now let's create it!
