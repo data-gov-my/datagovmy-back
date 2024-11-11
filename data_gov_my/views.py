@@ -787,6 +787,19 @@ class CheckSubscriptionView(APIView):
             Subscription.objects.get(email=email)
             return Response({'message': f'Email does exist'}, status=status.HTTP_200_OK)
         except Subscription.DoesNotExist:
+            sub = Subscription.objects.create(email=email, publications=[])
+            validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
+            message = jwt.encode({
+                'sub': email,
+                'validity': int(validity.timestamp()),
+            }, os.getenv("WORKFLOW_TOKEN"))
+            mail.send(
+                sender='notif@opendosm.my',
+                recipients=[sub.email],
+                subject='Your login token.',
+                message=f'{message}',
+                priority='now'
+            )
             return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
 
 
