@@ -136,6 +136,7 @@ class _PublicationLangValidateModel(BaseModel):
 
 
 class PublicationValidateModel(BaseModel):
+    abort_email: Optional[bool] = False
     publication: str
     publication_type: str
     release_date: date
