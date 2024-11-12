@@ -66,7 +66,6 @@ from data_gov_my.utils.metajson_structures import (
     PublicationValidateModel,
     i18nValidateModel,
 )
-from data_gov_my.utils.publication_helpers import send_email_to_subscribers
 
 logger = logging.getLogger("django")
 
@@ -169,8 +168,6 @@ class GeneralMetaBuilder(ABC):
                 if files:
                     builder = GeneralMetaBuilder.create(dir, isCategory=False)
                     builder.delete_operation(files)
-
-        send_email_to_subscribers()
 
     @staticmethod
     def filter_changed_files(file_list, compare_github=False) -> dict[str, list[dict]]:
