@@ -986,14 +986,16 @@ class PublicationBuilder(GeneralMetaBuilder):
                 )
 
                 for subscription in subscriptions:
+                    # TODO: locale
+                    pub = pub_object_en
                     mail.send(
-                        sender='notif@opendosm.my',
+                        sender='OpenDOSM <notif@opendosm.my>',
                         recipients=[subscription.email],
-                        subject=craft_title(metadata.title),
+                        subject=craft_title(pub.title),
                         message=craft_template_en(
-                            metadata.publication,
-                            metadata.publication_type_title,
-                            metadata.description
+                            pub.publication_id,
+                            pub.publication_type_title,
+                            pub.description
                         ),
                         priority='now'
                     )
