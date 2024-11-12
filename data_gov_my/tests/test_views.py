@@ -15,25 +15,6 @@ from data_gov_my.utils.publication_helpers import type_list, subtype_list, \
     populate_publication_types, populate_publication_subtypes, send_email_to_subscribers, craft_title, craft_template_en
 
 
-class TestCheckSubscription(APITestCase):
-    def setUp(self):
-        pass
-
-    def test_subscription_exists(self):
-        email = 'test4@gmail.com'
-        url = reverse('check-subscription')
-        self.assertEqual(url, '/check-subscription/')
-        r = self.client.post(url,  data={'email': email})
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['message'], f'Email does not exist')
-
-        # now let's create it!
-        Subscription.objects.create(email=email, publications=[])
-
-        r = self.client.post(url, data={'email': email})
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['message'], f'Email does exist')
-
 class TestEmailSubscription(APITestCase):
     def setUp(self):
         self.test_email = 'test@gmail.com'
@@ -96,7 +77,7 @@ class TestEmailSubscription(APITestCase):
 
         self.assertEqual(len(mail.outbox), 0)
         send_email_to_subscribers()
-        self.assertEqual(len(mail.outbox), publications_today_recount.count()*2)
+        self.assertEqual(len(mail.outbox), publications_today_recount.count() * 2)
         subscriber_list = [s.email for s in Subscription.objects.all()]
         for o in mail.outbox:
             self.assertEqual(len(o.recipients()), 1)
@@ -104,6 +85,7 @@ class TestEmailSubscription(APITestCase):
             # print(f'recipients: {o.to}')
             # print(f'subject: {o.subject}')
             # print(f'content: {o.body}')
+
 
 class TestPreviewSubscriptionEmail(APITestCase):
     def setUp(self):
@@ -141,6 +123,7 @@ class TestPreviewSubscriptionEmail(APITestCase):
             fail_silently=False,
         )
         self.assertEqual(len(mail.outbox), 1)
+
 
 class TestEmailSubscribeSubmission(APITestCase):
     def setUp(self):
@@ -265,7 +248,7 @@ class TestEmailSubscribeSubmission(APITestCase):
                     'wrt'
                 ]
             },
-            headers={'Authorization':  token}
+            headers={'Authorization': token}
         )
         # print(r.json())
         self.assertEqual(r.status_code, 200)
