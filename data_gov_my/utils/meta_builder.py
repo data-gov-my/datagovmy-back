@@ -979,7 +979,7 @@ class PublicationBuilder(GeneralMetaBuilder):
         )
 
         # Send notification to all subscribers of the publication type only if release date is today
-        if metadata.release_date == date.today():
+        if not metadata.abort_email and metadata.release_date == date.today():
             try:
                 subscriptions = Subscription.objects.filter(
                     publications__contains=[metadata.publication_type]
