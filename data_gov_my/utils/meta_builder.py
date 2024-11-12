@@ -40,9 +40,9 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationResource,
-    PublicationSubscription,
     PublicationUpcoming,
     i18nJson,
+    Subscription
 )
 from data_gov_my.utils import triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -66,6 +66,7 @@ from data_gov_my.utils.metajson_structures import (
     PublicationValidateModel,
     i18nValidateModel,
 )
+from data_gov_my.utils.publication_helpers import craft_title, craft_template_en
 
 logger = logging.getLogger("django")
 
@@ -980,19 +981,38 @@ class PublicationBuilder(GeneralMetaBuilder):
         # Send notification to all subscribers of the publication type only if release date is today
         if metadata.release_date == date.today():
             try:
-                subscription = PublicationSubscription.objects.get(
-                    publication_type=metadata.publication_type
+                subscriptions = Subscription.objects.filter(
+                    publications__contains=[metadata.publication_type]
                 )
-                if subscription.emails:
-                    # TODO: set up proper email template
+
+                for subscription in subscriptions:
                     mail.send(
-                        bcc=subscription.emails,
-                        subject="Just Published: {{publication_type}}",
-                        html_message="Just Published: {{publication_type}} (Proper email content WIP)",
-                        context={"publication_type": metadata.publication_type},
+                        sender='notif@opendosm.my',
+                        recipients=[subscription.email],
+                        subject=craft_title(metadata.title),
+                        message=craft_template_en(
+                            metadata.publication,
+                            metadata.publication_type_title,
+                            metadata.description
+                        ),
+                        priority='now'
                     )
-            except PublicationSubscription.DoesNotExist:
+            except Subscription.DoesNotExist:
                 pass
+            # try:
+            #     subscription = PublicationSubscription.objects.get(
+            #         publication_type=metadata.publication_type
+            #     )
+            #     if subscription.emails:
+            #         # TODO: set up proper email template
+            #         mail.send(
+            #             bcc=subscription.emails,
+            #             subject="Just Published: {{publication_type}}",
+            #             html_message="Just Published: {{publication_type}} (Proper email content WIP)",
+            #             context={"publication_type": metadata.publication_type},
+            #         )
+            # except PublicationSubscription.DoesNotExist:
+            #     pass
 
         return [pub_object_en, pub_object_bm]
 
