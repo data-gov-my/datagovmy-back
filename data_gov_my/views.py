@@ -797,7 +797,7 @@ class CheckSubscriptionView(APIView):
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Verify Your Email',
-                html_message=create_token_message(jwt_token=jwt_token),
+                message=create_token_message(jwt_token=jwt_token),
                 priority='now'
             )
             return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
@@ -849,7 +849,7 @@ class TokenRequestView(APIView):
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Verify Your Email',
-                html_message=create_token_message(jwt_token=message),
+                message=create_token_message(jwt_token=message),
                 priority='now'
             )
             return Response({'message': 'User subscribed. Email with login token sent'}, status=HTTPStatus.OK)
