@@ -796,7 +796,7 @@ class CheckSubscriptionView(APIView):
             mail.send(
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
-                subject='Your login token.',
+                subject='Verify Your Email',
                 message=create_token_message(jwt_token=jwt_token),
                 priority='now'
             )
