@@ -15,6 +15,7 @@ import requests
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.utils.html import strip_tags
 from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
@@ -793,11 +794,14 @@ class CheckSubscriptionView(APIView):
                 'sub': email,
                 'validity': int(validity.timestamp()),
             }, os.getenv("WORKFLOW_TOKEN"))
+            html_message = create_token_message(jwt_token=jwt_token)
+            message = strip_tags(html_message)
             mail.send(
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Verify Your Email',
-                html_message=create_token_message(jwt_token=jwt_token),
+                html_message=html_message,
+                message=message,
                 priority='now'
             )
             return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
@@ -841,15 +845,18 @@ class TokenRequestView(APIView):
         try:
             sub = Subscription.objects.get(email=email)
             validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
-            message = jwt.encode({
+            jwt_token = jwt.encode({
                 'sub': email,
                 'validity': int(validity.timestamp()),
             }, os.getenv("WORKFLOW_TOKEN"))
+            html_message = create_token_message(jwt_token=jwt_token)
+            message = strip_tags(html_message)
             mail.send(
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Verify Your Email',
-                html_message=create_token_message(jwt_token=message),
+                message=message,
+                html_message=html_message,
                 priority='now'
             )
             return Response({'message': 'User subscribed. Email with login token sent'}, status=HTTPStatus.OK)
