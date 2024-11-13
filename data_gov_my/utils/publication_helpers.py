@@ -462,11 +462,11 @@ Please use the following token to authenticate your email on OpenDOSM:
 Warm regards,
 OpenDOSM Authentication Bot
 
-Tech FAQ: Why such a long token?
+<i>Tech FAQ: Why such a long token?
 
 Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.
 
-Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!
+Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!</i>
 """
     return token_message_en
 
