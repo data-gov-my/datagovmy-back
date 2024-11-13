@@ -453,20 +453,20 @@ def send_email_to_subscribers():
 def create_token_message(jwt_token):
     # TODO: handle language preference
     token_message_en = f"""
-Thank you for subscribing!
+<p>Thank you for subscribing!</p>
 
-Please use the following token to authenticate your email on OpenDOSM:
+<p>Please use the following token to authenticate your email on OpenDOSM:</p>
 
-{jwt_token}
+<p>{jwt_token}</p>
 
-Warm regards,
-OpenDOSM Authentication Bot
+<p>Warm regards,</p>
+<p>OpenDOSM Authentication Bot</p>
 
-<i>Tech FAQ: Why such a long token?
+<i><p>Tech FAQ: Why such a long token?</p>
 
-Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.
+<p>Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.</p>
 
-Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!</i>
+<p>Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!</p></i>
 """
     return token_message_en
 
