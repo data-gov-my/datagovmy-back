@@ -449,3 +449,25 @@ def send_email_to_subscribers():
                 message=craft_template_en(p.publication_id, p.title, p.description),
                 priority='now'
             )
+
+def create_token_message(jwt_token):
+    token_message_en = f"""
+Thank you for subscribing!
+
+Please use the following token to authenticate your email on OpenDOSM:
+
+{jwt_token}
+
+Warm regards,
+OpenDOSM Authentication Bot
+
+Tech FAQ: Why such a long token?
+
+Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.
+
+Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!
+"""
+
+class OpenDosmMail:
+    def __init__(self):
+        pass
