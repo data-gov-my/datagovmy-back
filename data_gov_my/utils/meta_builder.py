@@ -982,7 +982,7 @@ class PublicationBuilder(GeneralMetaBuilder):
         if not metadata.abort_email and metadata.release_date == date.today():
             try:
                 subscriptions = Subscription.objects.filter(
-                    publications__contains=[metadata.publication_type]
+                    publications__overlap=[metadata.publication_type, 'all']
                 )
 
                 for subscription in subscriptions:
