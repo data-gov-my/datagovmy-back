@@ -57,7 +57,7 @@ from data_gov_my.serializers import (
 )
 from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-from data_gov_my.utils.publication_helpers import subtype_list
+from data_gov_my.utils.publication_helpers import subtype_list, create_token_message
 from data_gov_my.utils.throttling import FormRateThrottle
 
 env = environ.Env()
@@ -789,7 +789,7 @@ class CheckSubscriptionView(APIView):
         except Subscription.DoesNotExist:
             sub = Subscription.objects.create(email=email, publications=[])
             validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
-            message = jwt.encode({
+            jwt_token = jwt.encode({
                 'sub': email,
                 'validity': int(validity.timestamp()),
             }, os.getenv("WORKFLOW_TOKEN"))
@@ -797,7 +797,7 @@ class CheckSubscriptionView(APIView):
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Your login token.',
-                message=f'{message}',
+                message=create_token_message(jwt_token=jwt_token),
                 priority='now'
             )
             return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
@@ -848,8 +848,8 @@ class TokenRequestView(APIView):
             mail.send(
                 sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
-                subject='Your login token.',
-                message=f'{message}',
+                subject='Verify Your Email',
+                message=create_token_message(jwt_token=message),
                 priority='now'
             )
             return Response({'message': 'User subscribed. Email with login token sent'}, status=HTTPStatus.OK)
