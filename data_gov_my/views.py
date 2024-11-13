@@ -794,7 +794,7 @@ class CheckSubscriptionView(APIView):
                 'validity': int(validity.timestamp()),
             }, os.getenv("WORKFLOW_TOKEN"))
             mail.send(
-                sender='notif@opendosm.my',
+                sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Your login token.',
                 message=f'{message}',
@@ -846,7 +846,7 @@ class TokenRequestView(APIView):
                 'validity': int(validity.timestamp()),
             }, os.getenv("WORKFLOW_TOKEN"))
             mail.send(
-                sender='notif@opendosm.my',
+                sender='OpenDOSM <notif@opendosm.my>',
                 recipients=[sub.email],
                 subject='Your login token.',
                 message=f'{message}',
