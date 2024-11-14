@@ -56,6 +56,7 @@ from data_gov_my.serializers import (
     PublicationUpcomingSerializer,
     i18nSerializer,
 )
+from data_gov_my.utils import triggers
 from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
 from data_gov_my.utils.publication_helpers import subtype_list, create_token_message
@@ -821,6 +822,27 @@ class SubscriptionView(APIView):
         publication_list = request.data.getlist("publications", None)
         subscriber.publications = publication_list
         subscriber.save()
+
+        # make a POST request to tinybird
+        try:
+            r = requests.post(
+                url=os.getenv("SUBSCRIPTION_TINYBIRD_URL"),
+                headers={"Authorization": f"Bearer {os.getenv('SUBSCRIPTION_TINYBIRD_TOKEN')}"},
+                data=json.dumps({
+                    'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                    'email': email,
+                    'publications': publication_list
+                })
+            )
+            if r.status_code != 202:
+                triggers.send_telegram(f'STAGING TINYBIRD STATUS: {r.status_code}\nTEXT: {r.text}')
+            if r.json()["quarantined_rows"]:
+                triggers.send_telegram(f'STAGING TINYBIRD STATUS: {r.status_code}\nQUARANTINED ROWS: {r.json()["quarantined_rows"]}')
+
+        except requests.exceptions.RequestException as e:
+            print(f'tinybird error: {e}')
+            triggers.send_telegram(f'STAGING TINYBIRD ERROR: {e}')
+
         return Response({'message': 'Subscriptions updated.'}, HTTPStatus.OK)
 
     def get(self, request):
