@@ -282,16 +282,12 @@ class I18N(APIView):
 class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
-        print(f'lang: {lang}')
-
-        data = None
-        pub_type = PublicationType.objects.filter(language__contains=lang)
+        pub_type = PublicationType.objects.all()
         if lang == 'ms':
             data = {p.type_bm: p.dict_bm for p in pub_type}
-        elif lang == 'en':
-            data = {p.type_en: p.dict_en for p in pub_type}
         else:
-            return JsonResponse({'message': 'Error: Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
+            # default to English
+            data = {p.type_en: p.dict_en for p in pub_type}
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
