@@ -1229,19 +1229,17 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
             self, filename: str, metadata: PublicationTypeValidateModel
     ):
         df = pd.read_parquet(metadata.parquet_link)
+        type_list = df['type'].unique().tolist()
 
         PublicationType.objects.all().delete()
 
-        for type_value, group in df.groupby('type_bm'):
-            pt = PublicationType.objects.create(id=type_value)
-            pt.type_bm = type_value
-            pt.dict_bm = dict(zip(group['subtype'], group['subtype_bm']))
-            pt.language = 'ms-MY'
-            pt.save()
+        for l in type_list:
+            PublicationType.objects.create(id=l, dict_bm={}, dict_en={})
 
-        for type_value, group in df.groupby('type_en'):
-            pt = PublicationType.objects.get(id=type_value)
-            pt.type_en = type_value
-            pt.dict_en = dict(zip(group['subtype'], group['subtype_en']))
-            pt.language = 'en-GB'
-            pt.save()
+        for index, row in df.iterrows():
+            p = PublicationType.objects.get(id=row['type'])
+            p.type_en = row['type_en']
+            p.type_bm = row['type_bm']
+            p.dict_bm[row['subtype']] = row['subtype_bm']
+            p.dict_en[row['subtype']] = row['subtype_en']
+            p.save()
