@@ -263,8 +263,10 @@ class PublicationSubtype(models.Model):
     subtype_bm = models.CharField(max_length=100)
 
 class Subscription(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(primary_key=True)
     publications = ArrayField(models.CharField(max_length=100), default=list)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
 
 class PublicationResource(models.Model):
     resource_id = models.IntegerField()

@@ -23,9 +23,10 @@ admin.site.register(PublicationDocumentation)
 admin.site.register(PublicationDocumentationResource)
 admin.site.register(PublicationUpcoming)
 admin.site.register(ExplorersUpdate)
-admin.site.register(Subscription)
 
-
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ['created_at', 'email', 'publications', 'language']
 @admin.register(Publication)
 class PublicationAdmin(admin.ModelAdmin):
     search_fields = ["publication_id"]
