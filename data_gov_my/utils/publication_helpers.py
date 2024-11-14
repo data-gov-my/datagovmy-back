@@ -466,7 +466,7 @@ def create_token_message(jwt_token):
 
 <p>Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.</p>
 
-<p>Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!</p></i>
+<p>Therefore, we use JSON Web Tokens (JWTs) instead. These tokens are long enough to be self-contained and cryptographically secure, meaning they don’t require extra server resources. This makes OpenDOSM faster and more secure for you!</p></i>
 """
     return token_message_en
 
