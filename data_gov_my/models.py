@@ -253,8 +253,11 @@ class PublicationSubscription(models.Model):
 
 class PublicationType(models.Model):
     id = models.CharField(max_length=50, primary_key=True)
-    type_en = models.CharField(max_length=100)
-    type_bm = models.CharField(max_length=100)
+    type_en = models.CharField(max_length=50, blank=True, null=True)
+    dict_en = models.JSONField(null=True, blank=True)
+    type_bm = models.CharField(max_length=50, blank=True, null=True)
+    dict_bm = models.JSONField(null=True, blank=True)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, null=True)
 
 class PublicationSubtype(models.Model):
     id = models.CharField(max_length=50, primary_key=True)

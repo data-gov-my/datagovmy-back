@@ -186,3 +186,7 @@ class _PublicationUpcomingLangModel(BaseModel):
 class PublicationUpcomingValidateModel(BaseModel):
     manual_trigger: str | int | bool
     parquet_link: str
+
+class PublicationTypeValidateModel(BaseModel):
+    manual_trigger: str | int | bool
+    parquet_link: str
