@@ -793,7 +793,7 @@ class SubscriptionView(APIView):
         publication_list = request.data.getlist("publications", None)
         subscriber.publications = publication_list
         subscriber.save()
-        return Response({'message': 'Subscriptions updated.'}, HTTPStatus.OK)
+        return Response({'email': subscriber.email, 'message': 'Subscriptions updated.'}, HTTPStatus.OK)
 
     def get(self, request):
         token = request.headers.get("Authorization", None)
