@@ -42,7 +42,7 @@ from data_gov_my.models import (
     PublicationResource,
     PublicationUpcoming,
     i18nJson,
-    Subscription
+    Subscription, PublicationType, PublicationSubtype
 )
 from data_gov_my.utils import triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -64,7 +64,7 @@ from data_gov_my.utils.metajson_structures import (
     PublicationDocumentationValidateModel,
     PublicationUpcomingValidateModel,
     PublicationValidateModel,
-    i18nValidateModel,
+    i18nValidateModel, PublicationTypeValidateModel,
 )
 from data_gov_my.utils.publication_helpers import craft_title, craft_template_en
 
@@ -1210,3 +1210,38 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
         )
 
         return publications_en_created + publications_bm_created
+
+
+class PublicationTypeBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_TYPE"
+    MODEL = PublicationType
+    GITHUB_DIR = "pub-dosm/pubs"
+    VALIDATOR = PublicationTypeValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        Deletes the whole table because only a single file is supposed to reside within pub-dosm/pubs
+        """
+        pub_type = PublicationType.objects.all().delete()
+        return pub_type
+
+    def update_or_create_meta(
+            self, filename: str, metadata: PublicationTypeValidateModel
+    ):
+        df = pd.read_parquet(metadata.parquet_link)
+
+        PublicationType.objects.all().delete()
+
+        for type_value, group in df.groupby('type_bm'):
+            pt = PublicationType.objects.create(id=type_value)
+            pt.type_bm = type_value
+            pt.dict_bm = dict(zip(group['subtype'], group['subtype_bm']))
+            pt.language = 'ms-MY'
+            pt.save()
+
+        for type_value, group in df.groupby('type_en'):
+            pt = PublicationType.objects.get(id=type_value)
+            pt.type_en = type_value
+            pt.dict_en = dict(zip(group['subtype'], group['subtype_en']))
+            pt.language = 'en-GB'
+            pt.save()

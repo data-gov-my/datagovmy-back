@@ -1,12 +1,8 @@
-import os
 import json
 import logging
-from http import HTTPStatus
-from logging import exception
-
-import pandas as pd
+import os
 from datetime import datetime, timedelta
-from io import BytesIO
+from http import HTTPStatus
 from itertools import groupby
 from threading import Thread
 
@@ -15,10 +11,10 @@ import requests
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.utils.html import strip_tags
 from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.utils.html import strip_tags
 from django.utils.timezone import get_current_timezone
 from jose import jwt
 from post_office import mail
@@ -46,7 +42,7 @@ from data_gov_my.models import (
     PublicationSubscription,
     PublicationUpcoming,
     Subscription,
-    i18nJson, PublicationSubtype,
+    i18nJson, PublicationType,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -59,7 +55,7 @@ from data_gov_my.serializers import (
 from data_gov_my.utils import triggers
 from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-from data_gov_my.utils.publication_helpers import subtype_list, create_token_message
+from data_gov_my.utils.publication_helpers import create_token_message
 from data_gov_my.utils.throttling import FormRateThrottle
 
 env = environ.Env()
@@ -287,27 +283,17 @@ class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
         print(f'lang: {lang}')
-        r = requests.get('https://storage.dosm.gov.my/meta/arc_types.parquet')
-        if r.status_code == 200:
-            data = dict()
-            parquet_file = BytesIO(r.content)
-            df = pd.read_parquet(parquet_file)
-            if lang == 'ms':
-                # Iterate through the grouped data by 'type'
-                for type_value, group in df.groupby('type_bm'):
-                    # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
-                    data[type_value] = dict(zip(group['subtype'], group['subtype_bm']))
-            else:  # lang == 'en'
-                # Iterate through the grouped data by 'type'
-                for type_value, group in df.groupby('type_en'):
-                    # Create a dictionary where 'type_bm' is the key and 'subtype_bm' is the value
-                    data[type_value] = dict(zip(group['subtype'], group['subtype_en']))
-            return JsonResponse(data, status=status.HTTP_200_OK)
+
+        data = None
+        pub_type = PublicationType.objects.filter(language__contains=lang)
+        if lang == 'ms':
+            data = {p.type_bm: p.dict_bm for p in pub_type}
+        elif lang == 'en':
+            data = {p.type_en: p.dict_en for p in pub_type}
         else:
-            return Response(
-                {'error': 'Unable to get arc_types.parquet file.'},
-                status=status.HTTP_204_NO_CONTENT,
-            )
+            return JsonResponse({'message': 'Error: Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(data, status=status.HTTP_200_OK)
+
 
 
 class FORMS(generics.ListAPIView):
