@@ -38,3 +38,4 @@ class PublicationAdmin(admin.ModelAdmin):
 @admin.register(PublicationType)
 class PublicationTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'type_en', 'dict_en', 'type_bm', 'dict_bm']
+    ordering = ('id',)
