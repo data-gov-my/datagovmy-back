@@ -984,10 +984,20 @@ class PublicationBuilder(GeneralMetaBuilder):
                 subscriptions = Subscription.objects.filter(
                     publications__overlap=[metadata.publication_type, 'all']
                 )
-
+                triggers.send_telegram(
+                    f'List of subscribers to get email notif on {metadata.en.title}:'
+                    f'{[s.email for s in subscriptions]}'
+                )
                 for subscription in subscriptions:
-                    # TODO: locale
-                    pub = pub_object_en
+                    if subscription.language == 'ms-MY':
+                        pub = pub_object_bm
+                    elif subscription.language == 'en-GB':
+                        pub = pub_object_en
+                    else:
+                        pub = pub_object_en
+                        triggers.send_telegram(
+                            f'Can\'t determine subscriber\'s {subscription.email} locale. Will use en-GB.'
+                        )
                     mail.send(
                         sender='OpenDOSM <notif@opendosm.my>',
                         recipients=[subscription.email],
@@ -1000,7 +1010,9 @@ class PublicationBuilder(GeneralMetaBuilder):
                         priority='now'
                     )
             except Subscription.DoesNotExist:
-                pass
+                triggers.send_telegram(
+                    f'No one subscribe to {metadata.publication_type}. No email will be send.'
+                )
             # try:
             #     subscription = PublicationSubscription.objects.get(
             #         publication_type=metadata.publication_type
