@@ -67,6 +67,7 @@ from data_gov_my.utils.metajson_structures import (
     i18nValidateModel, PublicationTypeValidateModel,
 )
 from data_gov_my.utils.publication_helpers import craft_title, craft_template_en
+from data_gov_my.utils.subscription_email_helper import SubscriptionEmail
 
 logger = logging.getLogger("django")
 
@@ -988,46 +989,14 @@ class PublicationBuilder(GeneralMetaBuilder):
                     f'List of subscribers to get email notif on {metadata.en.title}:'
                     f'{[s.email for s in subscriptions]}'
                 )
-                for subscription in subscriptions:
-                    if subscription.language == 'ms-MY':
-                        pub = pub_object_bm
-                    elif subscription.language == 'en-GB':
-                        pub = pub_object_en
-                    else:
-                        pub = pub_object_en
-                        triggers.send_telegram(
-                            f'Can\'t determine subscriber\'s {subscription.email} locale. Will use en-GB.'
-                        )
-                    mail.send(
-                        sender='OpenDOSM <notif@opendosm.my>',
-                        recipients=[subscription.email],
-                        subject=craft_title(pub.title),
-                        message=craft_template_en(
-                            pub.publication_id,
-                            pub.publication_type_title,
-                            pub.description
-                        ),
-                        priority='now'
-                    )
+                for subscriber in subscriptions:
+                    publication_id = metadata.publication
+                    SubscriptionEmail(subscriber, publication_id).send_email()
+
             except Subscription.DoesNotExist:
                 triggers.send_telegram(
-                    f'No one subscribe to {metadata.publication_type}. No email will be send.'
+                    f'No one subscribed to {metadata.publication_type}. No email will be send.'
                 )
-            # try:
-            #     subscription = PublicationSubscription.objects.get(
-            #         publication_type=metadata.publication_type
-            #     )
-            #     if subscription.emails:
-            #         # TODO: set up proper email template
-            #         mail.send(
-            #             bcc=subscription.emails,
-            #             subject="Just Published: {{publication_type}}",
-            #             html_message="Just Published: {{publication_type}} (Proper email content WIP)",
-            #             context={"publication_type": metadata.publication_type},
-            #         )
-            # except PublicationSubscription.DoesNotExist:
-            #     pass
-
         return [pub_object_en, pub_object_bm]
 
 
