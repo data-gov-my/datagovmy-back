@@ -77,7 +77,7 @@ class SubscriptionEmail():
         content_bm = f'''
         <p>{self.publication.description}</p>
         <p>Anda boleh mengakses penerbitan tersebut di pautan ini:</p>
-        <p>https://open.dosm.gov.my/ms-MY/publications/cpi_2024-08</p>
+        <p>https://open.dosm.gov.my/ms-MY/publications/{self.publication.publication_id}</p>
         <p>Sekiranya anda ada sebarang pertanyaan mengenai data tersebut, anda boleh menghantar enkuiri kepada data@dosm.gov.my.</p>
         <p>Sekian, terima kasih.</p>
         <p>Bot Notifikasi OpenDOSM</p>
