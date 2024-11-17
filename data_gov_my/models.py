@@ -220,6 +220,7 @@ class Publication(models.Model):
     publication_type_title = models.CharField(max_length=150)
     title = models.CharField(max_length=150)
     description = models.CharField(max_length=300)
+    description_email = models.CharField(max_length=500, null=True)
     release_date = models.DateField()
     frequency = models.CharField(max_length=50)
     geography = ArrayField(
