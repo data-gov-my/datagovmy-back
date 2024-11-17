@@ -253,15 +253,15 @@ class PublicationSubscription(models.Model):
 
 class PublicationType(models.Model):
     order = models.IntegerField(blank=True, null=True)
-    id = models.CharField(max_length=50, primary_key=True)
-    type_en = models.CharField(max_length=50, blank=True, null=True)
+    id = models.CharField(max_length=100, primary_key=True)
+    type_en = models.CharField(max_length=100, blank=True, null=True)
     dict_en = models.JSONField(null=True, blank=True)
-    type_bm = models.CharField(max_length=50, blank=True, null=True)
+    type_bm = models.CharField(max_length=100, blank=True, null=True)
     dict_bm = models.JSONField(null=True, blank=True)
 
 class PublicationSubtype(models.Model):
     order = models.IntegerField(blank=True, null=True)
-    id = models.CharField(max_length=50, primary_key=True)
+    id = models.CharField(max_length=100, primary_key=True)
     publication_type = models.ForeignKey(PublicationType, on_delete=models.CASCADE)
     subtype_en = models.CharField(max_length=100)
     subtype_bm = models.CharField(max_length=100)
