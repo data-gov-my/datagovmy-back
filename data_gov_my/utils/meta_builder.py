@@ -1209,28 +1209,42 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
     def update_or_create_meta(
             self, filename: str, metadata: PublicationTypeValidateModel
     ):
-        df = pd.read_parquet(metadata.parquet_link)
+        df_type = pd.read_parquet(metadata.parquet_link)
+        df_subtype = pd.read_parquet(metadata.parquet_link)
 
         PublicationType.objects.all().delete()
         PublicationSubtype.objects.all().delete()
 
         # populate PublicationType
-        for index, row in df.iterrows():
-            PublicationType.objects.get_or_create(
-                defaults={'order': row['type_order'], 'id': row['type']},
-                order=row['type_order'], id=row['type'], dict_bm={}, dict_en={}
-            )
+        pub_type_list = []
+        for index, row in df_type.iterrows():
+            try:
+                PublicationType.objects.get(order=row['type_order'], id=row['type'])
+            except PublicationType.DoesNotExist:
+                pub_type = PublicationType.objects.create(
+                    order=row['type_order'],
+                    id=row['type'],
+                    type_en=row['type_en'],
+                    type_bm=row['type_bm'])
+                pub_type_list.append(pub_type)
 
         # populate PublicationSubtype
-        for index, row in df.iterrows():
-            p = PublicationType.objects.get(id=row['type'])
-            PublicationSubtype.objects.get_or_create(
-                defaults={'publication_type': p, 'order': row['subtype_order'], 'id': row['subtype']},
-                publication_type=p,
-                id=row['subtype'],
-                order=row['subtype_order'],
-                subtype_en=row['subtype_en'],
-                subtype_bm=row['subtype_bm'],
-            )
+        pub_subtype_list = []
+        for index, row in df_subtype.iterrows():
+            pub_type = PublicationType.objects.get(order=row['type_order'], id=row['type'])
+            try:
+                PublicationSubtype.objects.get(
+                    publication_type=pub_type,
+                    order=row['subtype_order'],
+                    id=row['subtype']
+                )
+            except PublicationSubtype.DoesNotExist:
+                pub_subtype = PublicationSubtype.objects.create(
+                    publication_type=pub_type,
+                    id=row['subtype'],
+                    order=row['subtype_order'],
+                    subtype_en=row['subtype_en'],
+                    subtype_bm=row['subtype_bm'])
+                pub_subtype_list.append(pub_subtype)
 
-        return [p for p in PublicationType.objects.all()] + [p for p in PublicationSubtype.objects.all()]
+        return pub_type_list + pub_subtype_list
