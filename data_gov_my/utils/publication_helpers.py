@@ -459,9 +459,8 @@ def create_token_message(jwt_token):
 
 <p>{jwt_token}</p>
 
-<p>Warm regards,</p>
-<p>OpenDOSM Authentication Bot</p>
-
+<p>Warm regards,</br>OpenDOSM Authentication Bot</p>
+<hr>
 <i><p>Tech FAQ: Why such a long token?</p>
 
 <p>Most websites send a simple 6-digit OTP for email verification. However, this approach requires extra resources (like a database) to store and track each OTP.</p>
