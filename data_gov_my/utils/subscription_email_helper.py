@@ -28,7 +28,7 @@ class SubscriptionEmail():
         self.sender = 'OpenDOSM <notif@opendosm.my>'
         self.subscriber = subscriber
         self.subscriber_language = self.subscriber.language
-        self.publication = Publication.objects.get(id=publication_id, language=self.subscriber_language)
+        self.publication = Publication.objects.get(publication_id=publication_id, language=self.subscriber_language)
 
 #     if
 #     subscription.language == 'ms-MY':
