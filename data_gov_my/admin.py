@@ -37,10 +37,10 @@ class PublicationAdmin(admin.ModelAdmin):
 
 @admin.register(PublicationType)
 class PublicationTypeAdmin(admin.ModelAdmin):
-    list_display = ['order', 'id', 'type_en', 'dict_en', 'type_bm', 'dict_bm']
+    list_display = ['order', 'id', 'type_en', 'type_bm']
     ordering = ('order',)
 
 @admin.register(PublicationSubtype)
-class PublicationSubtpeAdmin(admin.ModelAdmin):
+class PublicationSubtypeAdmin(admin.ModelAdmin):
     list_display = ['publication_type', 'order', 'id', 'subtype_en', 'subtype_bm']
-    ordering = ('publication_type', 'order')
+    ordering = ('publication_type__order', 'order')
