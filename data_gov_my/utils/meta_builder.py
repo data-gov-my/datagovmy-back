@@ -1248,14 +1248,14 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
                 pub_subtype_list.append(pub_subtype)
 
         # arrange all in PublicationType
-        for type in PublicationType.objects.all():
-            type_en = {}
-            type_bm = {}
+        for type in pub_type_list:
+            dict_en = {}
+            dict_bm = {}
             for subtype in type.publicationsubtype_set.all().order_by("order"):
-                type_en[subtype.id] = subtype.subtype_en
-                type_bm[subtype.id] = subtype.subtype_bm
-            type.type_en = type_en
-            type.type_bm = type_bm
+                dict_en[subtype.id] = subtype.subtype_en
+                dict_bm[subtype.id] = subtype.subtype_bm
+            type.dict_en = dict_en
+            type.dict_bm = dict_bm
             type.save()
 
         return pub_type_list + pub_subtype_list

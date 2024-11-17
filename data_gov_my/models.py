@@ -259,12 +259,20 @@ class PublicationType(models.Model):
     type_bm = models.CharField(max_length=100, blank=True, null=True)
     dict_bm = models.JSONField(null=True, blank=True)
 
+    def __str__(self) -> str:
+        return f"{self.order} ({self.id})"
+
 class PublicationSubtype(models.Model):
     order = models.IntegerField(blank=True, null=True)
     id = models.CharField(max_length=100, primary_key=True)
     publication_type = models.ForeignKey(PublicationType, on_delete=models.CASCADE)
     subtype_en = models.CharField(max_length=100)
     subtype_bm = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["publication_type__order", "order"]
+
+
 
 class Subscription(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
