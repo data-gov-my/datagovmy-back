@@ -252,6 +252,7 @@ class PublicationSubscription(models.Model):
     emails = ArrayField(models.EmailField(), default=list)
 
 class PublicationType(models.Model):
+    order = models.IntegerField(blank=True, null=True)
     id = models.CharField(max_length=50, primary_key=True)
     type_en = models.CharField(max_length=50, blank=True, null=True)
     dict_en = models.JSONField(null=True, blank=True)
@@ -259,6 +260,7 @@ class PublicationType(models.Model):
     dict_bm = models.JSONField(null=True, blank=True)
 
 class PublicationSubtype(models.Model):
+    order = models.IntegerField(blank=True, null=True)
     id = models.CharField(max_length=50, primary_key=True)
     publication_type = models.ForeignKey(PublicationType, on_delete=models.CASCADE)
     subtype_en = models.CharField(max_length=100)

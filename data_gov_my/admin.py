@@ -5,7 +5,7 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationUpcoming,
-    Subscription, PublicationType,
+    Subscription, PublicationType, PublicationSubtype,
 )
 from data_gov_my.models import (
     FormData,
@@ -37,5 +37,10 @@ class PublicationAdmin(admin.ModelAdmin):
 
 @admin.register(PublicationType)
 class PublicationTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'type_en', 'dict_en', 'type_bm', 'dict_bm']
-    ordering = ('id',)
+    list_display = ['order', 'id', 'type_en', 'dict_en', 'type_bm', 'dict_bm']
+    ordering = ('order',)
+
+@admin.register(PublicationSubtype)
+class PublicationSubtpeAdmin(admin.ModelAdmin):
+    list_display = ['publication_type', 'order', 'id', 'subtype_en', 'subtype_bm']
+    ordering = ('publication_type', 'order')

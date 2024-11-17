@@ -1210,19 +1210,27 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
             self, filename: str, metadata: PublicationTypeValidateModel
     ):
         df = pd.read_parquet(metadata.parquet_link)
-        type_list = df['type'].unique().tolist()
 
         PublicationType.objects.all().delete()
+        PublicationSubtype.objects.all().delete()
 
-        for l in type_list:
-            PublicationType.objects.create(id=l, dict_bm={}, dict_en={})
+        # populate PublicationType
+        for index, row in df.iterrows():
+            PublicationType.objects.get_or_create(
+                defaults={'order': row['type_order'], 'id': row['type']},
+                order=row['type_order'], id=row['type'], dict_bm={}, dict_en={}
+            )
 
+        # populate PublicationSubtype
         for index, row in df.iterrows():
             p = PublicationType.objects.get(id=row['type'])
-            p.type_en = row['type_en']
-            p.type_bm = row['type_bm']
-            p.dict_bm[row['subtype']] = row['subtype_bm']
-            p.dict_en[row['subtype']] = row['subtype_en']
-            p.save()
+            PublicationSubtype.objects.get_or_create(
+                defaults={'publication_type': p, 'order': row['subtype_order'], 'id': row['subtype']},
+                publication_type=p,
+                id=row['subtype'],
+                order=row['subtype_order'],
+                subtype_en=row['subtype_en'],
+                subtype_bm=row['subtype_bm'],
+            )
 
-        return [p for p in PublicationType.objects.all()]
+        return [p for p in PublicationType.objects.all()] + [p for p in PublicationSubtype.objects.all()]
