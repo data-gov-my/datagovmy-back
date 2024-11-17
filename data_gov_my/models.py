@@ -260,7 +260,7 @@ class PublicationType(models.Model):
     dict_bm = models.JSONField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return f"{self.order} ({self.id})"
+        return f"{self.order}-{self.id}"
 
 class PublicationSubtype(models.Model):
     order = models.IntegerField(blank=True, null=True)
@@ -270,7 +270,7 @@ class PublicationSubtype(models.Model):
     subtype_bm = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ["publication_type__order", "order"]
+        ordering = ["publication_type", "order"]
 
 
 

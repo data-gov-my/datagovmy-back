@@ -283,11 +283,15 @@ class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
         pub_type = PublicationType.objects.all().order_by("order")
+
+        data = {}
         if lang == 'ms':
-            data = {p.type_bm: p.dict_bm for p in pub_type}
+            for p in pub_type:
+                data[p.type_bm] = {s.subtype: s.subtype_bm for s in p.publicationsubtype_set.all().order_by("order")}
         else:
             # default to English
-            data = {p.type_en: p.dict_en for p in pub_type}
+            for p in pub_type:
+                data[p.type_en] = {s.subtype: s.subtype_en for s in p.publicationsubtype_set.all().order_by("order")}
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
