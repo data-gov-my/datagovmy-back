@@ -1252,8 +1252,8 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
             type_en = {}
             type_bm = {}
             for subtype in type.publicationsubtype_set.all().order_by("order"):
-                type_en[subtype.id] = subtype.type_en
-                type_bm[subtype.id] = subtype.type_bm
+                type_en[subtype.id] = subtype.subtype_en
+                type_bm[subtype.id] = subtype.subtype_bm
             type.type_en = type_en
             type.type_bm = type_bm
             type.save()
