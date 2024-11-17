@@ -17,7 +17,6 @@ SITES = Literal["datagovmy", "kkmnow", "opendosm", "databnm"]
 
 
 class DashboardChartModel(BaseModel):
-    name: str
     chart_type: str
     chart_source: str
     data_as_of: str
@@ -64,7 +63,6 @@ class DashboardChartModel(BaseModel):
 
 
 class DashboardValidateModel(BaseModel):
-    dashboard_name: str
     data_last_updated: datetime
     data_next_update: Optional[datetime] = None
     route: str
