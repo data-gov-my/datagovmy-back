@@ -459,7 +459,7 @@ def create_token_message(jwt_token):
 
 <p>{jwt_token}</p>
 
-<p>Warm regards<br>OpenDOSM Authentication Bot</p>
+<p>Warm regards,<br>OpenDOSM Authentication Bot</p>
 <hr>
 <i><p>Tech FAQ: Why such a long token?</p>
 
