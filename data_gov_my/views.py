@@ -282,7 +282,7 @@ class I18N(APIView):
 class PublicationTypeSubtypeList(APIView):
     def get(self, request, format=None):
         lang = request.query_params.get("lang")
-        pub_type = PublicationType.objects.all().order_by("id")
+        pub_type = PublicationType.objects.all().order_by("order")
         if lang == 'ms':
             data = {p.type_bm: p.dict_bm for p in pub_type}
         else:
