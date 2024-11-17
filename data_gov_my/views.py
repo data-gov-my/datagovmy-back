@@ -287,11 +287,11 @@ class PublicationTypeSubtypeList(APIView):
         data = {}
         if lang == 'ms':
             for p in pub_type:
-                data[p.type_bm] = {s.subtype: s.subtype_bm for s in p.publicationsubtype_set.all().order_by("order")}
+                data[p.type_bm] = {s.id: s.subtype_bm for s in p.publicationsubtype_set.all().order_by("order")}
         else:
             # default to English
             for p in pub_type:
-                data[p.type_en] = {s.subtype: s.subtype_en for s in p.publicationsubtype_set.all().order_by("order")}
+                data[p.type_en] = {s.id: s.subtype_en for s in p.publicationsubtype_set.all().order_by("order")}
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
