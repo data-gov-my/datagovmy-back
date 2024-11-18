@@ -1198,7 +1198,7 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
 class PublicationTypeBuilder(GeneralMetaBuilder):
     CATEGORY = "PUBLICATION_TYPE"
     MODEL = PublicationType
-    GITHUB_DIR = "pub-dosm/pubs"
+    GITHUB_DIR = "pub-dosm/subs"
     VALIDATOR = PublicationTypeValidateModel
 
     def delete_file(self, filename: str, data: dict):
@@ -1206,7 +1206,8 @@ class PublicationTypeBuilder(GeneralMetaBuilder):
         Deletes the whole table because only a single file is supposed to reside within pub-dosm/pubs
         """
         pub_type = PublicationType.objects.all().delete()
-        return pub_type
+        pub_subtype = PublicationSubtype.objects.all().delete()
+        return pub_type + pub_subtype
 
     def update_or_create_meta(
             self, filename: str, metadata: PublicationTypeValidateModel

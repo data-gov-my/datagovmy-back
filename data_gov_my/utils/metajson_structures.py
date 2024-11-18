@@ -131,7 +131,7 @@ class _PublicationResourceValidateModel(BaseModel):
 class _PublicationLangValidateModel(BaseModel):
     title: str
     description: str
-    description_email: str
+    description_email: Optional[str] = None
     publication_type_title: str
     resources: list[_PublicationResourceValidateModel]
 
