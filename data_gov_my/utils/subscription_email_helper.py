@@ -1,4 +1,5 @@
 import os
+
 from post_office import mail
 
 from data_gov_my.models import Subscription, Publication
@@ -65,8 +66,12 @@ class SubscriptionEmail():
         return craft_title(self.publication.title)
 
     def get_email_content(self):
+        if self.publication.description_email:
+            description_email = f'<p>{self.publication.description_email}</p>'
+        else:
+            description_email = ''
         content_en = f'''
-        <p>{self.publication.description_email}</p>
+        {description_email}
         <p>The publication is live at this link:</p>
         <p>https://open.dosm.gov.my/publications/{self.publication.publication_id}</p>
         <p>If you have any questions about the data, you may write to data@dosm.gov.my with your enquiry.</p>
@@ -75,7 +80,7 @@ class SubscriptionEmail():
         <i><p>Note: To stop or amend your OpenDOSM notifications, go to: https://open.dosm.gov.my/publications/manage-subscription</p></i>
 '''
         content_bm = f'''
-        <p>{self.publication.description_email}</p>
+        {description_email}
         <p>Penerbitan tersebut boleh diakses melalui pautan ini:</p>
         <p>https://open.dosm.gov.my/ms-MY/publications/{self.publication.publication_id}</p>
         <p>Sekiranya anda ada sebarang pertanyaan mengenai data tersebut, anda boleh menghantar enkuiri kepada data@dosm.gov.my.</p>
