@@ -838,6 +838,8 @@ class SubscriptionView(APIView):
         if not token:
             token = request.META["headers"]["Authorization"]
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        if datetime.now() > datetime.fromtimestamp(decoded_token['validity']):
+            return Response({'message':'Token expired.'}, status=status.HTTP_401_UNAUTHORIZED)
         email = decoded_token["sub"]
         email = normalize_email(email)
 
