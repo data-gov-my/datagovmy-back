@@ -1,17 +1,22 @@
 import json
 import logging
-from datetime import datetime
+import os
+from datetime import datetime, timedelta
+from http import HTTPStatus
 from itertools import groupby
 from threading import Thread
 
 import environ
+import requests
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db.models import F, Q, Sum
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import get_list_or_404, get_object_or_404
+from django.utils.html import strip_tags
 from django.utils.timezone import get_current_timezone
+from jose import jwt
 from post_office import mail
 from post_office.models import Email
 from rest_framework import generics, request, status
@@ -36,7 +41,8 @@ from data_gov_my.models import (
     PublicationResource,
     PublicationSubscription,
     PublicationUpcoming,
-    i18nJson,
+    Subscription,
+    i18nJson, PublicationType,
 )
 from data_gov_my.serializers import (
     FormDataSerializer,
@@ -46,8 +52,10 @@ from data_gov_my.serializers import (
     PublicationUpcomingSerializer,
     i18nSerializer,
 )
+from data_gov_my.utils import triggers
+from data_gov_my.utils.email_normalization import normalize_email
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-
+from data_gov_my.utils.publication_helpers import create_token_message
 from data_gov_my.utils.throttling import FormRateThrottle
 
 env = environ.Env()
@@ -167,8 +175,8 @@ class EXPLORER(APIView):
     def get(self, request, format=None):
         params = dict(request.GET)
         if (
-            "explorer" in params
-            and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
+                "explorer" in params
+                and params["explorer"][0] in exp_class.EXPLORERS_CLASS_LIST
         ):
             obj = exp_class.EXPLORERS_CLASS_LIST[params["explorer"][0]]()
             return obj.handle_api(params)
@@ -269,6 +277,23 @@ class I18N(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class PublicationTypeSubtypeList(APIView):
+    def get(self, request, format=None):
+        lang = request.query_params.get("lang")
+        pub_type = PublicationType.objects.all().order_by("order")
+
+        data = {}
+        if lang == 'ms':
+            for p in pub_type:
+                data[p.type_bm] = {s.id: s.subtype_bm for s in p.publicationsubtype_set.all().order_by("order")}
+        else:
+            # default to English
+            for p in pub_type:
+                data[p.type_en] = {s.id: s.subtype_en for s in p.publicationsubtype_set.all().order_by("order")}
+        return JsonResponse(data, status=status.HTTP_200_OK)
+
 
 
 class FORMS(generics.ListAPIView):
@@ -668,9 +693,9 @@ def handle_request(param_list: QueryDict, isDashboard=True):
         "data_next_update": data_next_update,
     }
     if (
-        all(p in param_list for p in params_req)
-        or all(p in param_list for p in params_opt)
-        or not isDashboard
+            all(p in param_list for p in params_req)
+            or all(p in param_list for p in params_opt)
+            or not isDashboard
     ):
         data = dbd_info["charts"]
 
@@ -682,7 +707,7 @@ def handle_request(param_list: QueryDict, isDashboard=True):
 
                 # dashboard endpoint should ignore this unless the chart name is query_values
                 if (isDashboard and k == "query_values") or (
-                    not isDashboard and k != "query_values"
+                        not isDashboard and k != "query_values"
                 ):
                     continue
 
@@ -715,10 +740,10 @@ def handle_request(param_list: QueryDict, isDashboard=True):
 
 
 def get_nested_data(
-    dbd_info: dict,
-    api_params: list[str],
-    param_list: QueryDict,
-    data: dict,
+        dbd_info: dict,
+        api_params: list[str],
+        param_list: QueryDict,
+        data: dict,
 ):
     """
     Slices dictionary,
@@ -740,3 +765,177 @@ def get_nested_data(
             break
 
     return data
+
+
+class CheckSubscriptionView(APIView):
+    def post(self, request):
+        email = request.data["email"]
+        email = normalize_email(email)
+        try:
+            Subscription.objects.get(email=email)
+            return Response({'message': f'Email does exist'}, status=status.HTTP_200_OK)
+        except Subscription.DoesNotExist:
+            sub = Subscription.objects.create(email=email, publications=[])
+            validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
+            jwt_token = jwt.encode({
+                'sub': email,
+                'validity': int(validity.timestamp()),
+            }, os.getenv("WORKFLOW_TOKEN"))
+            html_message = create_token_message(jwt_token=jwt_token)
+            message = strip_tags(html_message)
+            mail.send(
+                sender='OpenDOSM <notif@opendosm.my>',
+                recipients=[sub.email],
+                subject='Verify Your Email',
+                html_message=html_message,
+                message=message,
+                priority='now'
+            )
+            return Response({'message': f"Email does not exist"}, status=status.HTTP_200_OK)
+
+
+class SubscriptionView(APIView):
+    def put(self, request):
+        token = request.headers.get("Authorization", None)
+        if not token:
+            token = request.META["headers"]["Authorization"]
+
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        if datetime.now() > datetime.fromtimestamp(decoded_token['validity']):
+            return Response({'message':'Token expired.'}, status=status.HTTP_401_UNAUTHORIZED)
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        subscriber = Subscription.objects.get(email=email)
+        publication_list = request.data.getlist("publications", None)
+        subscriber.publications = publication_list
+        subscriber.save()
+        
+        # make a POST request to tinybird
+        try:
+            r = requests.post(
+                url=os.getenv("SUBSCRIPTION_TINYBIRD_URL"),
+                headers={"Authorization": f"Bearer {os.getenv('SUBSCRIPTION_TINYBIRD_TOKEN')}"},
+                data=json.dumps({
+                    'timestamp': datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"),
+                    'email': email,
+                    'publications': publication_list
+                })
+            )
+            if r.status_code != 202:
+                triggers.send_telegram(f'STAGING TINYBIRD STATUS: {r.status_code}\nTEXT: {r.text}')
+            if r.json()["quarantined_rows"]:
+                triggers.send_telegram(f'STAGING TINYBIRD STATUS: {r.status_code}\nQUARANTINED ROWS: {r.json()["quarantined_rows"]}')
+
+        except requests.exceptions.RequestException as e:
+            print(f'tinybird error: {e}')
+            triggers.send_telegram(f'STAGING TINYBIRD ERROR: {e}')
+
+        return Response({'email': subscriber.email, 'message': 'Subscriptions updated.'}, HTTPStatus.OK)
+
+    def get(self, request):
+        token = request.headers.get("Authorization", None)
+        if not token:
+            token = request.META["headers"]["Authorization"]
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        if datetime.now() > datetime.fromtimestamp(decoded_token['validity']):
+            return Response({'message':'Token expired.'}, status=status.HTTP_401_UNAUTHORIZED)
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        sub = Subscription.objects.get(email=email).publications
+        return Response({'email': email, 'data': sub}, HTTPStatus.OK)
+
+
+class TokenRequestView(APIView):
+    def post(self, request):
+        to = request.data.get("email", None)
+        if not to:
+            Response(status=HTTPStatus.BAD_REQUEST)
+
+        email = normalize_email(to)
+        try:
+            sub = Subscription.objects.get(email=email)
+            validity = datetime.now() + timedelta(minutes=5)  # token valid for 5 mins
+            jwt_token = jwt.encode({
+                'sub': email,
+                'validity': int(validity.timestamp()),
+            }, os.getenv("WORKFLOW_TOKEN"))
+            html_message = create_token_message(jwt_token=jwt_token)
+            message = strip_tags(html_message)
+            mail.send(
+                sender='OpenDOSM <notif@opendosm.my>',
+                recipients=[sub.email],
+                subject='Verify Your Email',
+                message=message,
+                html_message=html_message,
+                priority='now'
+            )
+            return Response({'message': 'User subscribed. Email with login token sent'}, status=HTTPStatus.OK)
+        except Subscription.DoesNotExist:
+            return Response({'message': 'Not subscribed. Proceed to sign up.'}, status=HTTPStatus.OK)
+
+
+class TokenVerifyView(APIView):
+    def post(self, request):
+        token = request.data.get("token", None)
+
+        try:
+            decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+            email = decoded_token["sub"]
+            email = normalize_email(email)
+        except Exception as e:
+            return Response({'message': f'Error {e}'}, status=HTTPStatus.OK)
+
+        try:
+            sub = Subscription.objects.get(email=email)
+            validity_timestamp = decoded_token["validity"]
+            if datetime.now() < datetime.fromtimestamp(validity_timestamp):
+                return Response({'message': 'Token verified.', 'email': sub.email}, status=HTTPStatus.OK)
+            else:
+                return Response({'message': 'Token expired.', 'email': sub.email}, status=HTTPStatus.OK)
+        except Subscription.DoesNotExist:
+            return Response({'message': 'Email not verified.'}, status=HTTPStatus.OK)
+
+
+class TokenManageSubscriptionView(APIView):
+    def post(self, request):
+        token = request.data.get("token", None)
+        decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
+        email = decoded_token["sub"]
+        email = normalize_email(email)
+
+        # Clear all existing subscription - can make it cleaner?
+        for publication in PublicationSubscription.objects.all():
+            if email in publication.emails:
+                publication.emails.remove(email)
+                publication.save()
+
+        publications_list = request.POST.getlist("publication_type")
+        if type(publications_list) is not list:
+            return Response(
+                {"error": f"Type `publication_type` should be a list. It's {type(publications_list)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        for publication in publications_list:
+            if not publication or not email:
+                return Response(
+                    {"error": "Provide both `publication_type` and `email` data."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                return Response(
+                    {"error": "Invalid email format."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            else:
+                pub_sub = PublicationSubscription.objects.get(publication_type=publication)
+                pub_sub.emails.append(email)
+                pub_sub.save()
+
+        return Response(
+            {"success": f"Subscribed to {publications_list}."},
+            status=status.HTTP_201_CREATED,
+        )

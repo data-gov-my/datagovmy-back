@@ -7,7 +7,7 @@ from post_office.models import Email, EmailTemplate
 from rest_framework.exceptions import ValidationError
 from django.contrib.postgres.fields import ArrayField
 
-from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES
+from data_gov_my.utils.common import LANGUAGE_CHOICES, SITE_CHOICES, SHORT_LANGUAGE_CHOICES
 
 
 class AuthTable(models.Model):
@@ -220,6 +220,7 @@ class Publication(models.Model):
     publication_type_title = models.CharField(max_length=150)
     title = models.CharField(max_length=150)
     description = models.CharField(max_length=300)
+    description_email = models.CharField(max_length=500, null=True)
     release_date = models.DateField()
     frequency = models.CharField(max_length=50)
     geography = ArrayField(
@@ -251,6 +252,32 @@ class PublicationSubscription(models.Model):
     publication_type = models.CharField(max_length=50, primary_key=True)
     emails = ArrayField(models.EmailField(), default=list)
 
+class PublicationType(models.Model):
+    order = models.IntegerField(blank=True, null=True)
+    id = models.CharField(max_length=100, primary_key=True)
+    type_en = models.CharField(max_length=100, blank=True, null=True)
+    type_bm = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.order}-{self.id}"
+
+class PublicationSubtype(models.Model):
+    order = models.IntegerField(blank=True, null=True)
+    id = models.CharField(max_length=100, primary_key=True)
+    publication_type = models.ForeignKey(PublicationType, on_delete=models.CASCADE)
+    subtype_en = models.CharField(max_length=100)
+    subtype_bm = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["publication_type", "order"]
+
+
+
+class Subscription(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField(primary_key=True)
+    publications = ArrayField(models.CharField(max_length=100), default=list)
+    language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default="en-GB")
 
 class PublicationResource(models.Model):
     resource_id = models.IntegerField()

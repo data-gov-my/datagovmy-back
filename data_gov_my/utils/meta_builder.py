@@ -40,9 +40,9 @@ from data_gov_my.models import (
     PublicationDocumentation,
     PublicationDocumentationResource,
     PublicationResource,
-    PublicationSubscription,
     PublicationUpcoming,
     i18nJson,
+    Subscription, PublicationType, PublicationSubtype
 )
 from data_gov_my.utils import triggers
 from data_gov_my.utils.chart_builders import ChartBuilder
@@ -64,8 +64,10 @@ from data_gov_my.utils.metajson_structures import (
     PublicationDocumentationValidateModel,
     PublicationUpcomingValidateModel,
     PublicationValidateModel,
-    i18nValidateModel,
+    i18nValidateModel, PublicationTypeValidateModel,
 )
+from data_gov_my.utils.publication_helpers import craft_title, craft_template_en
+from data_gov_my.utils.subscription_email_helper import SubscriptionEmail
 
 logger = logging.getLogger("django")
 
@@ -187,7 +189,7 @@ class GeneralMetaBuilder(ABC):
             for github_dir in changed_files:
                 github_dir_info = github_dir.split("/")
                 if f_info[: len(github_dir_info)] == github_dir_info:
-                    dir = os.path.join(*f_info[len(github_dir_info) :]).replace(
+                    dir = os.path.join(*f_info[len(github_dir_info):]).replace(
                         ".json", ""
                     )
                     if compare_github:  # used for filtering modified/created files
@@ -275,10 +277,10 @@ class GeneralMetaBuilder(ABC):
                 failed_routes = []
                 failed_info = []
                 telegram_msg = (
-                    triggers.format_header(
-                        f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
-                    )
-                    + "\n"
+                        triggers.format_header(
+                            f"<code>{str(model_obj).upper()}</code> REVALIDATION STATUS @ <b>{site}</b>"
+                        )
+                        + "\n"
                 )
                 if routes:
                     response = revalidate_frontend(routes=routes, site=site)
@@ -459,7 +461,7 @@ class DashboardBuilder(GeneralMetaBuilder):
         return obj
 
     def additional_handling(
-        self, rebuild: bool, meta_files, created_objects: List[MetaJson]
+            self, rebuild: bool, meta_files, created_objects: List[MetaJson]
     ):
         """
         Update or create new DashboardJson instances (unique chart data) based on each created MetaJson instance.
@@ -618,7 +620,7 @@ class DataCatalogueBuilder(GeneralMetaBuilder):
         return DataCatalogueMeta.objects.filter(id=filename).delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: DataCatalogueValidateModel
+            self, filename: str, metadata: DataCatalogueValidateModel
     ):
         # check if need to add default translations
         default_keys = set(self.default_translation_mapping)
@@ -797,7 +799,7 @@ class ExplorerBuilder(GeneralMetaBuilder):
         return obj
 
     def additional_handling(
-        self, rebuild: bool, meta_files, created_objects: List[MetaJson]
+            self, rebuild: bool, meta_files, created_objects: List[MetaJson]
     ):
         """
         Update or create new ExplorersUpdate instances (Entire Table) based on each created MetaJson instance.
@@ -894,6 +896,7 @@ class PublicationBuilder(GeneralMetaBuilder):
                 "publication_type_title": metadata.en.publication_type_title,
                 "title": metadata.en.title,
                 "description": metadata.en.description,
+                "description_email": metadata.en.description_email,
                 "release_date": metadata.release_date,
                 "frequency": metadata.frequency,
                 "geography": metadata.geography,
@@ -940,6 +943,7 @@ class PublicationBuilder(GeneralMetaBuilder):
                 "publication_type_title": metadata.bm.publication_type_title,
                 "title": metadata.bm.title,
                 "description": metadata.bm.description,
+                "description_email": metadata.bm.description_email,
                 "release_date": metadata.release_date,
                 "frequency": metadata.frequency,
                 "geography": metadata.geography,
@@ -978,22 +982,23 @@ class PublicationBuilder(GeneralMetaBuilder):
         )
 
         # Send notification to all subscribers of the publication type only if release date is today
-        if metadata.release_date == date.today():
+        if not metadata.abort_email and metadata.release_date == date.today():
             try:
-                subscription = PublicationSubscription.objects.get(
-                    publication_type=metadata.publication_type
+                subscriptions = Subscription.objects.filter(
+                    publications__overlap=[metadata.publication_type, 'all']
                 )
-                if subscription.emails:
-                    # TODO: set up proper email template
-                    mail.send(
-                        bcc=subscription.emails,
-                        subject="Just Published: {{publication_type}}",
-                        html_message="Just Published: {{publication_type}} (Proper email content WIP)",
-                        context={"publication_type": metadata.publication_type},
-                    )
-            except PublicationSubscription.DoesNotExist:
-                pass
+                triggers.send_telegram(
+                    f'List of subscribers to get email notif on {metadata.en.title}:'
+                    f'{[s.email for s in subscriptions]}'
+                )
+                for subscriber in subscriptions:
+                    publication_id = metadata.publication
+                    SubscriptionEmail(subscriber, publication_id).send_email()
 
+            except Subscription.DoesNotExist:
+                triggers.send_telegram(
+                    f'No one subscribed to {metadata.publication_type}. No email will be send.'
+                )
         return [pub_object_en, pub_object_bm]
 
 
@@ -1012,7 +1017,7 @@ class PublicationDocumentationBuilder(GeneralMetaBuilder):
         ).delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: PublicationDocumentationValidateModel
+            self, filename: str, metadata: PublicationDocumentationValidateModel
     ):
         # english publications
         pub_object_en, _ = PublicationDocumentation.objects.update_or_create(
@@ -1113,7 +1118,7 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
         return PublicationUpcoming.objects.all().delete()
 
     def update_or_create_meta(
-        self, filename: str, metadata: PublicationUpcomingValidateModel
+            self, filename: str, metadata: PublicationUpcomingValidateModel
     ):
         df = pd.read_parquet(metadata.parquet_link)
 
@@ -1188,3 +1193,72 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
         )
 
         return publications_en_created + publications_bm_created
+
+
+class PublicationTypeBuilder(GeneralMetaBuilder):
+    CATEGORY = "PUBLICATION_TYPE"
+    MODEL = PublicationType
+    GITHUB_DIR = "pub-dosm/subs"
+    VALIDATOR = PublicationTypeValidateModel
+
+    def delete_file(self, filename: str, data: dict):
+        """
+        Deletes the whole table because only a single file is supposed to reside within pub-dosm/pubs
+        """
+        pub_type = PublicationType.objects.all().delete()
+        pub_subtype = PublicationSubtype.objects.all().delete()
+        return pub_type + pub_subtype
+
+    def update_or_create_meta(
+            self, filename: str, metadata: PublicationTypeValidateModel
+    ):
+        df_type = pd.read_parquet(metadata.parquet_link)
+        df_subtype = pd.read_parquet(metadata.parquet_link)
+
+        PublicationType.objects.all().delete()
+        PublicationSubtype.objects.all().delete()
+
+        # populate PublicationType
+        pub_type_list = []
+        for index, row in df_type.iterrows():
+            try:
+                PublicationType.objects.get(order=row['type_order'], id=row['type'])
+            except PublicationType.DoesNotExist:
+                pub_type = PublicationType.objects.create(
+                    order=row['type_order'],
+                    id=row['type'],
+                    type_en=row['type_en'],
+                    type_bm=row['type_bm'])
+                pub_type_list.append(pub_type)
+
+        # populate PublicationSubtype
+        pub_subtype_list = []
+        for index, row in df_subtype.iterrows():
+            pub_type = PublicationType.objects.get(order=row['type_order'], id=row['type'])
+            try:
+                PublicationSubtype.objects.get(
+                    publication_type=pub_type,
+                    order=row['subtype_order'],
+                    id=row['subtype']
+                )
+            except PublicationSubtype.DoesNotExist:
+                pub_subtype = PublicationSubtype.objects.create(
+                    publication_type=pub_type,
+                    id=row['subtype'],
+                    order=row['subtype_order'],
+                    subtype_en=row['subtype_en'],
+                    subtype_bm=row['subtype_bm'])
+                pub_subtype_list.append(pub_subtype)
+
+        # arrange all in PublicationType
+        for type in pub_type_list:
+            dict_en = {}
+            dict_bm = {}
+            for subtype in type.publicationsubtype_set.all().order_by("order"):
+                dict_en[subtype.id] = subtype.subtype_en
+                dict_bm[subtype.id] = subtype.subtype_bm
+            type.dict_en = dict_en
+            type.dict_bm = dict_bm
+            type.save()
+
+        return pub_type_list + pub_subtype_list

@@ -49,6 +49,7 @@ class Command(BaseCommand):
             "PUBLICATION",
             "PUBLICATION_DOCS",
             "PUBLICATION_UPCOMING",
+            "PUBLICATION_TYPE"
         ] and operation in [
             "UPDATE",
             "REBUILD",

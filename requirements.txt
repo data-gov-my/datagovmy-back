@@ -26,8 +26,10 @@ django-rq==2.8.1
 django-ses==3.4.1
 django-storages==1.14.2
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
 drf-api-logger==1.1.14
 fastparquet==2023.2.0
+faker==32.1.0
 filelock==3.9.0
 fsspec==2023.3.0
 gevent==23.7.0
@@ -55,6 +57,7 @@ pydantic_core==2.1.2
 pytest==7.3.1
 pytest-django==4.5.2
 python-dateutil==2.8.2
+python-jose==3.3.0
 python-redis-lock==4.0.0
 python-slugify==8.0.1
 pytz==2022.7.1

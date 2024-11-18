@@ -131,11 +131,13 @@ class _PublicationResourceValidateModel(BaseModel):
 class _PublicationLangValidateModel(BaseModel):
     title: str
     description: str
+    description_email: Optional[str] = None
     publication_type_title: str
     resources: list[_PublicationResourceValidateModel]
 
 
 class PublicationValidateModel(BaseModel):
+    abort_email: Optional[bool] = False
     publication: str
     publication_type: str
     release_date: date
@@ -183,5 +185,9 @@ class _PublicationUpcomingLangModel(BaseModel):
 
 
 class PublicationUpcomingValidateModel(BaseModel):
+    manual_trigger: str | int | bool
+    parquet_link: str
+
+class PublicationTypeValidateModel(BaseModel):
     manual_trigger: str | int | bool
     parquet_link: str
