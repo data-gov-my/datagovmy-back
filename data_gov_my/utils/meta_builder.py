@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-import os
+import os, time
 import traceback
 from abc import ABC, abstractmethod
 from datetime import date
@@ -987,13 +987,10 @@ class PublicationBuilder(GeneralMetaBuilder):
                 subscriptions = Subscription.objects.filter(
                     publications__overlap=[metadata.publication_type, 'all']
                 )
-                triggers.send_telegram(
-                    f'List of subscribers to get email notif on {metadata.en.title}:'
-                    f'{[s.email for s in subscriptions]}'
-                )
                 for subscriber in subscriptions:
                     publication_id = metadata.publication
                     SubscriptionEmail(subscriber, publication_id).send_email()
+                    time.sleep(0.1) # sleep for 100ms to adhere with aws ses rate limit
 
             except Subscription.DoesNotExist:
                 triggers.send_telegram(
