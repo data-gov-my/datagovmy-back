@@ -987,10 +987,6 @@ class PublicationBuilder(GeneralMetaBuilder):
                 subscriptions = Subscription.objects.filter(
                     publications__overlap=[metadata.publication_type, 'all']
                 )
-                triggers.send_telegram(
-                    f'List of subscribers to get email notif on {metadata.en.title}:'
-                    f'{[s.email for s in subscriptions]}'
-                )
                 for subscriber in subscriptions:
                     publication_id = metadata.publication
                     SubscriptionEmail(subscriber, publication_id).send_email()
