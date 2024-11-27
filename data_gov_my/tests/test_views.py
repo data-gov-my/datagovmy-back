@@ -9,10 +9,9 @@ from django.utils import timezone
 from jose import jwt
 from rest_framework.test import APITestCase
 
-from data_gov_my.models import AuthTable, PublicationType, PublicationSubtype, Subscription, Publication
+from data_gov_my.models import AuthTable, Subscription, Publication
 from data_gov_my.utils.meta_builder import GeneralMetaBuilder
-from data_gov_my.utils.publication_helpers import type_list, subtype_list, \
-    populate_publication_types, populate_publication_subtypes, send_email_to_subscribers, craft_title, craft_template_en
+from data_gov_my.utils.publication_helpers import send_email_to_subscribers, craft_title, craft_template_en
 
 
 class TestEmailSubscription(APITestCase):
@@ -89,6 +88,9 @@ class TestEmailSubscription(APITestCase):
 
 class TestPreviewSubscriptionEmail(APITestCase):
     def setUp(self):
+        """
+        TODO: This is an expensive test setup, refactor to make it faster.
+        """
         self.test_email = 'test3@gmail.com'
         builder = GeneralMetaBuilder.create(property='PUBLICATION')
         builder.build_operation(manual=True, rebuild="REBUILD", meta_files=[])
@@ -109,12 +111,12 @@ class TestPreviewSubscriptionEmail(APITestCase):
         content = craft_template_en(pub.publication_id, pub.title, pub.description)
         from_email = 'notif@opendosm.my'
         recepient_list = [sub.email]
-        print(
-            f'Subject: {subject}\n'
-            f'Content: {content}\n'
-            f'From: {from_email}\n'
-            f'Recipients: {recepient_list}\n'
-        )
+        # print(
+        #     f'Subject: {subject}\n'
+        #     f'Content: {content}\n'
+        #     f'From: {from_email}\n'
+        #     f'Recipients: {recepient_list}\n'
+        # )
         mail.send_mail(
             subject,
             content,
@@ -127,14 +129,6 @@ class TestPreviewSubscriptionEmail(APITestCase):
 
 class TestEmailSubscribeSubmission(APITestCase):
     def setUp(self):
-
-        # Populate PublicationType and PublicationSubtype
-        populate_publication_types()
-        self.assertEqual(PublicationType.objects.count(), len(type_list))
-
-        populate_publication_subtypes()
-        self.assertEqual(PublicationSubtype.objects.count(), len(subtype_list))
-
         # Generate SHA-256 hash
         data = "Your input data here"
         hash_object = hashlib.sha256(data.encode())
@@ -176,7 +170,14 @@ class TestEmailSubscribeSubmission(APITestCase):
         self.assertEqual(r.json()['message'], 'User subscribed. Email with login token sent')
         self.assertEqual(len(mail.outbox), 1)
 
-        token = mail.outbox[0].body
+        mail_body = mail.outbox[0].body
+        # for i, line in enumerate(mail_body.split('\n')):
+        #     print(i, line)
+        """
+        This one is hardcoded based on current email. 
+        If in the future email structure changed, need to cater for changes.
+        """
+        token = mail_body.split('\n')[5]
         decoded_token = jwt.decode(token, os.getenv("WORKFLOW_TOKEN"))
         self.assertEqual(decoded_token['sub'], to)
 
