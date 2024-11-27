@@ -86,7 +86,7 @@ class SubscriptionEmail():
         <p>Sekiranya anda ada sebarang pertanyaan mengenai data tersebut, anda boleh menghantar enkuiri kepada data@dosm.gov.my.</p>
         <p>Sekian, terima kasih.</p>
         <p>Bot Notifikasi OpenDOSM</p>
-        <i><p>Nota: Untuk menghentikan atau meminda notifikasi anda daripada OpenDOSM, sila ke: https://open.dosm.gov.my/ms-MY/publications/manage-subscription</p></i> 
+        <i><p>Nota: Untuk menghentikan atau meminda notifikasi anda daripada OpenDOSM, sila ke: https://open.dosm.gov.my/ms-MY/publications/manage-subscription</p></i>
 
 '''
         if self.subscriber.language == 'en-GB':

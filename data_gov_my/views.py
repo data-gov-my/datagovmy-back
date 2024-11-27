@@ -810,7 +810,7 @@ class SubscriptionView(APIView):
         publication_list = request.data.getlist("publications", None)
         subscriber.publications = publication_list
         subscriber.save()
-        
+
         # make a POST request to tinybird
         try:
             r = requests.post(
