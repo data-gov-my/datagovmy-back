@@ -148,6 +148,15 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
+        # Clean up the unmanaged publication subscriber(s)
+        unmanaged_subs = Subscription.objects.filter(publications=[])
+        if unmanaged_subs:
+            triggers.send_telegram(
+                f'The following email(s) deleted from subscription list: {[u.email for u in unmanaged_subs]}.\n'
+                'Reason: Incomplete authentication flow.'
+            )
+            unmanaged_subs.delete()
+
         thread = Thread(target=GeneralMetaBuilder.selective_update)
         thread.start()
         return Response(status=status.HTTP_200_OK)
