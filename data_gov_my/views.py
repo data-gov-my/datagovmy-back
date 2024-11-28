@@ -148,6 +148,15 @@ class CHART(APIView):
 
 class UPDATE(APIView):
     def post(self, request, format=None):
+        # Clean up the unmanaged publication subscriber(s)
+        unmanaged_subs = Subscription.objects.filter(publications=[])
+        if unmanaged_subs:
+            triggers.send_telegram(
+                f'The following email(s) deleted from subscription list: {[u.email for u in unmanaged_subs]}.\n'
+                'Reason: Incomplete authentication flow.'
+            )
+            unmanaged_subs.delete()
+
         thread = Thread(target=GeneralMetaBuilder.selective_update)
         thread.start()
         return Response(status=status.HTTP_200_OK)
@@ -810,7 +819,7 @@ class SubscriptionView(APIView):
         publication_list = request.data.getlist("publications", None)
         subscriber.publications = publication_list
         subscriber.save()
-        
+
         # make a POST request to tinybird
         try:
             r = requests.post(

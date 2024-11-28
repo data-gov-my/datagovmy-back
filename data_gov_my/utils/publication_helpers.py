@@ -2,6 +2,7 @@ from datetime import date
 
 from post_office import mail
 from data_gov_my.models import PublicationType, PublicationSubtype, Publication, Subscription
+from data_gov_my.utils import triggers
 
 type_list = [
     'agriculture', 'bc', 'bop', 'businesses', 'census', 'census_economy',
@@ -419,12 +420,30 @@ Bot Notifikasi OpenDOSM
 Nota: Untuk menghentikan atau meminda notifikasi anda daripada OpenDOSM, sila ke: https://open.dosm.gov.my/publications/subscribe
 '''
 
+def validate_title(title):
+    try:
+        period = title.split(']')[0].strip('[')
+        topic = title.split(']')[1]
+        print()
+    except Exception as e:
+        print(e)
+        return False
+    return True
+
+
 def craft_title(title):
-    # Extract the month/year within square brackets
-    period = title.split(']')[0].strip('[')
-    topic = title.split(']')[1]
-    new_title = f"{topic}: {period}"
-    return new_title
+    try:
+        # Extract the month/year within square brackets
+        period = title.split(']')[0].strip('[')
+        topic = title.split(']')[1]
+        new_title = f"{topic}: {period}"
+        return new_title
+    except Exception as e:
+        triggers.send_telegram(
+            f'Incorrect title format: {title}\n'
+            f'Correct example: [2022] National Economic Accounts\n'
+            f'{e}'
+        )
 
 def send_email_to_subscribers():
     # TODO: get_preferred_language()

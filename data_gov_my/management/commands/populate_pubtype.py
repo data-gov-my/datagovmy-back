@@ -29,8 +29,3 @@ class Command(BaseCommand):
             p.dict_bm[row['subtype']] = row['subtype_bm']
             p.dict_en[row['subtype']] = row['subtype_en']
             p.save()
-
-
-
-
-
