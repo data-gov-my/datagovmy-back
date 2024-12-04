@@ -5,7 +5,7 @@ black==23.7.0
 bleach==6.0.0
 boto3==1.26.141
 botocore==1.29.141
-celery==5.2.7
+celery==5.4.0
 certifi==2022.12.7
 cfgv==3.3.1
 charset-normalizer==3.0.1
