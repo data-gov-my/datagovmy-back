@@ -990,7 +990,7 @@ class PublicationBuilder(GeneralMetaBuilder):
                 for subscriber in subscriptions:
                     publication_id = metadata.publication
                     SubscriptionEmail(subscriber, publication_id).send_email()
-                    time.sleep(0.1) # sleep for 100ms to adhere with aws ses rate limit
+                    time.sleep(0.1)  # sleep for 100ms to adhere with aws ses rate limit
 
             except Subscription.DoesNotExist:
                 triggers.send_telegram(
@@ -1118,6 +1118,16 @@ class PublicationUpcomingBuilder(GeneralMetaBuilder):
             self, filename: str, metadata: PublicationUpcomingValidateModel
     ):
         df = pd.read_parquet(metadata.parquet_link)
+
+        # Check for duplicate publication_id before saving all metadata
+        column_name = 'publication_id'
+        if not df[column_name].is_unique:
+            duplicates = df[column_name][df[column_name].duplicated()].tolist()
+            error_message = (f"""
+            Duplicate {column_name}: {duplicates} in file {metadata.parquet_link}. Please fix your parquet file.
+""")
+            triggers.send_telegram(error_message)
+            raise Exception(error_message)
 
         PublicationUpcoming.objects.all().delete()
 
