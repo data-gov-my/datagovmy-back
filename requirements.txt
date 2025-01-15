@@ -61,7 +61,7 @@ python-jose==3.3.0
 python-redis-lock==4.0.0
 python-slugify==8.0.1
 pytz==2022.7.1
-PyYAML==6.0
+PyYAML==6.0.2
 redis==4.5.1
 requests==2.28.2
 rq==1.15.1
