@@ -3,6 +3,7 @@ import ast
 import logging
 
 import pandas as pd
+from django.conf import settings
 from django.db.models import Count, Q
 from django.http import QueryDict
 from django.shortcuts import get_object_or_404
@@ -48,6 +49,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         # send email to notify subscription
         try:
             mail.send(
+                sender=settings.DATA_REQUEST_EMAIL,
                 recipients=email,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
@@ -104,6 +106,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             context = serializer.data
             context["name"] = data.get("name")
             email = mail.send(
+                sender=settings.DATA_REQUEST_EMAIL,
                 recipients=recipient,
                 language=email_lang,
                 template=self.FORM_TYPE,
