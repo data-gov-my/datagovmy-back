@@ -1,6 +1,7 @@
 # Create your views here.
 import ast
 import logging
+import os
 
 import pandas as pd
 from django.conf import settings
@@ -48,8 +49,12 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
 
         # send email to notify subscription
         try:
-            mail.send(
-                sender=settings.DATA_REQUEST_EMAIL,
+            with settings(
+                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
+                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+            ):
+                mail.send(
                 recipients=email,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
@@ -105,13 +110,17 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
         try:
             context = serializer.data
             context["name"] = data.get("name")
-            email = mail.send(
-                sender=settings.DATA_REQUEST_EMAIL,
-                recipients=recipient,
-                language=email_lang,
-                template=self.FORM_TYPE,
-                context=context,
-            )
+            with settings(
+                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
+                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+            ):
+                email = mail.send(
+                    recipients=recipient,
+                    language=email_lang,
+                    template=self.FORM_TYPE,
+                    context=context,
+                )
         except Exception as e:
             logging.error(e)
 

@@ -1,3 +1,4 @@
+import os
 from typing import Any
 
 from django import forms
@@ -89,13 +90,17 @@ class DataRequestAdmin(TranslationAdmin):
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
-                mail.send(
-                    sender=settings.DATA_REQUEST_EMAIL,
-                    bcc=list(recipients),
-                    template=template,
-                    language="en-GB",
-                    context=email_context,
-                )
+                with settings(
+                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
+                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+                ):
+                    mail.send(
+                        bcc=list(recipients),
+                        template=template,
+                        language="en-GB",
+                        context=email_context,
+                    )
 
         with translation.override("ms"):
             recipients = obj.subscription_set.filter(language="ms-MY").values_list(
@@ -104,13 +109,17 @@ class DataRequestAdmin(TranslationAdmin):
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
-                mail.send(
-                    sender=settings.DATA_REQUEST_EMAIL,
-                    bcc=list(recipients),
-                    template=template,
-                    language="ms-MY",
-                    context=email_context,
-                )
+                with settings(
+                        DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                        AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
+                        AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+                ):
+                    mail.send(
+                        bcc=list(recipients),
+                        template=template,
+                        language="ms-MY",
+                        context=email_context,
+                    )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.published_data.set(form.cleaned_data.get("published_data"))
@@ -125,13 +134,17 @@ class DataRequestAdmin(TranslationAdmin):
             # send email to agency to request for review
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
-                mail.send(
-                    sender=settings.DATA_REQUEST_EMAIL,
-                    recipients=obj.agency.emails,
-                    template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
-                    language="ms",
-                    context=context,
-                )
+                with settings(
+                        DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                        AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
+                        AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+                ):
+                    mail.send(
+                        recipients=obj.agency.emails,
+                        template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
+                        language="ms",
+                        context=context,
+                    )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)
