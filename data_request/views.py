@@ -69,7 +69,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                     ),
                     "agency": data_request.agency,
                 },
-                backend=backend,
+                backend="data_request",
             )
         except Exception as e:
             logging.error(e)
@@ -116,7 +116,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,
-                backend=backend,
+                backend="data_request",
             )
         except Exception as e:
             logging.error(e)
