@@ -99,7 +99,7 @@ class DataRequestAdmin(TranslationAdmin):
                     template=template,
                     language="en-GB",
                     context=email_context,
-                    backend=backend,
+                    backend="data_request",
                 )
 
         with translation.override("ms"):
@@ -115,7 +115,7 @@ class DataRequestAdmin(TranslationAdmin):
                     template=template,
                     language="ms-MY",
                     context=email_context,
-                    backend=backend,
+                    backend="data_request",
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
@@ -137,7 +137,7 @@ class DataRequestAdmin(TranslationAdmin):
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
-                    backend=backend,
+                    backend="data_request",
                 )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
