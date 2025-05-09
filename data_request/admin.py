@@ -15,7 +15,7 @@ from data_catalogue.models import DataCatalogueMeta
 from data_request.models import Agency, DataRequest
 from data_request.serializers import DataRequestSerializer
 
-backend = SESAPIEmailBackend()
+backend = SESAPIEmailBackend(region_name=settings.AWS_SES_REGION_NAME)
 
 
 class DataRequestAdminForm(forms.ModelForm):

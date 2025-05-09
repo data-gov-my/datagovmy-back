@@ -24,7 +24,7 @@ from data_request.serializers import (
     SubscriptionSerializer,
 )
 
-backend = SESAPIEmailBackend()
+backend = SESAPIEmailBackend(region_name=settings.AWS_SES_REGION_NAME)
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):

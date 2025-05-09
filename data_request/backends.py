@@ -1,10 +1,8 @@
 import os
 
+import boto3
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
-
-import boto3
-from post_office.models import Email
 
 
 class SESAPIEmailBackend(BaseEmailBackend):
