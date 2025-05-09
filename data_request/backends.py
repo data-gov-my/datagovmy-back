@@ -8,6 +8,7 @@ from django.core.mail.backends.base import BaseEmailBackend
 class SESAPIEmailBackend(BaseEmailBackend):
     def __init__(
             self,
+            sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
             aws_access_key_id=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
             aws_secret_access_key=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
             region_name=settings.AWS_SES_REGION_NAME,
@@ -16,6 +17,7 @@ class SESAPIEmailBackend(BaseEmailBackend):
         super().__init__(**kwargs)
         self.client = boto3.client(
             'ses',
+            sender=sender,
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
             region_name=region_name
