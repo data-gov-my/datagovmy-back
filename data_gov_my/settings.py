@@ -225,7 +225,7 @@ POST_OFFICE = {"CELERY_ENABLED": True}
 if not DEBUG:
     POST_OFFICE["BACKENDS"] = {
         "default": "django_ses.SESBackend",
-        "data_request": "data_request.backends.SESAPIEmailBackend",
+        "data_request": "data_request.backends.DataRequestEmailBackend",
     }
     # django-ses
     AWS_SES_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
