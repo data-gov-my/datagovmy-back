@@ -10,9 +10,12 @@ from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
+from data_request.backends import SESAPIEmailBackend
 from data_catalogue.models import DataCatalogueMeta
 from data_request.models import Agency, DataRequest
 from data_request.serializers import DataRequestSerializer
+
+backend = SESAPIEmailBackend()
 
 
 class DataRequestAdminForm(forms.ModelForm):
@@ -42,8 +45,8 @@ class DataRequestAdminForm(forms.ModelForm):
             if errors:
                 raise forms.ValidationError(errors)
         if status == "data_published" and not (
-            published_data.exists()
-            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+                published_data.exists()
+                or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
         ):
             raise forms.ValidationError(
                 {
@@ -90,17 +93,14 @@ class DataRequestAdmin(TranslationAdmin):
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
-                with settings(
-                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
-                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
-                ):
-                    mail.send(
-                        bcc=list(recipients),
-                        template=template,
-                        language="en-GB",
-                        context=email_context,
-                    )
+                mail.send(
+                    sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
+                    bcc=list(recipients),
+                    template=template,
+                    language="en-GB",
+                    context=email_context,
+                    backend=backend,
+                )
 
         with translation.override("ms"):
             recipients = obj.subscription_set.filter(language="ms-MY").values_list(
@@ -109,17 +109,14 @@ class DataRequestAdmin(TranslationAdmin):
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
-                with settings(
-                        DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
-                        AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-                        AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
-                ):
-                    mail.send(
-                        bcc=list(recipients),
-                        template=template,
-                        language="ms-MY",
-                        context=email_context,
-                    )
+                mail.send(
+                    sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
+                    bcc=list(recipients),
+                    template=template,
+                    language="ms-MY",
+                    context=email_context,
+                    backend=backend,
+                )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
         obj.published_data.set(form.cleaned_data.get("published_data"))
@@ -134,17 +131,14 @@ class DataRequestAdmin(TranslationAdmin):
             # send email to agency to request for review
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
-                with settings(
-                        DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
-                        AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-                        AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
-                ):
-                    mail.send(
-                        recipients=obj.agency.emails,
-                        template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
-                        language="ms",
-                        context=context,
-                    )
+                mail.send(
+                    sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
+                    recipients=obj.agency.emails,
+                    template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
+                    language="ms",
+                    context=context,
+                    backend=backend,
+                )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)

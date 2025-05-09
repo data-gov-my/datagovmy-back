@@ -17,11 +17,14 @@ from rest_framework.serializers import ValidationError
 
 from data_gov_my.utils.throttling import FormRateThrottle
 from data_request.models import Agency, DataRequest
+from data_request.backends import SESAPIEmailBackend
 from data_request.serializers import (
     AgencySerializer,
     DataRequestSerializer,
     SubscriptionSerializer,
 )
+
+backend = SESAPIEmailBackend()
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
@@ -49,12 +52,8 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
 
         # send email to notify subscription
         try:
-            with settings(
-                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
-                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
-            ):
-                mail.send(
+            mail.send(
+                sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
                 recipients=email,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
@@ -70,6 +69,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                     ),
                     "agency": data_request.agency,
                 },
+                backend=backend,
             )
         except Exception as e:
             logging.error(e)
@@ -110,17 +110,14 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
         try:
             context = serializer.data
             context["name"] = data.get("name")
-            with settings(
-                    DEFAULT_FROM_EMAIL=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
-                    AWS_SES_ACCESS_KEY_ID=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-                    AWS_SES_SECRET_ACCESS_KEY=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
-            ):
-                email = mail.send(
-                    recipients=recipient,
-                    language=email_lang,
-                    template=self.FORM_TYPE,
-                    context=context,
-                )
+            email = mail.send(
+                sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
+                recipients=recipient,
+                language=email_lang,
+                template=self.FORM_TYPE,
+                context=context,
+                backend=backend,
+            )
         except Exception as e:
             logging.error(e)
 
