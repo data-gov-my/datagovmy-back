@@ -9,8 +9,8 @@ class DataRequestEmailBackend(BaseEmailBackend):
     def __init__(
             self,
             region_name=settings.AWS_SES_REGION_NAME,
-            aws_access_key_id=os.getenv('AWS_SES_ACCESS_KEY_ID_DATA_REQUEST'),
-            aws_secret_access_key=os.getenv('AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST'),
+            aws_access_key_id=settings.AWS_SES_ACCESS_KEY_ID_DATA_REQUEST,
+            aws_secret_access_key=settings.AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST,
             **kwargs
     ):
         super().__init__(**kwargs)
