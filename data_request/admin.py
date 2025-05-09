@@ -2,7 +2,6 @@ import os
 from typing import Any
 
 from django import forms
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils import timezone, translation
@@ -10,12 +9,9 @@ from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
-from data_request.backends import SESAPIEmailBackend
 from data_catalogue.models import DataCatalogueMeta
 from data_request.models import Agency, DataRequest
 from data_request.serializers import DataRequestSerializer
-
-backend = SESAPIEmailBackend()
 
 
 class DataRequestAdminForm(forms.ModelForm):
@@ -94,6 +90,7 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
+                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
                     bcc=list(recipients),
                     template=template,
                     language="en-GB",
@@ -109,6 +106,7 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
+                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
                     bcc=list(recipients),
                     template=template,
                     language="ms-MY",
@@ -130,6 +128,7 @@ class DataRequestAdmin(TranslationAdmin):
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
                 mail.send(
+                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
                     recipients=obj.agency.emails,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
