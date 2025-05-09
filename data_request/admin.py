@@ -2,6 +2,7 @@ import os
 from typing import Any
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils import timezone, translation
@@ -90,7 +91,7 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
-                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     bcc=list(recipients),
                     template=template,
                     language="en-GB",
@@ -106,7 +107,7 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
-                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     bcc=list(recipients),
                     template=template,
                     language="ms-MY",
@@ -128,7 +129,7 @@ class DataRequestAdmin(TranslationAdmin):
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
                 mail.send(
-                    sender=os.getenv('DEFAULT_FROM_EMAIL_DATA_REQUEST'),
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=obj.agency.emails,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
