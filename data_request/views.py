@@ -24,7 +24,7 @@ from data_request.serializers import (
     SubscriptionSerializer,
 )
 
-backend = SESAPIEmailBackend(region_name=settings.AWS_SES_REGION_NAME)
+backend = SESAPIEmailBackend()
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
@@ -53,7 +53,6 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         # send email to notify subscription
         try:
             mail.send(
-                sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
                 recipients=email,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
@@ -111,7 +110,6 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             context = serializer.data
             context["name"] = data.get("name")
             email = mail.send(
-                sender=os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST"),
                 recipients=recipient,
                 language=email_lang,
                 template=self.FORM_TYPE,
