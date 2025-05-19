@@ -1,6 +1,8 @@
+import os
 from typing import Any
 
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.utils import timezone, translation
@@ -40,8 +42,8 @@ class DataRequestAdminForm(forms.ModelForm):
             if errors:
                 raise forms.ValidationError(errors)
         if status == "data_published" and not (
-            published_data.exists()
-            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+                published_data.exists()
+                or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
         ):
             raise forms.ValidationError(
                 {
@@ -89,10 +91,12 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     bcc=list(recipients),
                     template=template,
                     language="en-GB",
                     context=email_context,
+                    backend="data_request",
                 )
 
         with translation.override("ms"):
@@ -103,10 +107,12 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     bcc=list(recipients),
                     template=template,
                     language="ms-MY",
                     context=email_context,
+                    backend="data_request",
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
@@ -123,10 +129,12 @@ class DataRequestAdmin(TranslationAdmin):
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
                 mail.send(
+                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=obj.agency.emails,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
+                    backend="data_request",
                 )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()

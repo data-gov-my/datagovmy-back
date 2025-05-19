@@ -1,6 +1,7 @@
 # Create your views here.
 import ast
 import logging
+import os
 
 import pandas as pd
 from django.conf import settings
@@ -49,7 +50,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         # send email to notify subscription
         try:
             mail.send(
-                sender=settings.DATA_REQUEST_EMAIL,
+                sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                 recipients=email,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
@@ -65,6 +66,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                     ),
                     "agency": data_request.agency,
                 },
+                backend="data_request",
             )
         except Exception as e:
             logging.error(e)
@@ -106,11 +108,12 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             context = serializer.data
             context["name"] = data.get("name")
             email = mail.send(
-                sender=settings.DATA_REQUEST_EMAIL,
+                sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                 recipients=recipient,
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,
+                backend="data_request",
             )
         except Exception as e:
             logging.error(e)
