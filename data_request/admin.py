@@ -56,6 +56,13 @@ class DataRequestAdminForm(forms.ModelForm):
 
 
 class DataRequestAdmin(TranslationAdmin):
+    list_display = ['ticket_id', 'dataset_title', 'get_requestor_name_email']
+
+    def get_requestor_name_email(self, obj):
+        return f"{obj.subscription_set.first().name} ({obj.subscription_set.first().email})"
+    get_requestor_name_email.short_description = "Requestor"
+    get_requestor_name_email.admin_order_field = "subscription_set__name"
+
     readonly_fields = [
         "ticket_id",
         "purpose_of_request",
