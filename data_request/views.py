@@ -16,13 +16,14 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 
 from data_gov_my.utils.throttling import FormRateThrottle
-from data_request.models import Agency, DataRequest
+from data_request.models import Agency, DataRequest, DataRequestAdminEmail
 from data_request.serializers import (
     AgencySerializer,
     DataRequestSerializer,
     SubscriptionSerializer,
 )
 
+bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
     serializer_class = SubscriptionSerializer
@@ -52,6 +53,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
             mail.send(
                 sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                 recipients=email,
+                bcc=bcc_list,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
                 context={
@@ -110,6 +112,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             email = mail.send(
                 sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                 recipients=recipient,
+                bcc=bcc_list,
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,

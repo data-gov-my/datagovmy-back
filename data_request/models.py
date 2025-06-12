@@ -17,6 +17,13 @@ class Agency(models.Model):
     class Meta:
         verbose_name_plural = "agencies"
 
+class DataRequestAdminEmail(models.Model):
+    email = models.EmailField(unique=True, help_text="Email address of the data request administrator")
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Data Request Admin Email"
+        verbose_name_plural = "Data Request Admin Emails"
 
 class DataRequest(models.Model):
     STATUS_CHOICES = [
