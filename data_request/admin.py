@@ -11,9 +11,10 @@ from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
 from data_catalogue.models import DataCatalogueMeta
-from data_request.models import Agency, DataRequest
+from data_request.models import Agency, DataRequest, DataRequestAdminEmail
 from data_request.serializers import DataRequestSerializer
 
+bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
 
 class DataRequestAdminForm(forms.ModelForm):
     published_data = forms.ModelMultipleChoiceField(
@@ -93,7 +94,7 @@ class DataRequestAdmin(TranslationAdmin):
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
-            )
+            ) + bcc_list
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
@@ -138,6 +139,7 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=obj.agency.emails,
+                    bcc=bcc_list,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
@@ -165,6 +167,10 @@ class AgencyInline(TranslationTabularInline):
 class AgencyAdmin(TranslationAdmin, DynamicArrayMixin):
     list_display = ["acronym", "name_en", "name_ms"]
 
+@admin.register(DataRequestAdminEmail)
+class DataRequestAdminEmailAdmin(admin.ModelAdmin):
+    list_display = ('email', 'added_at')
+    search_fields = ('email',)
 
 admin.site.register(DataRequest, DataRequestAdmin)
 admin.site.register(Agency, AgencyAdmin)
