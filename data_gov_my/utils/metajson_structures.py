@@ -59,7 +59,7 @@ class DashboardChartModel(BaseModel):
             return v
 
         raise ValueError(
-            "Invalid data_as_of formats! (should be %Y-%m-%d %H:%M, %Y-%m, %Y or r'^\d{4}-Q[1-4]$')"
+            r"Invalid data_as_of formats! (should be %Y-%m-%d %H:%M, %Y-%m, %Y or r'^\d{4}-Q[1-4]$')"
         )
 
 
