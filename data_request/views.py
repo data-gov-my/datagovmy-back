@@ -113,7 +113,14 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             email = mail.send(
                 sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                 recipients=recipient,
-                bcc=bcc_list,
+                language=email_lang,
+                template=self.FORM_TYPE,
+                context=context,
+                backend="data_request",
+            )
+            email = mail.send(
+                sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                recipients=bcc_list,
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,
