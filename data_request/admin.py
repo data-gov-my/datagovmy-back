@@ -94,13 +94,14 @@ class DataRequestAdmin(TranslationAdmin):
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
-            ) + bcc_list
+            )
             email_context = DataRequestSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
-                    bcc=list(recipients),
+                    recipients=list(recipients),
+                    cc=bcc_list,
                     template=template,
                     language="en-GB",
                     context=email_context,
@@ -116,7 +117,8 @@ class DataRequestAdmin(TranslationAdmin):
             if recipients.exists():
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
-                    bcc=list(recipients),
+                    recipients=list(recipients),
+                    cc=bcc_list,
                     template=template,
                     language="ms-MY",
                     context=email_context,
@@ -140,7 +142,7 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=obj.agency.emails,
-                    bcc=bcc_list,
+                    cc=bcc_list,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
