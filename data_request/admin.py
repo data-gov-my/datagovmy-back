@@ -11,7 +11,7 @@ from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 from post_office import mail
 
 from data_catalogue.models import DataCatalogueMeta
-from data_request.models import Agency, DataRequest
+from data_request.models import Agency, DataRequest, DataRequestAdminEmail
 from data_request.serializers import DataRequestSerializer
 
 
@@ -90,6 +90,7 @@ class DataRequestAdmin(TranslationAdmin):
         return form
 
     def send_subscribtion_emails(self, obj: DataRequest, template: str, context={}):
+        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
@@ -99,7 +100,7 @@ class DataRequestAdmin(TranslationAdmin):
             if recipients.exists():
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
-                    bcc=list(recipients),
+                    recipients=list(recipients),
                     template=template,
                     language="en-GB",
                     context=email_context,
@@ -115,7 +116,7 @@ class DataRequestAdmin(TranslationAdmin):
             if recipients.exists():
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
-                    bcc=list(recipients),
+                    recipients=list(recipients),
                     template=template,
                     language="ms-MY",
                     context=email_context,
@@ -123,6 +124,7 @@ class DataRequestAdmin(TranslationAdmin):
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
+        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
         obj.published_data.set(form.cleaned_data.get("published_data"))
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
@@ -165,6 +167,10 @@ class AgencyInline(TranslationTabularInline):
 class AgencyAdmin(TranslationAdmin, DynamicArrayMixin):
     list_display = ["acronym", "name_en", "name_ms"]
 
+@admin.register(DataRequestAdminEmail)
+class DataRequestAdminEmailAdmin(admin.ModelAdmin):
+    list_display = ('email', 'added_at')
+    search_fields = ('email',)
 
 admin.site.register(DataRequest, DataRequestAdmin)
 admin.site.register(Agency, AgencyAdmin)
