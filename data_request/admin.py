@@ -101,7 +101,6 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=list(recipients),
-                    cc=bcc_list,
                     template=template,
                     language="en-GB",
                     context=email_context,
@@ -118,7 +117,6 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=list(recipients),
-                    cc=bcc_list,
                     template=template,
                     language="ms-MY",
                     context=email_context,
@@ -142,7 +140,6 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
                     recipients=obj.agency.emails,
-                    cc=bcc_list,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
