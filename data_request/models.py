@@ -42,6 +42,7 @@ class DataRequest(models.Model):
         max_length=20, choices=STATUS_CHOICES, default="submitted"
     )
     remark = models.TextField(blank=True, null=True)  # translatable
+    live_remark = models.TextField(blank=True, null=True)
     # keep track of dates
     date_submitted = models.DateTimeField(auto_now_add=True)
     date_under_review = models.DateTimeField(null=True, blank=True)
