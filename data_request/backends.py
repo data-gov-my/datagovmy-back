@@ -22,7 +22,11 @@ class DataRequestEmailBackend(BaseEmailBackend):
             try:
                 response = self.client.send_email(
                     Source=message.from_email,
-                    Destination={'ToAddresses': message.to},
+                    Destination={
+                        'ToAddresses': message.to,
+                        'CcAddresses': message.cc,
+                        'BccAddresses': message.bcc
+                    },
                     Message={
                         'Subject': {'Data': message.subject},
                         'Body': {
