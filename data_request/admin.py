@@ -99,12 +99,12 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
-                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                    sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=list(recipients),
                     template=template,
                     language="en-GB",
                     context=email_context,
-                    backend="data_request",
+                    backend="datagovmy_ses",
                 )
 
         with translation.override("ms"):
@@ -115,12 +115,12 @@ class DataRequestAdmin(TranslationAdmin):
             email_context.update(context)
             if recipients.exists():
                 mail.send(
-                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                    sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=list(recipients),
                     template=template,
                     language="ms-MY",
                     context=email_context,
-                    backend="data_request",
+                    backend="datagovmy_ses",
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
@@ -138,12 +138,12 @@ class DataRequestAdmin(TranslationAdmin):
             with translation.override("ms"):
                 context = DataRequestSerializer(obj).data
                 mail.send(
-                    sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                    sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=obj.agency.emails,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,
-                    backend="data_request",
+                    backend="datagovmy_ses",
                 )
         elif obj.status in ["rejected", "data_published"]:
             obj.date_completed = timezone.now()

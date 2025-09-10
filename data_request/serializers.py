@@ -55,6 +55,7 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "purpose_of_request",
             "status",
             "remark",
+            "live_remark",
             "name",
             "email",
             "institution",

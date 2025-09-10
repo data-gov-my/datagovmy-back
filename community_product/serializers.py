@@ -8,6 +8,7 @@ class CommunityProductListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "thumbnail",
+            "thumbnail_s3",
             "product_name",
             "product_description",
             "product_type",
@@ -25,6 +26,7 @@ class CommunityProductSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "thumbnail",
+            "thumbnail_s3",
             "name",
             "email",
             "institution",
