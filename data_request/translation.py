@@ -5,7 +5,7 @@ from data_request.models import Agency, DataRequest
 
 @register(DataRequest)
 class DataRequestTranslationOptions(TranslationOptions):
-    fields = ("dataset_title", "dataset_description", "remark")
+    fields = ("dataset_title", "dataset_description", "remark", "live_remark")
     fallback_languages = {"default": ("en", "ms")}
 
 
