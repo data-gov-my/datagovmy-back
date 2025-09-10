@@ -13,7 +13,7 @@ class DataGovMYSESBackend(BaseEmailBackend):
             'ses',
             region_name=settings.AWS_SES_REGION_NAME,
             aws_access_key_id=settings.AWS_SES_ACCESS_KEY_ID_DATA_GOV_MY,
-            aws_secret_access_key=settings.AWS_SES_SECRET_ACCESS_KEY_GOV_MY,
+            aws_secret_access_key=settings.AWS_SES_SECRET_ACCESS_KEY_DATA_GOV_MY,
         )
 
     def send_messages(self, email_messages):
