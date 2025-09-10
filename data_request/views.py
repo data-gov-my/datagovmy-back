@@ -50,7 +50,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         # send email to notify subscription
         try:
             mail.send(
-                sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                sender=settings.DATA_GOV_MY_FROM_EMAIL,
                 recipients=email,
                 bcc=bcc_list,
                 language=serializer.validated_data["language"],
@@ -67,7 +67,7 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
                     ),
                     "agency": data_request.agency,
                 },
-                backend="data_request",
+                backend="datagovmy_ses",
             )
         except Exception as e:
             logging.error(e)
@@ -111,13 +111,13 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             context = serializer.data
             context["name"] = data.get("name")
             email = mail.send(
-                sender=settings.DEFAULT_FROM_EMAIL_DATA_REQUEST,
+                sender=settings.DATA_GOV_MY_FROM_EMAIL,
                 recipients=recipient,
                 bcc=bcc_list,
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,
-                backend="data_request",
+                backend="datagovmy_ses",
             )
         except Exception as e:
             logging.error(e)

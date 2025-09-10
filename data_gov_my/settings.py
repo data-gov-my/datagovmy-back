@@ -215,7 +215,7 @@ EMAIL_BACKEND = "post_office.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
-DEFAULT_FROM_EMAIL_DATA_REQUEST = os.getenv("DEFAULT_FROM_EMAIL_DATA_REQUEST")
+DATA_GOV_MY_FROM_EMAIL = os.getenv("DATA_GOV_MY_FROM_EMAIL")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
@@ -226,13 +226,13 @@ POST_OFFICE = {"CELERY_ENABLED": True}
 if not DEBUG:
     POST_OFFICE["BACKENDS"] = {
         "default": "django_ses.SESBackend",
-        "data_request": "data_request.backends.DataRequestEmailBackend",
+        "datagovmy_ses": "data_gov_my.backends.DataGovMYSESBackend"
     }
     # django-ses
     AWS_SES_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
-    AWS_SES_ACCESS_KEY_ID_DATA_REQUEST = os.getenv("AWS_SES_ACCESS_KEY_ID_DATA_REQUEST")
+    AWS_SES_ACCESS_KEY_ID_DATA_GOV_MY = os.getenv("AWS_SES_ACCESS_KEY_ID_DATA_GOV_MY")
     AWS_SES_SECRET_ACCESS_KEY = os.getenv("AWS_SES_SECRET_ACCESS_KEY")
-    AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST = os.getenv("AWS_SES_SECRET_ACCESS_KEY_DATA_REQUEST")
+    AWS_SES_SECRET_ACCESS_KEY_DATA_GOV_MY = os.getenv("AWS_SES_SECRET_ACCESS_KEY_DATA_GOV_MY")
     USE_SES_V2 = os.getenv("USE_SES_V2")
     AWS_SES_REGION_NAME = os.getenv("AWS_SES_REGION_NAME")
     AWS_SES_REGION_ENDPOINT = os.getenv("AWS_SES_REGION_ENDPOINT")

@@ -8,6 +8,7 @@ from threading import Thread
 
 import environ
 import requests
+from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -323,10 +324,12 @@ class FORMS(generics.ListAPIView):
             recipient = form_data.get_recipient()
             if recipient:
                 email = mail.send(
+                    sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=recipient,
                     template=template.email_template,
                     language=form_data.language,
                     context=form_data.form_data,
+                    backend="datagovmy_ses",
                 )
                 form_data.email = email
                 form_data.save(update_fields=["email"])
