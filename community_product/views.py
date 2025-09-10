@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import QueryDict
 from django.utils import translation
 from post_office import mail
@@ -50,10 +51,12 @@ class CommunityProductCreateView(generics.CreateAPIView):
             # send email
             try:
                 email = mail.send(
+                    sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=serializer.data.get("email"),
                     language=language,
                     template=self.FORM_TYPE,
                     context=serializer.data,
+                    backend="datagovmy_ses",
                 )
 
             except Exception as e:
