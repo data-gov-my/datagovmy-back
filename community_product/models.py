@@ -38,6 +38,7 @@ class CommunityProduct(models.Model):
     thumbnail = models.ImageField(
         null=True, blank=True, upload_to="community-products/"
     )
+    thumbnail_s3 = models.URLField(null=True, blank=True, verbose_name="Thumbnail S3")
     product_name = models.CharField(max_length=255)  # translatable
     product_description = models.TextField()  # translatable
     problem_statement = models.TextField()  # translatable
