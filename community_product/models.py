@@ -77,8 +77,8 @@ class CommunityProduct(models.Model):
             for field in translate_fields:
                 if not getattr(self, field + "_ms"):
                     errors[field + "_ms"] = "This field is required."
-            if not self.thumbnail:
-                errors["thumbnail"] = "This field is required."
+            if not self.thumbnail_s3:
+                errors["thumbnail_s3"] = "This field is required."
 
         elif self.status == "rejected":
             if not self.remark_en:
