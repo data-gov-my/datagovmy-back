@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import admin
 from django.utils import translation, timezone
 from modeltranslation.admin import TranslationAdmin
@@ -47,6 +48,7 @@ class CommunityProductAdmin(TranslationAdmin):
             with translation.override(obj.language):
                 try:
                     mail.send(
+                        sender=settings.DATA_GOV_MY_FROM_EMAIL,
                         recipients=obj.email,
                         language=obj.language,
                         template=self.COMMUNITY_PRODUCT_APPROVED_TEMPLATE,
@@ -54,6 +56,7 @@ class CommunityProductAdmin(TranslationAdmin):
                             name=obj.name,
                             product_name=getattr(obj, f"product_name_{obj.language}"),
                         ),
+                        backend="datagovmy_ses",
                     )
                 except Exception as e:
                     logging.error(e)
@@ -62,6 +65,7 @@ class CommunityProductAdmin(TranslationAdmin):
             with translation.override(obj.language):
                 try:
                     mail.send(
+                        sender=settings.DATA_GOV_MY_FROM_EMAIL,
                         recipients=obj.email,
                         language=obj.language,
                         template=self.COMMUNITY_PRODUCT_REJECTED_TEMPLATE,
@@ -70,6 +74,7 @@ class CommunityProductAdmin(TranslationAdmin):
                             product_name=getattr(obj, f"product_name_{obj.language}"),
                             reason=getattr(obj, f"remark_{obj.language}"),
                         ),
+                        backend="datagovmy_ses",
                     )
                 except Exception as e:
                     logging.error(e)
