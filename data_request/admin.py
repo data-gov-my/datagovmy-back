@@ -90,7 +90,7 @@ class DataRequestAdmin(TranslationAdmin):
         return form
 
     def send_subscribtion_emails(self, obj: DataRequest, template: str, context={}):
-        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
+        cc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
@@ -101,7 +101,7 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=list(recipients),
-                    cc=bcc_list,
+                    cc=cc_list,
                     template=template,
                     language="en-GB",
                     context=email_context,
@@ -118,7 +118,7 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=list(recipients),
-                    cc=bcc_list,
+                    cc=cc_list,
                     template=template,
                     language="ms-MY",
                     context=email_context,
@@ -126,7 +126,7 @@ class DataRequestAdmin(TranslationAdmin):
                 )
 
     def save_model(self, request: Any, obj: Any, form: Any, change: Any) -> None:
-        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
+        cc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
         obj.published_data.set(form.cleaned_data.get("published_data"))
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
@@ -142,7 +142,7 @@ class DataRequestAdmin(TranslationAdmin):
                 mail.send(
                     sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=obj.agency.emails,
-                    cc=bcc_list,
+                    cc=cc_list,
                     template=self.DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE,
                     language="ms",
                     context=context,

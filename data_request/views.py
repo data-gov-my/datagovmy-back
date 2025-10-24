@@ -23,6 +23,7 @@ from data_request.serializers import (
     SubscriptionSerializer,
 )
 
+
 class SubscriptionCreateAPIView(generics.CreateAPIView):
     serializer_class = SubscriptionSerializer
     FORM_TYPE = "data_request_subscription"
@@ -45,14 +46,14 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
 
         subscription = serializer.save()
         data_request.subscription_set.add(subscription)
-        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
+        cc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
 
         # send email to notify subscription
         try:
             mail.send(
                 sender=settings.DATA_GOV_MY_FROM_EMAIL,
                 recipients=email,
-                bcc=bcc_list,
+                cc=cc_list,
                 language=serializer.validated_data["language"],
                 template=self.FORM_TYPE,
                 context={
@@ -104,7 +105,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
 
         headers = self.get_success_headers(serializer.data)
         recipient = serializer.validated_data.get("email")
-        bcc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
+        cc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
 
         # FIXME: use proper celery worker to queue send emails
         try:
@@ -113,7 +114,7 @@ class DataRequestCreateAPIView(generics.CreateAPIView):
             email = mail.send(
                 sender=settings.DATA_GOV_MY_FROM_EMAIL,
                 recipients=recipient,
-                bcc=bcc_list,
+                cc=cc_list,
                 language=email_lang,
                 template=self.FORM_TYPE,
                 context=context,
