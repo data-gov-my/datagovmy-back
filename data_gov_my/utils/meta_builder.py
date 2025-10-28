@@ -437,10 +437,10 @@ class DashboardBuilder(GeneralMetaBuilder):
 
     def delete_file(self, filename: str, data: dict):
         meta_count, meta_deleted = MetaJson.objects.filter(
-            dashboard_name=data.get("dashboard_name")
+            dashboard_name=Path(filename).stem
         ).delete()
         dashboard_count, dashboard_deleted = DashboardJson.objects.filter(
-            dashboard_name=data.get("dashboard_name")
+            dashboard_name=Path(filename).stem
         ).delete()
         meta_deleted.update(dashboard_deleted)
         return meta_count + dashboard_count, meta_deleted
@@ -453,11 +453,11 @@ class DashboardBuilder(GeneralMetaBuilder):
             "sites": metadata.sites,
         }
         obj, created = MetaJson.objects.update_or_create(
-            dashboard_name=metadata.dashboard_name,
+            dashboard_name=Path(filename).stem,
             defaults=updated_values,
         )
 
-        cache.set("META_" + metadata.dashboard_name, dashboard_meta)
+        cache.set("META_" + Path(filename).stem, dashboard_meta)
         return obj
 
     def additional_handling(
