@@ -12,7 +12,7 @@ from post_office import mail
 
 from data_catalogue.models import DataCatalogueMeta
 from data_request.models import Agency, DataRequest, DataRequestAdminEmail
-from data_request.serializers import DataRequestSerializer
+from data_request.serializers import DataRequestEmailContextSerializer
 
 
 class DataRequestAdminForm(forms.ModelForm):
@@ -42,8 +42,8 @@ class DataRequestAdminForm(forms.ModelForm):
             if errors:
                 raise forms.ValidationError(errors)
         if status == "data_published" and not (
-                published_data.exists()
-                or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+            published_data.exists()
+            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
         ):
             raise forms.ValidationError(
                 {
@@ -95,7 +95,7 @@ class DataRequestAdmin(TranslationAdmin):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
                 "email", flat=True
             )
-            email_context = DataRequestSerializer(obj).data
+            email_context = DataRequestEmailContextSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
                 mail.send(
@@ -112,7 +112,7 @@ class DataRequestAdmin(TranslationAdmin):
             recipients = obj.subscription_set.filter(language="ms-MY").values_list(
                 "email", flat=True
             )
-            email_context = DataRequestSerializer(obj).data
+            email_context = DataRequestEmailContextSerializer(obj).data
             email_context.update(context)
             if recipients.exists():
                 mail.send(
@@ -138,7 +138,7 @@ class DataRequestAdmin(TranslationAdmin):
             )
             # send email to agency to request for review
             with translation.override("ms"):
-                context = DataRequestSerializer(obj).data
+                context = DataRequestEmailContextSerializer(obj).data
                 mail.send(
                     sender=settings.DATA_GOV_MY_FROM_EMAIL,
                     recipients=obj.agency.emails,

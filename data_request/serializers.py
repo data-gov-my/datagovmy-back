@@ -55,13 +55,26 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "purpose_of_request",
             "status",
             "remark",
-            "live_remark",
             "name",
             "email",
             "institution",
             "language",
             "total_subscribers",
             "published_data",
+        ]
+
+
+class DataRequestEmailContextSerializer(serializers.ModelSerializer):
+    # Render agency as its translated name instead of primary key
+    agency = serializers.CharField(source="agency.name", read_only=True)
+
+    class Meta:
+        model = DataRequest
+        fields = [
+            "ticket_id",
+            "dataset_title",
+            "agency",
+            "live_remark",
         ]
 
 
