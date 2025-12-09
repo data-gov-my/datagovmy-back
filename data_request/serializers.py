@@ -45,6 +45,30 @@ class DataRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataRequest
         fields = [
+            # Note: Must not include live_remark field
+            "ticket_id",
+            "date_submitted",
+            "date_under_review",
+            "date_completed",
+            "dataset_title",
+            "dataset_description",
+            "agency",
+            "purpose_of_request",
+            "status",
+            "remark",
+            "name",
+            "email",
+            "institution",
+            "language",
+            "total_subscribers",
+            "published_data",
+        ]
+
+
+class DataRequestEmailContextSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataRequest
+        fields = [
             "ticket_id",
             "date_submitted",
             "date_under_review",
