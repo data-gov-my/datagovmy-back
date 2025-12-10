@@ -112,7 +112,7 @@ class Command(BaseCommand):
     ) -> None:
         prefix = "(dry-run) " if dry_run else ""
         self.stdout.write(
-            f"{prefix}[{obj.ticket_id}] send template={template} lang={language} to={to} recipients={recipients} cc={cc_list}"
+            f"{prefix}[{obj.ticket_id} - {obj.dataset_title}] send template={template} lang={language} to={to} recipients={recipients} cc={cc_list}"
         )
         if not dry_run:
             mail.send(
