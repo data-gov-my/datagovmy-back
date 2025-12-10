@@ -55,6 +55,8 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "purpose_of_request",
             "status",
             "remark",
+            # Must exclude live_remark field from API request/response
+            # "live_remark"
             "name",
             "email",
             "institution",
@@ -62,8 +64,6 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "total_subscribers",
             "published_data",
         ]
-        # Must exclude live_remark field from API request/response
-        exclude = ["live_remark"]
 
 
 # Serializer for data request emails' context
