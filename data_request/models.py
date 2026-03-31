@@ -30,6 +30,7 @@ class DataRequest(models.Model):
         ("submitted", "Submitted"),
         ("under_review", "Under Review"),
         ("rejected", "Rejected"),
+        ("data_provided", "Data Provided"),
         ("data_published", "Data Published"),
     ]
     ticket_id = models.AutoField(primary_key=True, editable=False)
