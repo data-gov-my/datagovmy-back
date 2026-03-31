@@ -41,9 +41,23 @@ class DataRequestAdminForm(forms.ModelForm):
                 errors["remark_ms"] = "This field is required."
             if errors:
                 raise forms.ValidationError(errors)
+        if status == "data_provided":
+            errors = {}
+            live_remark_en: str = cleaned_data.get("live_remark_en") or ""
+            live_remark_ms: str = cleaned_data.get("live_remark_ms") or ""
+            if not live_remark_en:
+                errors["live_remark_en"] = "This field is required."
+            if not live_remark_ms:
+                errors["live_remark_ms"] = "This field is required."
+            if published_data.exists():
+                errors["published_data"] = (
+                    'Published data items must not be set for "data_provided" status. Use "data_published" instead.'
+                )
+            if errors:
+                raise forms.ValidationError(errors)
         if status == "data_published" and not (
-                published_data.exists()
-                or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
+            published_data.exists()
+            or (self.DOCS_SITE_URL in remark_en and self.DOCS_SITE_URL in remark_ms)
         ):
             raise forms.ValidationError(
                 {
@@ -56,10 +70,11 @@ class DataRequestAdminForm(forms.ModelForm):
 
 
 class DataRequestAdmin(TranslationAdmin):
-    list_display = ['ticket_id', 'dataset_title', 'get_requestor_name_email']
+    list_display = ["ticket_id", "dataset_title", "get_requestor_name_email"]
 
     def get_requestor_name_email(self, obj):
         return f"{obj.subscription_set.first().name} ({obj.subscription_set.first().email})"
+
     get_requestor_name_email.short_description = "Requestor"
     get_requestor_name_email.admin_order_field = "subscription_set__name"
 
@@ -74,6 +89,7 @@ class DataRequestAdmin(TranslationAdmin):
     list_filter = ["status"]  # Add the 'status' field to enable filtering
     DATA_REQUEST_UNDER_REVIEW_TEMPLATE = "data_request_under_review"
     DATA_REQUEST_AGENCY_NOTIFICATION_TEMPLATE = "data_request_agency_notification"
+    DATA_REQUEST_DATA_PROVIDED_TEMPLATE = "data_request_data_provided"
     DATA_REQUEST_DATA_PUBLISHED_TEMPLATE = "data_request_data_published"
     DATA_REQUEST_REJECTED_TEMPLATE = "data_request_rejected"
 
@@ -148,14 +164,16 @@ class DataRequestAdmin(TranslationAdmin):
                     context=context,
                     backend="datagovmy_ses",
                 )
-        elif obj.status in ["rejected", "data_published"]:
+        elif obj.status in ["rejected", "data_provided", "data_published"]:
             obj.date_completed = timezone.now()
         super().save_model(request, obj, form, change)
 
         # after model is saved, make sure to send relevant emails
         if obj.status == "rejected":
+            self.send_subscribtion_emails(obj=obj, template=self.DATA_REQUEST_REJECTED_TEMPLATE)
+        if obj.status == "data_provided":
             self.send_subscribtion_emails(
-                obj=obj, template=self.DATA_REQUEST_REJECTED_TEMPLATE
+                obj=obj, template=self.DATA_REQUEST_DATA_PROVIDED_TEMPLATE
             )
         if obj.status == "data_published":
             self.send_subscribtion_emails(
@@ -170,10 +188,12 @@ class AgencyInline(TranslationTabularInline):
 class AgencyAdmin(TranslationAdmin, DynamicArrayMixin):
     list_display = ["acronym", "name_en", "name_ms"]
 
+
 @admin.register(DataRequestAdminEmail)
 class DataRequestAdminEmailAdmin(admin.ModelAdmin):
-    list_display = ('email', 'added_at')
-    search_fields = ('email',)
+    list_display = ("email", "added_at")
+    search_fields = ("email",)
+
 
 admin.site.register(DataRequest, DataRequestAdmin)
 admin.site.register(Agency, AgencyAdmin)
