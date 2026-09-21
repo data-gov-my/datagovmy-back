@@ -89,8 +89,10 @@ class General_Explorer:
 
     def populate_db(self, table="", source=None, rebuild=False):
         if table:  # If set, builds only the table requested
+            # The MetaJSON's `source` wins over `data_populate`, so a table can
+            # be pointed at a different file without a code change.
             self.bulk_insert(
-                self.data_populate[table],
+                source or self.data_populate[table],
                 table,
                 rebuild,
                 self.batch_size,
