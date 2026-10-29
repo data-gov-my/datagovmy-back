@@ -105,7 +105,7 @@ class DataRequestAdmin(TranslationAdmin):
 
         return form
 
-    def send_subscribtion_emails(self, obj: DataRequest, template: str, context={}):
+    def send_subscription_emails(self, obj: DataRequest, template: str, context={}):
         cc_list = [email.email for email in DataRequestAdminEmail.objects.all()]
         with translation.override("en"):
             recipients = obj.subscription_set.filter(language="en-GB").values_list(
@@ -147,7 +147,7 @@ class DataRequestAdmin(TranslationAdmin):
         if obj.status == "under_review" and not obj.date_under_review:
             obj.date_under_review = timezone.now()
             # send email updating user that it is now under review
-            self.send_subscribtion_emails(
+            self.send_subscription_emails(
                 obj=obj,
                 template=self.DATA_REQUEST_UNDER_REVIEW_TEMPLATE,
                 context={"name": obj.subscription_set.first().name},
@@ -170,13 +170,13 @@ class DataRequestAdmin(TranslationAdmin):
 
         # after model is saved, make sure to send relevant emails
         if obj.status == "rejected":
-            self.send_subscribtion_emails(obj=obj, template=self.DATA_REQUEST_REJECTED_TEMPLATE)
+            self.send_subscription_emails(obj=obj, template=self.DATA_REQUEST_REJECTED_TEMPLATE)
         if obj.status == "data_provided":
-            self.send_subscribtion_emails(
+            self.send_subscription_emails(
                 obj=obj, template=self.DATA_REQUEST_DATA_PROVIDED_TEMPLATE
             )
         if obj.status == "data_published":
-            self.send_subscribtion_emails(
+            self.send_subscription_emails(
                 obj=obj, template=self.DATA_REQUEST_DATA_PUBLISHED_TEMPLATE
             )
 
