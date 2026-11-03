@@ -13,6 +13,7 @@ class AuthMiddleware:
         "AUTH_TOKEN": ["POST"],
         "UPDATE_VIEW_COUNT": ["POST"],
         "FORMS": ["DELETE"],
+        "AgencyCreateAPIView": ["POST"],
     }
 
     def __init__(self, get_response):
