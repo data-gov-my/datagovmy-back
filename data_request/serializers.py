@@ -64,6 +64,8 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "total_subscribers",
             "published_data",
         ]
+        # Set only by admins in the Django admin; never from the public form.
+        read_only_fields = ["status", "remark", "date_under_review", "date_completed"]
 
 
 # Serializer for data request emails' context
