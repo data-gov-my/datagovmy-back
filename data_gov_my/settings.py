@@ -73,12 +73,21 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # Before AuthMiddleware so rejected requests are logged too.
+    "drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware",
     "data_gov_my.middleware.auth_middleware.AuthMiddleware",
 ]
 
 ROOT_URLCONF = "data_gov_my.urls"
 
-DRF_API_LOGGER_DATABASE = False  # Default to False
+# Audit log of write requests in Postgres (table drf_api_logs, viewable in the admin).
+# The real client IP is the DO_CONNECTING_IP header; client_ip_address trusts X-Forwarded-For.
+DRF_API_LOGGER_DATABASE = True
+DRF_API_LOGGER_METHODS = ["POST", "PUT", "PATCH", "DELETE"]
+DRF_API_LOGGER_SKIP_URL_NAME = ["AUTH_TOKEN"]
+DRF_API_LOGGER_EXCLUDE_KEYS = ["AUTHORIZATION", "COOKIE"]
+DRF_API_LOGGER_MAX_REQUEST_BODY_SIZE = 64 * 1024
+DRF_API_LOGGER_MAX_RESPONSE_BODY_SIZE = 64 * 1024
 
 TEMPLATES = [
     {

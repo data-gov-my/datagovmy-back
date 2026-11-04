@@ -43,3 +43,5 @@ class CommunityProductSerializer(serializers.ModelSerializer):
             "language",
             "date_approved",
         ]
+        # Set only by admins in the Django admin; never from the public form.
+        read_only_fields = ["status", "date_approved", "thumbnail", "thumbnail_s3"]
