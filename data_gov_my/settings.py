@@ -88,6 +88,9 @@ DRF_API_LOGGER_SKIP_URL_NAME = ["AUTH_TOKEN"]
 DRF_API_LOGGER_EXCLUDE_KEYS = ["AUTHORIZATION", "COOKIE"]
 DRF_API_LOGGER_MAX_REQUEST_BODY_SIZE = 64 * 1024
 DRF_API_LOGGER_MAX_RESPONSE_BODY_SIZE = 64 * 1024
+# drf_api_logger skips paths starting with MEDIA_URL; Django's default "" would skip every request.
+# Uploaded files are served from S3 (AWS_S3_CUSTOM_DOMAIN), so this URL is otherwise unused.
+MEDIA_URL = "/media/"
 
 TEMPLATES = [
     {
