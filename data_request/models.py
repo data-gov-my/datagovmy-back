@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import connection, models, transaction
+from django.db.models import Max
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 from data_gov_my.utils.common import LANGUAGE_CHOICES
@@ -54,6 +55,22 @@ class DataRequest(models.Model):
 
     def __str__(self) -> str:
         return f"{self.ticket_id} ({self.dataset_title})"
+
+    def save(self, *args, **kwargs):
+        # Ticket IDs are public, so keep them gapless: a Postgres sequence skips numbers
+        # after failovers and failed inserts. The lock serialises concurrent submissions
+        # until the surrounding transaction ends; reads are not blocked.
+        if self._state.adding and self.ticket_id is None:
+            with transaction.atomic():
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        f"LOCK TABLE {self._meta.db_table} IN SHARE ROW EXCLUSIVE MODE"
+                    )
+                last = DataRequest.objects.aggregate(last=Max("ticket_id"))["last"]
+                self.ticket_id = (last or 0) + 1
+                kwargs["force_insert"] = True
+                return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class Subscription(models.Model):

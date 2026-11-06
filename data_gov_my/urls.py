@@ -97,10 +97,6 @@ urlpatterns = [
         "community-product/",
         include("community_product.urls"),
     ),
-    path(
-        "address/",
-        include("address.urls"),
-    ),
 ]
 
 urlpatterns += [path("django-rq/", include("django_rq.urls"))]
