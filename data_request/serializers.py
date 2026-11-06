@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import serializers
 
 from data_catalogue.models import DataCatalogueMeta
@@ -36,10 +37,12 @@ class DataRequestSerializer(serializers.ModelSerializer):
             "institution": validated_data.pop("institution", ""),
             "language": validated_data.pop("language"),
         }
-        created_data_request = super().create(validated_data)
-        Subscription.objects.create(
-            data_request=created_data_request, **subscriber_data
-        )
+        # One transaction, so a failed subscriber insert doesn't leave a ticket behind.
+        with transaction.atomic():
+            created_data_request = super().create(validated_data)
+            Subscription.objects.create(
+                data_request=created_data_request, **subscriber_data
+            )
         return created_data_request
 
     class Meta:
